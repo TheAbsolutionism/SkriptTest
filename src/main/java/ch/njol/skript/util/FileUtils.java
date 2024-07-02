@@ -33,7 +33,6 @@ import java.util.Comparator;
 
 import org.skriptlang.skript.lang.converter.Converter;
 
-import javax.annotation.Nullable;
 
 /**
  * @author Peter Güttinger

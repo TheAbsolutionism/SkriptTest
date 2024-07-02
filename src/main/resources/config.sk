@@ -320,9 +320,9 @@ databases:
 
 		backup interval: 2 hours
 
-		backup purge: false
-		purge required: 50
-		purge remain: 20
+		backup purge: false #set to "true" to enable the automatic purging feature
+		purge required: 50 #Number of backup files required in order to start the purge process
+		purge remain: 20 #Number of files to be left remaining when purge starts
 
 	# PS: If you don't want some variables to be saved in any database (e.g. variables that contain an %entity% which usually despawn when the server is shut down)
 	# you can modify the last database's pattern to not match all variables, e.g. use '(?!x_).*' to match all variables that don't start with 'x_'.
