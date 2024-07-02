@@ -226,7 +226,7 @@ public abstract class VariablesStorage implements Closeable {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
 
 				if (backupInterval != null)
-					startBackupTask(backupInterval);
+					startBackupTask(backupInterval, sectionNode);
 			}
 		}
 
@@ -307,11 +307,26 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param backupInterval the backup interval.
 	 */
-	public void startBackupTask(Timespan backupInterval) {
+	public void startBackupTask(Timespan backupInterval, SectionNode sectionNode) {
 		// File is null or backup interval is invalid
 		if (file == null || backupInterval.getTicks() == 0)
 			return;
-
+		boolean purge = getValue(sectionNode, "backup purge", Boolean.class);
+		final Integer required = getValue(sectionNode, "purge required", Integer.class);
+		Integer remain = getValue(sectionNode, "purge remain", Integer.class);
+		if (required == null) {
+            purge = false;
+			Skript.error("Automatic variables backup purge disabling: Config - purge require is null");
+		}
+		if (remain == null) {
+			purge = false;
+			Skript.error("Automatic variables backup purge disabling: Config - purge remain is null");
+		} else if (remain <= 0) {
+			remain = 1;
+			Skript.error("Automatic variables backup purge: Config - purge remain <= 0. Defaulting to 1");
+		}
+		final boolean finalpurge = purge;
+		final Integer finalremain = remain;
 		backupTask = new Task(Skript.getInstance(), backupInterval.getTicks(), backupInterval.getTicks(), true) {
 			@Override
 			public void run() {
@@ -321,6 +336,13 @@ public abstract class VariablesStorage implements Closeable {
 					try {
 						// ..., then backup
 						FileUtils.backup(file);
+						if (finalpurge) {
+							try {
+								FileUtils.backupPurge(required, finalremain);
+							} catch (IOException e) {
+								Skript.error("Automatic variables backup purge failed: " + e.getLocalizedMessage());
+							}
+						}
 					} catch (IOException e) {
 						Skript.error("Automatic variables backup failed: " + e.getLocalizedMessage());
 					} finally {
