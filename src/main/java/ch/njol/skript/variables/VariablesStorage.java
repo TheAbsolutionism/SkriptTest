@@ -314,17 +314,22 @@ public abstract class VariablesStorage implements Closeable {
 		boolean purge = getValue(sectionNode, "backup purge", Boolean.class);
 		final Integer required = getValue(sectionNode, "purge required", Integer.class);
 		Integer remain = getValue(sectionNode, "purge remain", Integer.class);
-		if (required == null) {
-            purge = false;
-			Skript.error("Automatic variables backup purge disabling: Config - purge require is null");
+		if (purge) {
+			if (required == null || required <= 0) {
+				purge = false;
+				Skript.error("Disabling automatic variables backup purge: Config - purge require is invalid");
+			} else if (remain == null) {
+				purge = false;
+				Skript.error("Disabling automatic variables backup purge: Config - purge remain is null");
+			} else if (remain >= required) {
+				purge = false;
+				Skript.error("Disabling automatic variables backup purge: Config - purge remain can not be >= purge require");
+			} else if (remain <= 0) {
+				remain = 1;
+				Skript.error("Automatic variables backup purge: Config - purge remain <= 0. Defaulting to 1");
+			}
 		}
-		if (remain == null) {
-			purge = false;
-			Skript.error("Automatic variables backup purge disabling: Config - purge remain is null");
-		} else if (remain <= 0) {
-			remain = 1;
-			Skript.error("Automatic variables backup purge: Config - purge remain <= 0. Defaulting to 1");
-		}
+
 		final boolean finalpurge = purge;
 		final Integer finalremain = remain;
 		backupTask = new Task(Skript.getInstance(), backupInterval.getTicks(), backupInterval.getTicks(), true) {
