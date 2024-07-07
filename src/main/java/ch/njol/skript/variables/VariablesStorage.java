@@ -224,26 +224,23 @@ public abstract class VariablesStorage implements Closeable {
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
-				boolean purge = getValue(sectionNode, "backup purge", Boolean.class);
-				final Integer required = getValue(sectionNode, "purge required", Integer.class);
-				Integer remain = getValue(sectionNode, "purge remain", Integer.class);
+				boolean purge = getValue(sectionNode, "backup purge", boolean.class);
+				int required = getValue(sectionNode, "purge required", int.class);
+				int amount = getValue(sectionNode, "purge amount", int.class);
 				if (backupInterval != null)
 					if (purge) {
-						if (required == null || required <= 0) {
+						if (required <= 0) {
 							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - purge require is invalid");
-						} else if (remain == null) {
+							Skript.error("Disabling automatic variables backup purge: Config - 'purge require' is invalid");
+						} else if (amount <= 0) {
 							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - purge remain is null");
-						} else if (remain >= required) {
+							Skript.error("Disabling automatic variables backup purge: Config - 'purge amount' is invalid");
+						} else if (amount >= required) {
 							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - purge remain can not be >= purge require");
-						} else if (remain <= 0) {
-							remain = 1;
-							Skript.error("Automatic variables backup purge: Config - purge remain <= 0. Defaulting to 1");
+							Skript.error("Disabling automatic variables backup purge: Config - 'purge amount' is >= 'purge required'");
 						}
 					}
-					startBackupTask(backupInterval, purge, required, remain);
+                	startBackupTask(backupInterval, purge, required, amount);
 			}
 		}
 
@@ -324,7 +321,7 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param backupInterval the backup interval.
 	 */
-	public void startBackupTask(Timespan backupInterval, Boolean purge, Integer required, Integer remain) {
+	public void startBackupTask(Timespan backupInterval, boolean purge, int required, int amount) {
 		// File is null or backup interval is invalid
 		if (file == null || backupInterval.getTicks() == 0)
 			return;
@@ -339,7 +336,7 @@ public abstract class VariablesStorage implements Closeable {
 						FileUtils.backup(file);
 						if (purge) {
 							try {
-								FileUtils.backupPurge(required, remain);
+								FileUtils.backupPurge(required, amount);
 							} catch (IOException e) {
 								Skript.error("Automatic variables backup purge failed: " + e.getLocalizedMessage());
 							}
