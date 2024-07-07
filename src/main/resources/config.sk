@@ -340,6 +340,7 @@ databases:
 
 		# 'Backup purge' will check the specified number of backup files in the backup directory each time a backup file is created, if enabled
 		# If the number of backup files >= the number of 'purge required', it will delete files until number of files = `purge remain`, from oldest to newest in the backup directory
+		# 'purge required' can not be <= 0 , `purge remain` can not be <= 0 , `purge remain` can not be >= `purge required`
 
 		backup purge: false
 		purge required: 50
