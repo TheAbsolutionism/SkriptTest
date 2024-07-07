@@ -339,11 +339,11 @@ databases:
 		backup interval: 2 hours
 
 		# 'Backup purge' will check the specified number of backup files in the backup directory each time a backup file is created, if enabled
-		# If the number of backup files >= the number of 'purge required', it will delete 'purge amount' of files, from oldest to newest in the backup directory
+		# If the number of backup files >= the number of 'purge required', it will delete files until number of files = `purge remain`, from oldest to newest in the backup directory
 
 		backup purge: false
 		purge required: 50
-		purge amount: 30
+		purge remain: 20
 
 
 	# PS: If you don't want some variables to be saved in any database (e.g. variables that contain an %entity% which usually despawn when the server is shut down)

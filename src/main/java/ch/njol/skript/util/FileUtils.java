@@ -64,17 +64,18 @@ public abstract class FileUtils {
 		}
 	}
 
-	public static void backupPurge(int required, int amount) throws IOException {
-		if (required <= 0 || amount <= 0 || amount >= required)
+	public static void backupPurge(int required, int remain) throws IOException {
+		if (required <= 0 || remain <= 0 || remain >= required)
 			throw new IOException("Called with invalid inputs");
 		final File backupDir = new File("plugins/Skript/backups/");
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
 		final ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));
-		if (files == null || files.size() < required || files.size() <= amount)
+		if (files == null || files.size() < required || files.size() <= remain)
 			return;
 		files.sort(Comparator.comparingLong(File::lastModified));
-		for (int i = 0; i < amount; i++) {
+		final int Iterations = files.size() - remain;
+		for (int i = 0; i < Iterations; i++) {
 			files.get(i).delete();
 		}
 	}
