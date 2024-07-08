@@ -224,23 +224,15 @@ public abstract class VariablesStorage implements Closeable {
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
-				boolean purge = getValue(sectionNode, "backup purge", boolean.class);
-				int required = getValue(sectionNode, "purge required", int.class);
-				int remain = getValue(sectionNode, "purge remain", int.class);
+				int tokeep = getValue(sectionNode, "backups to keep", int.class);
+				boolean purge = false;
 				if (backupInterval != null)
-					if (purge) {
-						if (required <= 0) {
-							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - 'purge require' is invalid");
-						} else if (remain <= 0) {
-							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - 'purge remain' is invalid");
-						} else if (remain >= required) {
-							purge = false;
-							Skript.error("Disabling automatic variables backup purge: Config - 'purge remain' is >= 'purge required'");
-						}
+					if (tokeep == 0) {
+						Skript.error("Automatic variables backup purge: Config - 'backups to keep' cannot be 0");
+					} else if (tokeep >= 1) {
+						purge = true;
 					}
-                	startBackupTask(backupInterval, purge, required, remain);
+					startBackupTask(backupInterval, purge, tokeep);
 			}
 		}
 
@@ -321,7 +313,7 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param backupInterval the backup interval.
 	 */
-	public void startBackupTask(Timespan backupInterval, boolean purge, int required, int remain) {
+	public void startBackupTask(Timespan backupInterval, boolean purge, int tokeep) {
 		// File is null or backup interval is invalid
 		if (file == null || backupInterval.getTicks() == 0)
 			return;
@@ -336,7 +328,7 @@ public abstract class VariablesStorage implements Closeable {
 						FileUtils.backup(file);
 						if (purge) {
 							try {
-								FileUtils.backupPurge(required, remain);
+								FileUtils.backupPurge(tokeep);
 							} catch (IOException e) {
 								Skript.error("Automatic variables backup purge failed: " + e.getLocalizedMessage());
 							}
