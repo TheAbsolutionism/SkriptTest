@@ -224,7 +224,7 @@ public abstract class VariablesStorage implements Closeable {
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
-				int tokeep = getValue(sectionNode, "backups to keep", int.class);
+				int tokeep = getValue(sectionNode, "backups to keep", Integer.class);
 				boolean purge = false;
 				if (backupInterval != null)
 					if (tokeep == 0) {
