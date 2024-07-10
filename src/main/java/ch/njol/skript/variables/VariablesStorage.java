@@ -328,7 +328,7 @@ public abstract class VariablesStorage implements Closeable {
 						FileUtils.backup(file);
 						if (purge) {
 							try {
-								FileUtils.backupPurge(tokeep);
+								FileUtils.backupPurge(file, tokeep);
 							} catch (IOException e) {
 								Skript.error("Automatic variables backup purge failed: " + e.getLocalizedMessage());
 							}

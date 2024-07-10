@@ -64,10 +64,10 @@ public abstract class FileUtils {
 		}
 	}
 
-	public static void backupPurge(int tokeep) throws IOException {
+	public static void backupPurge(final File f, int tokeep) throws IOException {
 		if (tokeep <= 0)
 			throw new IOException("Called with invalid inputs");
-		final File backupDir = new File("plugins/Skript/backups/");
+		final File backupDir = new File(f.getParentFile(), "backups" + File.separator);
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
 		final ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));

@@ -289,6 +289,12 @@ databases:
 		# Variables are saved constantly no matter what is set here, thus a server crash will never make you loose any variables.
 		# Set this to 0 to disable this feature.
 
+		backups to keep: -1
+		# if enabled, will check the specified number of backup files in the backup directory each time a backup file is created
+		# If the number of backup files >= the number of 'backups to keep', it will delete files until number of files is equal to `backups to keep`
+		# If disabled, no backup files will be deleted
+		# By default, -1 equals disabled, set this to any number above 0 to enabled. Can not be set to 0
+
 
 	MySQL example:
 		# A MySQL database example, with options unrelated to MySQL removed.
@@ -325,6 +331,8 @@ databases:
 		monitor changes: false
 		monitor interval: 20 seconds
 
+		backups to keep: -1
+
 	default:
 		# The default "database" is a simple text file, with each variable on a separate line and the variable's name, type, and value separated by commas.
 		# This is the last database in this list to catch all variables that have not been saved anywhere else.
@@ -337,10 +345,6 @@ databases:
 		file: ./plugins/Skript/variables.csv
 
 		backup interval: 2 hours
-
-		# 'Backups to keep' will check the specified number of backup files in the backup directory each time a backup file is created, if enabled
-		# If the number of backup files >= the number of 'backups to keep', it will delete files until number of files = `backups to keep`
-		# -1 = disabled, can not = 0
 
 		backups to keep: -1
 
