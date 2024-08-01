@@ -290,10 +290,10 @@ databases:
 		# Set this to 0 to disable this feature.
 
 		backups to keep: -1
-		# if enabled, will check the specified number of backup files in the backup directory each time a backup file is created
-		# If the number of backup files >= the number of 'backups to keep', it will delete files until number of files is equal to `backups to keep`
+		# if enabled, will check the amount of backup files in the backup directory each time a backup file is created
+		# If the number of backup files > the number of 'backups to keep', it will delete files until number of files is equal to `backups to keep`
 		# If disabled, no backup files will be deleted
-		# By default, -1 equals disabled, set this to any number above 0 to enabled. Can not be set to 0
+		# By default, -1 equals disabled, set this to any number above 0 to enable. Can not be set to 0
 
 
 	MySQL example:
