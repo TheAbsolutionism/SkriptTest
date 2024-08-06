@@ -47,6 +47,7 @@ import ch.njol.util.Closeable;
  * @see DatabaseStorage
  */
 // FIXME ! large databases (>25 MB) cause the server to be unresponsive instead of loading slowly
+@SuppressWarnings("SuspiciousIndentAfterControlStatement")
 public abstract class VariablesStorage implements Closeable {
 
 	/**
@@ -226,13 +227,22 @@ public abstract class VariablesStorage implements Closeable {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
 				int tokeep = getValue(sectionNode, "backups to keep", Integer.class);
 				boolean purge = false;
+				boolean proceed = true;
 				if (backupInterval != null)
 					if (tokeep == 0) {
-						Skript.error("Automatic variables backup purge: Config - 'backups to keep' cannot be 0");
+						proceed = false;
 					} else if (tokeep >= 1) {
 						purge = true;
 					}
-					startBackupTask(backupInterval, purge, tokeep);
+					if (proceed) {
+                        startBackupTask(backupInterval, purge, tokeep);
+                    } else {
+						try {
+							FileUtils.backupPurge(file, tokeep);
+						} catch (IOException e) {
+							Skript.error("Variables backup wipe failed: " + e.getLocalizedMessage());
+						}
+					}
 			}
 		}
 

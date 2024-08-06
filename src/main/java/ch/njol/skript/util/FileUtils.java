@@ -65,15 +65,16 @@ public abstract class FileUtils {
 	}
 
 	public static void backupPurge(final File f, int tokeep) throws IOException {
-		if (tokeep <= 0)
-			throw new IOException("Called with invalid inputs");
+		if (tokeep < 0)
+			throw new IOException("Called with invalid input");
 		final File backupDir = new File(f.getParentFile(), "backups" + File.separator);
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
 		final ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));
 		if (files == null || files.size() <= tokeep)
 			return;
-		files.sort(Comparator.comparingLong(File::lastModified));
+		if (tokeep > 0)
+			files.sort(Comparator.comparingLong(File::lastModified));
 		final int Iterations = files.size() - tokeep;
 		for (int i = 0; i < Iterations; i++) {
 			files.get(i).delete();
