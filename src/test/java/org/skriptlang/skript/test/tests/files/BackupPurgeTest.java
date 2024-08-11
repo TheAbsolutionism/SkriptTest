@@ -44,7 +44,7 @@ public class BackupPurgeTest {
 		assertEquals("Backup Purge did not delete all files", 0, (new ArrayList<File>(Arrays.asList(dir.listFiles()))).size());
 
 		// Test calling with invalid input
-		assertThrows("Backup Purge did not throw exception for invalid input", IOException.class, () -> FileUtils.backupPurge(vars, -1));
+		assertThrows("Backup Purge did not throw exception for invalid input", IllegalArgumentException.class, () -> FileUtils.backupPurge(vars, -1));
 
 	}
 

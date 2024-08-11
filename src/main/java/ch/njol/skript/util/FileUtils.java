@@ -64,9 +64,9 @@ public abstract class FileUtils {
 		}
 	}
 
-	public static void backupPurge(File f, int toKeep) throws IOException {
+	public static void backupPurge(File f, int toKeep) throws IOException, IllegalArgumentException {
 		if (toKeep < 0)
-			throw new IOException("Called with invalid input, 'toKeep' can not be less than 0");
+			throw new IllegalArgumentException("Called with invalid input, 'toKeep' can not be less than 0");
 		File backupDir = new File(f.getParentFile(), "backups" + File.separator);
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
