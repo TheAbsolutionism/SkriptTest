@@ -225,20 +225,20 @@ public abstract class VariablesStorage implements Closeable {
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
 				Timespan backupInterval = getValue(sectionNode, "backup interval", Timespan.class);
-				int tokeep = getValue(sectionNode, "backups to keep", Integer.class);
-				boolean purge = false;
-				boolean proceed = true;
+				int toKeep = getValue(sectionNode, "backups to keep", Integer.class);
+				boolean removeBackups = false;
+				boolean startBackup = true;
 				if (backupInterval != null)
-					if (tokeep == 0) {
-						proceed = false;
-					} else if (tokeep >= 1) {
-						purge = true;
+					if (toKeep == 0) {
+						startBackup = false;
+					} else if (toKeep >= 1) {
+						removeBackups = true;
 					}
-					if (proceed) {
-                        startBackupTask(backupInterval, purge, tokeep);
+					if (startBackup) {
+                        startBackupTask(backupInterval, removeBackups, toKeep);
                     } else {
 						try {
-							FileUtils.backupPurge(file, tokeep);
+							FileUtils.backupPurge(file, toKeep);
 						} catch (IOException e) {
 							Skript.error("Variables backup wipe failed: " + e.getLocalizedMessage());
 						}
@@ -323,7 +323,7 @@ public abstract class VariablesStorage implements Closeable {
 	 *
 	 * @param backupInterval the backup interval.
 	 */
-	public void startBackupTask(Timespan backupInterval, boolean purge, int tokeep) {
+	public void startBackupTask(Timespan backupInterval, boolean removeBackups, int toKeep) {
 		// File is null or backup interval is invalid
 		if (file == null || backupInterval.getTicks() == 0)
 			return;
@@ -336,9 +336,9 @@ public abstract class VariablesStorage implements Closeable {
 					try {
 						// ..., then backup
 						FileUtils.backup(file);
-						if (purge) {
+						if (removeBackups) {
 							try {
-								FileUtils.backupPurge(file, tokeep);
+								FileUtils.backupPurge(file, toKeep);
 							} catch (IOException e) {
 								Skript.error("Automatic variables backup purge failed: " + e.getLocalizedMessage());
 							}

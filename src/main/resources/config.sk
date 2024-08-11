@@ -290,11 +290,9 @@ databases:
 		# Set this to 0 to disable this feature.
 
 		backups to keep: -1
-		# if enabled, will check the amount of backup files in the backup directory each time a backup file is created
-		# If the number of backup files > the number of 'backups to keep', it will delete files until number of files is equal to `backups to keep`
-		# If disabled, no backup files will be deleted
-		# By default, -1 equals disabled, set this to any number above 0 to enable it.
-		# By setting to 0, will disable any new variable backups from being created
+		# if set to a value greater than -1, Skript will ensure only that many backups are kept.
+		# Backups are removed from oldest to newest.
+		# If disabled (set to -1), no backup files will be deleted.
 		# WARNING: Setting to 0 will delete all files located in the backup directory upon plugin start/reload
 
 

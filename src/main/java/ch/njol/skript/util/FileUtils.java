@@ -64,19 +64,19 @@ public abstract class FileUtils {
 		}
 	}
 
-	public static void backupPurge(final File f, int tokeep) throws IOException {
-		if (tokeep < 0)
-			throw new IOException("Called with invalid input");
-		final File backupDir = new File(f.getParentFile(), "backups" + File.separator);
+	public static void backupPurge(File f, int toKeep) throws IOException {
+		if (toKeep < 0)
+			throw new IOException("Called with invalid input, 'toKeep' can not be less than 0");
+		File backupDir = new File(f.getParentFile(), "backups" + File.separator);
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
-		final ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));
-		if (files == null || files.size() <= tokeep)
+		ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));
+		if (files == null || files.size() <= toKeep)
 			return;
-		if (tokeep > 0)
+		if (toKeep > 0)
 			files.sort(Comparator.comparingLong(File::lastModified));
-		final int Iterations = files.size() - tokeep;
-		for (int i = 0; i < Iterations; i++) {
+		int numberToRemove = files.size() - toKeep;
+		for (int i = 0; i < numberToRemove; i++) {
 			files.get(i).delete();
 		}
 	}
