@@ -72,10 +72,10 @@ public abstract class FileUtils {
 	 * @throws IOException If 'backups' directory is not found
 	 * @throws IllegalArgumentException If 'toKeep' parameter is less than 0
 	 */
-	public static void backupPurge(File csvFile, int toKeep) throws IOException, IllegalArgumentException {
+	public static void backupPurge(File varFile, int toKeep) throws IOException, IllegalArgumentException {
 		if (toKeep < 0)
 			throw new IllegalArgumentException("Called with invalid input, 'toKeep' can not be less than 0");
-		File backupDir = new File(csvFile.getParentFile(), "backups" + File.separator);
+		File backupDir = new File(varFile.getParentFile(), "backups" + File.separator);
 		if (!backupDir.exists() || !backupDir.isDirectory())
 			throw new IOException("Backup directory not found");
 		ArrayList<File> files = new ArrayList<File>(Arrays.asList(backupDir.listFiles()));
