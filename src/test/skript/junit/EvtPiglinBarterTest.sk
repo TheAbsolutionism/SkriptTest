@@ -1,21 +1,11 @@
 test "EvtPiglinBarterJUnit" when running JUnit:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtPiglinBarterTest"
 
-	if running below minecraft "1.16.5":
-		complete objective "correct barter input" for {_test}
-		complete objective "clear barter drops" for {_test}
-		complete objective "set barter drops to 2 items" for {_test}
-		complete objective "remove item from barter drops" for {_test}
-		complete objective "add multiple items to barter drops" for {_test}
-		complete objective "remove all of an item from barter drops" for {_test}
-		complete objective "remove multiple items from barter drops" for {_test}
-		complete objective "barter drops test complete" for {_test}
-	else:
-		set {_slashIndex} to last index of "/" in "%script%.sk"
-		if {_slashIndex} is -1: # try \ separator (Windows)
-			set {_slashIndex} to last index of "\" in "%script%.sk"
-		set {_parent} to substring of "%script%.sk" from 0 to {_slashIndex}
-		load script "%{_parent}%-EvtPiglinBarter.sk"
+	set {_slashIndex} to last index of "/" in "%script%.sk"
+	if {_slashIndex} is -1: # try \ separator (Windows)
+		set {_slashIndex} to last index of "\" in "%script%.sk"
+	set {_parent} to substring of "%script%.sk" from 0 to {_slashIndex}
+	load script "%{_parent}%-EvtPiglinBarter.sk"
 
 	set {_tests::1} to "correct barter input"
 	set {_tests::2} to "clear barter drops"
