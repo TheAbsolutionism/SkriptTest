@@ -60,12 +60,12 @@ on piglin barter:
 
 	complete objective "barter drops test complete" for {_test}
 
-    set {_tests::1} to "correct barter input"
-    set {_tests::2} to "clear barter drops"
-    set {_tests::3} to "set barter drops to 2 items"
-    set {_tests::4} to "remove item from barter drops"
-    set {_tests::5} to "add multiple items to barter drops"
-    set {_tests::6} to "remove all of an item from barter drops"
-    set {_tests::7} to "remove multiple items from barter drops"
-    set {_tests::8} to "barter drops test complete"
-    ensure {_test} completes {_tests::*}
+	set {_tests::1} to "correct barter input"
+	set {_tests::2} to "clear barter drops"
+	set {_tests::3} to "set barter drops to 2 items"
+	set {_tests::4} to "remove item from barter drops"
+	set {_tests::5} to "add multiple items to barter drops"
+	set {_tests::6} to "remove all of an item from barter drops"
+	set {_tests::7} to "remove multiple items from barter drops"
+	set {_tests::8} to "barter drops test complete"
+	ensure {_test} completes {_tests::*}
