@@ -1,6 +1,5 @@
 test "EvtPiglinBarterJUnit" when running JUnit:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtPiglinBarterTest"
-	send "test called" to console
 
 	if running below minecraft "1.16.5":
 		complete objective "correct barter input" for {_test}
@@ -14,7 +13,7 @@ test "EvtPiglinBarterJUnit" when running JUnit:
 	else:
 		set {_slashIndex} to last index of "/" in "%script%.sk"
 		if {_slashIndex} is -1: # try \ separator (Windows)
-        	set {_slashIndex} to last index of "\" in "%script%.sk"
+			set {_slashIndex} to last index of "\" in "%script%.sk"
 		set {_parent} to substring of "%script%.sk" from 0 to {_slashIndex}
 		load script "%{_parent}%-EvtPiglinBarter.sk"
 
