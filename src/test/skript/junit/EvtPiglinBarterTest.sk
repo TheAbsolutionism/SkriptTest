@@ -13,6 +13,8 @@ test "EvtPiglinBarterJUnit" when running JUnit:
 		complete objective "barter drops test complete" for {_test}
 	else:
 		set {_slashIndex} to last index of "/" in "%script%.sk"
+		if {_slashIndex} is -1: # try \ separator (Windows)
+        	set {_slashIndex} to last index of "\" in "%script%.sk"
 		set {_parent} to substring of "%script%.sk" from 0 to {_slashIndex}
 		load script "%{_parent}%-EvtPiglinBarter.sk"
 
