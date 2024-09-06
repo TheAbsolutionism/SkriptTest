@@ -32,7 +32,7 @@ import ch.njol.skript.util.Color;
 
 public class WolfData extends EntityData<Wolf> {
 
-	private static boolean variantsEnabled = true;
+	private static boolean variantsEnabled = false;
 
 	static {
 		EntityData.register(WolfData.class, "wolf", Wolf.class, 1,
