@@ -1534,7 +1534,10 @@ public class BukkitClasses {
 		if (Skript.classExists("org.bukkit.entity.Wolf$Variant") && BukkitUtils.registryExists("WOLF_VARIANT")) {
 			wolfVariantClassInfo = new RegistryClassInfo<>(Wolf.Variant.class, Registry.WOLF_VARIANT, "wolfvariant", "wolf variants");
 		} else {
-			wolfVariantClassInfo = new ClassInfo<>(WolfData.WolfVariantDummy.class, "wolfvariant");
+			/*
+			 * Registers a dummy/placeholder class to ensure working operation on MC versions that do not have `Wolf.Variant`
+			 */
+			wolfVariantClassInfo = new ClassInfo<>(WolfData.VariantDummy.class, "wolfvariant");
 		}
 		Classes.registerClass(wolfVariantClassInfo
 			.user("wolf ?variants?")

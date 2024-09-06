@@ -160,6 +160,9 @@ public class WolfData extends EntityData<Wolf> {
 		return new WolfData();
 	}
 
-	public static class WolfVariantDummy {};
+	/**
+	 * A dummy/placeholder class to ensure working operation on MC versions that do not have `Wolf.Variant`
+	 */
+	public static class VariantDummy {};
 
 }
