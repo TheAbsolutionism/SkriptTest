@@ -20,6 +20,7 @@ package ch.njol.skript.entity;
 
 import ch.njol.skript.bukkitutil.BukkitUtils;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.util.coll.CollectionUtils;
 import com.google.common.collect.Iterators;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Wolf;
@@ -29,6 +30,8 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Color;
+
+import java.util.Objects;
 
 public class WolfData extends EntityData<Wolf> {
 
@@ -44,11 +47,12 @@ public class WolfData extends EntityData<Wolf> {
 		}
 	}
 
-	private static Wolf.Variant[] variants;
+
+	private static Object[] variants;
+	@Nullable
+	private Object variant;
 	@Nullable
 	private DyeColor collarColor;
-
-	private Wolf.@Nullable Variant variant;
 
 	private int angry = 0;
 	private int tamed = 0;
@@ -87,8 +91,11 @@ public class WolfData extends EntityData<Wolf> {
 			entity.setTamed(tamed == 1);
 		if (collarColor != null)
 			entity.setCollarColor(collarColor);
-		if (variant != null && variantsEnabled)
-			entity.setVariant(variant);
+		Object variantSet = null;
+		if (variantsEnabled) {
+			variantSet = variant != null ? variant : CollectionUtils.getRandom(variants);
+			entity.setVariant((Wolf.Variant) variantSet);
+		}
 	}
 
 	@Override
@@ -108,7 +115,8 @@ public class WolfData extends EntityData<Wolf> {
 		result = prime * result + angry;
 		result = prime * result + tamed;
 		result = prime * result + (collarColor == null ? 0 : collarColor.hashCode());
-		result = prime * result + (variant == null ? 0 : variant.hashCode());
+		if (variantsEnabled)
+			result = prime * result + (variant == null ? 0 : Objects.hashCode(variant));
 		return result;
 	}
 
