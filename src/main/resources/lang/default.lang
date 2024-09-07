@@ -1206,6 +1206,15 @@ entities:
 	dark oak chest boat:
 		name: dark oak chest boat¦s
 		pattern: dark oak chest boat(|1¦s)
+	cherry chest boat:
+		name: cherry chest boat¦s
+		pattern: cherry chest boat(|1¦s)
+	mangrove chest boat:
+		name: mangrove chest boat¦s
+		pattern: mangrove chest boat(|1¦s)
+	bamboo chest raft:
+		name: bamboo chest raft¦s
+		pattern: bamboo chest (raft|boat)(|1¦s)
 	frog:
 		name: frog¦s
 		pattern: <age> frog(|1¦s)|(4¦)frog (kid(|1¦s)|child(|1¦ren))
