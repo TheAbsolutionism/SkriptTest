@@ -21,6 +21,8 @@ package ch.njol.skript.variables;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -70,12 +72,12 @@ public abstract class VariablesStorage implements Closeable {
 	/**
 	 * The name of the database, i.e. this storage.
 	 */
-	protected String databaseName;
+	private String databaseName;
 
 	/**
 	 * The type of the database, i.e. this storage.
 	 */
-	protected final String databaseType;
+	private final String databaseType;
 
 	/**
 	 * The file associated with this variable storage.
@@ -130,6 +132,12 @@ public abstract class VariablesStorage implements Closeable {
 
 	/**
 	 * Get the config name of a database
+	 * <p>
+	 * Note: Returns the user set name for the database, ex:
+	 * <pre>{@code
+	 * default: <- Config Name
+	 *    type: CSV
+	 * }</pre>
 	 * @return name of database
 	 */
 	protected final String getUserConfigurationName() {
@@ -191,7 +199,7 @@ public abstract class VariablesStorage implements Closeable {
 		}
 	}
 
-	private static final ArrayList<File> registeredFiles = new ArrayList<File>();
+	private static final Set<File> registeredFiles = new HashSet<>();
 
 	/**
 	 * Loads the configuration for this variable storage
@@ -201,8 +209,8 @@ public abstract class VariablesStorage implements Closeable {
 	 * @return whether the loading succeeded.
 	 */
 	public final boolean load(SectionNode sectionNode) {
-		String name = sectionNode.getKey();
-		databaseName = name;
+		String dbName = sectionNode.getKey();
+		databaseName = dbName;
 
 		String pattern = getValue(sectionNode, "pattern");
 		if (pattern == null)
