@@ -70,7 +70,12 @@ public abstract class VariablesStorage implements Closeable {
 	/**
 	 * The name of the database, i.e. this storage.
 	 */
-	protected final String databaseName;
+	protected String databaseName;
+
+	/**
+	 * The type of the database, i.e. this storage.
+	 */
+	protected final String databaseType;
 
 	/**
 	 * The file associated with this variable storage.
@@ -98,11 +103,11 @@ public abstract class VariablesStorage implements Closeable {
 	 * This will also create the {@link #writeThread}, but it must be started
 	 * with {@link #load(SectionNode)}.
 	 *
-	 * @param name the name.
+	 * @param type the name.
 	 */
-	protected VariablesStorage(String name) {
-		assert name != null;
-		databaseName = name;
+	protected VariablesStorage(String type) {
+		assert type != null;
+		databaseType = type;
 
 		writeThread = Skript.newThread(() -> {
 			while (!closed) {
@@ -120,7 +125,23 @@ public abstract class VariablesStorage implements Closeable {
 					// Ignored as the `closed` field will indicate whether the thread actually needs to stop
 				}
 			}
-		}, "Skript variable save thread for database '" + name + "'");
+		}, "Skript variable save thread for database '" + type + "'");
+	}
+
+	/**
+	 * Get the config name of a database
+	 * @return name of database
+	 */
+	protected final String getUserConfigurationName() {
+		return databaseName;
+	}
+
+	/**
+	 * Get the config type of a database
+	 * @return type of databse
+	 */
+	protected final String getDatabaseType() {
+		return databaseType;
 	}
 
 	/**
@@ -180,6 +201,9 @@ public abstract class VariablesStorage implements Closeable {
 	 * @return whether the loading succeeded.
 	 */
 	public final boolean load(SectionNode sectionNode) {
+		String name = sectionNode.getKey();
+		databaseName = name;
+
 		String pattern = getValue(sectionNode, "pattern");
 		if (pattern == null)
 			return false;
@@ -225,7 +249,7 @@ public abstract class VariablesStorage implements Closeable {
 			}
 
 			if (registeredFiles.contains(file)) {
-				Skript.error("This file '" + fileName + "' is already registered to another database.");
+				Skript.error("Database `" + databaseName + "` failed to load. The file `" + fileName + "` is already registered to another database.");
 				return false;
 			} else {
 				registeredFiles.add(file);

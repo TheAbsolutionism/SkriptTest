@@ -128,8 +128,8 @@ public class FlatFileStorage extends VariablesStorage {
 	 *
 	 * @param name the name.
 	 */
-	FlatFileStorage(String name) {
-		super(name);
+	FlatFileStorage(String type) {
+		super(type);
 	}
 
 	/**

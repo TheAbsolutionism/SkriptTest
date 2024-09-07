@@ -79,11 +79,11 @@ public abstract class SQLStorage extends VariablesStorage {
 	/**
 	 * Creates a SQLStorage with a create table query.
 	 * 
-	 * @param name The name to be sent through this constructor when newInstance creates this class.
+	 * @param type The name to be sent through this constructor when newInstance creates this class.
 	 * @param createTableQuery The create table query to send to the SQL engine.
 	 */
-	public SQLStorage(String name, String createTableQuery) {
-		super(name);
+	public SQLStorage(String type, String createTableQuery) {
+		super(type);
 		this.createTableQuery = createTableQuery;
 		this.tableName = "variables21";
 	}
