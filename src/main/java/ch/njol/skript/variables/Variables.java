@@ -242,9 +242,9 @@ public class Variables {
 						Class<? extends VariablesStorage> storageClass = (Class<? extends VariablesStorage>) optional.get();
 						Constructor<?> constructor = storageClass.getDeclaredConstructor(String.class);
 						constructor.setAccessible(true);
-						variablesStorage = (VariablesStorage) constructor.newInstance(name, type);
+						variablesStorage = (VariablesStorage) constructor.newInstance(type);
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-						Skript.error("Failed to initalize database name , type '" + name + "' , `" + type + "'");
+						Skript.error("Failed to initialize database `" + name + "`");
 						successful = false;
 						continue;
 					}
