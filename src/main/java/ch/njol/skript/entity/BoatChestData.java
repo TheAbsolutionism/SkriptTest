@@ -126,21 +126,21 @@ public class BoatChestData extends EntityData<ChestBoat> {
 		Material type = itemType.getMaterial();
 		if (type == Material.OAK_BOAT)
 			ordinal = 0;
-		else if (type == Material.SPRUCE_BOAT)
+		else if (type == Material.SPRUCE_CHEST_BOAT)
 			ordinal = Boat.Type.SPRUCE.ordinal();
-		else if (type == Material.BIRCH_BOAT)
+		else if (type == Material.BIRCH_CHEST_BOAT)
 			ordinal = Boat.Type.BIRCH.ordinal();
-		else if (type == Material.JUNGLE_BOAT)
+		else if (type == Material.JUNGLE_CHEST_BOAT)
 			ordinal = Boat.Type.JUNGLE.ordinal();
-		else if (type == Material.ACACIA_BOAT)
+		else if (type == Material.ACACIA_CHEST_BOAT)
 			ordinal = Boat.Type.ACACIA.ordinal();
-		else if (type == Material.DARK_OAK_BOAT)
+		else if (type == Material.DARK_OAK_CHEST_BOAT)
 			ordinal = Boat.Type.DARK_OAK.ordinal();
-		else if (type == Material.CHERRY_BOAT)
+		else if (type == Material.CHERRY_CHEST_BOAT)
 			ordinal = Boat.Type.CHERRY.ordinal();
-		else if (type == Material.MANGROVE_BOAT)
+		else if (type == Material.MANGROVE_CHEST_BOAT)
 			ordinal = Boat.Type.MANGROVE.ordinal();
-		else if (type == Material.BAMBOO_RAFT)
+		else if (type == Material.BAMBOO_CHEST_RAFT)
 			ordinal = Boat.Type.BAMBOO.ordinal();
 		return hashCode_i() == ordinal + 2 || (matchedPattern + ordinal == 0) || ordinal == 0;
 	}
