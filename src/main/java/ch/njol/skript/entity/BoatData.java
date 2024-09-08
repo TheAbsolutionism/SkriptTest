@@ -44,9 +44,11 @@ public class BoatData extends EntityData<Boat> {
 		patterns[0] = "chest boat";
 		patterns[1] = "any chest boat";
 		for (Boat.Type boat : types) {
-			String boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " boat";
-			if (boatName.startsWith("bamboo"))
+			String boatName;
+			if (boat == Boat.Type.BAMBOO)
 				boatName = "bamboo raft";
+			else
+				boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " boat";
 			patterns[boat.ordinal() + 2] = boatName;
 		}
 		EntityData.register(BoatData.class, "boat", Boat.class, 0, patterns);

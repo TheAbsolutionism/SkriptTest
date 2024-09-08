@@ -43,9 +43,11 @@ public class BoatChestData extends EntityData<ChestBoat> {
 		patterns[0] = "chest boat";
 		patterns[1] = "any chest boat";
 		for (Boat.Type boat : types) {
-			String boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " chest boat";
-			if (boatName.startsWith("bamboo"))
+			String boatName;
+			if (boat == Boat.Type.BAMBOO)
 				boatName = "bamboo chest raft";
+			else
+				boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " chest boat";
 			patterns[boat.ordinal() + 2] = boatName;
 		}
 

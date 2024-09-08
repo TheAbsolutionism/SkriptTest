@@ -70,5 +70,5 @@ test "spawn entities":
 			clear entity within {_ent}
 			clear {_ent}
 		else:
-			assert false is true with "Failed to parse '%loop-value%' as an entity type"
+			assert false is true with "Failed to parse '%loop-value%' as an entity type", expected loop-value, got {_parse}
 	clear all entities
