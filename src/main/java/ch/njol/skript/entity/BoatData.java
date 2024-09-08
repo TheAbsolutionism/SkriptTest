@@ -71,10 +71,10 @@ public class BoatData extends EntityData<Boat> {
 	}
 
 	@Override
-	protected boolean init(@Nullable Class<? extends Boat> c, @Nullable Boat e) {
-		if (e != null)
+	protected boolean init(@Nullable Class<? extends Boat> c, @Nullable Boat entity) {
+		if (entity != null)
 
-			matchedPattern = 2 + e.getBoatType().ordinal();
+			matchedPattern = 2 + entity.getBoatType().ordinal();
 		return true;
 	}
 
@@ -108,15 +108,15 @@ public class BoatData extends EntityData<Boat> {
 
 	@Override
 	protected boolean equals_i(EntityData<?> obj) {
-		if (obj instanceof BoatData)
-			return matchedPattern == ((BoatData)obj).matchedPattern;
+		if (obj instanceof BoatData boatData)
+			return matchedPattern == boatData.matchedPattern;
 		return false;
 	}
 
 	@Override
-	public boolean isSupertypeOf(EntityData<?> e) {
-		if (e instanceof BoatData)
-			return matchedPattern <= 1 || matchedPattern == ((BoatData)e).matchedPattern;
+	public boolean isSupertypeOf(EntityData<?> entity) {
+		if (entity instanceof BoatData boatData)
+			return matchedPattern <= 1 || matchedPattern == boatData.matchedPattern;
 		return false;
 	}
 	

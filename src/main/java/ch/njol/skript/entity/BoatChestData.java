@@ -58,7 +58,7 @@ public class BoatChestData extends EntityData<ChestBoat> {
 		this(0);
 	}
 
-	public BoatChestData(Boat.Type type) {
+	public BoatChestData(@Nullable Boat.Type type) {
 		this(type != null ? type.ordinal() + 2 : 1);
 	}
 
@@ -72,9 +72,9 @@ public class BoatChestData extends EntityData<ChestBoat> {
 	}
 
 	@Override
-	protected boolean init(@Nullable Class<? extends ChestBoat> c, @Nullable ChestBoat e) {
-		if (e != null)
-			matchedPattern = 2 + e.getBoatType().ordinal();
+	protected boolean init(@Nullable Class<? extends ChestBoat> c, @Nullable ChestBoat entity) {
+		if (entity != null)
+			matchedPattern = 2 + entity.getBoatType().ordinal();
 		return true;
 	}
 
@@ -108,15 +108,15 @@ public class BoatChestData extends EntityData<ChestBoat> {
 
 	@Override
 	protected boolean equals_i(EntityData<?> obj) {
-		if (obj instanceof BoatChestData)
-			return matchedPattern == ((BoatChestData) obj).matchedPattern;
+		if (obj instanceof BoatChestData boatChestData)
+			return matchedPattern == boatChestData.matchedPattern;
 		return false;
 	}
 
 	@Override
-	public boolean isSupertypeOf(EntityData<?> e) {
-		if (e instanceof BoatChestData)
-			return matchedPattern <= 1 || matchedPattern == ((BoatChestData) e).matchedPattern;
+	public boolean isSupertypeOf(EntityData<?> entity) {
+		if (entity instanceof BoatChestData boatChestData)
+			return matchedPattern <= 1 || matchedPattern == boatChestData.matchedPattern;
 		return false;
 	}
 

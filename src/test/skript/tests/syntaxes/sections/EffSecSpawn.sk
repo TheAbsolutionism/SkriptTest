@@ -36,19 +36,28 @@ test "spawn cats by type" when running minecraft "1.15.2":
 	assert size of all cats = 0 with "Size of all cats is greater than 0 after all were deleted"
 
 test "spawn entities":
-	set {_entities::*} to "allay", "armadillo", "axolotl", "bat", "bee", "blaze", "bogged", "breeze", "camel", "cat"
-	add "cave spider", "chicken", "cod", "cow", "creeper", "dolphin", "donkey", "drowned", "elder guardian" to {_entities::*}
-	add "enderman", "endermite", "evoker", "fox", "frog", "ghast", "glow squid", "goat", "guardian", "hoglin" to {_entities::*}
-	add "horse", "husk", "iron golem", "llama", "magma cube", "mooshroom", "mule", "ocelot", "panda" to {_entities::*}
-	add "parrot", "phantom", "pig", "piglin", "piglin brute", "pillager", "polar bear", "pufferfish" to {_entities::*}
-	add "rabbit", "ravager", "salmon", "sheep", "shulker", "silverfish", "skeleton", "skeleton horse" to {_entities::*}
-	add "slime", "sniffer", "snow golem", "spider", "squid", "stray", "strider", "tadpole", "trader llama" to {_entities::*}
-	add "tropical fish", "turtle", "vex", "villager", "vindicator", "wandering trader", "warden", "witch" to {_entities::*}
-	add "wither skeleton", "wolf", "zoglin", "zombie", "zombie horse", "zombie villager", "zombified piglin" to {_entities::*}
-	add "ender dragon", "wither" to {_entities::*}
-	add "boat", "chest boat", "armor stand", "primed tnt", "firework", "arrow", "trident", "egg", "snowball" to {_entities::*}
-	add "wind charge", "end crystal", "fireball", "eye of ender", "minecart", "falling sand", "falling gravel" to {_entities::*}
+	set {_entities::*} to "allay", "axolotl", "bat", "bee", "blaze", "cat", "cave spider", "chicken" and "cod"
+	add "cow", "creeper", "dolphin", "donkey", "drowned", "elder guardian", "enderman" and "endermite" to {_entities::*}
+	add "evoker", "fox", "frog", "ghast", "glow squid", "goat", "guardian", "hoglin", "horse" and "husk" to {_entities::*}
+	add "iron golem", "llama", "magma cube", "mooshroom", "mule", "ocelot", "panda", "parrot" and "phantom" to {_entities::*}
+	add "pig", "piglin", "piglin brute", "pillager", "polar bear", "pufferfish", "rabbit" and "ravager" to {_entities::*}
+	add "salmon", "sheep", "shulker", "silverfish", "skeleton", "skeleton horse" and "slime" to {_entities::*}
+	add "snow golem", "spider", "squid", "stray", "strider", "tadpole", "trader llama" and "tropical fish" to {_entities::*}
+	add "turtle", "vex", "villager", "vindicator", "wandering trader", "warden", "witch" and "wither skeleton" to {_entities::*}
+	add "wolf", "zoglin", "zombie", "zombie horse", "zombie villager", "zombified piglin" to {_entities::*}
+	add "ender dragon" and "wither" to {_entities::*}
+	add "oak boat", "oak chest boat", "armor stand", "primed tnt", "firework", "arrow", "trident" and "egg" to {_entities::*}
+	add "snowball", "end crystal", "eye of ender", "regular minecart", "falling sand" and "falling gravel" to {_entities::*}
 	add "falling powder snow" to {_entities::*}
+
+	if running minecraft "1.20.0":
+		add "camel" and "sniffer"  to {_entities::*}
+	if running minecraft "1.20.6":
+		add "armadillo" to {_entities::*}
+	if running minecraft "1.21":
+		add "bogged" and "breeze" to {_entities::*}
+
+	# Note: Had to remove 'fireball' and 'wind charge'
 
 	clear all entities
 	loop {_entities::*}:
@@ -56,9 +65,10 @@ test "spawn entities":
 		if {_parse} is set:
 			spawn {_parse} at spawn of "world":
 				set {_ent} to entity
-			assert {_ent} is entity type within {_parse}
+			set {_assert} to whether {_ent} is entity type within {_parse}
+			assert {_assert} is true with "", expected (entity type within {_parse}), got {_ent}
 			clear entity within {_ent}
 			clear {_ent}
 		else:
-			assert false is true with "Failed to parse ''%loop-value%' as an entity type"
+			assert false is true with "Failed to parse '%loop-value%' as an entity type"
 	clear all entities
