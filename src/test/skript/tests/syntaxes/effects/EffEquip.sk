@@ -1,4 +1,4 @@
-test "equip effect zombie":
+test "equip effect":
 	spawn a zombie at spawn of "world":
 		set {_entity} to event-entity
 

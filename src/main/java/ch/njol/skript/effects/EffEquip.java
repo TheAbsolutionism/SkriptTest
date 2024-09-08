@@ -51,21 +51,21 @@ import ch.njol.util.Kleenean;
 @Name("Equip")
 @Description("Equips or unequips an entity with some given armor. This will replace any armor that the entity is wearing.")
 @Examples({
-	"equip player with diamond helmet",
-	"equip player with all diamond armor",
-	"unequip diamond chestplate from player",
-	"unequip all armor from player",
-	"unequip player's armor"
+		"equip player with diamond helmet",
+		"equip player with all diamond armor",
+		"unequip diamond chestplate from player",
+		"unequip all armor from player",
+		"unequip player's armor"
 })
 @Since("1.0, 2.7 (multiple entities, unequip)")
 public class EffEquip extends Effect {
 
 	static {
 		Skript.registerEffect(EffEquip.class,
-			"equip [%livingentities%] with %itemtypes%",
-			"make %livingentities% wear %itemtypes%",
-			"unequip %itemtypes% [from %livingentities%]",
-			"unequip %livingentities%'[s] (armor|equipment)"
+				"equip [%livingentities%] with %itemtypes%",
+				"make %livingentities% wear %itemtypes%",
+				"unequip %itemtypes% [from %livingentities%]",
+				"unequip %livingentities%'[s] (armor|equipment)"
 		);
 	}
 
