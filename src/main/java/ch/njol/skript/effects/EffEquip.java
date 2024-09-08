@@ -66,7 +66,7 @@ public class EffEquip extends Effect {
 				"make %livingentities% wear %itemtypes%",
 				"unequip %itemtypes% [from %livingentities%]",
 				"unequip %livingentities%'[s] (armor|equipment)"
-		);
+			);
 	}
 
 	@SuppressWarnings("NotNullFieldNotInitialized")
