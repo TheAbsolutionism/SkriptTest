@@ -124,7 +124,7 @@ public class BoatChestData extends EntityData<ChestBoat> {
 		int ordinal = -1;
 
 		Material material = itemType.getMaterial();
-		if (material == Material.OAK_BOAT) {
+		if (material == Material.OAK_CHEST_BOAT) {
 			ordinal = 0;
 		} else {
 			for (Boat.Type boat : types) {
