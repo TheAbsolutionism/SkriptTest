@@ -30,7 +30,9 @@ import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.EntityEquipment;
 import org.eclipse.jdt.annotation.Nullable;
@@ -50,7 +52,7 @@ import java.util.stream.Stream;
 public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 
 	static {
-		register(ExprArmorSlot.class, Slot.class, "((boots:(boots|shoes)|leggings:leg[ging]s|chestplate:chestplate[s]|helmet:helmet[s]) [(item|:slot)]|armour:armo[u]r[s])", "livingentities");
+		register(ExprArmorSlot.class, Slot.class, "((boots:(boots|shoes)|leggings:leg[ging]s|chestplate:chestplate[s]|helmet:helmet[s]) [(item|:slot)]|armour:armo[u]r[s]|bodyarmor:body armo[u]r)", "livingentities");
 	}
 
 	@Nullable
@@ -58,11 +60,14 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 	private boolean explicitSlot;
 	private boolean isArmor;
 
+	private boolean isBody;
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		isBody = parseResult.hasTag("bodyarmor");
 		isArmor = parseResult.hasTag("armour");
-		slot = isArmor ? null : EquipSlot.valueOf(parseResult.tags.get(0).toUpperCase(Locale.ENGLISH));
+		slot = (isArmor || isBody) ? null : EquipSlot.valueOf(parseResult.tags.get(0).toUpperCase(Locale.ENGLISH));
 		explicitSlot = parseResult.hasTag("slot"); // User explicitly asked for SLOT, not item
 		setExpr((Expression<? extends LivingEntity>) exprs[0]);
 		return true;
@@ -76,6 +81,13 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 					.flatMap(equipment -> {
 						if (equipment == null)
 							return null;
+						if (isBody) {
+							if (!(equipment.getHolder() instanceof Wolf) && !(equipment.getHolder() instanceof AbstractHorse))
+								return null;
+							return Stream.of(
+								new EquipmentSlot(equipment, EquipSlot.BODY, explicitSlot)
+							);
+						}
 						return Stream.of(
 								new EquipmentSlot(equipment, EquipSlot.HELMET, explicitSlot),
 								new EquipmentSlot(equipment, EquipSlot.CHESTPLATE, explicitSlot),
@@ -96,7 +108,7 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 
 	@Override
 	public boolean isSingle() {
-		return !isArmor && super.isSingle();
+		return isBody || (!isArmor && super.isSingle());
 	}
 
 	@Override

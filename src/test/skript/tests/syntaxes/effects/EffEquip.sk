@@ -1,4 +1,4 @@
-test "equip effect":
+test "equip effect zombie":
 	spawn a zombie at spawn of "world":
 		set {_entity} to event-entity
 
@@ -10,3 +10,20 @@ test "equip effect":
 	assert chestplate of {_entity} is a diamond chestplate named "Test" with "entity was not wearing a named diamond chestplate"
 
 	delete the entity within {_entity}
+
+test "equip effect wolf" when running minecraft "1.20.5":
+	spawn a wolf at spawn of "world":
+		set {_entity} to event-entity
+
+	equip {_entity} with wolf armor
+	assert body armor of {_entity} is wolf armor with "Entity was not wearing wolf armor"
+	unequip {_entity} equipment
+	assert body armor of {_entity} is air "Entity armor did not get unequipped"
+
+	spawn 4 wolves at spawn of "world"
+	equip all wolves with wolf armor
+	assert body armor of all wolves is wolf armor with "1 or more entities are not wearing wolf armor"
+	unequip all wolves' equipment
+	assert body armor of all wolves is air with "1 or more entities armor did not get unequipped"
+
+	clear all wolves
