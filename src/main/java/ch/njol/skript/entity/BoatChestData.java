@@ -27,25 +27,25 @@ import org.bukkit.Material;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.ChestBoat;
 import org.bukkit.inventory.ItemStack;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class BoatChestData extends EntityData<ChestBoat> {
 
+	private static final Boat.Type[] types = Boat.Type.values();
+
 	static {
 		// This ensures all boats are registered
 		// As well as in the correct order via 'ordinal'
-		int boatsSize = Boat.Type.values().length;
-		String[] patterns = new String[boatsSize + 2];
+		String[] patterns = new String[types.length + 2];
 		patterns[0] = "chest boat";
 		patterns[1] = "any chest boat";
-		for (Boat.Type boat : Boat.Type.values()) {
-			String boatName = boat.toString().replace("_", " ").toLowerCase();
-			if (boatName.equals("bamboo"))
-				boatName = boatName + " chest raft";
-			else
-				boatName = boatName + " chest boat";
+		for (Boat.Type boat : types) {
+			String boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " chest boat";
+			if (boatName.startsWith("bamboo"))
+				boatName = "bamboo chest raft";
 			patterns[boat.ordinal() + 2] = boatName;
 		}
 
@@ -108,7 +108,7 @@ public class BoatChestData extends EntityData<ChestBoat> {
 
 	@Override
 	protected boolean equals_i(EntityData<?> obj) {
-		if (obj instanceof BoatData)
+		if (obj instanceof BoatChestData)
 			return matchedPattern == ((BoatChestData) obj).matchedPattern;
 		return false;
 	}
@@ -123,25 +123,17 @@ public class BoatChestData extends EntityData<ChestBoat> {
 	public boolean isOfItemType(ItemType itemType) {
 		int ordinal = -1;
 
-		Material type = itemType.getMaterial();
-		if (type == Material.OAK_CHEST_BOAT)
+		Material material = itemType.getMaterial();
+		if (material == Material.OAK_BOAT) {
 			ordinal = 0;
-		else if (type == Material.SPRUCE_CHEST_BOAT)
-			ordinal = Boat.Type.SPRUCE.ordinal();
-		else if (type == Material.BIRCH_CHEST_BOAT)
-			ordinal = Boat.Type.BIRCH.ordinal();
-		else if (type == Material.JUNGLE_CHEST_BOAT)
-			ordinal = Boat.Type.JUNGLE.ordinal();
-		else if (type == Material.ACACIA_CHEST_BOAT)
-			ordinal = Boat.Type.ACACIA.ordinal();
-		else if (type == Material.DARK_OAK_CHEST_BOAT)
-			ordinal = Boat.Type.DARK_OAK.ordinal();
-		else if (type == Material.CHERRY_CHEST_BOAT)
-			ordinal = Boat.Type.CHERRY.ordinal();
-		else if (type == Material.MANGROVE_CHEST_BOAT)
-			ordinal = Boat.Type.MANGROVE.ordinal();
-		else if (type == Material.BAMBOO_CHEST_RAFT)
-			ordinal = Boat.Type.BAMBOO.ordinal();
+		} else {
+			for (Boat.Type boat : types) {
+				if (material.toString().contains(boat.toString())) {
+					ordinal = boat.ordinal();
+					break;
+				}
+			}
+		}
 		return hashCode_i() == ordinal + 2 || (matchedPattern + ordinal == 0) || ordinal == 0;
 	}
 

@@ -19,34 +19,34 @@
 package ch.njol.skript.entity;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Boat;
 import org.bukkit.inventory.ItemStack;
-import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.Aliases;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import org.jetbrains.annotations.Nullable;
 
 public class BoatData extends EntityData<Boat> {
+
+	private static final Boat.Type[] types = Boat.Type.values();
 
 	static {
 		// This ensures all boats are registered
 		// As well as in the correct order via 'ordinal'
-		int boatsSize = Boat.Type.values().length;
-		String[] patterns = new String[boatsSize + 2];
-		patterns[0] = "boat";
-		patterns[1] = "any boat";
-		for (Boat.Type boat : Boat.Type.values()) {
-			String boatName = boat.toString().replace("_", " ").toLowerCase();
-			if (boatName.equals("bamboo"))
-				boatName = boatName + " raft";
-			else
-				boatName = boatName + " boat";
+		String[] patterns = new String[types.length + 2];
+		patterns[0] = "chest boat";
+		patterns[1] = "any chest boat";
+		for (Boat.Type boat : types) {
+			String boatName = boat.toString().replace("_", " ").toLowerCase(Locale.ENGLISH) + " boat";
+			if (boatName.startsWith("bamboo"))
+				boatName = "bamboo raft";
 			patterns[boat.ordinal() + 2] = boatName;
 		}
 		EntityData.register(BoatData.class, "boat", Boat.class, 0, patterns);
@@ -56,7 +56,7 @@ public class BoatData extends EntityData<Boat> {
 		this(0);
 	}
 
-	public BoatData(Boat.Type type){
+	public BoatData(@Nullable Boat.Type type){
 		this(type != null ? type.ordinal() + 2 : 1);
 	}
 	
@@ -120,29 +120,20 @@ public class BoatData extends EntityData<Boat> {
 		return false;
 	}
 	
-	public boolean isOfItemType(ItemType i){
+	public boolean isOfItemType(ItemType itemType){
 		int ordinal = -1;
 
-		Material type = i.getMaterial();
-
-		if (type == Material.OAK_BOAT)
+		Material material = itemType.getMaterial();
+		if (material == Material.OAK_BOAT) {
 			ordinal = 0;
-		else if (type == Material.SPRUCE_BOAT)
-			ordinal = Boat.Type.SPRUCE.ordinal();
-		else if (type == Material.BIRCH_BOAT)
-			ordinal = Boat.Type.BIRCH.ordinal();
-		else if (type == Material.JUNGLE_BOAT)
-			ordinal = Boat.Type.JUNGLE.ordinal();
-		else if (type == Material.ACACIA_BOAT)
-			ordinal = Boat.Type.ACACIA.ordinal();
-		else if (type == Material.DARK_OAK_BOAT)
-			ordinal = Boat.Type.DARK_OAK.ordinal();
-		else if (type == Material.CHERRY_BOAT)
-			ordinal = Boat.Type.CHERRY.ordinal();
-		else if (type == Material.MANGROVE_BOAT)
-			ordinal = Boat.Type.MANGROVE.ordinal();
-		else if (type == Material.BAMBOO_RAFT)
-			ordinal = Boat.Type.BAMBOO.ordinal();
+		} else {
+			for (Boat.Type boat : types) {
+				if (material.toString().contains(boat.toString())) {
+					ordinal = boat.ordinal();
+					break;
+				}
+			}
+		}
 		return hashCode_i() == ordinal + 2 || (matchedPattern + ordinal == 0) || ordinal == 0;
 		
 	}

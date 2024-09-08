@@ -20,3 +20,45 @@ test "spawn section":
 	# Make sure variables carry over properly
 	assert {_before} is 10 with "value of {_before} should be 10 (got '%{_before}%')"
 	assert {_new var} is 5 with "value of {_new var} should be 5 (got '%{_new var}%')"
+
+test "spawn cats by type" when running minecraft "1.15.2":
+	delete all cats
+	set {_l} to location of spawn of world "world"
+	spawn 5 all black cats at {_l}
+	assert size of all cats = 5 with "Size of all cats is not 5"
+	assert size of all all black cats = 5 with "Size of all all black cats is not 5"
+	spawn 2 siamese cats at {_l}
+	assert size of all cats = 7 with "Size of all cats is not 7"
+	assert size of all siamese cats = 2 with "Size of all siamese cats is not 2"
+	delete all siamese cats
+	assert size of all cats = 5 with "Size of all cats is not 5 after delete 2 siamese cats"
+	delete all cats
+	assert size of all cats = 0 with "Size of all cats is greater than 0 after all were deleted"
+
+test "spawn entities":
+	set {_entities::*} to "allay", "armadillo", "axolotl", "bat", "bee", "blaze", "bogged", "breeze", "camel", "cat"
+	add "cave spider", "chicken", "cod", "cow", "creeper", "dolphin", "donkey", "drowned", "elder guardian" to {_entities::*}
+	add "enderman", "endermite", "evoker", "fox", "frog", "ghast", "glow squid", "goat", "guardian", "hoglin" to {_entities::*}
+	add "horse", "husk", "iron golem", "llama", "magma cube", "mooshroom", "mule", "ocelot", "panda" to {_entities::*}
+	add "parrot", "phantom", "pig", "piglin", "piglin brute", "pillager", "polar bear", "pufferfish" to {_entities::*}
+	add "rabbit", "ravager", "salmon", "sheep", "shulker", "silverfish", "skeleton", "skeleton horse" to {_entities::*}
+	add "slime", "sniffer", "snow golem", "spider", "squid", "stray", "strider", "tadpole", "trader llama" to {_entities::*}
+	add "tropical fish", "turtle", "vex", "villager", "vindicator", "wandering trader", "warden", "witch" to {_entities::*}
+	add "wither skeleton", "wolf", "zoglin", "zombie", "zombie horse", "zombie villager", "zombified piglin" to {_entities::*}
+	add "ender dragon", "wither" to {_entities::*}
+	add "boat", "chest boat", "armor stand", "primed tnt", "firework", "arrow", "trident", "egg", "snowball" to {_entities::*}
+	add "wind charge", "end crystal", "fireball", "eye of ender", "minecart", "falling sand", "falling gravel" to {_entities::*}
+	add "falling powder snow" to {_entities::*}
+
+	clear all entities
+	loop {_entities::*}:
+		set {_parse} to loop-value parsed as entity type
+		if {_parse} is set:
+			spawn {_parse} at spawn of "world":
+				set {_ent} to entity
+			assert {_ent} is entity type within {_parse}
+			clear entity within {_ent}
+			clear {_ent}
+		else:
+			assert false is true with "Failed to parse ''%loop-value%' as an entity type"
+	clear all entities
