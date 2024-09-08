@@ -21,9 +21,18 @@ package ch.njol.skript.effects;
 import ch.njol.skript.aliases.ItemData;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractHorse;
+import org.bukkit.entity.ChestedHorse;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Llama;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Steerable;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.LlamaInventory;
 import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
@@ -93,14 +102,10 @@ public class EffEquip extends Effect {
 	private static final ItemType HORSE_ARMOR = new ItemType(Material.IRON_HORSE_ARMOR, Material.GOLDEN_HORSE_ARMOR, Material.DIAMOND_HORSE_ARMOR);
 	private static final ItemType SADDLE = new ItemType(Material.SADDLE);
 	private static final ItemType CHEST = new ItemType(Material.CHEST);
-	private static ItemType WOLF_ARMOR;
 
 	static {
 		boolean usesWoolCarpetTag = Skript.fieldExists(Tag.class, "WOOL_CARPET");
-		CARPET = new ItemType(Tag.WOOL_CARPETS);
-		if (Skript.isRunningMinecraft(1, 20, 5)) {
-			WOLF_ARMOR = new ItemType(Material.WOLF_ARMOR);
-		}
+		CARPET = new ItemType(usesWoolCarpetTag ? Tag.WOOL_CARPETS : Tag.CARPETS);
 		// added in 1.20.6
 		if (Skript.fieldExists(Tag.class, "ITEM_CHEST_ARMOR")) {
 			CHESTPLATE = new ItemType(Tag.ITEMS_CHEST_ARMOR);
@@ -143,7 +148,7 @@ public class EffEquip extends Effect {
 
 
 
-	private static final ItemType[] ALL_EQUIPMENT = new ItemType[] {CHESTPLATE, LEGGINGS, BOOTS, HORSE_ARMOR, SADDLE, CHEST, CARPET, WOLF_ARMOR};
+	private static final ItemType[] ALL_EQUIPMENT = new ItemType[] {CHESTPLATE, LEGGINGS, BOOTS, HORSE_ARMOR, SADDLE, CHEST, CARPET};
 
 	@Override
 	protected void execute(Event event) {
@@ -198,31 +203,21 @@ public class EffEquip extends Effect {
 				EntityEquipment equipment = entity.getEquipment();
 				if (equipment == null)
 					continue;
-				if (entity instanceof Wolf) {
-					for (ItemType itemType : itemTypes) {
-						for (ItemStack item : itemType.getAll()) {
-							if (WOLF_ARMOR.isOfType(item)) {
-								equipment.setItem(EquipmentSlot.BODY, equip ? item : null);
-							}
+				for (ItemType itemType : itemTypes) {
+					for (ItemStack item : itemType.getAll()) {
+						if (CHESTPLATE.isOfType(item)) {
+							equipment.setChestplate(equip ? item : null);
+						} else if (LEGGINGS.isOfType(item)) {
+							equipment.setLeggings(equip ? item : null);
+						} else if (BOOTS.isOfType(item)) {
+							equipment.setBoots(equip ? item : null);
+						} else {
+							// Apply all other items to head, as all items will appear on a player's head
+							equipment.setHelmet(equip ? item : null);
 						}
 					}
-				} else {
-					for (ItemType itemType : itemTypes) {
-						for (ItemStack item : itemType.getAll()) {
-							if (CHESTPLATE.isOfType(item)) {
-								equipment.setChestplate(equip ? item : null);
-							} else if (LEGGINGS.isOfType(item)) {
-								equipment.setLeggings(equip ? item : null);
-							} else if (BOOTS.isOfType(item)) {
-								equipment.setBoots(equip ? item : null);
-							} else {
-								// Apply all other items to head, as all items will appear on a player's head
-								equipment.setHelmet(equip ? item : null);
-							}
-						}
-						if (unequipHelmet) { // Since players can wear any helmet, itemTypes won't have the item in the array every time
-							equipment.setHelmet(null);
-						}
+					if (unequipHelmet) { // Since players can wear any helmet, itemTypes won't have the item in the array every time
+						equipment.setHelmet(null);
 					}
 				}
 				if (entity instanceof Player)
