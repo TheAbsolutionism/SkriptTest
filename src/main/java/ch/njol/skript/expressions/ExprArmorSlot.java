@@ -43,22 +43,24 @@ import java.util.stream.Stream;
 @Description({
 	"Equipment of living entities, i.e. the boots, leggings, chestplate or helmet.",
 	"`Body armor` is a special slot that can only be used for:",
-	"    `Horse`: Horse Armor (Zombie and Skeleton Horse's do not work)",
-	"    `Wolf`: Wolf Armor",
-	"    `[Trader]Llama`: Carpet"
+	"<ul>",
+	"<li>`Horses`: Horse armour (doesn't work on zombie or skeleton horses)</li>",
+	"<li>`Wolves`: Wolf Armor</li>",
+	"<li>`Llamas` (regular or trader): Carpet</li>",
+	"</ul>"
 })
 @Examples({
 	"set chestplate of the player to a diamond chestplate",
 	"helmet of player is neither a helmet nor air # player is wearing a block, e.g. from another plugin"
 })
 @Keywords("armor")
-@Since("1.0, 2.8.0 (Armour)")
+@Since("1.0, 2.8.0 (Armour), INSERT VERSION (body armour)")
 public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 
 	private static final Set<Class<?>> bodyEntities = new HashSet<>(Arrays.asList(Horse.class, Llama.class, TraderLlama.class));
 
 	static {
-		if (Skript.isRunningMinecraft(1,20,5))
+		if (Skript.isRunningMinecraft(1, 20, 5))
 			bodyEntities.add(Wolf.class);
 		register(ExprArmorSlot.class, Slot.class, "((boots:(boots|shoes)|leggings:leg[ging]s|chestplate:chestplate[s]|helmet:helmet[s]) [(item|:slot)]|armour:armo[u]r[s]|bodyarmor:body armo[u]r)", "livingentities");
 	}

@@ -115,13 +115,13 @@ public class EquipmentSlot extends SlotWithIndex {
 		BODY() {
 			@Override
 			@Nullable
-			public ItemStack get(final EntityEquipment e) {
-				return e.getItem(org.bukkit.inventory.EquipmentSlot.BODY);
+			public ItemStack get(EntityEquipment equipment) {
+				return equipment.getItem(org.bukkit.inventory.EquipmentSlot.BODY);
 			}
 
 			@Override
-			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
-				e.setItem(org.bukkit.inventory.EquipmentSlot.BODY, item);
+			public void set(EntityEquipment equipment, final @Nullable ItemStack item) {
+				equipment.setItem(org.bukkit.inventory.EquipmentSlot.BODY, item);
 			}
 		};
 		
