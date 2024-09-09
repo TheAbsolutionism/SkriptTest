@@ -20,6 +20,7 @@ package ch.njol.skript.expressions;
 
 import java.util.Iterator;
 
+import ch.njol.skript.lang.function.ExprFunctionCall;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -157,6 +158,8 @@ public class ExprBlocks extends SimpleExpression<Block> {
 						if (number != null)
 							distance = number.intValue();
 					}
+				} else if (this.direction instanceof ExprFunctionCall) {
+					distance = (int) this.direction.getSingle(event).getDirection().length();
 				}
 				return new BlockLineIterator(location, vector, distance);
 			} else {

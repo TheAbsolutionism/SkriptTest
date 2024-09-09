@@ -18,6 +18,7 @@
  */
 package ch.njol.skript.util;
 
+import ch.njol.skript.Skript;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockIterator;
@@ -37,8 +38,12 @@ public class BlockLineIterator extends StoppableIterator<Block> {
 	 * @throws IllegalStateException randomly (Bukkit bug)
 	 */
 	public BlockLineIterator(Block start, Block end) throws IllegalStateException {
-		super(new BlockIterator(start.getWorld(), fitInWorld(start.getLocation().add(0.5, 0.5, 0.5), end.getLocation().subtract(start.getLocation()).toVector()),
-				end.equals(start) ? new Vector(1, 0, 0) : end.getLocation().subtract(start.getLocation()).toVector(), 0, 0), // should prevent an error if start = end
+		super(new BlockIterator(
+					start.getWorld(),
+					start.getLocation().toVector(),
+					end.equals(start) ? new Vector(1, 0, 0) : end.getLocation().subtract(start.getLocation()).toVector(),
+					0, 0
+			), // should prevent an error if start = end
 		new NullableChecker<Block>() {
 			private final double overshotSq = Math.pow(start.getLocation().distance(end.getLocation()) + 2, 2);
 			
@@ -59,7 +64,7 @@ public class BlockLineIterator extends StoppableIterator<Block> {
 	 * @throws IllegalStateException randomly (Bukkit bug)
 	 */
 	public BlockLineIterator(Location start, Vector direction, double distance) throws IllegalStateException {
-		super(new BlockIterator(start.getWorld(), fitInWorld(start, direction), direction, 0, 0), new NullableChecker<Block>() {
+		super(new BlockIterator(start.getWorld(), start.toVector(), direction, 0, 0), new NullableChecker<Block>() {
 			private final double distSq = distance * distance;
 			
 			@Override
@@ -87,14 +92,7 @@ public class BlockLineIterator extends StoppableIterator<Block> {
 	 * @return The newly modified Vector if needed.
 	 */
 	private static Vector fitInWorld(Location location, Vector direction) {
-		int lowest = WorldUtils.getWorldMinHeight(location.getWorld());
-		int highest = location.getWorld().getMaxHeight();
-		Vector vector = location.toVector();
-		int y = location.getBlockY();
-		if (y >= lowest && y <= highest)
-			return vector;
-		double newY = Math2.fit(lowest, location.getY(), highest);
-		return new Vector(location.getX(), newY, location.getZ());
+        return location.toVector();
 	}
 
 }
