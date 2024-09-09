@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import ch.njol.util.Math2;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;

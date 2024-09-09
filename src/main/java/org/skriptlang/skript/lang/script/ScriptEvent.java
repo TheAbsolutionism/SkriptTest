@@ -19,7 +19,7 @@
 package org.skriptlang.skript.lang.script;
 
 import ch.njol.skript.lang.parser.ParserInstance;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * A ScriptEvent is used for listening to and performing actions for different Script events.

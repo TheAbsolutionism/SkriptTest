@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.entity.ExperienceOrb;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;

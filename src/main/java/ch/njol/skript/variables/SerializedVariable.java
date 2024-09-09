@@ -18,7 +18,7 @@
  */
 package ch.njol.skript.variables;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * An instance of a serialized variable, contains the variable name

@@ -20,7 +20,7 @@ package ch.njol.skript.entity;
 
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Fox.Type;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;

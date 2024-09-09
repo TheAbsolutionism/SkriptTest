@@ -26,7 +26,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 // Bukkit does not provide a way to get a PotionEffect from PotionData
 // This class allows us to convert base PotionData of an item into a PotionEffect

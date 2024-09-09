@@ -34,7 +34,7 @@ import ch.njol.util.Kleenean;
 import com.google.common.collect.Lists;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerCommandSendEvent;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 import org.skriptlang.skript.lang.structure.Structure;
 
 import java.util.ArrayList;

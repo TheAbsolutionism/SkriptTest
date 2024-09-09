@@ -21,7 +21,7 @@ package ch.njol.skript.expressions;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import org.skriptlang.skript.lang.converter.Converter;

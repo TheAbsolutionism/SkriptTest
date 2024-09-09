@@ -18,7 +18,7 @@
  */
 package ch.njol.skript.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.yggdrasil.YggdrasilSerializable;
 

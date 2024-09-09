@@ -21,7 +21,7 @@ package ch.njol.util.coll.iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger

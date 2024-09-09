@@ -21,7 +21,7 @@ package ch.njol.skript.entity;
 import java.util.Random;
 
 import org.bukkit.entity.Bee;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;

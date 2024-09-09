@@ -20,7 +20,7 @@ package ch.njol.skript.expressions.base;
 
 import ch.njol.skript.classes.Converter;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;

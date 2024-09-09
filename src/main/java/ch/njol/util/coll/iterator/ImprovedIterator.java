@@ -20,7 +20,7 @@ package ch.njol.util.coll.iterator;
 
 import java.util.Iterator;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class ImprovedIterator<T> implements Iterator<T> {
 	

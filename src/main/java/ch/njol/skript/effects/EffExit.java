@@ -35,7 +35,7 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.sections.SecConditional;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.List;
 

@@ -22,7 +22,7 @@ import ch.njol.yggdrasil.Fields.FieldContext;
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilRobustEnum;
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilRobustSerializable;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;

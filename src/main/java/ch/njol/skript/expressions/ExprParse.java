@@ -45,7 +45,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

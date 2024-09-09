@@ -18,7 +18,7 @@
  */
 package org.skriptlang.skript.lang.converter;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Used to convert an object to a different type.

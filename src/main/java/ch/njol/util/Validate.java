@@ -20,7 +20,7 @@ package ch.njol.util;
 
 import java.util.Collection;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger

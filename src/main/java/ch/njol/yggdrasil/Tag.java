@@ -18,7 +18,7 @@
  */
 package ch.njol.yggdrasil;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;

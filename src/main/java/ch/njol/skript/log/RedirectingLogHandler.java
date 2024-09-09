@@ -19,7 +19,7 @@
 package ch.njol.skript.log;
 
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;

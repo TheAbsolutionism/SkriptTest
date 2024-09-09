@@ -19,7 +19,7 @@
 package ch.njol.skript.util;
 
 import org.bukkit.Sound;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger

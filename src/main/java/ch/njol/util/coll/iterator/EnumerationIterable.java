@@ -21,7 +21,7 @@ package ch.njol.util.coll.iterator;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * TODO this should actually only be an Iterator

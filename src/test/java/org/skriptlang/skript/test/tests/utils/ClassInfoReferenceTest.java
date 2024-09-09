@@ -32,14 +32,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.NotNull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
 
 public class ClassInfoReferenceTest {
 
-	@NotNull
+	@NonNull
 	private Expression<ClassInfoReference> parseAndWrap(String expr) {
 		ParseResult parseResult = SkriptParser.parse(expr, "%classinfos%", SkriptParser.ALL_FLAGS, ParseContext.DEFAULT);
 		if (parseResult == null)

@@ -27,7 +27,7 @@ import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import io.papermc.paper.world.MoonPhase;
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 @Name("Moon Phase")
 @Description("The current moon phase of a world.")

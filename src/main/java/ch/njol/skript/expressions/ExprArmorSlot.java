@@ -34,7 +34,7 @@ import ch.njol.util.Kleenean;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.EntityEquipment;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import java.util.*;
 import java.util.stream.Stream;

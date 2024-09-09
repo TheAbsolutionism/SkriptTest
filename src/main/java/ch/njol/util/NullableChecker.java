@@ -18,7 +18,7 @@
  */
 package ch.njol.util;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 public interface NullableChecker<T> extends Checker<T> {
 	

@@ -20,7 +20,7 @@ package ch.njol.skript.config;
 
 import java.util.Map.Entry;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @author Peter Güttinger

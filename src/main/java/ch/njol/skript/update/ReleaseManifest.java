@@ -21,7 +21,7 @@ package ch.njol.skript.update;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;

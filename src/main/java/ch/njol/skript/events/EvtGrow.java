@@ -34,7 +34,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 public class EvtGrow extends SkriptEvent {
 

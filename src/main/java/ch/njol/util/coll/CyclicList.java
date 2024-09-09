@@ -22,7 +22,7 @@ import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.Collection;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.util.Math2;
 

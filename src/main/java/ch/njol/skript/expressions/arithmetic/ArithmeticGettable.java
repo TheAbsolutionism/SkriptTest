@@ -19,7 +19,7 @@
 package ch.njol.skript.expressions.arithmetic;
 
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * @param <T> The return type of the gettable

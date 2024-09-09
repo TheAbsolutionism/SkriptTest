@@ -23,7 +23,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * This is used to manage local variable type hints.

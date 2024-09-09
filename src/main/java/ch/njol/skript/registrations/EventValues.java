@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import ch.njol.skript.Skript;

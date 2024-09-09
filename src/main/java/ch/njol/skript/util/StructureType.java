@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Location;
 import org.bukkit.TreeType;
 import org.bukkit.block.Block;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.LanguageChangeListener;

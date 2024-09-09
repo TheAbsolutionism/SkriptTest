@@ -31,7 +31,7 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 
 public class EvtFirework extends SkriptEvent {

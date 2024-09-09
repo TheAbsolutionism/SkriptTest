@@ -20,7 +20,7 @@ package ch.njol.skript.log;
 
 import java.util.logging.Level;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 

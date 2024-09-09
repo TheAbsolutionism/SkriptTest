@@ -19,7 +19,7 @@
 package ch.njol.skript.util;
 
 import org.bukkit.DyeColor;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 

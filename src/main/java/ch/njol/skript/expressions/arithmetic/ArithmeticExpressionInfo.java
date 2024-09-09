@@ -21,7 +21,7 @@ package ch.njol.skript.expressions.arithmetic;
 import org.bukkit.event.Event;
 
 import ch.njol.skript.lang.Expression;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 import org.skriptlang.skript.lang.arithmetic.Arithmetics;
 
 public class ArithmeticExpressionInfo<T> implements ArithmeticGettable<T> {

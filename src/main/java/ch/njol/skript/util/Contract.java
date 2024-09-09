@@ -19,7 +19,7 @@
 package ch.njol.skript.util;
 
 import ch.njol.skript.lang.Expression;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The 'contract' of a function or another callable.

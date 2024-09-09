@@ -18,7 +18,7 @@
  */
 package ch.njol.skript.timings;
 
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.Skript;
 import co.aikar.timings.Timing;

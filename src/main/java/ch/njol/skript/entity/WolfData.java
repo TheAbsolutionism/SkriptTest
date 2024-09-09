@@ -20,7 +20,7 @@ package ch.njol.skript.entity;
 
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Wolf;
-import org.jetbrains.annotations.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
