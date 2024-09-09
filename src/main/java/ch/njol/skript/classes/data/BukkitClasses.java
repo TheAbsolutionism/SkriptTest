@@ -106,6 +106,7 @@ import ch.njol.util.StringUtils;
 import ch.njol.yggdrasil.Fields;
 import io.papermc.paper.world.MoonPhase;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Peter Güttinger
@@ -1526,6 +1527,31 @@ public class BukkitClasses {
 				.name("Transform Reason")
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
+
+		if (Classes.getExactClassInfo(BlockState.class) == null) {
+			Classes.registerClass(new ClassInfo<>(BlockState.class, "blockstate")
+				.user("blockstates?")
+				.name("BlockState")
+				.description("Represents the block state of a block.")
+				.since("INSERT VERSION")
+				.parser(new Parser<>() {
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+
+					@Override
+					public @NotNull String toString(BlockState blockState, int flags) {
+						return String.format("BlockState{type=%s,location=%s}",
+							blockState.getType(), blockState.getLocation());
+					}
+
+					@Override
+					public @NotNull String toVariableNameString(BlockState blockState) {
+						return toString(blockState, 0);
+					}
+				}));
+		}
 	}
 
 }
