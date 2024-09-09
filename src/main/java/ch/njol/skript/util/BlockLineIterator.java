@@ -18,15 +18,12 @@
  */
 package ch.njol.skript.util;
 
-import ch.njol.skript.Skript;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import ch.njol.skript.bukkitutil.WorldUtils;
-import ch.njol.util.Math2;
 import ch.njol.util.NullableChecker;
 import ch.njol.util.coll.iterator.StoppableIterator;
 
@@ -38,11 +35,9 @@ public class BlockLineIterator extends StoppableIterator<Block> {
 	 * @throws IllegalStateException randomly (Bukkit bug)
 	 */
 	public BlockLineIterator(Block start, Block end) throws IllegalStateException {
-		super(new BlockIterator(
-					start.getWorld(),
-					start.getLocation().toVector(),
-					end.equals(start) ? new Vector(1, 0, 0) : end.getLocation().subtract(start.getLocation()).toVector(),
-					0, 0
+		super(new BlockIterator(start.getWorld(), start.getLocation().toVector(),
+				end.equals(start) ? new Vector(1, 0, 0) : end.getLocation().subtract(start.getLocation()).toVector(),
+				0, 0
 			), // should prevent an error if start = end
 		new NullableChecker<Block>() {
 			private final double overshotSq = Math.pow(start.getLocation().distance(end.getLocation()) + 2, 2);
