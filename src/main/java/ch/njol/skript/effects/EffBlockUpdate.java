@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 	"force update event-block as stone without physics updates"
 })
 @Since("INSERT VERSION")
-// Ported over from SkBee made by ShaneBee
+// Ported over from SkBee made by ShaneBee (Credits go to him)
 public class EffBlockUpdate extends Effect {
 
 	static {

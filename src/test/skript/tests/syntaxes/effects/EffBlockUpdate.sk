@@ -23,4 +23,3 @@ test "block update":
 	assert blocks at {_blocks::*} is sand with "As: 1 or more block state did not update with or without physics"
 	force update blocks at {_blocks::*} as air
 	assert blocks at {_blocks::*} is sand with "As: 1 or more block state did not update to air"
-	

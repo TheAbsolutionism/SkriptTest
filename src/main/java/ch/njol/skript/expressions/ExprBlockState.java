@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 	"wait 1 minute",
 	"force update {_state} without physics updates"})
 @Since("INSERT VERSION")
+// Ported over from SkBee made by ShaneBee (Credits go to him)
 public class ExprBlockState extends SimplePropertyExpression<Block, BlockState> {
 	static {
 		register(ExprBlockState.class, BlockState.class,
