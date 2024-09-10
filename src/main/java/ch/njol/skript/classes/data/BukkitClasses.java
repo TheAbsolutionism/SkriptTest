@@ -1530,7 +1530,7 @@ public class BukkitClasses {
 
 		if (Classes.getExactClassInfo(BlockState.class) == null) {
 			Classes.registerClass(new ClassInfo<>(BlockState.class, "blockstate")
-				.user("blockstates?")
+				.user("block ?states?")
 				.name("BlockState")
 				.description("Represents the block state of a block.")
 				.since("INSERT VERSION")

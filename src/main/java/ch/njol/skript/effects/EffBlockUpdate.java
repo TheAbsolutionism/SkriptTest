@@ -17,10 +17,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Name("BlockState - Update")
-@Description({"Updates the blockstate of a block to cached state or selected block",
+@Description({
+	"Updates the blockstate of a block to cached state or selected block",
 	"`force`: Will force the update of the block",
-	"`without physics`: Does not send updates to surrounding blocks"})
-@Examples({"set {_state} to blockstate of event-block",
+	"`without physics`: Does not send updates to surrounding blocks"
+})
+@Examples({
+	"set {_state} to blockstate of event-block",
 	"set event-block to air",
 	"wait 1 minute",
 	"force update {_state} without physics updates",
@@ -34,17 +37,16 @@ public class EffBlockUpdate extends Effect {
 	static {
 		Skript.registerEffect(EffBlockUpdate.class,
 			"[:force] update %blockstates% [physics:without (neighbour|physics) updates]",
-					"[:force] update %blocks% as %blockdata% [physics:without (neighbour|physics) updates]");
+			"[:force] update %blocks% as %blockdata% [physics:without (neighbour|physics) updates]");
 	}
 
-	private boolean force;
-	private boolean physics;
+	private boolean force, physics;
 	private Expression<BlockState> blockStates;
 	private Expression<Block> blocks;
 	private Expression<BlockData> blockData;
 
-	@SuppressWarnings({"unchecked"})
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		this.force = parseResult.hasTag("force");
 		this.physics = !parseResult.hasTag("physics");
@@ -75,11 +77,13 @@ public class EffBlockUpdate extends Effect {
 	@Override
 	public @NotNull String toString(@Nullable Event event, boolean bool) {
 		String result = this.force ? "force " : "";
-		if (this.blockStates != null)
+		if (this.blockStates != null) {
 			result += this.blockStates.toString(event, bool);
-		else
+		} else {
 			result += this.blocks.toString(event, bool) + " " + this.blockData.toString(event, bool);
+		}
 		result += this.physics ? " without neighbour updates" : "";
 		return result;
 	}
+
 }
