@@ -94,7 +94,8 @@ public class EffSecSendResourcePack extends EffectSection {
 
 	static {
 		Skript.registerSection(EffSecSendResourcePack.class,
-			"send [a|the] resource pack (at|from [[the] URL]) %string% to %players% [using|with]"
+			"send [a|the] resource pack [at|from [[the] URL]] %string% to %players% [using|with]",
+			"send [a|the] resource pack [at|from [[the] URL]] %string% with hash %string% to %players%"
 			);
 
 	}
@@ -107,12 +108,21 @@ public class EffSecSendResourcePack extends EffectSection {
 	private Expression<Player> recipients;
 	@Nullable
 	private Trigger trigger;
+	@Nullable
+	private Expression<String> oldHash;
+	private int pattern;
 
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, @Nullable SectionNode sectionNode, List<TriggerItem> triggerItems) {
 		this.url = (Expression<String>) exprs[0];
-		this.recipients = (Expression<Player>) exprs[1];
+		this.pattern = matchedPattern;
+		if (matchedPattern == 2) {
+			this.oldHash = (Expression<String>) exprs[1];
+			this.recipients = (Expression<Player>) exprs[2];
+		} else {
+			this.recipients = (Expression<Player>) exprs[1];
+		}
 
 		if (sectionNode != null) {
 			AtomicBoolean delayed = new AtomicBoolean(false);
@@ -134,7 +144,7 @@ public class EffSecSendResourcePack extends EffectSection {
 		assert url != null;
 		String address = url.getSingle(event);
 		UUID uuid = null;
-		String hash = "defaultHash";
+		String hash =  this.oldHash == null ? "defaultHash" : this.oldHash.getSingle(event);
 		String prompt = "The server has requested you to download a resource pack";
 		boolean force = false;
 		if (trigger != null) {
@@ -175,6 +185,9 @@ public class EffSecSendResourcePack extends EffectSection {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		String result = "send the resource pack from the URL " + url.toString(event, debug);
+		if (this.oldHash != null) {
+			result += " with hash " + this.oldHash.toString(event, debug);
+		}
 		if (trigger != null) {
 			ResourcePackEvent resourcePackEvent = (ResourcePackEvent) event;
 			String checkUUID = resourcePackEvent.getId();
@@ -184,7 +197,7 @@ public class EffSecSendResourcePack extends EffectSection {
 			if (checkUUID != null) {
 				result += ", with uuid " + checkUUID;
 			}
-			if (checkHash != null) {
+			if (checkHash != null && this.oldHash == null) {
 				result += ", with hash " + checkHash;
 			}
 			if (checkPrompt != null) {
