@@ -20,39 +20,41 @@ import org.jetbrains.annotations.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import ch.njol.skript.util.Utils;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Name("Send Resource Pack")
-@Description({"Request that the player's client download and switch resource packs. The client will download",
+@Description({
+	"Request that the player's client download and switch resource packs. The client will download",
 	"the resource pack in the background, and will automatically switch to it once the download is complete.",
 	"The URL must be a direct download link.",
 	"",
 	"The [**resource pack request action**](events.html#resource_pack_request_action) can be used to check",
-	"status of the sent resource pack request.",
+	"the status of the sent resource pack request.",
 	"",
-	"Take a look at [**Resource Pack Values**]() to see additional options."
+	"Take a look at [**Resource Pack Values**](https://docs.skriptlang.org/effects.html#EffResourcePackValues) to see additional options."
 })
 @Examples({
 	"on join:",
-	"	send the resource pack from \"URL\" to the player",
+		"\tsend the resource pack from \"URL\" to the player",
 	"",
-	"   send the resource pack from \"URL\" to the player using:",
-	"      set the resource pack uuid to \"1\"",
-	"      set the resource pack hash to \"Hash\"",
-	"      set the resource pack prompt to \"Please Download\"",
-	"      force the player to accept"
+		"\tsend the resource pack from \"URL\" to the player using:",
+			"\t\tset the resource pack uuid to \"1\"",
+			"\t\tset the resource pack hash to \"Hash\"",
+			"\t\tset the resource pack prompt to \"Please Download\"",
+			"\t\tforce the player to accept"
 })
-@Since("2.4") //Change??
+@Since("2.4, INSERT VERSION (section)")
 public class EffSecSendResourcePack extends EffectSection {
 
 	public static class ResourcePackEvent extends Event {
 		@Nullable
-		private String id, hash, prompt = null;
+		private String id, hash, prompt;
 		@Nullable
-		private Boolean force = null;
+		private Boolean force;
 
 		public ResourcePackEvent() {}
 
@@ -92,17 +94,15 @@ public class EffSecSendResourcePack extends EffectSection {
 
 	static {
 		Skript.registerSection(EffSecSendResourcePack.class,
-			"send [a|the] resource pack (at|from [[the] URL]) %string% to %players% [using|with]",
-			"remove [:all] resource pack[s] [id:with [the] [uu]id] from %players%"
+			"send [a|the] resource pack (at|from [[the] URL]) %string% to %players% [using|with]"
 			);
 
 	}
 
-	private int pattern;
-	@Nullable
+	@UnknownNullability
 	@SuppressWarnings("null")
 	private Expression<String> url;
-	@Nullable
+	@UnknownNullability
 	@SuppressWarnings("null")
 	private Expression<Player> recipients;
 	@Nullable
@@ -133,7 +133,7 @@ public class EffSecSendResourcePack extends EffectSection {
 		debug(event, true);
 		assert url != null;
 		String address = url.getSingle(event);
-		String uuid = null;
+		UUID uuid = null;
 		String hash = "defaultHash";
 		String prompt = "The server has requested you to download a resource pack";
 		boolean force = false;
@@ -149,7 +149,7 @@ public class EffSecSendResourcePack extends EffectSection {
 			Boolean checkForce = resourcePackEvent.getForce();
 
 			if (checkUUID != null) {
-				uuid = Utils.convertUUID(checkUUID);
+				uuid = UUID.fromString(Utils.convertUUID(checkUUID));
 			}
 			if (checkHash != null) {
 				hash = checkHash;
@@ -163,12 +163,12 @@ public class EffSecSendResourcePack extends EffectSection {
 		}
 		for (Player player : recipients.getArray(event)) {
 			if (uuid != null) {
-				player.setResourcePack(UUID.fromString(uuid), address, StringUtils.hexStringToByteArray(hash), prompt, force);
+				player.setResourcePack(uuid, address, StringUtils.hexStringToByteArray(hash), prompt, force);
 			} else {
 				player.setResourcePack(address, StringUtils.hexStringToByteArray(hash), prompt, force);
 			}
 		}
-		return getNext();
+		return super.walk(event, false);
 	}
 
 
@@ -176,10 +176,11 @@ public class EffSecSendResourcePack extends EffectSection {
 	public String toString(@Nullable Event event, boolean debug) {
 		String result = "send the resource pack from the URL " + url.toString(event, debug);
 		if (trigger != null) {
-			String checkUUID = ((ResourcePackEvent) event).getId();
-			String checkHash = ((ResourcePackEvent) event).getHash();
-			String checkPrompt = ((ResourcePackEvent) event).getPrompt();
-			Boolean checkForce = ((ResourcePackEvent) event).getForce();
+			ResourcePackEvent resourcePackEvent = (ResourcePackEvent) event;
+			String checkUUID = resourcePackEvent.getId();
+			String checkHash = resourcePackEvent.getHash();
+			String checkPrompt = resourcePackEvent.getPrompt();
+			Boolean checkForce = resourcePackEvent.getForce();
 			if (checkUUID != null) {
 				result += ", with uuid " + checkUUID;
 			}
@@ -193,6 +194,7 @@ public class EffSecSendResourcePack extends EffectSection {
 				result +=  ", with force";
 			}
 		}
+		result += " to " + recipients.toString(event, debug);
 		return result;
 	}
 

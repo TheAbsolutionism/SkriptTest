@@ -13,11 +13,14 @@ import ch.njol.util.Kleenean;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.UUID;
 
 @Name("Remove Resource Pack")
-@Description({"Remove all resource packs or a resource pack by uuid sent by the server.",
+@Description({
+	"Remove all resource packs or a resource pack by uuid sent by the server.",
+	"You can only choose to remove all or by uuid, not both",
 	"",
 	"You can allow up to 32 alphanumeric characters in the uuid."
 })
@@ -29,21 +32,21 @@ import java.util.UUID;
 public class EffRemoveResourcePack extends Effect {
 
 	static {
-		Skript.registerEffect(EffRemoveResourcePack.class, "remove [:all] resource pack[s] [id:with [the] [uu]id %string%] from %players%");
+		Skript.registerEffect(EffRemoveResourcePack.class, "remove [:all] resource pack[s] [with [the] [uu]id %-string%] from %players%");
 	}
 
 	@Nullable
 	private boolean modeAll, modeId;
-	@Nullable
+	@UnknownNullability
 	private Expression<String> id;
-	@Nullable
+	@UnknownNullability
 	private Expression<Player> recipients;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		modeAll = parseResult.hasTag("all");
-		modeId = parseResult.hasTag("id");
-		if (modeAll && modeId) {
+		modeId = (!modeAll);
+		if (modeAll && exprs[0] != null) {
 			Skript.error("You cannot remove all and by uuid");
 			return false;
 		}
@@ -56,15 +59,18 @@ public class EffRemoveResourcePack extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		String uuid = null;
+		UUID uuid = null;
 		if (modeId) {
-			uuid = Utils.convertUUID(id.getSingle(event));
+			uuid = UUID.fromString(Utils.convertUUID(id.getSingle(event)));
+			if (uuid == null) {
+				return;
+			}
 		}
 		for (Player player : recipients.getArray(event)) {
 			if (modeAll) {
 				player.removeResourcePacks();
-			} else if (modeId && uuid != null) {
-				player.removeResourcePack(UUID.fromString(uuid));
+			} else if (modeId) {
+				player.removeResourcePack(uuid);
 			}
 		}
 	}
@@ -74,11 +80,11 @@ public class EffRemoveResourcePack extends Effect {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		if (modeAll) {
-			return "remove all recource packs from " + recipients.toString(event, debug);
+			return "remove all resource packs from " + recipients.toString(event, debug);
 		} else if (modeId) {
 			return "remove resource pack with the uuid " + id.toString(event, debug) + " from " + recipients.toString(event, debug);
 		}
-		return null;
+		return "null";
 	}
 
 }

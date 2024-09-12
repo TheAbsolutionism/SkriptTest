@@ -841,9 +841,12 @@ public abstract class Utils {
 
 	}
 
+	/**
+	 * Converts an alphanumeric string into a valid UUID string
+	 * @param input alphanumeric string
+	 * @return Valid UUID string
+	 */
 	@Nullable
-	// Converts string to a valid UUID string (32 alphanumeric and 4 dashes, 36)
-	// Example: Inserting "1" converts to "00000000-00000000-00000000-00000001"
 	public static String convertUUID(String input) {
 		if (input.isEmpty()) {
 			return "00000000-00000000-00000000-00000000";
