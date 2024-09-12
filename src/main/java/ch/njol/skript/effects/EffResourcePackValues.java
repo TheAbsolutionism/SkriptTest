@@ -63,7 +63,7 @@ public class EffResourcePackValues extends Effect {
 			return false;
 		}
 		pattern = matchedPattern;
-		if (exprs.length == 1 || exprs[0] != null) {
+		if (exprs.length == 1) {
 			value = (Expression<String>) exprs[0];
 		}
 		return true;

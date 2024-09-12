@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"The [**resource pack request action**](events.html#resource_pack_request_action) can be used to check",
 	"status of the sent resource pack request.",
 	"",
-	"Take a look at [**Resource Pack Values**]() to look at additional options."
+	"Take a look at [**Resource Pack Values**]() to see additional options."
 })
 @Examples({
 	"on join:",
@@ -181,16 +181,16 @@ public class EffSecSendResourcePack extends EffectSection {
 			String checkPrompt = ((ResourcePackEvent) event).getPrompt();
 			Boolean checkForce = ((ResourcePackEvent) event).getForce();
 			if (checkUUID != null) {
-				result += " with uuid " + checkUUID;
+				result += ", with uuid " + checkUUID;
 			}
 			if (checkHash != null) {
-				result += " with hash " + checkHash;
+				result += ", with hash " + checkHash;
 			}
 			if (checkPrompt != null) {
-				result += " with prompt " + checkPrompt;
+				result += ", with prompt " + checkPrompt;
 			}
 			if (checkForce != null) {
-				result +=  " with force";
+				result +=  ", with force";
 			}
 		}
 		return result;
