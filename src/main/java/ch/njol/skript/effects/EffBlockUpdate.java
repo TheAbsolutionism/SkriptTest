@@ -31,13 +31,13 @@ import org.jetbrains.annotations.Nullable;
 	"force update event-block as stone without physics updates"
 })
 @Since("INSERT VERSION")
-// Ported over from SkBee made by ShaneBee (Credits go to him)
+// Originally sourced from SkBee by ShaneBee (https://github.com/ShaneBeee/SkBee/blob/master/src/main/java/com/shanebeestudios/skbee/elements/other/effects/EffBlockstateUpdate.java)
 public class EffBlockUpdate extends Effect {
 
 	static {
 		Skript.registerEffect(EffBlockUpdate.class,
-			"[:force] update %blockstates% [physics:without (neighbour|physics) updates]",
-			"[:force] update %blocks% as %blockdata% [physics:without (neighbour|physics) updates]");
+			"[:force] update %blockstates% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]",
+			"[:force] update %blockstates% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]");
 	}
 
 	private boolean force, physics;
@@ -75,12 +75,12 @@ public class EffBlockUpdate extends Effect {
 	}
 
 	@Override
-	public @NotNull String toString(@Nullable Event event, boolean bool) {
+	public @NotNull String toString(@Nullable Event event, boolean debug) {
 		String result = this.force ? "force " : "";
 		if (this.blockStates != null) {
-			result += this.blockStates.toString(event, bool);
+			result += this.blockStates.toString(event, debug);
 		} else {
-			result += this.blocks.toString(event, bool) + " " + this.blockData.toString(event, bool);
+			result += this.blocks.toString(event, debug) + " " + this.blockData.toString(event, debug);
 		}
 		result += this.physics ? " without neighbour updates" : "";
 		return result;

@@ -22,8 +22,9 @@ import org.jetbrains.annotations.Nullable;
 	"force update {_state} without physics updates"
 })
 @Since("INSERT VERSION")
-// Ported over from SkBee made by ShaneBee (Credits go to him)
+// Originally sourced from SkBee by ShaneBee (https://github.com/ShaneBeee/SkBee/blob/master/src/main/java/com/shanebeestudios/skbee/elements/other/expressions/ExprBlockStateGet.java)
 public class ExprBlockState extends SimplePropertyExpression<Block, BlockState> {
+
 	static {
 		register(ExprBlockState.class, BlockState.class, "(captured|block)[ ]state[s]", "blocks");
 	}
