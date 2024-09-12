@@ -16,25 +16,26 @@ import org.jetbrains.annotations.UnknownNullability;
 
 @Name("Resource Pack Values")
 @Description({
-	"Optional values to be used when sending a resource pack",
-	"Can only be used in a Resource Pack Effect Section",
+	"Optional values to be used when sending a resource pack. " +
+	"These can only be used in a Resource Pack Effect Section",
 	"",
-	"The uuid is used to store and indetify the resource pack. Use this when you want to remove a specific resource pack.",
-	"You can allow up to 32 alphanumeric characters in the uuid.",
+	"The UUID is used to identify the resource pack. Useful when removing packs from players.",
+	"UUIDs must be valid using the following format: ",
+	"\"00000000-00000000-00000000-00000000\"",
 	"",
-	"The hash is used for caching, the player won't have to re-download the resource pack that way. ",
-	"The hash must be SHA-1, you can get the SHA-1 hash of your resource pack using ",
-	"[**this online tool**](https://emn178.github.io/online-tools/sha1_checksum.html)",
+	"The hash is used for caching, so that the player doesn't have to re-download the resource pack each time they join. ",
+	"The hash must be SHA-1, you can get the SHA-1 hash of your resource pack using " +
+    "<a href=\\\"https://emn178.github.io/online-tools/sha1_checksum.html\\\">this online tool</a>.",
 	"",
-	"The prompt is used to display a custom message when a players is prompted",
+	"The prompt can be used to display a custom message when a players is prompted" +
 	"to download the sent resource pack",
 	"",
-	"Using with force, forces the player to accept the request",
+	"The force option, forces the player to accept the request",
 })
 @Examples({
 	"on join:",
-		"\tsend the resource pack from \"URL\" to the player using:",
-			"\t\tset the resource pack uuid to \"1\"",
+		"\tsend the resource pack from \"URL\" to the player:",
+			"\t\tset the resource pack uuid to \"00000000-00000000-00000000-000000001\"",
 			"\t\tset the resource pack hash to \"Hash\"",
 			"\t\tset the resource pack prompt to \"Please Download\"",
 			"\t\tforce the player to accept"
@@ -44,15 +45,14 @@ public class EffResourcePackValues extends Effect {
 
 	static {
 		Skript.registerEffect(EffResourcePackValues.class,
-			"set [the] [resource][ ][pack] [uu]id to %string%",
-			"set [the] [resource][ ][pack] hash to %string%",
-			"set [the] [resource][ ][pack] prompt [message] to %string%",
+			"set [the] [[resource] [pack]] [uu]id to %string%",
+			"set [the] [[resource] [pack]] hash to %string%",
+			"set [the] [[resource] [pack]] prompt [message] to %string%",
 			"force [the] player[s] to accept"
 		);
 	}
 
-	@UnknownNullability
-	private Expression<String> value;
+	private @UnknownNullability Expression<String> value;
 	private int pattern;
 
 	@Override

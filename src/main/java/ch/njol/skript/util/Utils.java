@@ -848,9 +848,11 @@ public abstract class Utils {
 	 */
 	@Nullable
 	public static String convertUUID(String input) {
-		if (input.isEmpty()) {
+		if (input.isEmpty())
 			return "00000000-00000000-00000000-00000000";
-		}
+		if (UUID.fromString(input) != null)
+			return input;
+
 		String[] parts = input.replaceAll("[^a-zA-Z0-9-]", "").split("-");
 		StringBuilder cleanInput = new StringBuilder();
 		for (String part : parts) {
