@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Player;
@@ -23,11 +24,11 @@ import java.util.UUID;
 	"You can only choose to remove all packs or by UUID, not both",
 	"",
 	"UUIDs must be valid using the following format: ",
-	"\"00000000-00000000-00000000-00000000\"",
+	"\"00000000-0000-0000-0000-000000000000\"",
 })
 @Examples({
 	"remove all resource packs from all players",
-	"remove resource pack with the uuid \"00000000-00000000-00000000-000000001\" from all players"
+	"remove resource pack with the uuid \"00000000-0000-0000-0000-0000000000001\" from all players"
 })
 @Since("INSERT VERSION")
 public class EffRemoveResourcePack extends Effect {
@@ -62,7 +63,11 @@ public class EffRemoveResourcePack extends Effect {
 	protected void execute(Event event) {
 		UUID uuid = null;
 		if (pattern == 2) {
-			uuid = UUID.fromString(Utils.convertUUID(id.getSingle(event)));
+			try {
+				uuid = UUID.fromString(id.getSingle(event));
+			} catch (IllegalArgumentException exception) {
+				Skript.error("Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
+			}
 			if (uuid == null) {
 				return;
 			}

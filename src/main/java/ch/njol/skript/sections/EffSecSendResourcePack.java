@@ -11,6 +11,7 @@ import ch.njol.skript.lang.EffectSection;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import ch.njol.util.StringUtils;
@@ -145,7 +146,7 @@ public class EffSecSendResourcePack extends EffectSection {
 		UUID uuid = null;
 		String hash =  this.oldHash == null ? null : this.oldHash.getSingle(event);
 		String prompt = null;
-		Boolean force = null;
+		Boolean force = false;
 		if (trigger != null) {
 			ResourcePackEvent resourcePackEvent = new ResourcePackEvent();
 			Variables.setLocalVariables(resourcePackEvent, Variables.copyLocalVariables(event));
@@ -158,7 +159,14 @@ public class EffSecSendResourcePack extends EffectSection {
 			Boolean checkForce = resourcePackEvent.getForce();
 
 			if (checkUUID != null) {
-				uuid = UUID.fromString(Utils.convertUUID(checkUUID));
+				try {
+					uuid = UUID.fromString(checkUUID);
+				} catch (IllegalArgumentException exception) {
+					Skript.error("Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
+				}
+				if (uuid == null) {
+					return super.walk(event, false);
+				}
 			}
 			if (checkHash != null) {
 				hash = checkHash;
@@ -166,7 +174,7 @@ public class EffSecSendResourcePack extends EffectSection {
 			if (checkPrompt != null) {
 				prompt = checkPrompt;
 			}
-			if (checkForce) {
+			if (checkForce != null) {
 				force = checkForce;
 			}
 		}

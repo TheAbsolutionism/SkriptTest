@@ -841,36 +841,4 @@ public abstract class Utils {
 
 	}
 
-	/**
-	 * Converts an alphanumeric string into a valid UUID string
-	 * @param input alphanumeric string
-	 * @return Valid UUID string
-	 */
-	@Nullable
-	public static String convertUUID(String input) {
-		if (input.isEmpty())
-			return "00000000-00000000-00000000-00000000";
-		if (UUID.fromString(input) != null)
-			return input;
-
-		String[] parts = input.replaceAll("[^a-zA-Z0-9-]", "").split("-");
-		StringBuilder cleanInput = new StringBuilder();
-		for (String part : parts) {
-			cleanInput.append(part);
-		}
-		String result = cleanInput.toString().substring(0, Math.min(32, cleanInput.length()));
-		result = String.format("%32s", result).replace(' ', '0');
-
-		StringBuilder uuid = new StringBuilder();
-		uuid.append(result.substring(0, 8))
-			.append("-")
-			.append(result.substring(8, 16))
-			.append("-")
-			.append(result.substring(16, 24))
-			.append("-")
-			.append(result.substring(24, 32));
-
-		return uuid.toString();
-	}
-
 }

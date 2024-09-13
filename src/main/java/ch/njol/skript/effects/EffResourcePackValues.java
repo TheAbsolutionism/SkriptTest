@@ -21,7 +21,7 @@ import org.jetbrains.annotations.UnknownNullability;
 	"",
 	"The UUID is used to identify the resource pack. Useful when removing packs from players.",
 	"UUIDs must be valid using the following format: ",
-	"\"00000000-00000000-00000000-00000000\"",
+	"\"00000000-0000-0000-0000-000000000000\"",
 	"",
 	"The hash is used for caching, so that the player doesn't have to re-download the resource pack each time they join. ",
 	"The hash must be SHA-1, you can get the SHA-1 hash of your resource pack using " +
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.UnknownNullability;
 @Examples({
 	"on join:",
 		"\tsend the resource pack from \"URL\" to the player:",
-			"\t\tset the resource pack uuid to \"00000000-00000000-00000000-000000001\"",
+			"\t\tset the resource pack uuid to \"00000000-0000-0000-0000-000000000001\"",
 			"\t\tset the resource pack hash to \"Hash\"",
 			"\t\tset the resource pack prompt to \"Please Download\"",
 			"\t\tforce the player to accept"
