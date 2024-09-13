@@ -70,6 +70,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerExpCooldownChangeEvent.ChangeReason;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -1526,6 +1527,12 @@ public class BukkitClasses {
 				.name("Transform Reason")
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
+
+		Classes.registerClass(new EnumClassInfo<>(ChangeReason.class,  "changereason", "change reasons")
+			.user("[experience|exp|xp] ?change (reason|cause)s?")
+			.name("Experience Cooldown Change Reason")
+			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
+			.since("INSERT VERSION"));
 	}
 
 }
