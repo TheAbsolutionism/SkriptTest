@@ -35,7 +35,7 @@ public class EffRemoveResourcePack extends Effect {
 
 	static {
 		Skript.registerEffect(EffRemoveResourcePack.class,
-			"remove all resource pack[s] [with [the] [uu]id %-string%] from %players%",
+			"remove all resource pack[s] from %players%",
 			"remove [a|the] resource pack with [the] [uu]id %string% from %players%"
 		);
 	}
@@ -66,7 +66,7 @@ public class EffRemoveResourcePack extends Effect {
 			try {
 				uuid = UUID.fromString(id.getSingle(event));
 			} catch (IllegalArgumentException exception) {
-				Skript.error("Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
+				Skript.error("Remove Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
 			}
 			if (uuid == null) {
 				return;

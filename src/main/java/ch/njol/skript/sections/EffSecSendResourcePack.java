@@ -162,7 +162,7 @@ public class EffSecSendResourcePack extends EffectSection {
 				try {
 					uuid = UUID.fromString(checkUUID);
 				} catch (IllegalArgumentException exception) {
-					Skript.error("Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
+					Skript.error("Send Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
 				}
 				if (uuid == null) {
 					return super.walk(event, false);
