@@ -25,3 +25,4 @@ test "spawn wolves by variant" when running minecraft "1.21.0":
 	assert size of all wolves = 5 with "Size of all wolves is not 5 after delete 2 rusty wolves"
 	delete all wolves
 	assert size of all wolves = 0 with "Size of all wolves is greater than 0 after all were deleted"
+	

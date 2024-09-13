@@ -49,10 +49,9 @@ public class WolfData extends EntityData<Wolf> {
 
 
 	private static Object[] variants;
-	@Nullable
-	private Object variant;
-	@Nullable
-	private DyeColor collarColor;
+
+	private @Nullable Object variant;
+	private @Nullable DyeColor collarColor;
 
 	private int angry = 0;
 	private int tamed = 0;
@@ -101,7 +100,7 @@ public class WolfData extends EntityData<Wolf> {
 	@Override
 	public boolean match(Wolf entity) {
 		return (angry == 0 || entity.isAngry() == (angry == 1)) && (tamed == 0 || entity.isTamed() == (tamed == 1)) &&
-			(collarColor == null ? true : entity.getCollarColor() == collarColor) && (variant == null ? true : entity.getVariant() == variant);
+			(collarColor == null || entity.getCollarColor() == collarColor) && (variant == null || entity.getVariant() == variant);
 	}
 
 	@Override
