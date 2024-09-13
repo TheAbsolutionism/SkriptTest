@@ -798,14 +798,15 @@ public class SimpleEvents {
 		Skript.registerEvent("Player Experience Cooldown Event", SimpleEvent.class, PlayerExpCooldownChangeEvent.class, "player (experience|exp|xp) cooldown change")
 			.description(
 				"Called when a players experience cooldown changes.",
-				"<ul>",
-				"<li>event-player : The player whose cooldown was changed.</li>",
-				"<li>event-change reason : The reason it was changed.</li>",
-				"<li>event-timespan : The new timespan for the player.</li>",
-				"<li>past event-timespan : The previous timespan, before being changed.</li>",
-				"</ul>"
+				"Experience cooldown is how long until a player can pickup another orb of experience"
 			)
-			.examples("on player experience cooldown change:")
+			.examples(
+				"on player experience cooldown change:",
+					"\tevent-player",
+					"\tevent-change reason",
+					"\tevent-timespan",
+					"\tpast event-timespan"
+			)
 			.since("INSERT VERSION");
 
 	}

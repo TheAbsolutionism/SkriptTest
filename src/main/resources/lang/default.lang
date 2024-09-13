@@ -2278,7 +2278,7 @@ transform reasons:
 # -- Change Reasons --
 change reasons:
 	plugin: plugin
-	pickup_orb: orb, orb pickup, pickup, pickup orb
+	pickup_orb: orb pickup, pickup orb
 
 # -- Boolean --
 boolean:

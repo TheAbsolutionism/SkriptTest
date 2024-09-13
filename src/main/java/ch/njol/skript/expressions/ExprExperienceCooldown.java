@@ -1,6 +1,5 @@
 package ch.njol.skript.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -28,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Timespan> {
 
 	static {
-		register(ExprExperienceCooldown.class, Timespan.class, "(experience|exp|xp) cooldown", "players");
+		register(ExprExperienceCooldown.class, Timespan.class, "[the] (experience|exp|xp) cooldown", "players");
 	}
 
 	@Override
@@ -52,32 +51,31 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 	@Override
 	public @Nullable void change(Event event, Object[] delta, ChangeMode mode) {
 		int providedTime = 0;
-		if (delta[0] != null && delta[0] instanceof Timespan span) {
-			providedTime = (int) span.get(Timespan.TimePeriod.TICK);
+		if (delta[0] != null && delta[0] instanceof Timespan timeSpan) {
+			providedTime = (int) timeSpan.get(Timespan.TimePeriod.TICK);
 		}
 		switch (mode) {
-			case ADD:
+			case ADD -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(player.getExpCooldown() + providedTime);
 				}
-				return;
-			case REMOVE:
+			}
+			case REMOVE -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(Math.max(player.getExpCooldown() + providedTime, 0));
 				}
-				return;
-			case SET:
+			}
+			case SET -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(providedTime);
 				}
-				return;
-			case DELETE, RESET:
+			}
+			case DELETE, RESET -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(0);
 				}
-				return;
-			default:
-				return;
+			}
+			default -> {}
 		}
 	}
 
