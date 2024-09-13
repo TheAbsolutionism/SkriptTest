@@ -89,7 +89,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 	}
 
 	@Override
-	public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (getParser().getHasDelayBefore().isTrue()) {
 			Skript.error("Can't change the drops after the event has already passed");
 			return null;
@@ -108,7 +108,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 	}
 
 	@Override
-	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 
 		List<ItemStack> drops = null;
 		int originalExperience = 0;
