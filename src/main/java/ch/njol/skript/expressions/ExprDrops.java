@@ -121,7 +121,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 				.map(Item::getItemStack)
 				.toList();
 		} else {
-			return;;
+			return;
 		}
 
 		assert delta != null;
