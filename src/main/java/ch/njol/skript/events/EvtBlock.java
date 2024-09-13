@@ -71,7 +71,19 @@ public class EvtBlock extends SkriptEvent {
 			.examples("on form of snow:", "on form of a mushroom:")
 			.since("1.0, 2.6 (BlockData support)");
 		Skript.registerEvent("Block Drop", EvtBlock.class, BlockDropItemEvent.class, "block drop[ping] [[of] %-itemtypes/blockdatas%]")
-			.description("Called when a block drops items")
+			.description(
+				"Called when a block broken by a player drops items",
+				"<ul>",
+				"<li>event-player : The player that broke the block</li>",
+				"<li>past event-block : The block that was broken</li>",
+				"<li>event-block : The block after being broken</li>",
+				"<li>event-items (or drops) : The drops of the block</li>",
+				"<li>event-entities : The entities of the dropped items</li>",
+				"</ul>",
+				"",
+				"If the breaking of the block leads to others being broken, such as torches, they will appear",
+				"in \"event-items\" and \"event-entities\"."
+			)
 			.examples("on block drop:", "on block drop of oak log:")
 			.since("INSERT VERSION");
 	}
@@ -145,7 +157,7 @@ public class EvtBlock extends SkriptEvent {
 	
 	@Override
 	public @NotNull String toString(@Nullable Event event, boolean debug) {
-		return "break/place/burn/fade/form/drop item/ of " + Classes.toString(types);
+		return "break/place/burn/fade/form/drop of " + Classes.toString(types);
 	}
 	
 }
