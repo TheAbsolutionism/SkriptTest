@@ -1,0 +1,25 @@
+on load:
+	broadcast "On Load Block Drop"
+	set {_test::1} to "got player"
+	set {_test::2} to "got block"
+	set {_test::3} to "got items"
+	set {_test::4} to "got drops"
+	set {_test::5} to "got entities"
+
+	ensure junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest" completes {_test::*}
+	
+	
+on block drop:
+	broadcast "AH, I have been broken"
+	junit test is "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	if event-block is set:
+		complete objective "got block" for junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	if event-player is set:
+		complete objective "got player" for junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	if event-items is set:
+		complete objective "got items" for junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	if drops is set:
+		complete objective "got drops" for junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	if event-entities is set:
+		complete objective "got entities" for junit test "org.skriptlang.skript.test.tests.syntaxes.events.EvtBlockDropTest"
+	clear event-entities

@@ -34,7 +34,10 @@ import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Experience;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -61,7 +64,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!getParser().isCurrentEvent(EntityDeathEvent.class)) {
+		if (!getParser().isCurrentEvent(EntityDeathEvent.class, BlockDropItemEvent.class)) {
 			Skript.error("The expression 'drops' can only be used in death events", ErrorQuality.SEMANTIC_ERROR);
 			return false;
 		}
@@ -69,20 +72,24 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 	}
 
 	@Override
-	@Nullable
-	protected ItemType[] get(Event e) {
-		if (!(e instanceof EntityDeathEvent))
-			return null;
-
-		return ((EntityDeathEvent) e).getDrops()
-			.stream()
-			.map(ItemType::new)
-			.toArray(ItemType[]::new);
+	protected @Nullable ItemType[] get(Event event) {
+		if (event instanceof EntityDeathEvent entityDeathEvent) {
+			return entityDeathEvent.getDrops()
+				.stream()
+				.map(ItemType::new)
+				.toArray(ItemType[]::new);
+		} else if (event instanceof BlockDropItemEvent blockDropItemEvent) {
+			return blockDropItemEvent.getItems()
+				.stream()
+				.map(Item::getItemStack)
+				.map(ItemType::new)
+				.toArray(ItemType[]::new);
+		}
+		return new ItemType[0];
 	}
 
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
 		if (getParser().getHasDelayBefore().isTrue()) {
 			Skript.error("Can't change the drops after the event has already passed");
 			return null;
@@ -102,11 +109,19 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
-		if (!(event instanceof EntityDeathEvent))
-			return;
 
-		List<ItemStack> drops = ((EntityDeathEvent) event).getDrops();
-		int originalExperience = ((EntityDeathEvent) event).getDroppedExp();
+		List<ItemStack> drops = null;
+		int originalExperience = 0;
+		if (event instanceof EntityDeathEvent entityDeathEvent) {
+			drops = entityDeathEvent.getDrops();
+			originalExperience = entityDeathEvent.getDroppedExp();
+		} else if (event instanceof BlockDropItemEvent blockDropItemEvent) {
+			drops = blockDropItemEvent.getItems()
+				.stream()
+				.map(Item::getItemStack)
+				.toList();
+		}
+
 		assert delta != null;
 
 		// separate the delta into experience and drops to make it easier to handle
@@ -144,20 +159,20 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		// todo: All the experience stuff should be removed from this class for 2.8 and given to ExprExperience
 
 		// handle experience
-		if (deltaExperience > -1) {
+		if (deltaExperience > -1 && event instanceof EntityDeathEvent entityDeathEvent) {
 			switch (mode) {
 				case SET:
-					((EntityDeathEvent) event).setDroppedExp(deltaExperience);
+					entityDeathEvent.setDroppedExp(deltaExperience);
 					break;
 				case ADD:
-					((EntityDeathEvent) event).setDroppedExp(originalExperience + deltaExperience);
+					entityDeathEvent.setDroppedExp(originalExperience + deltaExperience);
 					break;
 				case REMOVE:
-					((EntityDeathEvent) event).setDroppedExp(originalExperience - deltaExperience);
+					entityDeathEvent.setDroppedExp(originalExperience - deltaExperience);
 					// fallthrough to check for removeAllExperience
 				case REMOVE_ALL:
 					if (removeAllExperience)
-						((EntityDeathEvent) event).setDroppedExp(0);
+						entityDeathEvent.setDroppedExp(0);
 					break;
 				case DELETE:
 				case RESET:
