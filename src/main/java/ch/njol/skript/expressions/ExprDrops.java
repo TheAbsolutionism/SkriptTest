@@ -163,22 +163,15 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		// handle experience
 		if (deltaExperience > -1 && event instanceof EntityDeathEvent entityDeathEvent) {
 			switch (mode) {
-				case SET:
-					entityDeathEvent.setDroppedExp(deltaExperience);
-					break;
-				case ADD:
-					entityDeathEvent.setDroppedExp(originalExperience + deltaExperience);
-					break;
-				case REMOVE:
-					entityDeathEvent.setDroppedExp(originalExperience - deltaExperience);
-					// fallthrough to check for removeAllExperience
-				case REMOVE_ALL:
+				case SET -> {entityDeathEvent.setDroppedExp(deltaExperience);}
+				case ADD -> {entityDeathEvent.setDroppedExp(originalExperience + deltaExperience);}
+				case REMOVE -> {entityDeathEvent.setDroppedExp(originalExperience - deltaExperience);} // fallthrough to check for removeAllExperience
+				case REMOVE_ALL -> {
 					if (removeAllExperience)
 						entityDeathEvent.setDroppedExp(0);
-					break;
-				case DELETE:
-				case RESET:
-					assert false;
+				}
+				case DELETE -> {}
+				case RESET -> {assert false;}
 			}
 		}
 

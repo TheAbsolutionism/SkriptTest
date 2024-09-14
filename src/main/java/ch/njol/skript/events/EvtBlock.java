@@ -74,11 +74,11 @@ public class EvtBlock extends SkriptEvent {
 			.description(
 				"Called when a block broken by a player drops something.",
 				"<ul>",
-				"<li>event-player : The player that broke the block</li>",
-				"<li>past event-block : The block that was broken</li>",
-				"<li>event-block : The block after being broken</li>",
-				"<li>event-items (or drops) : The drops of the block</li>",
-				"<li>event-entities : The entities of the dropped items</li>",
+				"<li>event-player: The player that broke the block</li>",
+				"<li>past event-block: The block that was broken</li>",
+				"<li>event-block: The block after being broken</li>",
+				"<li>event-items (or drops): The drops of the block</li>",
+				"<li>event-entities: The entities of the dropped items</li>",
 				"</ul>",
 				"",
 				"If the breaking of the block leads to others being broken, such as torches, they will appear" +
