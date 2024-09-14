@@ -74,7 +74,7 @@ public class BoatChestData extends EntityData<ChestBoat> {
 	}
 
 	@Override
-	protected boolean init(@Nullable Class<? extends ChestBoat> c, @Nullable ChestBoat entity) {
+	protected boolean init(@Nullable Class<? extends ChestBoat> clazz, @Nullable ChestBoat entity) {
 		if (entity != null)
 			matchedPattern = 2 + entity.getBoatType().ordinal();
 		return true;
@@ -130,7 +130,7 @@ public class BoatChestData extends EntityData<ChestBoat> {
 			ordinal = 0;
 		} else {
 			for (Boat.Type boat : types) {
-				if (material.toString().contains(boat.toString())) {
+				if (material.name().contains(boat.toString())) {
 					ordinal = boat.ordinal();
 					break;
 				}
