@@ -795,17 +795,17 @@ public class SimpleEvents {
 					.requiredPlugins("Paper");
 		}
 
-		Skript.registerEvent("Player Experience Cooldown Event", SimpleEvent.class, PlayerExpCooldownChangeEvent.class, "player (experience|exp|xp) cooldown change")
+		Skript.registerEvent("Experience Cooldown Change", SimpleEvent.class, PlayerExpCooldownChangeEvent.class, "player (experience|[e]xp) cooldown change")
 			.description(
-				"Called when a players experience cooldown changes.",
-				"Experience cooldown is how long until a player can pickup another orb of experience"
+				"Called when a player's experience cooldown changes.",
+				"Experience cooldown is how long until a player can pick up another orb of experience."
 			)
 			.examples(
 				"on player experience cooldown change:",
-					"\tevent-player",
-					"\tevent-change reason",
-					"\tevent-timespan",
-					"\tpast event-timespan"
+					"\tbroadcast event-player",
+					"\tbroadcast event-timespan",
+					"\tbroadcast past event-timespan",
+					"\tbroadcast xp change reason"
 			)
 			.since("INSERT VERSION");
 

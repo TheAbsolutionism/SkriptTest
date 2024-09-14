@@ -24,5 +24,4 @@ public class EvtExperienceCooldownChangeTest extends SkriptJUnitTest {
 		Bukkit.getPluginManager().callEvent(event);
 	}
 
-
 }

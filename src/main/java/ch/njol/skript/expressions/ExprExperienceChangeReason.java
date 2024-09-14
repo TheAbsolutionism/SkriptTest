@@ -1,6 +1,5 @@
 package ch.njol.skript.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -17,23 +16,25 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"on player experience cooldown change:",
-		"\tchange reason is plugin",
-		"\tchange reason is orb pickup"
+		"\tif xp change reason is plugin:",
+			"\t\t#Changed by a plugin",
+		"\telse if xp change reason is orb pickup:",
+			"\t\t#Changed by picking up xp orb"
 })
 @Since("INSERT VERSION")
-public class ExprChangeReason extends EventValueExpression<ChangeReason> {
+public class ExprExperienceChangeReason extends EventValueExpression<ChangeReason> {
 
 	static {
-		register(ExprChangeReason.class, ChangeReason.class, "[the] [experience|exp|xp] change (reason|cause|type)");
+		register(ExprExperienceChangeReason.class, ChangeReason.class, "[the] (experience|[e]xp) change (reason|cause|type)");
 	}
 
-	public ExprChangeReason() {
+	public ExprExperienceChangeReason() {
 		super(ChangeReason.class);
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "change reason";
+		return "experience change reason";
 	}
 
 }

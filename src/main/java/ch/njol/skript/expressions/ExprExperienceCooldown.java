@@ -16,7 +16,10 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Experience Cooldown")
-@Description("The experience cooldown of a player")
+@Description({
+	"The experience cooldown of a player.",
+	"Experience cooldown is how long until a player can pick up another orb of experience."
+})
 @Examples({
 	"send experience cooldown of player",
 	"set experience cooldown of player to 1 hour",
@@ -27,13 +30,13 @@ import org.jetbrains.annotations.Nullable;
 public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Timespan> {
 
 	static {
-		register(ExprExperienceCooldown.class, Timespan.class, "[the] (experience|exp|xp) cooldown", "players");
+		register(ExprExperienceCooldown.class, Timespan.class, "[the] (experience|[e]xp) cooldown", "players");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setExpr((Expression<? extends Player>) exprs[0]);
+		setExpr((Expression<Player>) exprs[0]);
 		return true;
 	}
 
@@ -49,11 +52,11 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 	}
 
 	@Override
-	public @Nullable void change(Event event, Object[] delta, ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedTime = 0;
-		if (delta[0] != null && delta[0] instanceof Timespan timeSpan) {
+		if (delta[0] != null && delta[0] instanceof Timespan timeSpan)
 			providedTime = (int) timeSpan.get(Timespan.TimePeriod.TICK);
-		}
+
 		switch (mode) {
 			case ADD -> {
 				for (Player player : getExpr().getArray(event)) {
@@ -62,7 +65,7 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 			}
 			case REMOVE -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(Math.max(player.getExpCooldown() + providedTime, 0));
+					player.setExpCooldown(Math.max(player.getExpCooldown() - providedTime, 0));
 				}
 			}
 			case SET -> {
@@ -70,7 +73,7 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 					player.setExpCooldown(providedTime);
 				}
 			}
-			case DELETE, RESET -> {
+			case DELETE, RESET, REMOVE_ALL -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(0);
 				}
