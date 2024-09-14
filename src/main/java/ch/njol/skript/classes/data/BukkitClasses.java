@@ -44,10 +44,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
+import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -1526,6 +1523,13 @@ public class BukkitClasses {
 				.name("Transform Reason")
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
+
+		Classes.registerClass(new ClassInfo<>(Beacon.class, "beacon")
+			.user("beacons?")
+			.name("Beacon")
+			.description("Represents a beacon class")
+			.since("INSERT VERSION")
+		);
 	}
 
 }

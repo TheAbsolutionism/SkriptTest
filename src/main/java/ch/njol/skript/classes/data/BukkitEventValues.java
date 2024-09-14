@@ -42,14 +42,14 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
+import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import com.destroystokyo.paper.event.entity.EndermanAttackPlayerEvent;
 import com.destroystokyo.paper.event.entity.ProjectileCollideEvent;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import io.papermc.paper.event.block.BeaconActivatedEvent;
+import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import io.papermc.paper.event.entity.EntityMoveEvent;
-import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
-import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
-import io.papermc.paper.event.player.PlayerTradeEvent;
+import io.papermc.paper.event.player.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.FireworkEffect;
@@ -58,6 +58,7 @@ import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -75,6 +76,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockDamageEvent;
@@ -179,6 +181,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
@@ -1935,5 +1938,90 @@ public final class BukkitEventValues {
 				return event.getRegainReason();
 			}
 		}, EventValues.TIME_NOW);
+
+		// BeaconEffectEvent
+		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent")) {
+			EventValues.registerEventValue(BeaconEffectEvent.class, PotionEffectType.class, new Getter<PotionEffectType, BeaconEffectEvent>() {
+				@Override
+				public @Nullable PotionEffectType get(BeaconEffectEvent event) {
+					return event.getEffect().getType();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconEffectEvent.class, Player.class, new Getter<Player, BeaconEffectEvent>() {
+				@Override
+				public @Nullable Player get(BeaconEffectEvent event) {
+					return event.getPlayer();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconEffectEvent.class, Block.class, new Getter<Block, BeaconEffectEvent>() {
+				@Override
+				public @Nullable Block get(BeaconEffectEvent event) {
+					return event.getBlock();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconEffectEvent.class, Boolean.class, new Getter<Boolean, BeaconEffectEvent>() {
+				@Override
+				public @Nullable Boolean get(BeaconEffectEvent event) {
+					return event.isPrimary();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconEffectEvent.class, Beacon.class, new Getter<Beacon, BeaconEffectEvent>() {
+				@Override
+				public @Nullable Beacon get(BeaconEffectEvent event) {
+					return (Beacon) event.getBlock().getState();
+				}
+			}, EventValues.TIME_NOW);
+		}
+		// BeaconActivatedEvent
+		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent")) {
+			EventValues.registerEventValue(BeaconActivatedEvent.class, Beacon.class, new Getter<Beacon, BeaconActivatedEvent>() {
+				@Override
+				public @Nullable Beacon get(BeaconActivatedEvent event) {
+					return event.getBeacon();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconActivatedEvent.class, Block.class, new Getter<Block, BeaconActivatedEvent>() {
+				@Override
+				public @Nullable Block get(BeaconActivatedEvent event) {
+					return event.getBlock();
+				}
+			}, EventValues.TIME_NOW);
+		}
+		// BeaconDeactivatedEvent
+		if (Skript.classExists("io.papermc.paper.event.block.BeaconDeactivatedEvent")) {
+			EventValues.registerEventValue(BeaconDeactivatedEvent.class, Beacon.class, new Getter<Beacon, BeaconDeactivatedEvent>() {
+				@Override
+				public @Nullable Beacon get(BeaconDeactivatedEvent event) {
+					return event.getBeacon();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(BeaconDeactivatedEvent.class, Block.class, new Getter<Block, BeaconDeactivatedEvent>() {
+				@Override
+				public @Nullable Block get(BeaconDeactivatedEvent event) {
+					return event.getBlock();
+				}
+			}, EventValues.TIME_NOW);
+		}
+		// PlayerChangeBeaconEffectEvent
+		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
+			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Block.class, new Getter<Block, PlayerChangeBeaconEffectEvent>() {
+				@Override
+				public @Nullable Block get(PlayerChangeBeaconEffectEvent event) {
+					return event.getBeacon();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Beacon.class, new Getter<Beacon, PlayerChangeBeaconEffectEvent>() {
+				@Override
+				public @Nullable Beacon get(PlayerChangeBeaconEffectEvent event) {
+					return (Beacon) event.getBeacon().getState();
+				}
+			}, EventValues.TIME_NOW);
+			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, PotionEffectType.class, new Getter<PotionEffectType, PlayerChangeBeaconEffectEvent>() {
+				@Override
+				public @Nullable PotionEffectType get(PlayerChangeBeaconEffectEvent event) {
+					return event.getPrimary();
+				}
+			}, EventValues.TIME_NOW, "Use 'primary effect' and/or 'secondary effect' in beacon change events", PlayerChangeBeaconEffectEvent.class);
+		}
 	}
 }
