@@ -1545,7 +1545,7 @@ public class BukkitClasses {
 			.description("Represents the variant of a wolf entity.",
 				"NOTE: Minecraft namespaces are supported, ex: 'minecraft:ashen'.")
 			.since("@VERSION")
-			.requiredPlugins("Minecraft 1.21 or newer")
+			.requiredPlugins("Minecraft 1.21+")
 			.documentationId("WolfVariant"));
 	}
 
