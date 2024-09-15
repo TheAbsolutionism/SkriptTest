@@ -89,7 +89,8 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 			return;
 
 		LivingEntity[] entities = (LivingEntity[]) delta[0];
-		assert entities != null;
+		if (entities == null)
+			return;
 		switch (mode) {
 			case REMOVE -> {
 				for (LivingEntity entity : entities) {
