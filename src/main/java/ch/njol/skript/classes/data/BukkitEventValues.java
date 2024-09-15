@@ -58,7 +58,6 @@ import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -1963,21 +1962,9 @@ public final class BukkitEventValues {
 					return event.isPrimary();
 				}
 			}, EventValues.TIME_NOW);
-			EventValues.registerEventValue(BeaconEffectEvent.class, Beacon.class, new Getter<Beacon, BeaconEffectEvent>() {
-				@Override
-				public @Nullable Beacon get(BeaconEffectEvent event) {
-					return (Beacon) event.getBlock().getState();
-				}
-			}, EventValues.TIME_NOW);
 		}
 		// BeaconActivatedEvent
 		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent")) {
-			EventValues.registerEventValue(BeaconActivatedEvent.class, Beacon.class, new Getter<Beacon, BeaconActivatedEvent>() {
-				@Override
-				public @Nullable Beacon get(BeaconActivatedEvent event) {
-					return event.getBeacon();
-				}
-			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(BeaconActivatedEvent.class, Block.class, new Getter<Block, BeaconActivatedEvent>() {
 				@Override
 				public @Nullable Block get(BeaconActivatedEvent event) {
@@ -1987,12 +1974,6 @@ public final class BukkitEventValues {
 		}
 		// BeaconDeactivatedEvent
 		if (Skript.classExists("io.papermc.paper.event.block.BeaconDeactivatedEvent")) {
-			EventValues.registerEventValue(BeaconDeactivatedEvent.class, Beacon.class, new Getter<Beacon, BeaconDeactivatedEvent>() {
-				@Override
-				public @Nullable Beacon get(BeaconDeactivatedEvent event) {
-					return event.getBeacon();
-				}
-			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(BeaconDeactivatedEvent.class, Block.class, new Getter<Block, BeaconDeactivatedEvent>() {
 				@Override
 				public @Nullable Block get(BeaconDeactivatedEvent event) {
@@ -2012,12 +1993,6 @@ public final class BukkitEventValues {
 				@Override
 				public @Nullable Block get(PlayerChangeBeaconEffectEvent event) {
 					return event.getBeacon();
-				}
-			}, EventValues.TIME_NOW);
-			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Beacon.class, new Getter<Beacon, PlayerChangeBeaconEffectEvent>() {
-				@Override
-				public @Nullable Beacon get(PlayerChangeBeaconEffectEvent event) {
-					return (Beacon) event.getBeacon().getState();
 				}
 			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, PotionEffectType.class, new Getter<PotionEffectType, PlayerChangeBeaconEffectEvent>() {
