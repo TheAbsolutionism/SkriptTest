@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 		"\tbroadcast primary beacon effect",
 		"\tbroadcast secondary beacon effect",
 		"\tbroadcast event-player",
-		"\tbroadcast event-beacon",
 		"\tbroadcast event-block"
 })
 @RequiredPlugins("Paper")

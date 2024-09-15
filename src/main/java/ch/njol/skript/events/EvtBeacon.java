@@ -33,8 +33,7 @@ public class EvtBeacon extends SkriptEvent {
 				.description("Called when a beacon is activated or deactivated")
 				.examples(
 					"on beacon activate:",
-						"\tbroadcast event-beacon",
-						"\tbroadcast event-block"
+						"\tbroadcast event-beacon"
 				)
 				.since("INSERT VERSION")
 				.requiredPlugins("Paper");
@@ -45,7 +44,6 @@ public class EvtBeacon extends SkriptEvent {
 				.description("Called when a player changes the effects of a beacon")
 				.examples(
 					"on beacon effect change:",
-						"\tbroadcast event-beacon",
 						"\tbroadcast event-player",
 						"\tbroadcast event-block",
 						"\tbroadcast primary beacon effect",
