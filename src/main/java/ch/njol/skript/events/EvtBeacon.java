@@ -1,8 +1,6 @@
 package ch.njol.skript.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Name;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -33,7 +31,7 @@ public class EvtBeacon extends SkriptEvent {
 				.description("Called when a beacon is activated or deactivated")
 				.examples(
 					"on beacon activate:",
-						"\tbroadcast event-beacon"
+						"\tbroadcast event-block"
 				)
 				.since("INSERT VERSION")
 				.requiredPlugins("Paper");
