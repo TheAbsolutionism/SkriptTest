@@ -48,14 +48,17 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
+		switch (mode) {
+			case REMOVE_ALL, DELETE, REMOVE -> {return null;}
+		}
 		return CollectionUtils.array(Timespan.class);
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedTime = 0;
-		if (delta[0] != null && delta[0] instanceof Timespan timeSpan)
-			providedTime = (int) timeSpan.get(Timespan.TimePeriod.TICK);
+		if (delta[0] != null)
+			providedTime = (int) ((Timespan) delta[0]).get(Timespan.TimePeriod.TICK);
 
 		switch (mode) {
 			case ADD -> {
@@ -73,7 +76,7 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 					player.setExpCooldown(providedTime);
 				}
 			}
-			case DELETE, RESET, REMOVE_ALL -> {
+			case RESET -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(0);
 				}

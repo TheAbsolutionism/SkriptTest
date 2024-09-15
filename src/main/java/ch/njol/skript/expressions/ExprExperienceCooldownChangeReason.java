@@ -9,7 +9,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerExpCooldownChangeEvent.ChangeReason;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Experience Change Reason")
+@Name("Experience Cooldown Change Reason")
 @Description({
 	"The <a href='classes.html#experiencechangereason'>experience change reason</a> within in an" +
 	"<a href='events.html#experience cooldown change event'>experience cooldown change event</a>."
@@ -22,13 +22,13 @@ import org.jetbrains.annotations.Nullable;
 			"\t\t#Changed by picking up xp orb"
 })
 @Since("INSERT VERSION")
-public class ExprExperienceChangeReason extends EventValueExpression<ChangeReason> {
+public class ExprExperienceCooldownChangeReason extends EventValueExpression<ChangeReason> {
 
 	static {
-		register(ExprExperienceChangeReason.class, ChangeReason.class, "[the] (experience|[e]xp) change (reason|cause|type)");
+		register(ExprExperienceCooldownChangeReason.class, ChangeReason.class, "[the] (experience|[e]xp) change (reason|cause|type)");
 	}
 
-	public ExprExperienceChangeReason() {
+	public ExprExperienceCooldownChangeReason() {
 		super(ChangeReason.class);
 	}
 
