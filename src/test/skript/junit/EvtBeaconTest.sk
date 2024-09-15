@@ -24,17 +24,17 @@ on beacon effect:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtBeaconTest"
 	junit test is {_test}
 	complete objective "beacon effect" for junit test {_test}
-	if effect primary = true:
+	if applied effect is primary:
 		complete objective "beacon effect - primary" for junit test {_test}
-		if event-beacon is set:
+		if event-block is set:
 			complete objective "effect - primary - got beacon" for junit test {_test}
 		if event-player is set:
 			complete objective "effect - primary - got player" for junit test {_test}
 		if event-potioneffecttype is health boost:
 			complete objective "effect - primary - got health boost effect" for junit test {_test}
-	else if effect primary = false:
+	else if applied effect is secondary:
 		complete objective "beacon effect - secondary" for junit test {_test}
-		if event-beacon is set:
+		if event-block is set:
 			complete objective "effect - secondary - got beacon" for junit test {_test}
 		if event-player is set:
 			complete objective "effect - secondary - got player" for junit test {_test}
@@ -45,14 +45,14 @@ on beacon activate:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtBeaconTest"
 	junit test is {_test}
 	complete objective "beacon activated" for junit test {_test}
-	if event-beacon is set:
+	if event-block is set:
 		complete objective "activated - got beacon" for junit test {_test}
 
 on beacon deactivate:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtBeaconTest"
 	junit test is {_test}
 	complete objective "beacon deactivated" for junit test {_test}
-	if event-beacon is set:
+	if event-block is set:
 		complete objective "deactivated - got beacon" for junit test {_test}
 
 on beacon change effect:
@@ -61,9 +61,9 @@ on beacon change effect:
 	complete objective "beacon change effect" for junit test {_test}
 	if event-player is set:
 		complete objective "change effect - got player" for junit test {_test}
-	if primary effect is health boost:
+	if primary beacon effect is health boost:
 		complete objective "change effect - got primary effect type" for junit test {_test}
-	if secondary effect is luck:
+	if secondary beacon effect is luck:
 		complete objective "change effect - got secondary effect type" for junit test {_test}
-	if event-beacon is set:
+	if event-block is set:
 		complete objective "change effect - got beacon" for junit test {_test}

@@ -21,7 +21,7 @@ public class EvtBeacon extends SkriptEvent {
 				.description("Called when a player gets an effect from a beacon")
 				.examples(
 					"on beacon effect:",
-						"\tbroadcast event-potion effect",
+						"\tbroadcast event-potioneffecttype",
 						"\tbroadcast event-player",
 						"\tbroadcast event-block"
 				)
@@ -44,33 +44,38 @@ public class EvtBeacon extends SkriptEvent {
 				"beacon change effect", "beacon effect change")
 				.description("Called when a player changes the effects of a beacon")
 				.examples(
-					"on beacon effect change:"
+					"on beacon effect change:",
+						"\tbroadcast event-beacon",
+						"\tbroadcast event-player",
+						"\tbroadcast event-block",
+						"\tbroadcast primary beacon effect",
+						"\tbroadcast secondary beacon effect"
 				)
 				.since("INSERT VERSION")
 				.requiredPlugins("Paper");
 		}
 	}
 
-	private boolean activate;
+	private boolean isActivate;
 
 	@Override
 	public boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
-		activate = !parseResult.hasTag("de");
+		isActivate = !parseResult.hasTag("de");
 		return true;
 	}
 
 	@Override
 	public boolean check(Event event) {
 		if (event instanceof BeaconActivatedEvent) {
-			return activate;
+			return isActivate;
 		} else if (event instanceof BeaconDeactivatedEvent) {
-			return !activate;
+			return !isActivate;
 		}
 		return true;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "beacon /effect/activate/deactivate";
+		return "beacon effect/activate/deactivate/change effect";
 	}
 }

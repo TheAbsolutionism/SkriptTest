@@ -2004,6 +2004,12 @@ public final class BukkitEventValues {
 		}
 		// PlayerChangeBeaconEffectEvent
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
+			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Player.class, new Getter<Player, PlayerChangeBeaconEffectEvent>() {
+				@Override
+				public @Nullable Player get(PlayerChangeBeaconEffectEvent event) {
+					return event.getPlayer();
+				}
+			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Block.class, new Getter<Block, PlayerChangeBeaconEffectEvent>() {
 				@Override
 				public @Nullable Block get(PlayerChangeBeaconEffectEvent event) {
@@ -2021,7 +2027,7 @@ public final class BukkitEventValues {
 				public @Nullable PotionEffectType get(PlayerChangeBeaconEffectEvent event) {
 					return event.getPrimary();
 				}
-			}, EventValues.TIME_NOW, "Use 'primary effect' and/or 'secondary effect' in beacon change events", PlayerChangeBeaconEffectEvent.class);
+			}, EventValues.TIME_NOW, "Use 'primary beacon effect' and/or 'secondary beacon effect' in beacon change effect events", PlayerChangeBeaconEffectEvent.class);
 		}
 	}
 }

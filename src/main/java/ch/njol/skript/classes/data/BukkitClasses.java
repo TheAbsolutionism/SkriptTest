@@ -1524,12 +1524,6 @@ public class BukkitClasses {
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
 
-		Classes.registerClass(new ClassInfo<>(Beacon.class, "beacon")
-			.user("beacons?")
-			.name("Beacon")
-			.description("Represents a beacon class")
-			.since("INSERT VERSION")
-		);
 	}
 
 }
