@@ -61,6 +61,7 @@ on beacon change effect:
 	complete objective "beacon change effect" for junit test {_test}
 	if event-player is set:
 		complete objective "change effect - got player" for junit test {_test}
+	broadcast "Primary: %primary beacon effect%"
 	if primary beacon effect is health boost:
 		complete objective "change effect - got primary effect type" for junit test {_test}
 	if secondary beacon effect is luck:

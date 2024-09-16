@@ -46,8 +46,6 @@ import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import com.destroystokyo.paper.event.entity.EndermanAttackPlayerEvent;
 import com.destroystokyo.paper.event.entity.ProjectileCollideEvent;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
-import io.papermc.paper.event.block.BeaconActivatedEvent;
-import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import io.papermc.paper.event.player.*;
 import org.bukkit.Bukkit;
@@ -1950,57 +1948,21 @@ public final class BukkitEventValues {
 					return event.getPlayer();
 				}
 			}, EventValues.TIME_NOW);
-			EventValues.registerEventValue(BeaconEffectEvent.class, Block.class, new Getter<Block, BeaconEffectEvent>() {
-				@Override
-				public @Nullable Block get(BeaconEffectEvent event) {
-					return event.getBlock();
-				}
-			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(BeaconEffectEvent.class, Boolean.class, new Getter<Boolean, BeaconEffectEvent>() {
 				@Override
 				public @Nullable Boolean get(BeaconEffectEvent event) {
 					return event.isPrimary();
 				}
-			}, EventValues.TIME_NOW);
-		}
-		// BeaconActivatedEvent
-		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent")) {
-			EventValues.registerEventValue(BeaconActivatedEvent.class, Block.class, new Getter<Block, BeaconActivatedEvent>() {
-				@Override
-				public @Nullable Block get(BeaconActivatedEvent event) {
-					return event.getBlock();
-				}
-			}, EventValues.TIME_NOW);
-		}
-		// BeaconDeactivatedEvent
-		if (Skript.classExists("io.papermc.paper.event.block.BeaconDeactivatedEvent")) {
-			EventValues.registerEventValue(BeaconDeactivatedEvent.class, Block.class, new Getter<Block, BeaconDeactivatedEvent>() {
-				@Override
-				public @Nullable Block get(BeaconDeactivatedEvent event) {
-					return event.getBlock();
-				}
-			}, EventValues.TIME_NOW);
+			}, EventValues.TIME_NOW, "Use 'applied effect is (primary|secondary)' in beacon effect events", BeaconEffectEvent.class);
 		}
 		// PlayerChangeBeaconEffectEvent
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
-			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Player.class, new Getter<Player, PlayerChangeBeaconEffectEvent>() {
-				@Override
-				public @Nullable Player get(PlayerChangeBeaconEffectEvent event) {
-					return event.getPlayer();
-				}
-			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Block.class, new Getter<Block, PlayerChangeBeaconEffectEvent>() {
 				@Override
 				public @Nullable Block get(PlayerChangeBeaconEffectEvent event) {
 					return event.getBeacon();
 				}
 			}, EventValues.TIME_NOW);
-			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, PotionEffectType.class, new Getter<PotionEffectType, PlayerChangeBeaconEffectEvent>() {
-				@Override
-				public @Nullable PotionEffectType get(PlayerChangeBeaconEffectEvent event) {
-					return event.getPrimary();
-				}
-			}, EventValues.TIME_NOW, "Use 'primary beacon effect' and/or 'secondary beacon effect' in beacon change effect events", PlayerChangeBeaconEffectEvent.class);
 		}
 	}
 }
