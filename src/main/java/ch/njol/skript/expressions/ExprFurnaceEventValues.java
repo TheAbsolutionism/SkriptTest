@@ -19,7 +19,6 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Events;
@@ -31,7 +30,6 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
@@ -53,6 +51,7 @@ import org.jetbrains.annotations.Nullable;
 @Examples({
 	"on furnace smelt:",
 		"\tbroadcast smelted item",
+		"\t# Or 'result'",
 	"on furnace extract:",
 		"\tbroadcast extracted item",
 	"on fuel burn:",
@@ -62,11 +61,11 @@ import org.jetbrains.annotations.Nullable;
 		"\tclear smelting item"
 })
 @Events({"smelt", "fuel burn", "smelting start", "furnace extract"})
-@Since("1.0, 2.8.0 (syntax rework)")
+@Since("INSERT VERSION")
 public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack> {
 
 	enum FurnaceValues {
-		SMELTED("smelted item", FurnaceSmeltEvent.class, "Can only use 'smelted item' in a smelting event."),
+		SMELTED("(smelted item|result [item])", FurnaceSmeltEvent.class, "Can only use 'smelted item' in a smelting event."),
 		EXTRACTED("extracted item[s]", FurnaceExtractEvent.class, "Can only use 'extracted item' in a furnace extract event."),
 		SMELTING("smelting item", FurnaceStartSmeltEvent.class, "Can only use 'smelting item' in a start smelting event"),
 		BURNED("fuel burned [item]", FurnaceBurnEvent.class, "Can only use 'fuel burned' in a fuel burning event.");
@@ -127,27 +126,23 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Block[] source) {
-		return get(source, new Getter<ItemStack, Block>() {
-			@Override
-			public @Nullable ItemStack get(Block block) {
-				switch (type) {
-					case SMELTING -> {
-						return ((FurnaceStartSmeltEvent) event).getSource();
-					}
-					case BURNED -> {
-						return ((FurnaceBurnEvent) event).getFuel();
-					}
-					case SMELTED -> {
-						return ((FurnaceSmeltEvent) event).getResult();
-					}
-					case EXTRACTED -> {
-						FurnaceExtractEvent extractEvent = (FurnaceExtractEvent) event;
-						return ItemStack.of(extractEvent.getItemType(), extractEvent.getItemAmount());
-					}
-				}
-				return null;
-			}
-		});
+        ItemStack stack = null;
+		switch (type) {
+            case SMELTING -> {
+                stack = ((FurnaceStartSmeltEvent) event).getSource();
+            }
+            case BURNED -> {
+				stack =  ((FurnaceBurnEvent) event).getFuel();
+            }
+            case SMELTED -> {
+				stack = ((FurnaceSmeltEvent) event).getResult();
+            }
+            case EXTRACTED -> {
+                FurnaceExtractEvent extractEvent = (FurnaceExtractEvent) event;
+				stack = new ItemStack(extractEvent.getItemType(), extractEvent.getItemAmount());
+            }
+        };
+		return new ItemStack[]{stack};
 	}
 
 	@Override

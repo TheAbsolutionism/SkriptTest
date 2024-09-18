@@ -53,7 +53,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 
 	@Override
 	public @Nullable Timespan convert(Entity entity) {
-		return Timespan.fromTicks(Math.max(entity.getFireTicks(), 0));
+		return new Timespan(Timespan.TimePeriod.TICK, Math.max(entity.getFireTicks(), 0));
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		Entity[] entities = getExpr().getArray(event);
-		int change = delta == null ? 0 : (int) ((Timespan) delta[0]).getTicks();
+		int change = delta == null ? 0 : (int) ((Timespan) delta[0]).getAs(Timespan.TimePeriod.TICK);
 		switch (mode) {
 			case REMOVE:
 				change = -change;

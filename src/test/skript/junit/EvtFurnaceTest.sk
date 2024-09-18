@@ -18,6 +18,7 @@ on unload:
 on smelt:
 	junit test is {-EvtFurnaceTest}
 	complete objective "smelt event" for junit test {-EvtFurnaceTest}
+	broadcast "%smelted item%"
 	if smelted item is an iron ingot:
 		complete objective "smelt - got smelted item" for junit test {-EvtFurnaceTest}
 
@@ -30,7 +31,7 @@ on start smelt:
 on fuel burn:
 	junit test is {-EvtFurnaceTest}
 	complete objective "fuel burn event" for junit test {-EvtFurnaceTest}
-	if smelting item is a lava bucket:
+	if fuel burned item is a lava bucket:
 		complete objective "fuel burn - got fuel burned item" for junit test {-EvtFurnaceTest}
 
 on furnace extract:

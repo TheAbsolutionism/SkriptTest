@@ -5,9 +5,7 @@ import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.Classes;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
@@ -18,17 +16,23 @@ import org.jetbrains.annotations.Nullable;
 public class EvtFurnace extends SkriptEvent {
 
 	static {
-		Skript.registerEvent("Smelt", EvtFurnace.class, FurnaceSmeltEvent.class, "[furnace] smelt[ing] [of %-itemtypes%]")
+		Skript.registerEvent("Smelt", EvtFurnace.class, FurnaceSmeltEvent.class, "[furnace] smelt[ed] [of %-itemtypes%]")
 			.description("Called when a furnace smelts an item in its <a href='expressions.html#ExprFurnaceSlot'>ore slot</a>.")
 			.examples(
 				"on smelt:",
 				"on smelt of raw iron:",
-					"\tbroadcast "
+					"\tbroadcast smelted item",
+					"\tset smelt item to iron block"
 			)
 			.since("1.0, INSERT VERSION (Of ItemType)");
 		Skript.registerEvent("Fuel Burn", EvtFurnace.class, FurnaceBurnEvent.class, "[furnace] fuel burn[ing] [of %-itemtypes%]")
 			.description("Called when a furnace burns an item from its <a href='expressions.html#ExprFurnaceSlot'>fuel slot</a>.")
-			.examples("on fuel burning:")
+			.examples(
+				"on fuel burning:",
+					"\tbroadcast fuel burned",
+					"\tif fuel burned is coal:",
+						"\tadd 20 seconds to burn time"
+			)
 			.since("1.0, INSERT VERSION (Of ItemType)");
 		Skript.registerEvent("Furnace Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace extract[ing] [of %-itemtypes%]")
 			.description("Called when a player takes any item out of the furnace.")
@@ -42,7 +46,12 @@ public class EvtFurnace extends SkriptEvent {
 			"[furnace] start smelt[ing] [of %-itemtypes%]",
 			"[furnace] smelt[ing] start [of %-itemtypes%]")
 			.description("Called when a furnace starts smelting an item in its ...")
-			.examples("on furnace start smelting of raw iron:")
+			.examples(
+				"on smelting start:",
+					"\tif the smelting item is raw iron:",
+						"\t\tset total cook time to 1 second",
+				"on smelting start of raw iron:"
+			)
 			.since("INSERT VERSION");
 	}
 

@@ -46,7 +46,8 @@ import static ch.njol.util.Math2.floor;
 
 @Name("Furnace Times")
 @Description({
-	"You can use these expressions to change the time of a furnace.",
+	"You can use these expressions to change the cook, total cook, and burn time of a furnace.",
+	"If used within any furnace event, you do not have to provide 'of event-block'.",
 	"<ul>",
 	"<li>cook time: The amount of time an item has been smelting for.</li>",
 	"<li>total cook time: The amount of time an item is required to smelt for until done.</li>",
@@ -56,7 +57,10 @@ import static ch.njol.util.Math2.floor;
 @Examples({
 	"set the cooking time of {_block} to 10",
 	"set the total cooking time of {_block} to 50",
-	"set the burning time of {_block} to 100"
+	"set the burning time of {_block} to 100",
+	"on smelt:",
+		"\tif the fuel slot is charcoal:",
+			"\t\tadd 5 seconds to the burn time"
 })
 @Since("INSERT VERSION")
 public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
@@ -163,7 +167,6 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedTime = 0;
-		Skript.adminBroadcast("Changing: " + type + "| Mode: " + mode);
 		if (delta != null && delta[0] instanceof Timespan span)
 			providedTime = (int) span.get(Timespan.TimePeriod.TICK);
 
@@ -190,7 +193,6 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 						burnEvent.setBurnTime(providedTime);
 					} else {
 						for (Block block : getExpr().getArray(event)) {
-							Skript.adminBroadcast("----- Setting Burn Time: " + providedTime);
 							Furnace furnace = (Furnace) block.getState();
 							furnace.setBurnTime((short) providedTime);
 							furnace.update(true);
@@ -294,7 +296,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		if (getExpr() != null) {
 			return getExpr().isSingle();
 		}
-        return true;
+		return true;
 	}
 
 	@Override
