@@ -48,10 +48,10 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		switch (mode) {
-			case ADD, SET, RESET -> {return CollectionUtils.array(Timespan.class);}
-		}
-		return null;
+		return switch (mode) {
+			case ADD, SET, RESET -> CollectionUtils.array(Timespan.class);
+			default -> null;
+		};
 	}
 
 	@Override
