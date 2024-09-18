@@ -25,6 +25,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.effects.Delay;
+import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -40,7 +41,9 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
+import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.inventory.FurnaceInventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -73,14 +76,12 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	
 	static {
 		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY,
-				"[the] (0:ore slot|1:fuel slot|2:result [5:slot])",
-				"[the] (0:ore|1:fuel|2:result) slot[s] of %blocks%",
+				"[the] (0:ore|1:fuel|2:result) [slot[s]] [of %blocks%]",
 				"%blocks%'[s] (0:ore|1:fuel|2:result) slot[s]"
 		);
 	}
 
-	@Nullable
-	private Expression<Block> blocks;
+	private @Nullable Expression<Block> blocks;
 	private boolean isEvent;
 	private boolean isResultSlot;
 	private int slot;
@@ -88,22 +89,18 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		isEvent = matchedPattern == 0;
-		if (!isEvent)
+
+		if (exprs[0] != null) {
 			blocks = (Expression<Block>) exprs[0];
-
-		slot = parseResult.mark;
-		isResultSlot = slot == 7;
-		if (isResultSlot)
-			slot = RESULT;
-
-		if (isEvent && (slot == ORE || slot == RESULT) && !getParser().isCurrentEvent(FurnaceSmeltEvent.class)) {
-			Skript.error("Cannot use 'result slot' or 'ore slot' outside an ore smelt event.");
-			return false;
-		} else if (isEvent && slot == FUEL && !getParser().isCurrentEvent(FurnaceBurnEvent.class)) {
-			Skript.error("Cannot use 'fuel slot' outside a fuel burn event.");
-			return false;
+		} else {
+			if (!getParser().isCurrentEvent(FurnaceBurnEvent.class, FurnaceStartSmeltEvent.class, FurnaceExtractEvent.class, FurnaceSmeltEvent.class)) {
+				Skript.error("There's no furnace in a " + getParser().getCurrentEventName() + " event.");
+				return false;
+			}
+			isEvent = true;
+			blocks = new EventValueExpression<>(Block.class);
 		}
+		slot = parseResult.mark;
 
 		return true;
 	}
@@ -111,32 +108,13 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	@Override
 	@Nullable
 	protected Slot[] get(Event event) {
-		Block[] blocks;
-		if (isEvent) {
-			blocks = new Block[1];
-			if (event instanceof FurnaceSmeltEvent) {
-				blocks[0] = ((FurnaceSmeltEvent) event).getBlock();
-			} else if (event instanceof FurnaceBurnEvent) {
-				blocks[0] = ((FurnaceBurnEvent) event).getBlock();
-			} else {
-				return new Slot[0];
-			}
-		} else {
-			assert this.blocks != null;
-			blocks = this.blocks.getArray(event);
-		}
-
 		List<Slot> slots = new ArrayList<>();
-		for (Block block : blocks) {
+		for (Block block : this.blocks.getArray(event)) {
 			BlockState state = block.getState();
 			if (!(state instanceof Furnace))
 				continue;
 			FurnaceInventory furnaceInventory = ((Furnace) state).getInventory();
-			if (isEvent && !Delay.isDelayed(event)) {
-				slots.add(new FurnaceEventSlot(event, furnaceInventory));
-			} else { // Normal inventory slot is fine since the time will always be in the present
-				slots.add(new InventorySlot(furnaceInventory, slot));
-			}
+			slots.add(new InventorySlot(furnaceInventory, slot));
 		}
 		return slots.toArray(new Slot[0]);
 	}
@@ -156,29 +134,20 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		String time = (getTime() == -1) ? "past " : (getTime() == 1) ? "future " : "";
-		String slotName = (slot == ORE) ? "ore" : (slot == FUEL) ? "fuel" : "result";
-		if (isEvent) {
-			return "the " + time + slotName + (isResultSlot ? " slot" : "");
-		} else {
-			assert blocks != null;
-			return "the " + time + slotName + " slot of " + blocks.toString(event, debug);
+		String result = "";
+		switch (slot) {
+			case ORE -> {result = "ore slot";}
+			case FUEL -> {result = "fuel slot";}
+			case RESULT -> {result = "result slot";}
 		}
+		if (isEvent) {
+			result += " of " + event.getEventName();
+		} else {
+			result += " of " + blocks.toString(event, debug);
+		}
+		return result;
 	}
 
-	@Override
-	public boolean setTime(int time) {
-		if (isEvent) { // getExpr will be null
-			if (slot == RESULT && !isResultSlot) { // 'the past/future result' - doesn't make sense, don't allow it
-				return false;
-			} else if (slot == FUEL) {
-				return setTime(time, FurnaceBurnEvent.class);
-			} else {
-				return setTime(time, FurnaceSmeltEvent.class);
-			}
-		}
-		return false;
-	}
 	
 	private final class FurnaceEventSlot extends InventorySlot {
 		

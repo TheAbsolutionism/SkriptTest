@@ -120,18 +120,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.DragType;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -1933,6 +1922,20 @@ public final class BukkitEventValues {
 			@Nullable
 			public RegainReason get(EntityRegainHealthEvent event) {
 				return event.getRegainReason();
+			}
+		}, EventValues.TIME_NOW);
+
+		// FurnaceExtractEvent
+		EventValues.registerEventValue(FurnaceExtractEvent.class, Player.class, new Getter<Player, FurnaceExtractEvent>() {
+			@Override
+			public @Nullable Player get(FurnaceExtractEvent event) {
+				return event.getPlayer();
+			}
+		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(FurnaceExtractEvent.class, ItemStack[].class, new Getter<ItemStack[], FurnaceExtractEvent>() {
+			@Override
+			public ItemStack @Nullable [] get(FurnaceExtractEvent event) {
+				return new ItemStack[]{ItemStack.of(event.getItemType(), event.getItemAmount())};
 			}
 		}, EventValues.TIME_NOW);
 	}

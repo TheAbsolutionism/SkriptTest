@@ -24,7 +24,10 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
+import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -41,14 +44,20 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	}
 
 	@Override
-	@Nullable
-	public Timespan convert(Entity entity) {
+	@SuppressWarnings("unchecked")
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+		if (!(exprs[0] instanceof Entity))
+			return false;
+		return true;
+	}
+
+	@Override
+	public @Nullable Timespan convert(Entity entity) {
 		return Timespan.fromTicks(Math.max(entity.getFireTicks(), 0));
 	}
 
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return (mode != ChangeMode.REMOVE_ALL) ? CollectionUtils.array(Timespan.class) :  null;
 	}
 
@@ -75,7 +84,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	}
 
 	@Override
-	public Class<? extends Timespan> getReturnType() {
+	public Class<Timespan> getReturnType() {
 		return Timespan.class;
 	}
 
