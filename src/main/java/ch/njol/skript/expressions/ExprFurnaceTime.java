@@ -78,20 +78,6 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 
 	}
 
-
-	/*
-		COOKTIME
-			Through Furnace block
-			Get, Set, Remove, Add, Clear
-		TOTALCOOKTIME
-			Thorugh Furnace Block, Through FurnaceStartSmeltEvent
-			Get, Set, Remove, Add, Clear
-		BURNTIME
-			Through Furnace block, Through FurnaceBurnEvent
-			Get, Set, Add, Remove, Clear
-
-		 */
-
 	private static final FurnaceExpressions[] furnaceExprs = FurnaceExpressions.values();
 	
 	static {

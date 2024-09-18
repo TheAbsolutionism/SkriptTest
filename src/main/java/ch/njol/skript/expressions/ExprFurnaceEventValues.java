@@ -82,21 +82,6 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	}
 
-	/*
-		SMELTING
-			Through FurnaceStartSmeltEvent
-			Get
-		BURNED
-			Thorugh FurnaceBurnEvent
-			Get
-		SMELTED
-			Through FurnaceSmeltEvent
-			Get, Set, Clear
-		EXTRACTED
-			Through FurnaceExtractEvent
-			Get
-		 */
-
 	private static final FurnaceValues[] furnaceValues = FurnaceValues.values();
 
 	static {
