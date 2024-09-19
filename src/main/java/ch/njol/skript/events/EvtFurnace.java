@@ -16,7 +16,9 @@ import org.jetbrains.annotations.Nullable;
 public class EvtFurnace extends SkriptEvent {
 
 	static {
-		Skript.registerEvent("Smelt", EvtFurnace.class, FurnaceSmeltEvent.class, "[furnace] smelt[ed] [of %-itemtypes%]")
+		Skript.registerEvent("Smelt", EvtFurnace.class, FurnaceSmeltEvent.class,
+				"[furnace] [ore] smelt[ed|ing] [of %-itemtypes%]",
+				"[furnace] smelt[ed|ing] of ore")
 			.description("Called when a furnace smelts an item in its <a href='expressions.html#ExprFurnaceSlot'>ore slot</a>.")
 			.examples(
 				"on smelt:",
@@ -24,17 +26,17 @@ public class EvtFurnace extends SkriptEvent {
 					"\tbroadcast smelted item",
 					"\tset smelt item to iron block"
 			)
-			.since("1.0, INSERT VERSION (Of ItemType)");
+			.since("1.0, INSERT VERSION (specific item)");
 		Skript.registerEvent("Fuel Burn", EvtFurnace.class, FurnaceBurnEvent.class, "[furnace] fuel burn[ing] [of %-itemtypes%]")
 			.description("Called when a furnace burns an item from its <a href='expressions.html#ExprFurnaceSlot'>fuel slot</a>.")
 			.examples(
 				"on fuel burning:",
 					"\tbroadcast fuel burned",
 					"\tif fuel burned is coal:",
-						"\tadd 20 seconds to burn time"
+						"\t\tadd 20 seconds to burn time"
 			)
-			.since("1.0, INSERT VERSION (Of ItemType)");
-		Skript.registerEvent("Furnace Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace extract[ing] [of %-itemtypes%]")
+			.since("1.0, INSERT VERSION (specific item)");
+		Skript.registerEvent("Furnace Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace extract[ion] [of %-itemtypes%]")
 			.description("Called when a player takes any item out of the furnace.")
 			.examples(
 				"on furnace extract:",
@@ -43,8 +45,8 @@ public class EvtFurnace extends SkriptEvent {
 			)
 			.since("INSERT VERSION");
 		Skript.registerEvent("Start Smelt", EvtFurnace.class, FurnaceStartSmeltEvent.class,
-			"[furnace] start smelt[ing] [of %-itemtypes%]",
-			"[furnace] smelt[ing] start [of %-itemtypes%]")
+			"[furnace] start [of] smelt[ing] [[of] %-itemtypes%]",
+			"[furnace] smelting start [of %-itemtypes%]")
 			.description("Called when a furnace starts smelting an item in its ...")
 			.examples(
 				"on smelting start:",

@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -46,8 +28,7 @@ import static ch.njol.util.Math2.floor;
 
 @Name("Furnace Times")
 @Description({
-	"You can use these expressions to change the cook, total cook, and burn time of a furnace.",
-	"If used within any furnace event, you do not have to provide 'of event-block'.",
+	"The cook time, total cook time, and burn time of a furnace. Can be changed.",
 	"<ul>",
 	"<li>cook time: The amount of time an item has been smelting for.</li>",
 	"<li>total cook time: The amount of time an item is required to smelt for until done.</li>",
@@ -68,7 +49,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	enum FurnaceExpressions {
 		COOKTIME("cook[ing] time"),
 		TOTALCOOKTIME("total cook[ing] time"),
-		BURNTIME("burn[ing] time");
+		BURNTIME("fuel burn[ing] time");
 
 		private String name;
 
@@ -156,133 +137,147 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		if (delta != null && delta[0] instanceof Timespan span)
 			providedTime = (int) span.get(Timespan.TimePeriod.TICK);
 
+		switch (type) {
+			case COOKTIME -> changeCookTime(event, providedTime, mode);
+			case TOTALCOOKTIME -> changeTotalCookTime(event, providedTime, mode);
+			case BURNTIME -> changeBurnTime(event, providedTime, mode);
+		}
+	}
+
+	private void changeCookTime(Event event, int providedTime, ChangeMode mode) {
 		switch (mode) {
 			case SET -> {
-				if (type == FurnaceExpressions.COOKTIME) {
+				for (Block block : getExpr().getArray(event)) {
+					Furnace furnace = (Furnace) block.getState();
+					furnace.setCookTime((short) providedTime);
+					furnace.update(true);
+				}
+			}
+			case DELETE -> {
+				for (Block block : getExpr().getArray(event)) {
+					Furnace furnace = (Furnace) block.getState();
+					furnace.setCookTime((short) 0);
+					furnace.update(true);
+				}
+			}
+			case REMOVE -> {
+				for (Block block : getExpr().getArray(event)) {
+					Furnace furnace = (Furnace) block.getState();
+					furnace.setCookTime((short) Math.min(furnace.getCookTime() - providedTime, 0));
+					furnace.update(true);
+				}
+			}
+			case ADD -> {
+				for (Block block : getExpr().getArray(event)) {
+					Furnace furnace = (Furnace) block.getState();
+					furnace.setCookTime((short) (furnace.getCookTime() + providedTime));
+					furnace.update(true);
+				}
+			}
+		}
+	}
+
+	private void changeTotalCookTime(Event event, int providedTime, ChangeMode mode) {
+		switch (mode) {
+			case SET -> {
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
+					startEvent.setTotalCookTime(providedTime);
+				} else {
 					for (Block block : getExpr().getArray(event)) {
 						Furnace furnace = (Furnace) block.getState();
-						furnace.setCookTime((short) providedTime);
+						furnace.setCookTimeTotal(providedTime);
 						furnace.update(true);
-					}
-				} else if (type == FurnaceExpressions.TOTALCOOKTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-						startEvent.setTotalCookTime(providedTime);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setCookTimeTotal(providedTime);
-							furnace.update(true);
-						}
-					}
-				} else if (type == FurnaceExpressions.BURNTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-						burnEvent.setBurnTime(providedTime);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setBurnTime((short) providedTime);
-							furnace.update(true);
-						}
 					}
 				}
 			}
 			case DELETE -> {
-				if (type == FurnaceExpressions.COOKTIME) {
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
+					startEvent.setTotalCookTime(0);
+				} else {
 					for (Block block : getExpr().getArray(event)) {
 						Furnace furnace = (Furnace) block.getState();
-						furnace.setCookTime((short) 0);
+						furnace.setCookTimeTotal(0);
 						furnace.update(true);
-					}
-				} else if (type == FurnaceExpressions.TOTALCOOKTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-						startEvent.setTotalCookTime(0);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setCookTimeTotal(0);
-							furnace.update(true);
-						}
-					}
-				} else if (type == FurnaceExpressions.BURNTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-						burnEvent.setBurnTime(0);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setBurnTime((short) 0);
-							furnace.update(true);
-						}
 					}
 				}
 			}
 			case REMOVE -> {
-				if (type == FurnaceExpressions.COOKTIME) {
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
+					startEvent.setTotalCookTime(Math.min(startEvent.getTotalCookTime() - providedTime, 0));
+				} else {
 					for (Block block : getExpr().getArray(event)) {
 						Furnace furnace = (Furnace) block.getState();
-						furnace.setCookTime((short) Math.min(furnace.getCookTime() - providedTime, 0));
+						furnace.setCookTimeTotal(Math.min(furnace.getCookTimeTotal() - providedTime, 0));
 						furnace.update(true);
-					}
-				} else if (type == FurnaceExpressions.TOTALCOOKTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-						startEvent.setTotalCookTime(Math.min(startEvent.getTotalCookTime() - providedTime, 0));
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setCookTimeTotal(Math.min(furnace.getCookTimeTotal() - providedTime, 0));
-							furnace.update(true);
-						}
-					}
-				} else if (type == FurnaceExpressions.BURNTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-						burnEvent.setBurnTime(Math.min(burnEvent.getBurnTime() - providedTime, 0));
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setBurnTime((short) Math.min(furnace.getBurnTime() - providedTime, 0));
-							furnace.update(true);
-						}
 					}
 				}
 			}
 			case ADD -> {
-				if (type == FurnaceExpressions.COOKTIME) {
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
+					startEvent.setTotalCookTime(startEvent.getTotalCookTime() + providedTime);
+				} else {
 					for (Block block : getExpr().getArray(event)) {
 						Furnace furnace = (Furnace) block.getState();
-						furnace.setCookTime((short) (furnace.getCookTime() + providedTime));
+						furnace.setCookTimeTotal(furnace.getCookTimeTotal() + providedTime);
 						furnace.update(true);
-					}
-				} else if (type == FurnaceExpressions.TOTALCOOKTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-						startEvent.setTotalCookTime(startEvent.getTotalCookTime() + providedTime);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setCookTimeTotal(furnace.getCookTimeTotal() + providedTime);
-							furnace.update(true);
-						}
-					}
-				} else if (type == FurnaceExpressions.BURNTIME) {
-					if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-						burnEvent.setBurnTime(burnEvent.getBurnTime() + providedTime);
-					} else {
-						for (Block block : getExpr().getArray(event)) {
-							Furnace furnace = (Furnace) block.getState();
-							furnace.setBurnTime((short) (furnace.getBurnTime() + providedTime));
-							furnace.update(true);
-						}
 					}
 				}
 			}
 		}
+	}
 
+	private void changeBurnTime(Event event, int providedTime, ChangeMode mode) {
+		switch (mode) {
+			case SET -> {
+				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+					burnEvent.setBurnTime(providedTime);
+				} else {
+					for (Block block : getExpr().getArray(event)) {
+						Furnace furnace = (Furnace) block.getState();
+						furnace.setBurnTime((short) providedTime);
+						furnace.update(true);
+					}
+				}
+			}
+			case DELETE -> {
+				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+					burnEvent.setBurnTime(0);
+				} else {
+					for (Block block : getExpr().getArray(event)) {
+						Furnace furnace = (Furnace) block.getState();
+						furnace.setBurnTime((short) 0);
+						furnace.update(true);
+					}
+				}
+			}
+			case REMOVE -> {
+				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+					burnEvent.setBurnTime(Math.min(burnEvent.getBurnTime() - providedTime, 0));
+				} else {
+					for (Block block : getExpr().getArray(event)) {
+						Furnace furnace = (Furnace) block.getState();
+						furnace.setBurnTime((short) Math.min(furnace.getBurnTime() - providedTime, 0));
+						furnace.update(true);
+					}
+				}
+			}
+			case ADD -> {
+				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+					burnEvent.setBurnTime(burnEvent.getBurnTime() + providedTime);
+				} else {
+					for (Block block : getExpr().getArray(event)) {
+						Furnace furnace = (Furnace) block.getState();
+						furnace.setBurnTime((short) (furnace.getBurnTime() + providedTime));
+						furnace.update(true);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
 	public boolean isSingle() {
-		if (getExpr() != null) {
-			return getExpr().isSingle();
-		}
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override
@@ -292,18 +287,11 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		String result = "";
-		switch (type)  {
-			case COOKTIME -> {result = "cook time";}
-			case TOTALCOOKTIME -> {result = "total cook time";}
-			case BURNTIME -> {result = "burn time";}
-		}
-		if (!explicitlyBlock) {
-			result += " of " + event.toString();
-		} else if (explicitlyBlock) {
-			result += " of " + getExpr().toString(event, debug);
-		}
-		return result;
+		return switch (type) {
+			case COOKTIME -> "cook time";
+			case TOTALCOOKTIME -> "total cook time";
+			case BURNTIME -> "burn time";
+		} + " of " + getExpr().toString(event, debug);
 	}
 	
 }

@@ -35,6 +35,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
@@ -47,8 +48,7 @@ import java.util.List;
 
 @Name("Furnace Slot")
 @Description({
-	"A slot of a furnace, i.e. either the ore, fuel or result slot.",
-	"If used within any furnace event, you do not have to provide 'of event-block'."
+	"A slot of a furnace, i.e. either the ore, fuel or result slot."
 })
 @Examples({
 	"set the fuel slot of the clicked block to a lava bucket",
@@ -66,7 +66,8 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	static {
 		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY,
-			"[the] (0:ore|1:fuel|2:result) slot[s] [of %blocks%]"
+			"[the] (0:ore|1:fuel|2:result) slot[s] [of %blocks%]",
+			"%blocks%['s] (0:ore|1:fuel|2:result) slot[s]"
 		);
 	}
 
@@ -97,14 +98,8 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 		Block[] blocks;
 		if (isEvent) {
 			blocks = new Block[1];
-			if (event instanceof FurnaceSmeltEvent smeltEvent) {
-				blocks[0] = smeltEvent.getBlock();
-			} else if (event instanceof FurnaceBurnEvent burnEvent) {
-				blocks[0] = burnEvent.getBlock();
-			} else if (event instanceof FurnaceStartSmeltEvent startEvent) {
-				blocks[0] = startEvent.getBlock();
-			} else if (event instanceof FurnaceExtractEvent extractEvent) {
-				blocks[0] = extractEvent.getBlock();
+			if (event instanceof BlockEvent blockEvent) {
+				blocks[0] = blockEvent.getBlock();
 			} else {
 				return new Slot[0];
 			}
@@ -152,7 +147,5 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 		}
 		return result;
 	}
-
-
 
 }

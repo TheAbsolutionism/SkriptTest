@@ -24,10 +24,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -41,14 +38,6 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 
 	static {
 		register(ExprFireTicks.class, Timespan.class, "(burn[ing]|fire) (time|duration)", "entities");
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!(exprs[0] instanceof Entity))
-			return false;
-		return true;
 	}
 
 	@Override

@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -45,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Furnace Event Values")
 @Description({
-	"Represents the expressions you can use within furnace events to get special data.",
-	"Only 'smelting item' can be changed, the rest are getters."
+	"Represents the expressions you can use within furnace events to get items correlated to an event.",
+	"Only 'smelting item' can be changed."
 })
 @Examples({
 	"on furnace smelt:",
@@ -70,12 +52,11 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 		SMELTING("smelting item", FurnaceStartSmeltEvent.class, "Can only use 'smelting item' in a start smelting event"),
 		BURNED("fuel burned [item]", FurnaceBurnEvent.class, "Can only use 'fuel burned' in a fuel burning event.");
 
-
-		private String name, error;
+		private String pattern, error;
 		private Class<? extends Event> clazz;
 
-		FurnaceValues(String name, Class<? extends Event> clazz, String error) {
-			this.name = name;
+		FurnaceValues(String pattern, Class<? extends Event> clazz, String error) {
+			this.pattern = "[the] " + pattern;
 			this.clazz = clazz;
 			this.error = error;
 		}
@@ -85,11 +66,10 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 	private static final FurnaceValues[] furnaceValues = FurnaceValues.values();
 
 	static {
-
 		int size = furnaceValues.length;
 		String[] patterns  = new String[size];
 		for (FurnaceValues value : furnaceValues) {
-			patterns[value.ordinal()] = "[the] " + value.name;
+			patterns[value.ordinal()] = value.pattern;
 		}
 
 		Skript.registerExpression(ExprFurnaceEventValues.class, ItemStack.class, ExpressionType.PROPERTY, patterns);
@@ -111,22 +91,22 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Block[] source) {
-        ItemStack stack = null;
+		ItemStack stack = null;
 		switch (type) {
-            case SMELTING -> {
-                stack = ((FurnaceStartSmeltEvent) event).getSource();
-            }
-            case BURNED -> {
+			case SMELTING -> {
+				stack = ((FurnaceStartSmeltEvent) event).getSource();
+			}
+			case BURNED -> {
 				stack =  ((FurnaceBurnEvent) event).getFuel();
-            }
-            case SMELTED -> {
+			}
+			case SMELTED -> {
 				stack = ((FurnaceSmeltEvent) event).getResult();
-            }
-            case EXTRACTED -> {
-                FurnaceExtractEvent extractEvent = (FurnaceExtractEvent) event;
+			}
+			case EXTRACTED -> {
+				FurnaceExtractEvent extractEvent = (FurnaceExtractEvent) event;
 				stack = new ItemStack(extractEvent.getItemType(), extractEvent.getItemAmount());
-            }
-        };
+			}
+		};
 		return new ItemStack[]{stack};
 	}
 
@@ -135,10 +115,9 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 		if (type != FurnaceValues.SMELTED) {
 			return null;
 		}
-		switch (mode) {
-			case SET, DELETE -> {return CollectionUtils.array(ItemStack.class);}
-		}
-		return null;
+		if (mode != ChangeMode.SET && mode != ChangeMode.DELETE)
+			return null;
+		return CollectionUtils.array(ItemStack.class);
 	}
 
 	@Override
@@ -146,18 +125,13 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 		if (!(event instanceof FurnaceSmeltEvent smeltEvent))
 			return;
 
-		switch (mode) {
-			case SET -> {
-				smeltEvent.setResult((ItemStack) delta[0]);
-			}
-			case DELETE -> {
-				smeltEvent.setResult(ItemStack.of(Material.AIR));
-			}
+		if (mode == ChangeMode.SET) {
+			smeltEvent.setResult((ItemStack) delta[0]);
+		} else if (mode == ChangeMode.DELETE) {
+			smeltEvent.setResult(ItemStack.of(Material.AIR));
 		}
 
 	}
-
-
 
 	@Override
 	public boolean isSingle() {
