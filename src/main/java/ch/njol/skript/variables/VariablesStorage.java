@@ -209,8 +209,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * @return whether the loading succeeded.
 	 */
 	public final boolean load(SectionNode sectionNode) {
-		String dbName = sectionNode.getKey();
-		databaseName = dbName;
+		databaseName = sectionNode.getKey();
 
 		String pattern = getValue(sectionNode, "pattern");
 		if (pattern == null)
@@ -259,9 +258,8 @@ public abstract class VariablesStorage implements Closeable {
 			if (registeredFiles.contains(file)) {
 				Skript.error("Database `" + databaseName + "` failed to load. The file `" + fileName + "` is already registered to another database.");
 				return false;
-			} else {
-				registeredFiles.add(file);
 			}
+			registeredFiles.add(file);
 
 			// Set the backup interval, if present & enabled
 			if (!"0".equals(getValue(sectionNode, "backup interval"))) {
