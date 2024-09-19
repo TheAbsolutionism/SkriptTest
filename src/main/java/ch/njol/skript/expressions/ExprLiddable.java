@@ -12,12 +12,9 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.block.EnderChest;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Block;
+import org.bukkit.block.Lidded;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,14 +45,8 @@ public class ExprLiddable extends PropertyExpression<Block, Boolean> {
 		List<Boolean> booleanList = new ArrayList<>();
 		for (Block block : getExpr().getArray(event)) {
 			BlockState state = block.getState();
-			if (state instanceof Chest chest) {
-				booleanList.add(chest.isOpen());
-			} else if (state instanceof EnderChest enderChest) {
-				booleanList.add(enderChest.isOpen());
-			} else if (state instanceof Barrel barrel) {
-				booleanList.add(barrel.isOpen());
-			} else if (state instanceof ShulkerBox shulkerBox) {
-				booleanList.add(shulkerBox.isOpen());
+			if (state instanceof Lidded lidBlock) {
+				booleanList.add(lidBlock.isOpen());
 			}
 		}
 		return booleanList.toArray(new Boolean[0]);
@@ -74,27 +65,15 @@ public class ExprLiddable extends PropertyExpression<Block, Boolean> {
 		if (toOpen) {
 			for (Block block : getExpr().getArray(event)) {
 				BlockState state = block.getState();
-				if (state instanceof Chest chest) {
-					chest.open();
-				} else if (state instanceof EnderChest enderChest) {
-					enderChest.open();
-				} else if (state instanceof Barrel barrel) {
-					barrel.open();
-				} else if (state instanceof ShulkerBox shulkerBox) {
-					shulkerBox.open();
+				if (state instanceof Lidded lidBlock) {
+					lidBlock.open();
 				}
 			}
 		} else {
 			for (Block block : getExpr().getArray(event)) {
 				BlockState state = block.getState();
-				if (state instanceof Chest chest) {
-					chest.close();
-				} else if (state instanceof EnderChest enderChest) {
-					enderChest.close();
-				} else if (state instanceof Barrel barrel) {
-					barrel.close();
-				} else if (state instanceof ShulkerBox shulkerBox) {
-					shulkerBox.close();
+				if (state instanceof Lidded lidBlock) {
+					lidBlock.close();
 				}
 			}
 		}
