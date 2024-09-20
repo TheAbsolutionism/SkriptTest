@@ -1,4 +1,7 @@
 test "block update":
+	set {_loc} to spawn of world "world" ~ vector(10,10,10)
+	set {_blocks::*} to blocks in radius 2 of block at {_loc}
+
 	force update blocks at {_blocks::*} as sand without physics updates
 	assert blocks at {_blocks::*} is sand with "As: 1 or more block state did not update with or without physics"
 	force update blocks at {_blocks::*} as air without physics updates
