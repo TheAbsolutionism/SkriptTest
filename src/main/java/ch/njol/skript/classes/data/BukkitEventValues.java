@@ -1945,7 +1945,7 @@ public final class BukkitEventValues {
 		// PlayerExpCooldownChangeEvent
 		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, Player.class, new Getter<Player, PlayerExpCooldownChangeEvent>() {
 			@Override
-			public @Nullable Player get(PlayerExpCooldownChangeEvent event) {
+			public Player get(PlayerExpCooldownChangeEvent event) {
 				return event.getPlayer();
 			}
 		}, EventValues.TIME_NOW);

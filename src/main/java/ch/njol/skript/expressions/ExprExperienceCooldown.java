@@ -6,19 +6,17 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Experience Cooldown")
+@Name("Experience Pickup Cooldown")
 @Description({
 	"The experience cooldown of a player.",
-	"Experience cooldown is how long until a player can pick up another orb of experience."
+	"Experience cooldown is how long until a player can pick up another orb of experience.",
+	"The cooldown of a player must be 0 to pick up another orb of experience."
 })
 @Examples({
 	"send experience cooldown of player",
@@ -30,16 +28,10 @@ import org.jetbrains.annotations.Nullable;
 public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Timespan> {
 
 	static {
-		register(ExprExperienceCooldown.class, Timespan.class, "[the] (experience|[e]xp) cooldown", "players");
+		register(ExprExperienceCooldown.class, Timespan.class, "[the] (experience|[e]xp) [pickup|collection] cooldown", "players");
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setExpr((Expression<Player>) exprs[0]);
-		return true;
-	}
-
+	private static final int maxTicks = Integer.MAX_VALUE;
 
 	@Override
 	public @Nullable Timespan convert(Player player) {
@@ -49,7 +41,7 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case ADD, SET, RESET -> CollectionUtils.array(Timespan.class);
+			case ADD, SET, RESET, DELETE -> CollectionUtils.array(Timespan.class);
 			default -> null;
 		};
 	}
@@ -63,20 +55,20 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 		switch (mode) {
 			case ADD -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(player.getExpCooldown() + providedTime);
+					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(player.getExpCooldown() + providedTime, -1)));
 				}
 			}
 			case REMOVE -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(Math.max(player.getExpCooldown() - providedTime, 0));
+					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(player.getExpCooldown() - providedTime, -1)));
 				}
 			}
 			case SET -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(providedTime);
+					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(providedTime, -1)));
 				}
 			}
-			case RESET -> {
+			case RESET, DELETE -> {
 				for (Player player : getExpr().getArray(event)) {
 					player.setExpCooldown(0);
 				}
