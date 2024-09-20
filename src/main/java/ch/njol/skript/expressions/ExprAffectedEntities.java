@@ -77,19 +77,18 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-        if (mode == ChangeMode.REMOVE_ALL)
-            return null;
-		return CollectionUtils.array(LivingEntity[].class);
+		switch (mode) {
+			case ADD, SET, DELETE, REMOVE -> {return CollectionUtils.array(LivingEntity[].class);}
+		}
+		return null;
 	}
 
 	@Override
-	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof AreaEffectCloudApplyEvent areaEvent))
 			return;
 
-		LivingEntity[] entities = (LivingEntity[]) delta[0];
-		if (entities == null)
-			return;
+		LivingEntity[] entities = (LivingEntity[]) delta;
 		switch (mode) {
 			case REMOVE:
 				for (LivingEntity entity : entities) {
@@ -98,6 +97,7 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 				break;
 			case SET:
 				areaEvent.getAffectedEntities().clear();
+				// FALLTHROUGH
 			case ADD:
 				for (LivingEntity entity : entities) {
 					areaEvent.getAffectedEntities().add(entity);
