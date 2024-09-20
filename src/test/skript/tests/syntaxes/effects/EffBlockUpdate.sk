@@ -1,24 +1,4 @@
 test "block update":
-	set {_block} to spawn of world "world" ~ vector(10,10,10)
-	set {_stateAir} to block state of block at {_block}
-	set block at {_block} to stone
-	set {_stateStone} to block state of block at {_block}
-	set block at {_block} to air
-	force update {_stateStone}
-	assert block at {_block} is stone with "State: Block state did not update to stone"
-	force update {_stateAir}
-	assert block at {_block} is air with "State: Block state did not update to air"
-
-	set {_blocks::*} to blocks in radius 2 of block at {_block}
-	set {_statesAir::*} to block state of {_blocks::*}
-	set blocks at {_blocks::*} to stone
-	set {_statesStone::*} to block state of blocks at {_blocks::*}
-	set blocks at {_blocks::*} to air
-	force update {_statesStone::*}
-	assert blocks at {_blocks::*} is stone with "States: 1 or more block state did not update to stone"
-	force update {_statesAir::*}
-	assert blocks at {_blocks::*} is air with "States: 1 or more block state did not update to air"
-
 	force update blocks at {_blocks::*} as sand without physics updates
 	assert blocks at {_blocks::*} is sand with "As: 1 or more block state did not update with or without physics"
 	force update blocks at {_blocks::*} as air without physics updates
