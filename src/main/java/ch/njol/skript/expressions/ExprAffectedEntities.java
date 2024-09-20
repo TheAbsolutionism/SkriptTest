@@ -77,10 +77,10 @@ public class ExprAffectedEntities extends SimpleExpression<LivingEntity> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		switch (mode) {
-			case ADD, SET, DELETE, REMOVE -> {return CollectionUtils.array(LivingEntity[].class);}
-		}
-		return null;
+		return switch (mode) {
+			case ADD, SET, DELETE, REMOVE -> CollectionUtils.array(LivingEntity[].class);
+			default -> null;
+		};
 	}
 
 	@Override
