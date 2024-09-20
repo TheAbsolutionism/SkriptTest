@@ -25,12 +25,12 @@ public class CondAppliedEffect extends Condition {
 
 	static {
 		Skript.registerCondition(CondAppliedEffect.class,
-			"applied effect is primary",
-			"applied effect is secondary"
+			"applied effect is [the] (primary|:secondary) [[potion] effect]",
+			"applied effect (isn't|is not) [the] (primary|:secondary) [[potion] effect]"
 			);
 	}
 
-	private int pattern;
+	private boolean checkPrimary;
 
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -38,7 +38,9 @@ public class CondAppliedEffect extends Condition {
 			Skript.error("This condition can only be used in a on beacon effect event.");
 			return false;
 		}
-		pattern = matchedPattern;
+		checkPrimary = !parseResult.hasTag("secondary");
+		if (matchedPattern == 1)
+			setNegated(true);
 		return true;
 	}
 
@@ -46,17 +48,12 @@ public class CondAppliedEffect extends Condition {
 	public boolean check(Event event) {
 		BeaconEffectEvent beaconEffectEvent = (BeaconEffectEvent) event;
 		boolean isPrimary = beaconEffectEvent.isPrimary();
-		if (pattern == 0) {
-			return isPrimary;
-		} else if (pattern == 1) {
-			return !isPrimary;
-		}
-		return false;
+		return isPrimary == checkPrimary;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "applied effect is " + (pattern == 0 ? "primary" : "secondary");
+		return "applied effect is " + (isNegated() ? "not" : "") + (checkPrimary ? "primary" : "secondary");
 	}
 
 }

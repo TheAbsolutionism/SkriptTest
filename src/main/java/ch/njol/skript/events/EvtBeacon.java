@@ -27,7 +27,7 @@ public class EvtBeacon extends SkriptEvent {
 				.requiredPlugins("Paper");
 		}
 		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent")) {
-			Skript.registerEvent("Beacon Toggle", EvtBeacon.class, new Class[] {BeaconActivatedEvent.class, BeaconDeactivatedEvent.class}, "beacon [:de]activate")
+			Skript.registerEvent("Beacon Toggle", EvtBeacon.class, new Class[] {BeaconActivatedEvent.class, BeaconDeactivatedEvent.class}, "beacon [:de]activat(e|ion)")
 				.description("Called when a beacon is activated or deactivated")
 				.examples(
 					"on beacon activate:",
@@ -38,7 +38,7 @@ public class EvtBeacon extends SkriptEvent {
 		}
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
 			Skript.registerEvent("Beacon Change Effect", EvtBeacon.class, PlayerChangeBeaconEffectEvent.class,
-				"beacon change effect", "beacon effect change")
+				"beacon change effect", "beacon effect change", "player chang(e[s]|ing) [of] beacon effect")
 				.description("Called when a player changes the effects of a beacon")
 				.examples(
 					"on beacon effect change:",
@@ -67,11 +67,12 @@ public class EvtBeacon extends SkriptEvent {
 		} else if (event instanceof BeaconDeactivatedEvent) {
 			return !isActivate;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		return "beacon effect/activate/deactivate/change effect";
 	}
+
 }

@@ -43,27 +43,23 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 		RANGE("[beacon] range"),
 		TIER("[beacon] tier");
 
-		private final String name;
+		private final String pattern;
 
-		BeaconValues(String name) {
-			this.name = name;
+		BeaconValues(String pattern) {
+			this.pattern = pattern;
 		}
 	}
 
-	private static boolean PAPER_EVENTS, PAPER_RANGE = false;
+	private static final boolean PAPER_EVENTS = Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent");
+	private static final boolean PAPER_RANGE = Skript.methodExists(Beacon.class, "getEffectRange");
 	private static BeaconValues[] beaconValues = BeaconValues.values();
 
 	static {
-		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent"))
-			PAPER_EVENTS = true;
-		if (Skript.methodExists(Beacon.class, "getEffectRange"))
-			PAPER_RANGE = true;
-
 		int size = beaconValues.length;
 		String[] patterns = new String[size * 2];
 		for (BeaconValues value : beaconValues) {
-			patterns[2 * value.ordinal()] = "%blocks%['s] " + value.name;
-			patterns[2 * value.ordinal() + 1] = value.name + " [of %blocks%]";
+			patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
+			patterns[2 * value.ordinal() + 1] = value.pattern + " [of %blocks%]";
 		}
 
 		Skript.registerExpression(ExprBeaconValues.class, Object.class, ExpressionType.PROPERTY, patterns);
@@ -76,7 +72,7 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		valueType = beaconValues[(int) floor(matchedPattern/2)];
 		if (valueType == BeaconValues.RANGE && !PAPER_RANGE) {
-			Skript.error("This can only be used on Paper.");
+			Skript.error(valueType.pattern + "can only be used on Paper.");
 			return false;
 		}
 		if (exprs[0] != null) {
@@ -147,6 +143,14 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 				providedRange = (double) ((long) delta[0]);
 			}
 		}
+		switch (valueType) {
+			case RANGE -> {changeRange(event, providedRange, mode);}
+			case PRIMARY -> {changePrimary(event, providedEffect, mode);}
+			case SECONDARY -> {changeSecondary(event, providedEffect, mode);}
+		}
+	}
+
+	private void changeRange(Event event, double providedRange, ChangeMode mode) {
 		switch (mode) {
 			case ADD -> {
 				for (Block block : getExpr().getArray(event)) {
@@ -163,45 +167,55 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 				}
 			}
 			case DELETE, RESET -> {
-				if (valueType == BeaconValues.RANGE) {
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.resetEffectRange();
-						beacon.update(true);
-					}
-				} else if (valueType == BeaconValues.PRIMARY) {
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.setPrimaryEffect(null);
-						beacon.update(true);
-					}
-				} else if (valueType == BeaconValues.SECONDARY)	{
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.setSecondaryEffect(null);
-						beacon.update(true);
-					}
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.resetEffectRange();
+					beacon.update(true);
 				}
 			}
 			case SET -> {
-				if (valueType == BeaconValues.RANGE) {
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.setEffectRange(providedRange);
-						beacon.update(true);
-					}
-				} else if (valueType == BeaconValues.PRIMARY) {
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.setPrimaryEffect(providedEffect);
-						beacon.update(true);
-					}
-				} else if (valueType == BeaconValues.SECONDARY) {
-					for (Block block : getExpr().getArray(event)) {
-						Beacon beacon = (Beacon) block.getState();
-						beacon.setSecondaryEffect(providedEffect);
-						beacon.update(true);
-					}
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.setEffectRange(providedRange);
+					beacon.update(true);
+				}
+			}
+		}
+	}
+
+	private void changePrimary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
+		switch (mode) {
+			case SET -> {
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.setPrimaryEffect(providedEffect);
+					beacon.update(true);
+				}
+			}
+			case DELETE, RESET -> {
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.setPrimaryEffect(null);
+					beacon.update(true);
+				}
+			}
+		}
+	}
+
+	private void changeSecondary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
+		switch (mode) {
+			case SET -> {
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.setSecondaryEffect(providedEffect);
+					beacon.update(true);
+				}
+			}
+			case DELETE, RESET -> {
+				for (Block block : getExpr().getArray(event)) {
+					Beacon beacon = (Beacon) block.getState();
+					beacon.setSecondaryEffect(null);
+					beacon.update(true);
 				}
 			}
 		}
@@ -210,7 +224,7 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override
@@ -220,18 +234,12 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		String result = "";
-		if (isEffect) {
-			if (valueType == BeaconValues.PRIMARY) {
-				result = "primary beacon effect";
-			} else {
-				result = "secondary beacon effect";
-			}
-		} else if (valueType == BeaconValues.RANGE) {
-			result = "range";
-		} else if (valueType == BeaconValues.TIER) {
-			result = "tier";
-		}
-		return result + " of " + getExpr().toString(event, debug);
+		return switch (valueType) {
+			case PRIMARY -> "primary beacon effect";
+			case SECONDARY -> "secondary beacon effect";
+			case RANGE -> "beacon range";
+			case TIER -> "beacon tier";
+		} + " of " + getExpr().toString(event, debug);
 	}
+
 }

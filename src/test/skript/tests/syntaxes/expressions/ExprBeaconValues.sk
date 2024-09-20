@@ -1,9 +1,21 @@
 on load:
-	set {_loc} to spawn of world "world" ~ vector(5,5,5)
+	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
+	set {_corner2} to {_corner1} ~ vector(8,3,8)
+	set blocks within {_corner1} and {_corner2} to emerald block
+	set {_loc} to {_corner1} ~ vector(4,4,4)
 	set block at {_loc} to beacon
+	set {-ExprBeaconValues} to block at {_loc}
 
+on unload:
+	clear {-ExprBeaconValues}
+	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
+	set {_corner2} to {_corner1} ~ vector(8,3,8)
+	set blocks within {_corner1} and {_corner2} to air
+	broadcast "ExprBeaconValues - Unload"
 
 on beacon activate:
+	broadcast "ExprBeaconValues - Beacon Activated"
+	event-block is {-ExprBeaconValues}
 	set primary beacon effect to haste
 	assert primary beacon effect is haste with "Set beacon primary effect to haste"
 	clear primary beacon effect
@@ -20,3 +32,7 @@ on beacon activate:
 	assert beacon range is 15 with "Add 5 to beacon range"
 
 	set event-block to air
+	clear {-ExprBeaconValues}
+	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
+	set {_corner2} to {_corner1} ~ vector(8,3,8)
+	set blocks within {_corner1} and {_corner2} to air

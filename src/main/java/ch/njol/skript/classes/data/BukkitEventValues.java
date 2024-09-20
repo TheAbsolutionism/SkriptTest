@@ -1938,19 +1938,19 @@ public final class BukkitEventValues {
 		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent")) {
 			EventValues.registerEventValue(BeaconEffectEvent.class, PotionEffectType.class, new Getter<PotionEffectType, BeaconEffectEvent>() {
 				@Override
-				public @Nullable PotionEffectType get(BeaconEffectEvent event) {
+				public PotionEffectType get(BeaconEffectEvent event) {
 					return event.getEffect().getType();
 				}
 			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(BeaconEffectEvent.class, Player.class, new Getter<Player, BeaconEffectEvent>() {
 				@Override
-				public @Nullable Player get(BeaconEffectEvent event) {
+				public Player get(BeaconEffectEvent event) {
 					return event.getPlayer();
 				}
 			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(BeaconEffectEvent.class, Boolean.class, new Getter<Boolean, BeaconEffectEvent>() {
 				@Override
-				public @Nullable Boolean get(BeaconEffectEvent event) {
+				public Boolean get(BeaconEffectEvent event) {
 					return event.isPrimary();
 				}
 			}, EventValues.TIME_NOW, "Use 'applied effect is (primary|secondary)' in beacon effect events", BeaconEffectEvent.class);
@@ -1959,7 +1959,7 @@ public final class BukkitEventValues {
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
 			EventValues.registerEventValue(PlayerChangeBeaconEffectEvent.class, Block.class, new Getter<Block, PlayerChangeBeaconEffectEvent>() {
 				@Override
-				public @Nullable Block get(PlayerChangeBeaconEffectEvent event) {
+				public Block get(PlayerChangeBeaconEffectEvent event) {
 					return event.getBeacon();
 				}
 			}, EventValues.TIME_NOW);
