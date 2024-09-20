@@ -1,38 +1,18 @@
 on load:
-	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
-	set {_corner2} to {_corner1} ~ vector(8,3,8)
-	set blocks within {_corner1} and {_corner2} to emerald block
-	set {_loc} to {_corner1} ~ vector(4,4,4)
+	#Note: Can not test 'secondary effect' due to the requirements in order to set it are too long of a time
+	# Than that can be allowed in this test
+
+	set {_loc} to spawn of world "world" ~ vector(5,5,5)
 	set block at {_loc} to beacon
-	set {-ExprBeaconValues} to block at {_loc}
 
-on unload:
-	clear {-ExprBeaconValues}
-	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
-	set {_corner2} to {_corner1} ~ vector(8,3,8)
-	set blocks within {_corner1} and {_corner2} to air
-	broadcast "ExprBeaconValues - Unload"
+	set {_block} to block at {_loc}
+	set primary beacon effect of {_block} to haste
+	assert primary beacon effect of {_block} is haste with "Set beacon primary effect to haste"
+	clear primary beacon effect of {_block}
+	assert primary beacon effect of {_block} is not set with "Clear beacon primary effect"
+	set range of {_block} to 10
+	assert range of {_block} is 10 with "Set beacon range to 10"
+	add 5 to range of {_block}
+	assert range of {_block} is 15 with "Add 5 to beacon range"
 
-on beacon activate:
-	broadcast "ExprBeaconValues - Beacon Activated"
-	event-block is {-ExprBeaconValues}
-	set primary beacon effect to haste
-	assert primary beacon effect is haste with "Set beacon primary effect to haste"
-	clear primary beacon effect
-	assert primary beacon effect is not set with "Clear beacon primary effect"
-
-	set secondary beacon effect to regeneration
-	assert secondary beacon effect is regeneration with "Set beacon secondary effect to regeneration"
-	clear secondary beacon effect
-	assert secondary beacon effect is not set with "Clear beacon secondary effect"
-
-	set beacon range to 10
-	assert beacon range is 10 with "Set beacon range to 10"
-	add 5 to beacon range
-	assert beacon range is 15 with "Add 5 to beacon range"
-
-	set event-block to air
-	clear {-ExprBeaconValues}
-	set {_corner1} to spawn of world "world" ~ vector(10,1,10)
-	set {_corner2} to {_corner1} ~ vector(8,3,8)
-	set blocks within {_corner1} and {_corner2} to air
+	set block at {_loc} to air
