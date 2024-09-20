@@ -16,7 +16,7 @@ public class EvtBeacon extends SkriptEvent {
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent")) {
 			Skript.registerEvent("Beacon Effect", EvtBeacon.class, BeaconEffectEvent.class, "beacon effect")
-				.description("Called when a player gets an effect from a beacon")
+				.description("Called when a player gets an effect from a beacon.")
 				.examples(
 					"on beacon effect:",
 						"\tbroadcast event-potioneffecttype",
@@ -28,7 +28,7 @@ public class EvtBeacon extends SkriptEvent {
 		}
 		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent")) {
 			Skript.registerEvent("Beacon Toggle", EvtBeacon.class, new Class[] {BeaconActivatedEvent.class, BeaconDeactivatedEvent.class}, "beacon [:de]activat(e|ion)")
-				.description("Called when a beacon is activated or deactivated")
+				.description("Called when a beacon is activated or deactivated.")
 				.examples(
 					"on beacon activate:",
 						"\tbroadcast event-block"
@@ -39,7 +39,7 @@ public class EvtBeacon extends SkriptEvent {
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent")) {
 			Skript.registerEvent("Beacon Change Effect", EvtBeacon.class, PlayerChangeBeaconEffectEvent.class,
 				"beacon change effect", "beacon effect change", "player chang(e[s]|ing) [of] beacon effect")
-				.description("Called when a player changes the effects of a beacon")
+				.description("Called when a player changes the effects of a beacon.")
 				.examples(
 					"on beacon effect change:",
 						"\tbroadcast event-player",
@@ -67,7 +67,7 @@ public class EvtBeacon extends SkriptEvent {
 		} else if (event instanceof BeaconDeactivatedEvent) {
 			return !isActivate;
 		}
-		return false;
+		return true;
 	}
 
 	@Override

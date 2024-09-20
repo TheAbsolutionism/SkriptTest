@@ -5,11 +5,11 @@ on load:
 	set {_tests::4} to "deactivated - got beacon"
 	set {_tests::5} to "beacon effect"
 	set {_tests::5} to "beacon effect - primary"
-	set {_tests::6} to "effect - primary - got beacon"
+	set {_tests::6} to "effect - primary - got block"
 	set {_tests::7} to "effect - primary - got player"
 	set {_tests::8} to "effect - primary - got health boost effect"
 	set {_tests::9} to "beacon effect - secondary"
-	set {_tests::10} to "effect - secondary - got beacon"
+	set {_tests::10} to "effect - secondary - got block"
 	set {_tests::11} to "effect - secondary - got player"
 	set {_tests::12} to "effect - secondary - got luck effect"
 	set {_tests::13} to "beacon change effect"
@@ -24,18 +24,18 @@ on beacon effect:
 	set {_test} to "org.skriptlang.skript.test.tests.syntaxes.events.EvtBeaconTest"
 	junit test is {_test}
 	complete objective "beacon effect" for junit test {_test}
-	if applied effect is primary:
+	if applied effect is the primary effect:
 		complete objective "beacon effect - primary" for junit test {_test}
 		if event-block is set:
-			complete objective "effect - primary - got beacon" for junit test {_test}
+			complete objective "effect - primary - got block" for junit test {_test}
 		if event-player is set:
 			complete objective "effect - primary - got player" for junit test {_test}
 		if event-potioneffecttype is health boost:
 			complete objective "effect - primary - got health boost effect" for junit test {_test}
-	else if applied effect is secondary:
+	else if applied effect is the secondary effect:
 		complete objective "beacon effect - secondary" for junit test {_test}
 		if event-block is set:
-			complete objective "effect - secondary - got beacon" for junit test {_test}
+			complete objective "effect - secondary - got block" for junit test {_test}
 		if event-player is set:
 			complete objective "effect - secondary - got player" for junit test {_test}
 		if event-potioneffecttype is luck:

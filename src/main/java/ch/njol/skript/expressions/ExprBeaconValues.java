@@ -57,9 +57,16 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 	static {
 		int size = beaconValues.length;
 		String[] patterns = new String[size * 2];
-		for (BeaconValues value : beaconValues) {
-			patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
-			patterns[2 * value.ordinal() + 1] = value.pattern + " [of %blocks%]";
+		if (PAPER_EVENTS) {
+			for (BeaconValues value : beaconValues) {
+				patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
+				patterns[2 * value.ordinal() + 1] = value.pattern + " [of %blocks%]";
+			}
+		} else {
+			for (BeaconValues value : beaconValues) {
+				patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
+				patterns[2 * value.ordinal() + 1] = value.pattern + " of %blocks%";
+			}
 		}
 
 		Skript.registerExpression(ExprBeaconValues.class, Object.class, ExpressionType.PROPERTY, patterns);
@@ -72,7 +79,7 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		valueType = beaconValues[(int) floor(matchedPattern/2)];
 		if (valueType == BeaconValues.RANGE && !PAPER_RANGE) {
-			Skript.error(valueType.pattern + "can only be used on Paper.");
+			Skript.error(valueType.pattern + " can only be used on Paper.");
 			return false;
 		}
 		if (exprs[0] != null) {
