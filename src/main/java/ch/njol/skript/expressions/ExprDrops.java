@@ -72,7 +72,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 	}
 
 	@Override
-	protected @Nullable ItemType[] get(Event event) {
+	protected ItemType @Nullable [] get(Event event) {
 		if (event instanceof EntityDeathEvent entityDeathEvent) {
 			return entityDeathEvent.getDrops()
 				.stream()
@@ -85,6 +85,7 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 				.map(ItemType::new)
 				.toArray(ItemType[]::new);
 		}
+		assert false;
 		return new ItemType[0];
 	}
 
@@ -97,7 +98,6 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		switch (mode) {
 			case ADD:
 			case REMOVE:
-			case REMOVE_ALL:
 			case SET:
 				return CollectionUtils.array(ItemType[].class, Inventory[].class, Experience[].class);
 			case DELETE: // handled by EffClearDrops
@@ -109,7 +109,6 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-
 		List<ItemStack> drops = null;
 		int originalExperience = 0;
 		if (event instanceof EntityDeathEvent entityDeathEvent) {

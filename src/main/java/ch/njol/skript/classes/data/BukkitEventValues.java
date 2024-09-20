@@ -1940,13 +1940,13 @@ public final class BukkitEventValues {
 		// BlockDropItemEvent
 		EventValues.registerEventValue(BlockDropItemEvent.class, Block.class, new Getter<Block, BlockDropItemEvent>() {
 			@Override
-			public @Nullable Block get(BlockDropItemEvent event) {
+			public Block get(BlockDropItemEvent event) {
 				return new BlockStateBlock(event.getBlockState());
 			}
 		}, EventValues.TIME_PAST);
 		EventValues.registerEventValue(BlockDropItemEvent.class, Player.class, new Getter<Player, BlockDropItemEvent>() {
 			@Override
-			public @Nullable Player get(BlockDropItemEvent event) {
+			public Player get(BlockDropItemEvent event) {
 				return event.getPlayer();
 			}
 		}, EventValues.TIME_NOW);

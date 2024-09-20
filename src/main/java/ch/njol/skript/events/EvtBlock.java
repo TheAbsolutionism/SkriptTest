@@ -164,7 +164,7 @@ public class EvtBlock extends SkriptEvent {
 	}
 	
 	@Override
-	public @NotNull String toString(@Nullable Event event, boolean debug) {
+	public String toString(@Nullable Event event, boolean debug) {
 		return "break/place/burn/fade/form/drop of " + Classes.toString(types);
 	}
 	
