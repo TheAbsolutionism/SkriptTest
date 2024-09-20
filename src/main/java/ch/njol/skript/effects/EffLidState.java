@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Open/Close Lid")
-@Description("Open or close the lid of blocks.")
+@Description("Open or close the lid of the block(s).")
 @Examples({
 	"open the lid of {_chest}",
 	"close the lid of {_blocks::*}"
@@ -25,9 +25,9 @@ public class EffLidState extends Effect {
 
 	static {
 		Skript.registerEffect(EffLidState.class,
-			"open [the] lid (of|for) %blocks%",
-			"close [the] lid (of|for) %blocks%"
-			);
+			"(open|:close) [the] lid (of|for) %blocks%",
+			"(open|:close) %blocks%['s] lid"
+		);
 	}
 
 	private boolean setOpen;
@@ -36,7 +36,7 @@ public class EffLidState extends Effect {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setOpen = matchedPattern == 0;
+		setOpen = !parseResult.hasTag("close");
 		blocks = (Expression<Block>) exprs[0];
 		return true;
 	}
@@ -56,7 +56,7 @@ public class EffLidState extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (setOpen ? "open" : "close") + "lid of " + blocks.toString(event, debug);
+		return (setOpen ? "open" : "close") + " lid of " + blocks.toString(event, debug);
 	}
 
 }

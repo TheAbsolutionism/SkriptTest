@@ -14,8 +14,8 @@ import org.bukkit.block.Lidded;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Lid is Open")
-@Description("Check to see if the lid of blocks are open or closed.")
+@Name("Lid Is Open/Closed")
+@Description("Check to see whether lidded blocks (chests, shulkers, etc.) are open or closed.")
 @Examples({
 	"if the lid of {_chest} is closed:",
 		"\topen the lid of {_block}"
@@ -25,22 +25,19 @@ public class CondLidState extends PropertyCondition<Block> {
 
 	static {
 		Skript.registerCondition(CondLidState.class, ConditionType.PROPERTY,
-			"[the] lid [state] of %blocks% (is|are) open[ed]",
-			"[the] lid [state] of %blocks% (isn't|aren't) open[ed]",
-			"[the] lid [state] of %blocks% (is|are) close[d]",
-			"[the] lid [state] of %blocks% (isn't|aren't) close[d]"
+			"[the] lid [state[s]] of %blocks% (is|are) (open[ed]|:close[d])",
+			"[the] lid [state[s]] of %blocks% (isn't|is not|aren't|are not) (open[ed]|:close[d])",
+			"%blocks%['s] lid [state[s]] (is|are) (open[ed]|:close[d])",
+			"%blocks%['s] lid [state[s]] (isn't|is not|aren't|are not) (open[ed]|:close[d])"
 		);
-
-
 	}
 
 	private boolean checkOpen;
-	private Expression<Block> blocks;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		checkOpen = matchedPattern <= 1;
-		blocks = (Expression<Block>) exprs[0];
+		checkOpen = !parseResult.hasTag("close");
 		setExpr((Expression<Block>) exprs[0]);
 		if (matchedPattern == 1 || matchedPattern == 3)
 			setNegated(true);
@@ -49,19 +46,12 @@ public class CondLidState extends PropertyCondition<Block> {
 
 	@Override
 	public boolean check(Block block) {
-		if (!(block.getState() instanceof Lidded lidBlock))
-			return false;
-		return lidBlock.isOpen() == checkOpen;
+		return (block.getState() instanceof Lidded lidded) ? lidded.isOpen() == checkOpen : false;
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return (checkOpen ? "opened" : "closed") + "lid state";
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return (checkOpen ? "opened" : "closed") + "lid of " + blocks.toString(event, debug);
+		return (checkOpen ? "opened" : "closed") + " lid state";
 	}
 
 }
