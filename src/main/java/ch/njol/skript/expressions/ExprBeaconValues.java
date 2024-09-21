@@ -55,18 +55,14 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 	private static BeaconValues[] beaconValues = BeaconValues.values();
 
 	static {
+		String patternEnding = " of %blocks%";
+		if (PAPER_EVENTS)
+			patternEnding = " [of %blocks%]";
 		int size = beaconValues.length;
 		String[] patterns = new String[size * 2];
-		if (PAPER_EVENTS) {
-			for (BeaconValues value : beaconValues) {
-				patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
-				patterns[2 * value.ordinal() + 1] = value.pattern + " [of %blocks%]";
-			}
-		} else {
-			for (BeaconValues value : beaconValues) {
-				patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
-				patterns[2 * value.ordinal() + 1] = value.pattern + " of %blocks%";
-			}
+		for (BeaconValues value : beaconValues) {
+			patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
+			patterns[2 * value.ordinal() + 1] = value.pattern + patternEnding;
 		}
 
 		Skript.registerExpression(ExprBeaconValues.class, Object.class, ExpressionType.PROPERTY, patterns);
