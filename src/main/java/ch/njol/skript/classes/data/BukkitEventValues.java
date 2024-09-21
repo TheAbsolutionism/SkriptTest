@@ -1951,19 +1951,19 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, ChangeReason.class, new Getter<ChangeReason, PlayerExpCooldownChangeEvent>() {
 			@Override
-			public @Nullable ChangeReason get(PlayerExpCooldownChangeEvent event) {
+			public ChangeReason get(PlayerExpCooldownChangeEvent event) {
 				return event.getReason();
 			}
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, Timespan.class, new Getter<Timespan, PlayerExpCooldownChangeEvent>() {
 			@Override
-			public @Nullable Timespan get(PlayerExpCooldownChangeEvent event) {
+			public Timespan get(PlayerExpCooldownChangeEvent event) {
 				return new Timespan(Timespan.TimePeriod.TICK, event.getNewCooldown());
 			}
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, Timespan.class, new Getter<Timespan, PlayerExpCooldownChangeEvent>() {
 			@Override
-			public @Nullable Timespan get(PlayerExpCooldownChangeEvent event) {
+			public Timespan get(PlayerExpCooldownChangeEvent event) {
 				return new Timespan(Timespan.TimePeriod.TICK, event.getPlayer().getExpCooldown());
 			}
 		}, EventValues.TIME_PAST);

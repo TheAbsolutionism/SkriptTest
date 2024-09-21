@@ -16,16 +16,16 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"on player experience cooldown change:",
-		"\tif xp change reason is plugin:",
+		"\tif xp cooldown change reason is plugin:",
 			"\t\t#Changed by a plugin",
-		"\telse if xp change reason is orb pickup:",
+		"\telse if xp cooldown change reason is orb pickup:",
 			"\t\t#Changed by picking up xp orb"
 })
 @Since("INSERT VERSION")
 public class ExprExperienceCooldownChangeReason extends EventValueExpression<ChangeReason> {
 
 	static {
-		register(ExprExperienceCooldownChangeReason.class, ChangeReason.class, "[the] (experience|[e]xp) change (reason|cause|type)");
+		register(ExprExperienceCooldownChangeReason.class, ChangeReason.class, "[the] (experience|[e]xp) cooldown change (reason|cause|type)");
 	}
 
 	public ExprExperienceCooldownChangeReason() {

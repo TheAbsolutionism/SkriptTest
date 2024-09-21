@@ -20,9 +20,9 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"send experience cooldown of player",
-	"set experience cooldown of player to 1 hour",
-	"if experience cooldown of player >= 10 minutes:",
-		"\tclear experience cooldown of player"
+	"set the xp pickup cooldown of player to 1 hour",
+	"if exp collection cooldown of player >= 10 minutes:",
+		"\tclear the experience pickup cooldown of player"
 })
 @Since("INSERT VERSION")
 public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Timespan> {
@@ -34,7 +34,7 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 	private static final int maxTicks = Integer.MAX_VALUE;
 
 	@Override
-	public @Nullable Timespan convert(Player player) {
+	public Timespan convert(Player player) {
 		return new Timespan(Timespan.TimePeriod.TICK, player.getExpCooldown());
 	}
 
