@@ -16,7 +16,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Name("BlockState - Update")
+@Name("Update Block")
 @Description({
 	"Updates the blocks to a selected block",
 	"`force`: Will force the update of the block",
@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"update {_blocks::*} as gravel",
-	"force update {_blocks::*} as sand without physics updates",
-	"update {_blocks::*} without neighbouring updates"
+	"force update {_blocks::*} to be sand without physics updates",
+	"update {_blocks::*} as stone without neighbouring updates"
 })
 @Since("INSERT VERSION")
 // Originally sourced from SkBee by ShaneBee (https://github.com/ShaneBeee/SkBee/blob/master/src/main/java/com/shanebeestudios/skbee/elements/other/effects/EffBlockstateUpdate.java)
@@ -33,11 +33,10 @@ public class EffBlockUpdate extends Effect {
 
 	static {
 		Skript.registerEffect(EffBlockUpdate.class,
-			"[:force] update %blocks% as %blockdata% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]");
+			"[:force] update %blocks% (as|to be) %blockdata% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]");
 	}
 
 	private boolean force, physics;
-	private Expression<BlockState> blockStates;
 	private Expression<Block> blocks;
 	private Expression<BlockData> blockData;
 
