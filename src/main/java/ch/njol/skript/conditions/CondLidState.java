@@ -27,8 +27,8 @@ public class CondLidState extends PropertyCondition<Block> {
 		Skript.registerCondition(CondLidState.class, ConditionType.PROPERTY,
 			"[the] lid [state[s]] of %blocks% (is|are) (open[ed]|:close[d])",
 			"[the] lid [state[s]] of %blocks% (isn't|is not|aren't|are not) (open[ed]|:close[d])",
-			"%blocks%['s] lid [state[s]] (is|are) (open[ed]|:close[d])",
-			"%blocks%['s] lid [state[s]] (isn't|is not|aren't|are not) (open[ed]|:close[d])"
+			"%blocks%'[s] lid [state[s]] (is|are) (open[ed]|:close[d])",
+			"%blocks%'[s] lid [state[s]] (isn't|is not|aren't|are not) (open[ed]|:close[d])"
 		);
 	}
 
@@ -39,8 +39,7 @@ public class CondLidState extends PropertyCondition<Block> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		checkOpen = !parseResult.hasTag("close");
 		setExpr((Expression<Block>) exprs[0]);
-		if (matchedPattern == 1 || matchedPattern == 3)
-			setNegated(true);
+		setNegated(matchedPattern == 1 || matchedPattern == 3);
 		return true;
 	}
 
