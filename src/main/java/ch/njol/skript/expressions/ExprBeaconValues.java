@@ -21,6 +21,8 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static ch.njol.util.Math2.floor;
 
 @Name("Beacon Effects")
@@ -38,8 +40,8 @@ import static ch.njol.util.Math2.floor;
 public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	enum BeaconValues {
-		PRIMARY("primary beacon effect"),
-		SECONDARY("secondary beacon effect"),
+		PRIMARY("primary [beacon] effect"),
+		SECONDARY("secondary [beacon] effect"),
 		RANGE("[beacon] range"),
 		TIER("[beacon] tier");
 
@@ -62,7 +64,7 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 		String[] patterns = new String[size * 2];
 		for (BeaconValues value : beaconValues) {
 			patterns[2 * value.ordinal()] = "%blocks%['s] " + value.pattern;
-			patterns[2 * value.ordinal() + 1] = value.pattern + patternEnding;
+			patterns[2 * value.ordinal() + 1] = "[the] " + value.pattern + patternEnding;
 		}
 
 		Skript.registerExpression(ExprBeaconValues.class, Object.class, ExpressionType.PROPERTY, patterns);
@@ -81,8 +83,6 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 		if (exprs[0] != null) {
 			setExpr((Expression<Block>) exprs[0]);
 		} else {
-			if (!PAPER_EVENTS)
-				return false;
 			if (!getParser().isCurrentEvent(PlayerChangeBeaconEffectEvent.class, BeaconEffectEvent.class, BeaconActivatedEvent.class, BeaconDeactivatedEvent.class)) {
 				Skript.error("There is no beacon in a " + getParser().getCurrentEventName() + " event.");
 				return false;
@@ -153,74 +153,34 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 		}
 	}
 
+	private void changeBeacons(Event event, Consumer<Beacon> changer) {
+		for (Block block : getExpr().getArray(event)) {
+			Beacon beacon = (Beacon) block.getState();
+			changer.accept(beacon);
+			beacon.update(true);
+		}
+	}
+
 	private void changeRange(Event event, double providedRange, ChangeMode mode) {
 		switch (mode) {
-			case ADD -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setEffectRange(beacon.getEffectRange() + providedRange);
-					beacon.update(true);
-				}
-			}
-			case REMOVE -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setEffectRange(Math.max(beacon.getEffectRange() - providedRange, 0));
-					beacon.update(true);
-				}
-			}
-			case DELETE, RESET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.resetEffectRange();
-					beacon.update(true);
-				}
-			}
-			case SET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setEffectRange(providedRange);
-					beacon.update(true);
-				}
-			}
+			case ADD -> changeBeacons(event, beacon -> beacon.setEffectRange(beacon.getEffectRange() + providedRange));
+			case REMOVE -> changeBeacons(event, beacon -> beacon.setEffectRange(Math.max(beacon.getEffectRange() - providedRange, 0)));
+			case SET -> changeBeacons(event, beacon -> beacon.setEffectRange(providedRange));
+			case DELETE, RESET -> changeBeacons(event, Beacon::resetEffectRange);
 		}
 	}
 
 	private void changePrimary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
 		switch (mode) {
-			case SET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setPrimaryEffect(providedEffect);
-					beacon.update(true);
-				}
-			}
-			case DELETE, RESET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setPrimaryEffect(null);
-					beacon.update(true);
-				}
-			}
+			case ADD -> changeBeacons(event, beacon -> beacon.setPrimaryEffect(providedEffect));
+			case DELETE, RESET -> changeBeacons(event, beacon -> beacon.setPrimaryEffect(null));
 		}
 	}
 
 	private void changeSecondary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
 		switch (mode) {
-			case SET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setSecondaryEffect(providedEffect);
-					beacon.update(true);
-				}
-			}
-			case DELETE, RESET -> {
-				for (Block block : getExpr().getArray(event)) {
-					Beacon beacon = (Beacon) block.getState();
-					beacon.setSecondaryEffect(null);
-					beacon.update(true);
-				}
-			}
+			case ADD -> changeBeacons(event, beacon -> beacon.setSecondaryEffect(providedEffect));
+			case DELETE, RESET -> changeBeacons(event, beacon -> beacon.setSecondaryEffect(null));
 		}
 	}
 
