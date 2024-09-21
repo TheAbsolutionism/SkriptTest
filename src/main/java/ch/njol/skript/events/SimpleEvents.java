@@ -805,7 +805,7 @@ public class SimpleEvents {
 					"\tbroadcast event-player",
 					"\tbroadcast event-timespan",
 					"\tbroadcast past event-timespan",
-					"\tbroadcast xp change reason"
+					"\tbroadcast xp cooldown change reason"
 			)
 			.since("INSERT VERSION");
 
