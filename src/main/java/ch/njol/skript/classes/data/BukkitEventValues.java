@@ -1952,13 +1952,13 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(BlockDropItemEvent.class, ItemStack[].class, new Getter<ItemStack[], BlockDropItemEvent>() {
 			@Override
-			public @Nullable ItemStack[] get(BlockDropItemEvent event) {
+			public ItemStack[] get(BlockDropItemEvent event) {
 				return event.getItems().stream().map(Item::getItemStack).toArray(ItemStack[]::new);
 			}
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(BlockDropItemEvent.class, Entity[].class, new Getter<Entity[], BlockDropItemEvent>() {
 			@Override
-			public @Nullable Entity[] get(BlockDropItemEvent event) {
+			public Entity[] get(BlockDropItemEvent event) {
 				return event.getItems().toArray(Entity[]::new);
 			}
 		}, EventValues.TIME_NOW);

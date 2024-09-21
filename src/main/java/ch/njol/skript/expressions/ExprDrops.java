@@ -130,25 +130,25 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		boolean removeAllExperience = false;
 		List<ItemType> deltaDrops = new ArrayList<>();
 		for (Object o : delta) {
-			if (o instanceof Experience) {
+			if (o instanceof Experience experience) {
 				// Special case for `remove xp from the drops`
-				if ((((Experience) o).getInternalXP() == -1 && mode == ChangeMode.REMOVE) || mode == ChangeMode.REMOVE_ALL) {
+				if ((experience.getInternalXP() == -1 && mode == ChangeMode.REMOVE) || mode == ChangeMode.REMOVE_ALL) {
 					removeAllExperience = true;
 				}
 				// add the value even if we're removing all experience, just so we know that experience was changed
 				if (deltaExperience == -1) {
-					deltaExperience = ((Experience) o).getXP();
+					deltaExperience = experience.getXP();
 				} else {
-					deltaExperience += ((Experience) o).getXP();
+					deltaExperience += experience.getXP();
 				}
-			} else if (o instanceof Inventory) {
+			} else if (o instanceof Inventory inventory) {
 				// inventories are unrolled into their contents
-				for (ItemStack item : ((Inventory) o).getContents()) {
+				for (ItemStack item : inventory.getContents()) {
 					if (item != null)
 						deltaDrops.add(new ItemType(item));
 				}
-			} else if (o instanceof ItemType) {
-				deltaDrops.add((ItemType) o);
+			} else if (o instanceof ItemType itemType) {
+				deltaDrops.add(itemType);
 			} else {
 				assert false;
 			}
@@ -162,15 +162,22 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		// handle experience
 		if (deltaExperience > -1 && event instanceof EntityDeathEvent entityDeathEvent) {
 			switch (mode) {
-				case SET -> {entityDeathEvent.setDroppedExp(deltaExperience);}
-				case ADD -> {entityDeathEvent.setDroppedExp(originalExperience + deltaExperience);}
-				case REMOVE -> {entityDeathEvent.setDroppedExp(originalExperience - deltaExperience);} // fallthrough to check for removeAllExperience
-				case REMOVE_ALL -> {
+				case SET:
+					entityDeathEvent.setDroppedExp(deltaExperience);
+					break;
+				case ADD:
+					entityDeathEvent.setDroppedExp(originalExperience + deltaExperience);
+					break;
+				case REMOVE:
+					entityDeathEvent.setDroppedExp(originalExperience - deltaExperience);
+					// fallthrough to check for removeAllExperience
+				case REMOVE_ALL:
 					if (removeAllExperience)
 						entityDeathEvent.setDroppedExp(0);
-				}
-				case DELETE -> {}
-				case RESET -> {assert false;}
+					break;
+				case DELETE:
+				case RESET:
+					assert false;
 			}
 		}
 
