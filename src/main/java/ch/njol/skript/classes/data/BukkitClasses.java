@@ -1529,18 +1529,17 @@ public class BukkitClasses {
 				.description("Represents a transform reason of an <a href='events.html#entity transform'>entity transform event</a>.")
 				.since("2.8.0"));
     
-		Classes.registerClass(new EnumClassInfo<>(ChangeReason.class,  "experiencecooldownchangereason", "experience cooldown change reasons")
-			.user("(experience|[e]xp) cooldown change (reason|cause)s?")
-			.name("Experience Cooldown Change Reason")
-			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
-			.since("INSERT VERSION"));
-    
 		Classes.registerClass(new EnumClassInfo<>(EntityPotionEffectEvent.Cause.class, "entitypotioncause", "entity potion causes")
 				.user("(entity )?potion ?effect ?cause")
 				.name("Entity Potion Cause")
 				.description("Represents the cause of the action of a potion effect on an entity, e.g. arrow, command")
 				.since("INSERT VERSION"));
-  
+
+		Classes.registerClass(new EnumClassInfo<>(ChangeReason.class,  "experiencecooldownchangereason", "experience cooldown change reasons")
+			.user("(experience|[e]xp) cooldown change (reason|cause)s?")
+			.name("Experience Cooldown Change Reason")
+			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
+			.since("INSERT VERSION"));
 	}
 
 }
