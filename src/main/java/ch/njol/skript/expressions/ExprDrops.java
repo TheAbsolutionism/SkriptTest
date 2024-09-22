@@ -62,12 +62,16 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 		Skript.registerExpression(ExprDrops.class, ItemType.class, ExpressionType.SIMPLE, "[the] drops");
 	}
 
+	private boolean isDeathEvent;
+
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!getParser().isCurrentEvent(EntityDeathEvent.class, BlockDropItemEvent.class)) {
 			Skript.error("The expression 'drops' can only be used in death events and block drop events");
 			return false;
 		}
+		if (getParser().isCurrentEvent(EntityDeathEvent.class))
+			isDeathEvent = true;
 		return true;
 	}
 
@@ -99,7 +103,10 @@ public class ExprDrops extends SimpleExpression<ItemType> {
 			case ADD:
 			case REMOVE:
 			case SET:
-				return CollectionUtils.array(ItemType[].class, Inventory[].class, Experience[].class);
+				if (isDeathEvent)
+					return CollectionUtils.array(ItemType[].class, Inventory[].class, Experience[].class);
+				else
+					return CollectionUtils.array(ItemType[].class, Inventory[].class);
 			case DELETE: // handled by EffClearDrops
 			case RESET:
 			default:
