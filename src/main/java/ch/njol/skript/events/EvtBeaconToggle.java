@@ -25,8 +25,8 @@ public class EvtBeaconToggle extends SkriptEvent {
 		if (Skript.classExists("io.papermc.paper.event.block.BeaconActivatedEvent"))
 			Skript.registerEvent("Beacon Toggle", EvtBeaconToggle.class, new Class[] {BeaconActivatedEvent.class, BeaconDeactivatedEvent.class},
 					"beacon toggle",
-				"beacon activat(e|ion)",
-				"beacon deactivat(e|ion)");
+					"beacon activat(e|ion)",
+					"beacon deactivat(e|ion)");
 	}
 
 	private boolean isActivate, isToggle;

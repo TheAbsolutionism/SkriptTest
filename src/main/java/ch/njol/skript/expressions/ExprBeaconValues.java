@@ -10,6 +10,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
+import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import io.papermc.paper.event.block.BeaconActivatedEvent;
@@ -27,8 +28,10 @@ import static ch.njol.util.Math2.floor;
 
 @Name("Beacon Effects")
 @Description({
-	"The active effects of the beacon.",
-	"The secondary effect can only be set to regeneration and it can only be set when the beacon has achieved the highest tier.",
+	"The active effects of a beacon.",
+	"The secondary effect can be set to anything, but the icon in the GUI will not display correctly.",
+	"The secondary effect can only be set when the beacon is at max tier.",
+	"The primary and secondary effect can not be the same, primary will always retain the potion type and secondary will be cleared.",
 	"You can only change the range on Paper."
 })
 @Examples({
@@ -36,6 +39,8 @@ import static ch.njol.util.Math2.floor;
 	"set primary beacon effect of {_block} to haste",
 	"add 1 to range of {_block}"
 })
+@RequiredPlugins("Paper (Range)")
+@Events({"Beacon Effect", "Beacon Toggle", "Beacon Change Effect"})
 @Since("INSERT VERSION")
 public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
@@ -126,13 +131,12 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.REMOVE_ALL || valueType == BeaconValues.TIER) {
-			return null;
+		if (mode != ChangeMode.REMOVE_ALL && valueType != BeaconValues.TIER) {
+			if (!isEffect || (isEffect && (mode != ChangeMode.ADD && mode != ChangeMode.REMOVE))) {
+				return CollectionUtils.array(Object.class);
+			}
 		}
-		if (isEffect && (mode == ChangeMode.ADD || mode == ChangeMode.REMOVE)) {
-			return null;
-		}
-		return CollectionUtils.array(Object.class);
+		return null;
 	}
 
 	@Override
@@ -147,9 +151,9 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 			}
 		}
 		switch (valueType) {
-			case RANGE -> {changeRange(event, providedRange, mode);}
-			case PRIMARY -> {changePrimary(event, providedEffect, mode);}
-			case SECONDARY -> {changeSecondary(event, providedEffect, mode);}
+			case RANGE -> changeRange(event, providedRange, mode);
+			case PRIMARY -> changePrimary(event, providedEffect, mode);
+			case SECONDARY -> changeSecondary(event, providedEffect, mode);
 		}
 	}
 
@@ -163,27 +167,26 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	private void changeRange(Event event, double providedRange, ChangeMode mode) {
 		switch (mode) {
-			case ADD -> changeBeacons(event, beacon -> beacon.setEffectRange(beacon.getEffectRange() + providedRange));
-			case REMOVE -> changeBeacons(event, beacon -> beacon.setEffectRange(Math.max(beacon.getEffectRange() - providedRange, 0)));
-			case SET -> changeBeacons(event, beacon -> beacon.setEffectRange(providedRange));
+			case ADD -> changeBeacons(event, beacon -> beacon.setEffectRange(Math2.fit(0, beacon.getEffectRange() + providedRange, Integer.MAX_VALUE)));
+			case REMOVE -> changeBeacons(event, beacon -> beacon.setEffectRange(Math2.fit(0, beacon.getEffectRange() - providedRange, Integer.MAX_VALUE)));
+			case SET -> changeBeacons(event, beacon -> beacon.setEffectRange(Math2.fit(0, providedRange, Integer.MAX_VALUE)));
 			case DELETE, RESET -> changeBeacons(event, Beacon::resetEffectRange);
 		}
 	}
 
 	private void changePrimary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
 		switch (mode) {
-			case ADD -> changeBeacons(event, beacon -> beacon.setPrimaryEffect(providedEffect));
+			case SET -> changeBeacons(event, beacon -> beacon.setPrimaryEffect(providedEffect));
 			case DELETE, RESET -> changeBeacons(event, beacon -> beacon.setPrimaryEffect(null));
 		}
 	}
 
 	private void changeSecondary(Event event, PotionEffectType providedEffect, ChangeMode mode) {
 		switch (mode) {
-			case ADD -> changeBeacons(event, beacon -> beacon.setSecondaryEffect(providedEffect));
+			case SET -> changeBeacons(event, beacon -> beacon.setSecondaryEffect(providedEffect));
 			case DELETE, RESET -> changeBeacons(event, beacon -> beacon.setSecondaryEffect(null));
 		}
 	}
-
 
 	@Override
 	public boolean isSingle() {
