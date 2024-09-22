@@ -7,6 +7,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
+import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -52,20 +53,21 @@ public class ExprExperienceCooldown extends SimplePropertyExpression<Player, Tim
 		if (delta[0] != null)
 			providedTime = (int) ((Timespan) delta[0]).get(Timespan.TimePeriod.TICK);
 
+
 		switch (mode) {
 			case ADD -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(player.getExpCooldown() + providedTime, -1)));
+					player.setExpCooldown(Math2.fit(-1, player.getExpCooldown() + providedTime, Integer.MAX_VALUE));
 				}
 			}
 			case REMOVE -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(player.getExpCooldown() - providedTime, -1)));
+					player.setExpCooldown(Math2.fit(-1, player.getExpCooldown() - providedTime, Integer.MAX_VALUE));
 				}
 			}
 			case SET -> {
 				for (Player player : getExpr().getArray(event)) {
-					player.setExpCooldown(Math.min(Integer.MAX_VALUE, Math.max(providedTime, -1)));
+					player.setExpCooldown(Math2.fit(-1, providedTime, Integer.MAX_VALUE));
 				}
 			}
 			case RESET, DELETE -> {

@@ -34,7 +34,7 @@ public class ExprExperienceCooldownChangeReason extends EventValueExpression<Cha
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "experience change reason";
+		return "experience cooldown change reason";
 	}
 
 }
