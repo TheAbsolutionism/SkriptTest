@@ -52,9 +52,10 @@ public class EffBlockUpdate extends Effect {
 
 	@Override
 	protected void execute(Event event) {
+		BlockData data = this.blockData.getSingle(event);
 		for (Block block : this.blocks.getArray(event)) {
 			BlockState state = block.getState();
-			state.setBlockData(this.blockData.getSingle(event));
+			state.setBlockData(data);
 			state.update(this.force, this.physics);
 		}
 	}
