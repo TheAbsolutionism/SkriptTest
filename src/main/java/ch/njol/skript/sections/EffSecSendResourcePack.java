@@ -90,7 +90,6 @@ public class EffSecSendResourcePack extends EffectSection {
 			return force;
 		}
 
-
 		@Override
 		public @NotNull HandlerList getHandlers() {
 			throw new IllegalStateException();
@@ -102,9 +101,7 @@ public class EffSecSendResourcePack extends EffectSection {
 			"send [a|the] resource pack [at|from [[the] URL]] %string% to %players%",
 			"send [a|the] resource pack [at|from [[the] URL]] %string% with hash %string% to %players%"
 			);
-
 	}
-
 
 	private @UnknownNullability Expression<String> url;
 	private @UnknownNullability Expression<Player> recipients;
@@ -136,7 +133,6 @@ public class EffSecSendResourcePack extends EffectSection {
 
 		return true;
 	}
-
 
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
@@ -191,7 +187,6 @@ public class EffSecSendResourcePack extends EffectSection {
 		}
 		return super.walk(event, false);
 	}
-
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {

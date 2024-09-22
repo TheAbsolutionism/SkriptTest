@@ -49,7 +49,7 @@ public class EffRemoveResourcePack extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		pattern = matchedPattern;
-		if (matchedPattern == 2) {
+		if (matchedPattern == 1) {
 			id = (Expression<String>) exprs[0];
 			recipients = (Expression<Player>) exprs[1];
 		} else {
@@ -62,11 +62,11 @@ public class EffRemoveResourcePack extends Effect {
 	@Override
 	protected void execute(Event event) {
 		UUID uuid = null;
-		if (pattern == 2) {
+		if (pattern == 1) {
 			try {
 				uuid = UUID.fromString(id.getSingle(event));
 			} catch (IllegalArgumentException exception) {
-				Skript.error("Remove Resource Pack UUID failed: " + exception.getLocalizedMessage(), ErrorQuality.SEMANTIC_ERROR);
+				Skript.error("Remove Resource Pack UUID failed: " + exception.getLocalizedMessage());
 			}
 			if (uuid == null) {
 				return;
@@ -87,12 +87,9 @@ public class EffRemoveResourcePack extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		if (pattern == 1) {
+		if (pattern == 0)
 			return "remove all resource packs from " + recipients.toString(event, debug);
-		} else if (pattern == 2) {
-			return "remove resource pack with the uuid " + id.toString(event, debug) + " from " + recipients.toString(event, debug);
-		}
-		return "null";
+		return "remove resource pack with the uuid " + id.toString(event, debug) + " from " + recipients.toString(event, debug);
 	}
 
 }
