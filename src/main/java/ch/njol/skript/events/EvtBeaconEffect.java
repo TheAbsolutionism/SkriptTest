@@ -17,9 +17,12 @@ import org.skriptlang.skript.lang.comparator.Relation;
 @Description("Called when a player gets an effect from a beacon.")
 @Examples({
 	"on beacon effect:",
-	"\tbroadcast applied effect",
-	"\tbroadcast event-player",
-	"\tbroadcast event-block"
+		"\tbroadcast applied effect",
+		"\tbroadcast event-player",
+		"\tbroadcast event-block",
+	"on primary beacon effect apply of haste:",
+	"on application of secondary beacon effect:",
+	"on beacon effect of speed:"
 })
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
@@ -28,7 +31,9 @@ public class EvtBeaconEffect extends SkriptEvent {
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent"))
 			Skript.registerEvent("Beacon Effect", EvtBeaconEffect.class, BeaconEffectEvent.class,
-				"[:primary|:secondary] beacon effect [of %-potioneffecttypes%]");
+				"[:primary|:secondary] beacon effect [of %-potioneffecttypes%]",
+				"application of [:primary|:secondary] beacon effect [of %-potioneffecttypes%]",
+				"[:primary|:secondary] beacon effect apply [of %-potioneffecttypes%]");
 
 	}
 
