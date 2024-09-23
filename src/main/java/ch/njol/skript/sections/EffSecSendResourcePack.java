@@ -6,6 +6,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.effects.EffResourcePackValues;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.EffectSection;
 import ch.njol.skript.lang.Expression;
@@ -124,7 +125,7 @@ public class EffSecSendResourcePack extends EffectSection {
 		if (sectionNode != null) {
 			AtomicBoolean delayed = new AtomicBoolean(false);
 			Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
-			trigger = loadCode(sectionNode, "resource", afterLoading, ResourcePackEvent.class);
+			trigger = loadRestrictedCode(new Class[]{EffResourcePackValues.class}, sectionNode, "resource", afterLoading, ResourcePackEvent.class);
 			if (delayed.get()) {
 				Skript.error("Delays can't be used within a Resource Pack Effect Section");
 				return false;
