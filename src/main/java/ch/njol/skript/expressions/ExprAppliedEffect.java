@@ -12,22 +12,23 @@ import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Applied Effect")
-@Description("Checks to see if the applied effect of a beacon effect event is primary or secondary")
+@Name("Applied Beacon Effect")
+@Description("The type of effect applied by a beacon.")
 @Examples({
 	"on beacon effect:",
-	"\tif the applied effect is primary beacon effect:",
-	"\t\tbroadcast \"Is Primary\"",
-	"\telse if applied effect = secondary effect:",
-	"\t\tbroadcast \"Is Secondary\""
+		"\tif the applied effect is primary beacon effect:",
+			"\t\tbroadcast \"Is Primary\"",
+		"\telse if applied effect = secondary effect:",
+			"\t\tbroadcast \"Is Secondary\""
 })
+@Events("Beacon Effect")
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
 public class ExprAppliedEffect extends SimpleExpression<PotionEffectType> {
 
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent")) {
-			Skript.registerExpression(ExprAppliedEffect.class, PotionEffectType.class, ExpressionType.SIMPLE, "[the] applied effect");
+			Skript.registerExpression(ExprAppliedEffect.class, PotionEffectType.class, ExpressionType.SIMPLE, "[the] applied [beacon] effect");
 		}
 	}
 

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static ch.njol.util.Math2.floor;
 
 @Name("Beacon Effects")
 @Description({
@@ -57,13 +56,13 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 		}
 	}
 
-	private static final boolean PAPER_EVENTS = Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent");
-	private static final boolean PAPER_RANGE = Skript.methodExists(Beacon.class, "getEffectRange");
+	private static final boolean SUPPORTS_CHANGE_EVENT = Skript.classExists("io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent");
+	private static final boolean SUPPORTS_RANGE = Skript.methodExists(Beacon.class, "getEffectRange");
 	private static BeaconValues[] beaconValues = BeaconValues.values();
 
 	static {
 		String patternEnding = " of %blocks%";
-		if (PAPER_EVENTS)
+		if (SUPPORTS_CHANGE_EVENT)
 			patternEnding = " [of %blocks%]";
 		int size = beaconValues.length;
 		String[] patterns = new String[size * 2];
@@ -80,8 +79,8 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		valueType = beaconValues[(int) floor(matchedPattern/2)];
-		if (valueType == BeaconValues.RANGE && !PAPER_RANGE) {
+		valueType = beaconValues[(int) Math2.floor(matchedPattern/2)];
+		if (valueType == BeaconValues.RANGE && !SUPPORTS_RANGE) {
 			Skript.error(valueType.pattern + " can only be used on Paper.");
 			return false;
 		}
@@ -108,14 +107,14 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 				Beacon beacon  = (Beacon) block.getState();
 				switch (valueType) {
 					case PRIMARY -> {
-						if (PAPER_EVENTS && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
+						if (SUPPORTS_CHANGE_EVENT && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
 							return changeEvent.getPrimary();
 						} else if (beacon.getPrimaryEffect() != null) {
 							return beacon.getPrimaryEffect().getType();
 						}
 					}
 					case SECONDARY-> {
-						if (PAPER_EVENTS && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
+						if (SUPPORTS_CHANGE_EVENT && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
 							return changeEvent.getSecondary();
 						} else if (beacon.getSecondaryEffect() != null) {
 							return beacon.getSecondaryEffect().getType();
