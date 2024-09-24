@@ -136,9 +136,9 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	public String toString(@Nullable Event event, boolean debug) {
 		String result = "";
 		switch (slot) {
-			case ORE -> {result = "ore slot";}
-			case FUEL -> {result = "fuel slot";}
-			case RESULT -> {result = "result slot";}
+			case ORE -> result = "ore slot";
+			case FUEL -> result = "fuel slot";
+			case RESULT -> result = "result slot";
 		}
 		if (isEvent) {
 			result += " of " + event.getEventName();

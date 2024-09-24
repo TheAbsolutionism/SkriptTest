@@ -24,10 +24,9 @@ import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-
-@Name("Furnace Event Values")
+@Name("Furnace Event Items")
 @Description({
-	"Represents the expressions you can use within furnace events to get items correlated to an event.",
+	"Represents the different items in furnace events.",
 	"Only 'smelting item' can be changed."
 })
 @Examples({
@@ -37,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 	"on furnace extract:",
 		"\tbroadcast extracted item",
 	"on fuel burn:",
-		"\tbroadcast fuel burned",
+		"\tbroadcast burned fuel",
 	"on smelting start:",
 		"\tbroadcast smelting item",
 		"\tclear smelting item"
@@ -47,18 +46,19 @@ import org.jetbrains.annotations.Nullable;
 public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack> {
 
 	enum FurnaceValues {
-		SMELTED("(smelted item|result [item])", FurnaceSmeltEvent.class, "Can only use 'smelted item' in a smelting event."),
-		EXTRACTED("extracted item[s]", FurnaceExtractEvent.class, "Can only use 'extracted item' in a furnace extract event."),
-		SMELTING("smelting item", FurnaceStartSmeltEvent.class, "Can only use 'smelting item' in a start smelting event"),
-		BURNED("fuel burned [item]", FurnaceBurnEvent.class, "Can only use 'fuel burned' in a fuel burning event.");
+		SMELTED("(smelted item|result [item])", "smelted item", FurnaceSmeltEvent.class, "'smelted item' can only be used in a smelting event."),
+		EXTRACTED("extracted item[s]", "extracted item", FurnaceExtractEvent.class, "'extracted item' can only be used in a furnace extract event."),
+		SMELTING("smelting item", "smelting item", FurnaceStartSmeltEvent.class, "'smelting item' can only be used in a start smelting event"),
+		BURNED("burned (fuel|item)", "burned fuel item", FurnaceBurnEvent.class, "'burned fuel' can only be used in a fuel burning event.");
 
-		private String pattern, error;
+		private String pattern, error, toString;
 		private Class<? extends Event> clazz;
 
-		FurnaceValues(String pattern, Class<? extends Event> clazz, String error) {
+		FurnaceValues(String pattern, String toString, Class<? extends Event> clazz, String error) {
 			this.pattern = "[the] " + pattern;
 			this.clazz = clazz;
 			this.error = error;
+			this.toString = toString;
 		}
 
 	}
@@ -112,9 +112,8 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (type != FurnaceValues.SMELTED) {
+		if (type != FurnaceValues.SMELTED)
 			return null;
-		}
 		if (mode != ChangeMode.SET && mode != ChangeMode.DELETE)
 			return null;
 		return CollectionUtils.array(ItemStack.class);
@@ -145,12 +144,7 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return switch (type) {
-			case SMELTED -> "smelted item";
-			case SMELTING -> "smelting item";
-			case BURNED -> "fuel burned item";
-			case EXTRACTED -> "extracted item";
-		};
+		return type.toString;
 	}
 
 }

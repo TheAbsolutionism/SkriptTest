@@ -28,9 +28,9 @@ public class EvtFurnaceTest extends SkriptJUnitTest {
 	public void setUp() {
 		furnace = setBlock(Material.FURNACE);
 		furnace.setType(Material.FURNACE);
-		for (Recipe check : Bukkit.getRecipesFor(new ItemStack(Material.GOLD_INGOT))) {
-			if (check instanceof FurnaceRecipe) {
-				recipe = (FurnaceRecipe) check;
+		for (Recipe goldIngotRecipe : Bukkit.getRecipesFor(new ItemStack(Material.GOLD_INGOT))) {
+			if (goldIngotRecipe instanceof FurnaceRecipe furnaceRecipe) {
+				recipe = furnaceRecipe;
 				break;
 			}
 		}

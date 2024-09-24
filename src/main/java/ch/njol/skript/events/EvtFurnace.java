@@ -22,9 +22,10 @@ public class EvtFurnace extends SkriptEvent {
 			.description("Called when a furnace smelts an item in its <a href='expressions.html#ExprFurnaceSlot'>ore slot</a>.")
 			.examples(
 				"on smelt:",
+					"\tclear the smelted item",
 				"on smelt of raw iron:",
 					"\tbroadcast smelted item",
-					"\tset smelt item to iron block"
+					"\tset the smelted item to iron block"
 			)
 			.since("1.0, INSERT VERSION (specific item)");
 		Skript.registerEvent("Fuel Burn", EvtFurnace.class, FurnaceBurnEvent.class, "[furnace] fuel burn[ing] [of %-itemtypes%]")
@@ -32,11 +33,11 @@ public class EvtFurnace extends SkriptEvent {
 			.examples(
 				"on fuel burning:",
 					"\tbroadcast fuel burned",
-					"\tif fuel burned is coal:",
+					"\tif burned fuel is coal:",
 						"\t\tadd 20 seconds to burn time"
 			)
 			.since("1.0, INSERT VERSION (specific item)");
-		Skript.registerEvent("Furnace Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace extract[ion] [of %-itemtypes%]")
+		Skript.registerEvent("Furnace Item Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace [item] extract[ion] [of %-itemtypes%]")
 			.description("Called when a player takes any item out of the furnace.")
 			.examples(
 				"on furnace extract:",
@@ -47,12 +48,13 @@ public class EvtFurnace extends SkriptEvent {
 		Skript.registerEvent("Start Smelt", EvtFurnace.class, FurnaceStartSmeltEvent.class,
 			"[furnace] start [of] smelt[ing] [[of] %-itemtypes%]",
 			"[furnace] smelting start [of %-itemtypes%]")
-			.description("Called when a furnace starts smelting an item in its ...")
+			.description("Called when a furnace starts smelting an item in its ore slot.")
 			.examples(
 				"on smelting start:",
 					"\tif the smelting item is raw iron:",
 						"\t\tset total cook time to 1 second",
-				"on smelting start of raw iron:"
+				"on smelting start of raw iron:",
+					"\tadd 20 seconds to total cook time"
 			)
 			.since("INSERT VERSION");
 	}
@@ -87,8 +89,8 @@ public class EvtFurnace extends SkriptEvent {
 		}
 
 		return types.check(event, o -> {
-			if (o instanceof ItemType)
-				return ((ItemType) o).isSupertypeOf(item);
+			if (o instanceof ItemType itemType)
+				return itemType.isSupertypeOf(item);
 			return false;
 		});
 	}
