@@ -105,25 +105,26 @@ public class ExprBeaconValues extends PropertyExpression<Block, Object> {
 			@Override
 			public @Nullable Object get(Block block) {
 				Beacon beacon  = (Beacon) block.getState();
-				switch (valueType) {
+				return switch (valueType) {
 					case PRIMARY -> {
 						if (SUPPORTS_CHANGE_EVENT && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
-							return changeEvent.getPrimary();
+							yield changeEvent.getPrimary();
 						} else if (beacon.getPrimaryEffect() != null) {
-							return beacon.getPrimaryEffect().getType();
+							yield beacon.getPrimaryEffect().getType();
 						}
+						yield null;
 					}
 					case SECONDARY-> {
 						if (SUPPORTS_CHANGE_EVENT && event instanceof PlayerChangeBeaconEffectEvent changeEvent) {
-							return changeEvent.getSecondary();
+							yield changeEvent.getSecondary();
 						} else if (beacon.getSecondaryEffect() != null) {
-							return beacon.getSecondaryEffect().getType();
+							yield beacon.getSecondaryEffect().getType();
 						}
+						yield null;
 					}
-					case RANGE -> {return beacon.getEffectRange();}
-					case TIER -> {return beacon.getTier();}
+					case RANGE -> beacon.getEffectRange();
+					case TIER -> beacon.getTier();
 				};
-				return null;
 			}
 		});
 	}
