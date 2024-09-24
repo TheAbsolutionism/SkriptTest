@@ -39,14 +39,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Stream;
 
-@Name("Armour Slot")
+@Name("Armor Slot")
 @Description({
 	"Equipment of living entities, i.e. the boots, leggings, chestplate or helmet.",
-	"`Body armor` is a special slot that can only be used for:",
+	"Body armor is a special slot that can only be used for:",
 	"<ul>",
-	"<li>`Horses`: Horse armour (doesn't work on zombie or skeleton horses)</li>",
-	"<li>`Wolves`: Wolf Armor</li>",
-	"<li>`Llamas` (regular or trader): Carpet</li>",
+	"<li>Horses: Horse armour (doesn't work on zombie or skeleton horses)</li>",
+	"<li>Wolves: Wolf Armor</li>",
+	"<li>Llamas (regular or trader): Carpet</li>",
 	"</ul>"
 })
 @Examples({
@@ -54,7 +54,7 @@ import java.util.stream.Stream;
 	"helmet of player is neither a helmet nor air # player is wearing a block, e.g. from another plugin"
 })
 @Keywords("armor")
-@Since("1.0, 2.8.0 (Armour), INSERT VERSION (body armour)")
+@Since("1.0, 2.8.0 (armor), INSERT VERSION (body armor)")
 public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 
 	private static final Set<Class<?>> bodyEntities = new HashSet<>(Arrays.asList(Horse.class, Llama.class, TraderLlama.class));
@@ -91,11 +91,9 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 						if (equipment == null)
 							return null;
 						if (isBody) {
-							if (!(bodyEntities.contains(equipment.getHolder().getType().getEntityClass())))
+							if (!bodyEntities.contains(equipment.getHolder().getType().getEntityClass()))
 								return null;
-							return Stream.of(
-								new EquipmentSlot(equipment, EquipSlot.BODY, explicitSlot)
-							);
+							return Stream.of(new EquipmentSlot(equipment, EquipSlot.BODY, explicitSlot));
 						}
 						return Stream.of(
 								new EquipmentSlot(equipment, EquipSlot.HELMET, explicitSlot),
