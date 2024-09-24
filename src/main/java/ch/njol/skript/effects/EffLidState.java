@@ -44,11 +44,11 @@ public class EffLidState extends Effect {
 	@Override
 	protected void execute(Event event) {
 		for (Block block : blocks.getArray(event)) {
-			if (block.getState() instanceof Lidded lidBlock) {
+			if (block.getState() instanceof Lidded lidded) {
 				if (setOpen) {
-					lidBlock.open();
+					lidded.open();
 				} else {
-					lidBlock.close();
+					lidded.close();
 				}
 			}
 		}
