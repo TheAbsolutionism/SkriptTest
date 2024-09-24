@@ -18,6 +18,8 @@
  */
 package ch.njol.skript.util;
 
+import ch.njol.skript.bukkitutil.WorldUtils;
+import ch.njol.util.Math2;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockIterator;
@@ -87,7 +89,14 @@ public class BlockLineIterator extends StoppableIterator<Block> {
 	 * @return The newly modified Vector if needed.
 	 */
 	private static Vector fitInWorld(Location location, Vector direction) {
-        return location.toVector();
+		int lowest = WorldUtils.getWorldMinHeight(location.getWorld());
+		int highest = location.getWorld().getMaxHeight();
+		Vector vector = location.toVector();
+		int y = location.getBlockY();
+		if (y >= lowest && y <= highest)
+			return vector;
+		double newY = Math2.fit(lowest, location.getY(), highest);
+		return new Vector(location.getX(), newY, location.getZ());
 	}
 
 }
