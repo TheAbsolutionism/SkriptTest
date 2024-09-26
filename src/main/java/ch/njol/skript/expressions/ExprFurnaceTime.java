@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static ch.njol.util.Math2.floor;
 
 @Name("Furnace Times")
 @Description({
@@ -38,10 +37,10 @@ import static ch.njol.util.Math2.floor;
 @Examples({
 	"set the cooking time of {_block} to 10",
 	"set the total cooking time of {_block} to 50",
-	"set the burning time of {_block} to 100",
+	"set the fuel burning time of {_block} to 100",
 	"on smelt:",
 		"\tif the fuel slot is charcoal:",
-			"\t\tadd 5 seconds to the burn time"
+			"\t\tadd 5 seconds to the fuel burn time"
 })
 @Since("INSERT VERSION")
 public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
@@ -49,7 +48,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	enum FurnaceExpressions {
 		COOKTIME("cook[ing] time", "cook time"),
 		TOTALCOOKTIME("total cook[ing] time", "total cook time"),
-		BURNTIME("fuel burn[ing] time", "burn time");
+		BURNTIME("fuel burn[ing] time", "fuel burn time");
 
 		private String name, toString;
 
@@ -67,7 +66,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		int size = furnaceExprs.length;
 		String[] patterns = new String[size * 2];
 		for (FurnaceExpressions value : furnaceExprs) {
-			patterns[2 * value.ordinal()] = "[the] [furnace] " + value.name + " of %blocks%";
+			patterns[2 * value.ordinal()] = "[the] [furnace] " + value.name + " [of %blocks%]";
 			patterns[2 * value.ordinal() + 1] = "%blocks%['s]" + value.name;
 		}
 
@@ -75,12 +74,12 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	}
 
 	private FurnaceExpressions type;
-	private boolean explicitlyBlock;
+	private boolean explicitlyBlock = false;
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = furnaceExprs[(int) floor(matchedPattern / 2)];
+		type = furnaceExprs[(int) Math2.floor(matchedPattern / 2)];
 		if (exprs[0] != null) {
 			explicitlyBlock = true;
 			setExpr((Expression<Block>) exprs[0]);
@@ -89,6 +88,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 				Skript.error("There's no furnace in a " + getParser().getCurrentEventName() + " event.");
 				return false;
 			}
+			explicitlyBlock = false;
 			setExpr(new EventValueExpression<>(Block.class));
 		}
 		return true;
@@ -105,16 +105,18 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 						return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getCookTime());
 					}
 					case TOTALCOOKTIME -> {
-						if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
+						if (event instanceof FurnaceStartSmeltEvent startEvent && block.equals(startEvent.getBlock())) {
 							return new Timespan(Timespan.TimePeriod.TICK, startEvent.getTotalCookTime());
 						} else {
 							return new Timespan(Timespan.TimePeriod.TICK, furnace.getCookTimeTotal());
 						}
 					}
 					case BURNTIME -> {
-						if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+						if (event instanceof FurnaceBurnEvent burnEvent && block.equals(burnEvent.getBlock())) {
+							Skript.adminBroadcast("Getting Event");
 							return new Timespan(Timespan.TimePeriod.TICK, burnEvent.getBurnTime());
 						} else {
+							Skript.adminBroadcast("Getting Furnace");
 							return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getBurnTime());
 						}
 					}

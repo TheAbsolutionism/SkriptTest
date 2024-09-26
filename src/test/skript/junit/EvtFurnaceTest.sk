@@ -7,7 +7,7 @@ on load:
 	set {_tests::3} to "start smelt event"
 	set {_tests::4} to "start smelt - got smelting item"
 	set {_tests::5} to "fuel burn event"
-	set {_tests::6} to "fuel burn - got fuel burned item"
+	set {_tests::6} to "fuel burn - got burned fuel item"
 	set {_tests::7} to "extract event"
 	set {_tests::8} to "extract - got extracted item"
 	set {_tests::9} to "extract - got player"
@@ -30,8 +30,8 @@ on start smelt:
 on fuel burn:
 	junit test is {@EvtFurnaceTest}
 	complete objective "fuel burn event" for junit test {@EvtFurnaceTest}
-	if fuel burned item is a lava bucket:
-		complete objective "fuel burn - got fuel burned item" for junit test {@EvtFurnaceTest}
+	if burned fuel is a lava bucket:
+		complete objective "fuel burn - got burned fuel item" for junit test {@EvtFurnaceTest}
 
 on furnace extract:
 	junit test is {@EvtFurnaceTest}
