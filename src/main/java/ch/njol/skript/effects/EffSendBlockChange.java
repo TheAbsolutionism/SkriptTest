@@ -88,15 +88,13 @@ public class EffSendBlockChange extends Effect {
 	@Override
 	protected void execute(Event e) {
 		Object object = this.as.getSingle(e);
-		if (object instanceof ItemType) {
-			ItemType itemType = (ItemType) object;
+		if (object instanceof ItemType itemType) {
 			for (Player player : players.getArray(e)) {
 				for (Block block : blocks.getArray(e)) {
 					itemType.sendBlockChange(player, block.getLocation());
 				}
 			}
-		} else if (BLOCK_DATA_SUPPORT && object instanceof BlockData) {
-			BlockData blockData = (BlockData) object;
+		} else if (BLOCK_DATA_SUPPORT && object instanceof BlockData blockData) {
 			for (Player player : players.getArray(e)) {
 				for (Block block : blocks.getArray(e)) {
 					player.sendBlockChange(block.getLocation(), blockData);

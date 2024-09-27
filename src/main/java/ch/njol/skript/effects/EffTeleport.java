@@ -106,19 +106,19 @@ public class EffTeleport extends Effect {
 			return next;
 
 		if (!delayed) {
-			if (e instanceof PlayerRespawnEvent && entityArray.length == 1 && entityArray[0].equals(((PlayerRespawnEvent) e).getPlayer())) {
+			if (e instanceof PlayerRespawnEvent respawnEvent && entityArray.length == 1 && entityArray[0].equals(respawnEvent.getPlayer())) {
 				if (unknownWorld)
 					return next;
-				((PlayerRespawnEvent) e).setRespawnLocation(loc);
+				respawnEvent.setRespawnLocation(loc);
 				return next;
 			}
 
-			if (e instanceof PlayerMoveEvent && entityArray.length == 1 && entityArray[0].equals(((PlayerMoveEvent) e).getPlayer())) {
+			if (e instanceof PlayerMoveEvent moveEvent && entityArray.length == 1 && entityArray[0].equals(moveEvent.getPlayer())) {
 				if (unknownWorld) { // we can approximate the world
 					loc = loc.clone();
-					loc.setWorld(((PlayerMoveEvent) e).getFrom().getWorld());
+					loc.setWorld(moveEvent.getFrom().getWorld());
 				}
-				((PlayerMoveEvent) e).setTo(loc);
+				moveEvent.setTo(loc);
 				return next;
 			}
 		}

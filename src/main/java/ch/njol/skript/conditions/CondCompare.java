@@ -120,10 +120,10 @@ public class CondCompare extends Condition implements VerboseAssert {
 		if ((parser.mark & 0x1) != 0) // "neither" on the left side
 			setNegated(!isNegated());
 		if ((parser.mark & 0x4) != 0) { // "neither" on the right side
-			if (second instanceof ExpressionList)
-				((ExpressionList<?>) second).invertAnd();
-			if (third instanceof ExpressionList)
-				((ExpressionList<?>) third).invertAnd();
+			if (second instanceof ExpressionList<?> secondList)
+				secondList.invertAnd();
+			if (third instanceof ExpressionList<?> thirdList)
+				thirdList.invertAnd();
 		}
 		final boolean b = init(parser.expr);
 		final Expression<?> third = this.third;
@@ -166,8 +166,8 @@ public class CondCompare extends Condition implements VerboseAssert {
 		try (ParseLogHandler log = SkriptLogger.startParseLogHandler()) {
 			if (first.getReturnType() == Object.class) {
 				Expression<?> expression = null;
-				if (first instanceof UnparsedLiteral)
-					expression = attemptReconstruction((UnparsedLiteral) first, second);
+				if (first instanceof UnparsedLiteral firstUnparsed)
+					expression = attemptReconstruction(firstUnparsed, second);
 				if (expression == null)
 					expression = first.getConvertedExpression(Object.class);
 				if (expression == null) {
@@ -178,8 +178,8 @@ public class CondCompare extends Condition implements VerboseAssert {
 			}
 			if (second.getReturnType() == Object.class) {
 				Expression<?> expression = null;
-				if (second instanceof UnparsedLiteral)
-					expression = attemptReconstruction((UnparsedLiteral) second, first);
+				if (second instanceof UnparsedLiteral secondUnparsed)
+					expression = attemptReconstruction(secondUnparsed, first);
 				if (expression == null)
 					expression = second.getConvertedExpression(Object.class);
 				if (expression == null) {
@@ -190,8 +190,8 @@ public class CondCompare extends Condition implements VerboseAssert {
 			}
 			if (third != null && third.getReturnType() == Object.class) {
 				Expression<?> expression = null;
-				if (third instanceof UnparsedLiteral)
-					expression = attemptReconstruction((UnparsedLiteral) third, first);
+				if (third instanceof UnparsedLiteral thirdUnparsed)
+					expression = attemptReconstruction(thirdUnparsed, first);
 				if (expression == null)
 					expression = third.getConvertedExpression(Object.class);
 				if (expression == null) {
@@ -256,8 +256,8 @@ public class CondCompare extends Condition implements VerboseAssert {
 			source = expression.getSource();
 
 		// Try to get access to unparsed content of it
-		if (source instanceof UnparsedLiteral) {
-			String unparsed = ((UnparsedLiteral) source).getData();
+		if (source instanceof UnparsedLiteral unparsedLiteral) {
+			String unparsed = unparsedLiteral.getData();
 			T data = Classes.parse(unparsed, type, ParseContext.DEFAULT);
 			if (data != null) { // Success, let's make a literal of it
 				return new SimpleLiteral<>(data, false, new UnparsedLiteral(unparsed));

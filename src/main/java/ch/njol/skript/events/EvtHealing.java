@@ -61,9 +61,8 @@ public class EvtHealing extends SkriptEvent {
 
 	@Override
 	public boolean check(Event event) {
-		if (!(event instanceof EntityRegainHealthEvent))
+		if (!(event instanceof EntityRegainHealthEvent healthEvent))
 			return false;
-		EntityRegainHealthEvent healthEvent = (EntityRegainHealthEvent) event;
 		if (entityDatas != null) {
 			Entity compare = healthEvent.getEntity();
 			boolean result = false;

@@ -91,8 +91,8 @@ public class EffReplace extends Effect {
 	@Override
 	protected void execute(Event event) {
 		Object[] needles = this.needles.getAll(event);
-		if (haystack instanceof ExpressionList) {
-			for (Expression<?> haystackExpr : ((ExpressionList<?>) haystack).getExpressions()) {
+		if (haystack instanceof ExpressionList<?> expressionList) {
+			for (Expression<?> haystackExpr : expressionList.getExpressions()) {
 				replace(event, needles, haystackExpr);
 			}
 		} else {

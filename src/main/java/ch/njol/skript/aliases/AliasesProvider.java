@@ -208,8 +208,8 @@ public class AliasesProvider {
 		// Hack damage tag into item
 		Object damage = tags.get("Damage");
 		int flags = 0;
-		if (damage instanceof Number) { // Use helper for version compatibility
-			ItemUtils.setDamage(stack, ((Number) damage).shortValue());
+		if (damage instanceof Number number) { // Use helper for version compatibility
+			ItemUtils.setDamage(stack, number.shortValue());
 			tags.remove("Damage");
 			flags |= ItemFlags.CHANGED_DURABILITY;
 		}

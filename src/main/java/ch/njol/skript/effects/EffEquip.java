@@ -161,41 +161,41 @@ public class EffEquip extends Effect {
 			unequipHelmet = true;
 		}
 		for (LivingEntity entity : entities.getArray(event)) {
-			if (SUPPORTS_STEERABLE && entity instanceof Steerable) {
+			if (SUPPORTS_STEERABLE && entity instanceof Steerable steerable) {
 				for (ItemType itemType : itemTypes) {
 					if (SADDLE.isOfType(itemType.getMaterial())) {
-						((Steerable) entity).setSaddle(equip);
+						steerable.setSaddle(equip);
 					}
 				}
-			} else if (entity instanceof Pig) {
+			} else if (entity instanceof Pig pig) {
 				for (ItemType itemType : itemTypes) {
 					if (itemType.isOfType(Material.SADDLE)) {
-						((Pig) entity).setSaddle(equip);
+						pig.setSaddle(equip);
 						break;
 					}
 				}
-			} else if (entity instanceof Llama) {
-				LlamaInventory inv = ((Llama) entity).getInventory();
+			} else if (entity instanceof Llama llama) {
+				LlamaInventory inv = llama.getInventory();
 				for (ItemType itemType : itemTypes) {
 					for (ItemStack item : itemType.getAll()) {
 						if (CARPET.isOfType(item)) {
 							inv.setDecor(equip ? item : null);
 						} else if (CHEST.isOfType(item)) {
-							((Llama) entity).setCarryingChest(equip);
+							llama.setCarryingChest(equip);
 						}
 					}
 				}
-			} else if (entity instanceof AbstractHorse) {
+			} else if (entity instanceof AbstractHorse abstractHorse) {
 				// Spigot's API is bad, just bad... Abstract horse doesn't have horse inventory!
-				Inventory inv = ((AbstractHorse) entity).getInventory();
+				Inventory inv = abstractHorse.getInventory();
 				for (ItemType itemType : itemTypes) {
 					for (ItemStack item : itemType.getAll()) {
 						if (SADDLE.isOfType(item)) {
 							inv.setItem(0, equip ? item : null); // Slot 0=saddle
 						} else if (HORSE_ARMOR.isOfType(item)) {
 							inv.setItem(1, equip ? item : null); // Slot 1=armor
-						} else if (CHEST.isOfType(item) && entity instanceof ChestedHorse) {
-							((ChestedHorse) entity).setCarryingChest(equip);
+						} else if (CHEST.isOfType(item) && entity instanceof ChestedHorse chestedHorse) {
+							chestedHorse.setCarryingChest(equip);
 						}
 					}
 				}
@@ -220,8 +220,8 @@ public class EffEquip extends Effect {
 						equipment.setHelmet(null);
 					}
 				}
-				if (entity instanceof Player)
-					PlayerUtils.updateInventory((Player) entity);
+				if (entity instanceof Player player)
+					PlayerUtils.updateInventory(player);
 			}
 		}
 	}

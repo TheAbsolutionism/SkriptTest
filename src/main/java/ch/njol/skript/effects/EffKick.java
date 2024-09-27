@@ -73,10 +73,10 @@ public class EffKick extends Effect {
 		if (r == null)
 			return;
 		for (final Player p : players.getArray(e)) {
-			if (e instanceof PlayerLoginEvent && p.equals(((PlayerLoginEvent) e).getPlayer()) && !Delay.isDelayed(e)) {
-				((PlayerLoginEvent) e).disallow(Result.KICK_OTHER, r);
-			} else if (e instanceof PlayerKickEvent && p.equals(((PlayerKickEvent) e).getPlayer()) && !Delay.isDelayed(e)) {
-				((PlayerKickEvent) e).setLeaveMessage(r);
+			if (e instanceof PlayerLoginEvent loginEvent && p.equals(loginEvent.getPlayer()) && !Delay.isDelayed(e)) {
+				loginEvent.disallow(Result.KICK_OTHER, r);
+			} else if (e instanceof PlayerKickEvent kickEvent && p.equals(kickEvent.getPlayer()) && !Delay.isDelayed(e)) {
+				kickEvent.setLeaveMessage(r);
 			} else {
 				p.kickPlayer(r);
 			}

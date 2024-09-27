@@ -87,8 +87,8 @@ public class AliasesParser {
 			}
 			
 			// Section nodes are for variations
-			if (node instanceof SectionNode) {
-				VariationGroup vars = loadVariations((SectionNode) node);
+			if (node instanceof SectionNode sectionNode) {
+				VariationGroup vars = loadVariations(sectionNode);
 				if (vars != null) {
 					String groupName = node.getKey();
 					assert groupName != null;
@@ -100,14 +100,14 @@ public class AliasesParser {
 			}
 			
 			// Sanity check
-			if (!(node instanceof EntryNode)) {
+			if (!(node instanceof EntryNode entryNode)) {
 				Skript.error(m_unexpected_section.toString());
 				continue;
 			}
 			
 			// Check for conditions
 			if (conditions.containsKey(key)) {
-				boolean success = conditions.get(key).apply(((EntryNode) node).getValue());
+				boolean success = conditions.get(key).apply((entryNode).getValue());
 				if (!success) { // Failure causes ignoring rest in this section node
 					Skript.debug("Condition " + key + " was NOT met; not loading more");
 					return;
@@ -116,7 +116,7 @@ public class AliasesParser {
 			}
 			
 			// Get value (it always exists)
-			String value = ((EntryNode) node).getValue();
+			String value = entryNode.getValue();
 			
 			loadAlias(key, value);
 		}
@@ -550,8 +550,7 @@ public class AliasesParser {
 			// Construct alias name and variations
 			for (int i = 0; i < count; i++) {
 				PatternSlot slot = slots.get(i);
-				if (slot instanceof VariationSlot) { // A variation
-					VariationSlot varSlot = (VariationSlot) slot;
+				if (slot instanceof VariationSlot varSlot) { // A variation
 					pattern.append(varSlot.getName());
 					Variation var = varSlot.getVariation();
 					String varId = var.getId();

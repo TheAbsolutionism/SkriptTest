@@ -92,23 +92,23 @@ public class EffShoot extends Effect {
 			return;
 		for (final Object shooter : shooters.getArray(e)) {
 			for (final EntityData<?> d : types.getArray(e)) {
-				if (shooter instanceof LivingEntity) {
-					final Vector vel = dir.getDirection(((LivingEntity) shooter).getLocation()).multiply(v.doubleValue());
+				if (shooter instanceof LivingEntity livingEntity) {
+					final Vector vel = dir.getDirection(livingEntity.getLocation()).multiply(v.doubleValue());
 					final Class<? extends Entity> type = d.getType();
 					if (Fireball.class.isAssignableFrom(type)) {// fireballs explode in the shooter's face by default
-						final Fireball projectile = (Fireball) ((LivingEntity) shooter).getWorld().spawn(((LivingEntity) shooter).getEyeLocation().add(vel.clone().normalize().multiply(0.5)), type);
+						final Fireball projectile = (Fireball) livingEntity.getWorld().spawn(livingEntity.getEyeLocation().add(vel.clone().normalize().multiply(0.5)), type);
 						projectile.setShooter((ProjectileSource) shooter);
 						projectile.setVelocity(vel);
 						lastSpawned = projectile;
 					} else if (Projectile.class.isAssignableFrom(type)) {
 						@SuppressWarnings("unchecked")
-						final Projectile projectile = ((LivingEntity) shooter).launchProjectile((Class<? extends Projectile>) type);
+						final Projectile projectile = livingEntity.launchProjectile((Class<? extends Projectile>) type);
 						set(projectile, d);
 						projectile.setVelocity(vel);
 						lastSpawned = projectile;
 					} else {
-						final Location loc = ((LivingEntity) shooter).getLocation();
-						loc.setY(loc.getY() + ((LivingEntity) shooter).getEyeHeight() / 2);
+						final Location loc = livingEntity.getLocation();
+						loc.setY(loc.getY() + livingEntity.getEyeHeight() / 2);
 						final Entity projectile = d.spawn(loc);
 						if (projectile != null)
 							projectile.setVelocity(vel);

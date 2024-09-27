@@ -94,8 +94,7 @@ public class EffRing extends Effect {
 
 		for (Block block : blocks.getArray(event)) {
 			BlockState state = block.getState(false);
-			if (state instanceof Bell) {
-				Bell bell = (Bell) state;
+			if (state instanceof Bell bell) {
 				bell.ring(actualEntity, blockFace);
 			}
 		}

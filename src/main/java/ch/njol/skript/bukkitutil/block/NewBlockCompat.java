@@ -82,10 +82,9 @@ public class NewBlockCompat implements BlockCompat {
 
 		@Override
 		public boolean equals(@Nullable Object other) {
-			if (!(other instanceof NewBlockValues))
+			if (!(other instanceof NewBlockValues newBlockValues))
 				return false;
-			NewBlockValues n = (NewBlockValues) other;
-			return (data.matches(n.data) || n.data.matches(data)) && type.equals(n.type);
+			return (data.matches(newBlockValues.data) || newBlockValues.data.matches(data)) && type.equals(newBlockValues.type);
 		}
 
 		@SuppressWarnings("null")
@@ -105,14 +104,13 @@ public class NewBlockCompat implements BlockCompat {
 
 		@Override
 		public MatchQuality match(BlockValues other) {
-			if (!(other instanceof NewBlockValues)) {
+			if (!(other instanceof NewBlockValues newBlockValues)) {
 				throw new IllegalArgumentException("wrong block compat");
 			}
-			NewBlockValues n = (NewBlockValues) other;
-			if (type == n.type) {
-				if (data.equals(n.data)) { // Check for exact item match
+			if (type == newBlockValues.type) {
+				if (data.equals(newBlockValues.data)) { // Check for exact item match
 					return MatchQuality.EXACT;
-				} else if (data.matches(n.data)) { // What about explicitly defined states only?
+				} else if (data.matches(newBlockValues.data)) { // What about explicitly defined states only?
 					return MatchQuality.SAME_ITEM;
 				} else { // Just same material and different block states
 					return MatchQuality.SAME_MATERIAL;

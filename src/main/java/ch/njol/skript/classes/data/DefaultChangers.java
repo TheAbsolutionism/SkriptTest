@@ -80,19 +80,18 @@ public class DefaultChangers {
 			boolean hasItem = false;
 			for (final Entity e : entities) {
 				for (final Object d : delta) {
-					if (d instanceof PotionEffectType) {
+					if (d instanceof PotionEffectType potionEffectType) {
 						assert mode == ChangeMode.REMOVE || mode == ChangeMode.REMOVE_ALL;
-						if (!(e instanceof LivingEntity))
+						if (!(e instanceof LivingEntity livingEntity))
 							continue;
-						((LivingEntity) e).removePotionEffect((PotionEffectType) d);
+						livingEntity.removePotionEffect(potionEffectType);
 					} else {
-						if (e instanceof Player) {
-							final Player p = (Player) e;
-							if (d instanceof Experience) {
-								p.giveExp(((Experience) d).getXP());
-							} else if (d instanceof Inventory) {
-								PlayerInventory inventory = p.getInventory();
-								for (ItemStack itemStack : (Inventory) d) {
+						if (e instanceof Player player) {
+							if (d instanceof Experience experience) {
+								player.giveExp(experience.getXP());
+							} else if (d instanceof Inventory inv) {
+								PlayerInventory inventory = player.getInventory();
+								for (ItemStack itemStack : inv) {
 									if (itemStack == null)
 										continue;
 									if (mode == ChangeMode.ADD) {
@@ -101,21 +100,21 @@ public class DefaultChangers {
 										inventory.remove(itemStack);
 									}
 								}
-							} else if (d instanceof ItemType) {
+							} else if (d instanceof ItemType itemType) {
 								hasItem = true;
-								final PlayerInventory invi = p.getInventory();
+								final PlayerInventory invi = player.getInventory();
 								if (mode == ChangeMode.ADD)
-									((ItemType) d).addTo(invi);
+									itemType.addTo(invi);
 								else if (mode == ChangeMode.REMOVE)
-									((ItemType) d).removeFrom(invi);
+									itemType.removeFrom(invi);
 								else
-									((ItemType) d).removeAll(invi);
+									itemType.removeAll(invi);
 							}
 						}
 					}
 				}
-				if (e instanceof Player && hasItem)
-					PlayerUtils.updateInventory((Player) e);
+				if (e instanceof Player player && hasItem)
+					PlayerUtils.updateInventory(player);
 			}
 		}
 	};
@@ -206,14 +205,13 @@ public class DefaultChangers {
 					case ADD:
 						assert delta != null;
 						
-						if(delta instanceof ItemStack[]) { // Old behavior - legacy code (is it used? no idea)
-							ItemStack[] items = (ItemStack[]) delta;
+						if(delta instanceof ItemStack[] items) { // Old behavior - legacy code (is it used? no idea)
 							if(items.length > 36) {
 								return;
 							}
 							for (final Object d : delta) {
-								if (d instanceof Inventory) {
-									for (final ItemStack i : (Inventory) d) {
+								if (d instanceof Inventory inventory) {
+									for (final ItemStack i : inventory) {
 										if (i != null)
 											invi.addItem(i);
 									}
@@ -223,12 +221,12 @@ public class DefaultChangers {
 							}
 						} else {
 							for (final Object d : delta) {
-								if (d instanceof ItemStack) {
-									new ItemType((ItemStack) d).addTo(invi); // Can't imagine why would be ItemStack, but just in case...
-								} else if (d instanceof ItemType) {
-									((ItemType) d).addTo(invi);
-								} else if (d instanceof Block) {
-									new ItemType((Block) d).addTo(invi);
+								if (d instanceof ItemStack itemStack) {
+									new ItemType(itemStack).addTo(invi); // Can't imagine why would be ItemStack, but just in case...
+								} else if (d instanceof ItemType itemType) {
+									itemType.addTo(invi);
+								} else if (d instanceof Block block) {
+									new ItemType(block).addTo(invi);
 								} else {
 									Skript.error("Can't " + d.toString() + " to an inventory!");
 								}
@@ -243,11 +241,11 @@ public class DefaultChangers {
 							// Potential fast path: remove all items -> clear inventory
 							boolean equal = true;
 							for (int i = 0; i < delta.length; i++) {
-								if (!(delta[i] instanceof ItemType)) {
+								if (!(delta[i] instanceof ItemType itemType)) {
 									equal = false;
 									break; // Not an item, take slow path
 								}
-								if (((ItemType) delta[i]).getMaterial() != cachedMaterials[i]) {
+								if (itemType.getMaterial() != cachedMaterials[i]) {
 									equal = false;
 									break;
 								}
@@ -260,9 +258,9 @@ public class DefaultChangers {
 						
 						// Slow path
 						for (final Object d : delta) {
-							if (d instanceof Inventory) {
+							if (d instanceof Inventory inventory) {
 								assert mode == ChangeMode.REMOVE;
-								for (ItemStack itemStack : (Inventory) d) {
+								for (ItemStack itemStack : inventory) {
 									if (itemStack != null)
 										invi.removeItem(itemStack);
 								}
@@ -278,8 +276,8 @@ public class DefaultChangers {
 						assert false;
 				}
 				InventoryHolder holder = invi.getHolder();
-				if (holder instanceof Player) {
-					((Player) holder).updateInventory();
+				if (holder instanceof Player player) {
+					player.updateInventory();
 				}
 			}
 		}
@@ -304,10 +302,10 @@ public class DefaultChangers {
 					case SET:
 						assert delta != null;
 						Object object = delta[0];
-						if (object instanceof ItemType) {
-							((ItemType) object).getBlock().setBlock(block, true);
-						} else if (object instanceof BlockData) {
-							block.setBlockData(((BlockData) object));
+						if (object instanceof ItemType itemType) {
+							itemType.getBlock().setBlock(block, true);
+						} else if (object instanceof BlockData blockData) {
+							block.setBlockData(blockData);
 						}
 						break;
 					case DELETE:
@@ -318,13 +316,13 @@ public class DefaultChangers {
 					case REMOVE_ALL:
 						assert delta != null;
 						BlockState state = block.getState();
-						if (!(state instanceof InventoryHolder))
+						if (!(state instanceof InventoryHolder inventoryHolder))
 							break;
-						Inventory invi = ((InventoryHolder) state).getInventory();
+						Inventory invi = inventoryHolder.getInventory();
 						if (mode == ChangeMode.ADD) {
 							for (Object obj : delta) {
-								if (obj instanceof Inventory) {
-									for (ItemStack i : (Inventory) obj) {
+								if (obj instanceof Inventory inventory) {
+									for (ItemStack i : inventory) {
 										if (i != null)
 											invi.addItem(i);
 									}
@@ -334,8 +332,8 @@ public class DefaultChangers {
 							}
 						} else {
 							for (Object obj : delta) {
-								if (obj instanceof Inventory) {
-									invi.removeItem(((Inventory) obj).getContents());
+								if (obj instanceof Inventory inventory) {
+									invi.removeItem(inventory.getContents());
 								} else {
 									if (mode == ChangeMode.REMOVE)
 										((ItemType) obj).removeFrom(invi);

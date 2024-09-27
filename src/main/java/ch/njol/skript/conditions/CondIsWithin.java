@@ -114,17 +114,17 @@ public class CondIsWithin extends Condition {
 			return false;
 
 		// Entities
-		if (area instanceof Entity) {
-			BoundingBox box = ((Entity) area).getBoundingBox();
+		if (area instanceof Entity entity) {
+			BoundingBox box = entity.getBoundingBox();
 			return locsToCheck.check(event, (loc) -> box.contains(loc.toVector()), isNegated());
 		}
 
 		// Blocks
-		if (area instanceof Block) {
-			for (BoundingBox box : ((Block) area).getCollisionShape().getBoundingBoxes()) {
+		if (area instanceof Block block) {
+			for (BoundingBox box : block.getCollisionShape().getBoundingBoxes()) {
 				// getCollisionShape().getBoundingBoxes() returns a list of bounding boxes relative to the block's position,
 				// so we need to subtract the block position from each location
-				Vector blockVector = ((Block) area).getLocation().toVector();
+				Vector blockVector = block.getLocation().toVector();
 				if (!locsToCheck.check(event, (loc) -> box.contains(loc.toVector().subtract(blockVector)), isNegated())) {
 					return false;
 				}

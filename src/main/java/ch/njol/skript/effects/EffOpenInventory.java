@@ -104,10 +104,10 @@ public class EffOpenInventory extends Effect {
 			
 			assert invi != null;
 			Object o = invi.getSingle(e);
-			if (o instanceof Inventory) {
-				i = (Inventory) o;
-			} else if (o instanceof InventoryType) {
-				i = Bukkit.createInventory(null, (InventoryType) o);
+			if (o instanceof Inventory inv) {
+				i = inv;
+			} else if (o instanceof InventoryType invType) {
+				i = Bukkit.createInventory(null, invType);
 			} else {
 				return;
 			}

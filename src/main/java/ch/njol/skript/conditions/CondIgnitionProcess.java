@@ -60,7 +60,7 @@ public class CondIgnitionProcess extends PropertyCondition<LivingEntity> {
 
 	@Override
 	public boolean check(LivingEntity e) {
-		return e instanceof Creeper && ((Creeper) e).isIgnited();
+		return e instanceof Creeper creeper && creeper.isIgnited();
 	}
 
 	@Override

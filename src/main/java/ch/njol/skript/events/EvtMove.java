@@ -107,16 +107,14 @@ public class EvtMove extends SkriptEvent {
 	@Override
 	public boolean check(Event event) {
 		Location from, to;
-		if (isPlayer && event instanceof PlayerMoveEvent) {
-			PlayerMoveEvent playerEvent = (PlayerMoveEvent) event;
-			from = playerEvent.getFrom();
-			to = playerEvent.getTo();
-		} else if (HAS_ENTITY_MOVE && event instanceof EntityMoveEvent) {
-			EntityMoveEvent entityEvent = (EntityMoveEvent) event;
-			if (!(entityData.isInstance(entityEvent.getEntity())))
+		if (isPlayer && event instanceof PlayerMoveEvent playerMoveEvent) {
+			from = playerMoveEvent.getFrom();
+			to = playerMoveEvent.getTo();
+		} else if (HAS_ENTITY_MOVE && event instanceof EntityMoveEvent entityMoveEvent) {
+			if (!(entityData.isInstance(entityMoveEvent.getEntity())))
 				return false;
-			from = entityEvent.getFrom();
-			to = entityEvent.getTo();
+			from = entityMoveEvent.getFrom();
+			to = entityMoveEvent.getTo();
 		} else {
 			return false;
 		}

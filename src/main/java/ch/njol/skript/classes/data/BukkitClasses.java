@@ -891,12 +891,12 @@ public class BukkitClasses {
 					
 					@Override
 					public String toString(InventoryHolder holder, int flags) {
-						if (holder instanceof BlockState) {
-							return Classes.toString(((BlockState) holder).getBlock());
+						if (holder instanceof BlockState blockState) {
+							return Classes.toString(blockState.getBlock());
 						} else if (holder instanceof DoubleChest) {
 							return Classes.toString(holder.getInventory().getLocation().getBlock());
-						} else if (holder instanceof BlockInventoryHolder) {
-							return Classes.toString(((BlockInventoryHolder) holder).getBlock());
+						} else if (holder instanceof BlockInventoryHolder blockInventoryHolder) {
+							return Classes.toString(blockInventoryHolder.getBlock());
 						} else if (Classes.getSuperClassInfo(holder.getClass()).getC() == InventoryHolder.class) {
 							return holder.getClass().getSimpleName(); // an inventory holder and only that
 						} else {

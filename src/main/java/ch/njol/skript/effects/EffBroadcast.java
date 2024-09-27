@@ -79,8 +79,8 @@ public class EffBroadcast extends Effect {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		messageExpr = LiteralUtils.defendExpression(exprs[0]);
-		messages = messageExpr instanceof ExpressionList ?
-			((ExpressionList<?>) messageExpr).getExpressions() : new Expression[] {messageExpr};
+		messages = messageExpr instanceof ExpressionList<?> expressionList ?
+			expressionList.getExpressions() : new Expression[] {messageExpr};
 		worlds = (Expression<World>) exprs[1];
 		return LiteralUtils.canInitSafely(messageExpr);
 	}
@@ -101,12 +101,12 @@ public class EffBroadcast extends Effect {
 		}
 
 		for (Expression<?> message : getMessages()) {
-			if (message instanceof VariableString) {
-				if (!dispatchEvent(getRawString(event, (VariableString) message), receivers))
+			if (message instanceof VariableString variableString) {
+				if (!dispatchEvent(getRawString(event, variableString), receivers))
 					continue;
 				BaseComponent[] components = BungeeConverter.convert(((VariableString) message).getMessageComponents(event));
 				receivers.forEach(receiver -> receiver.spigot().sendMessage(components));
-			} else if (message instanceof ExprColoured && ((ExprColoured) message).isUnsafeFormat()) { // Manually marked as trusted
+			} else if (message instanceof ExprColoured exprColoured && exprColoured.isUnsafeFormat()) { // Manually marked as trusted
 				for (Object realMessage : message.getArray(event)) {
 					if (!dispatchEvent(Utils.replaceChatStyles((String) realMessage), receivers))
 						continue;
@@ -115,7 +115,7 @@ public class EffBroadcast extends Effect {
 				}
 			} else {
 				for (Object messageObject : message.getArray(event)) {
-					String realMessage = messageObject instanceof String ? (String) messageObject : Classes.toString(messageObject);
+					String realMessage = messageObject instanceof String string ? string : Classes.toString(messageObject);
 					if (!dispatchEvent(Utils.replaceChatStyles(realMessage), receivers))
 						continue;
 					receivers.forEach(receiver -> receiver.sendMessage(realMessage));
@@ -156,8 +156,8 @@ public class EffBroadcast extends Effect {
 
 	@Nullable
 	private static String getRawString(Event event, Expression<? extends String> string) {
-		if (string instanceof VariableString)
-			return ((VariableString) string).toUnformattedString(event);
+		if (string instanceof VariableString variableString)
+			return variableString.toUnformattedString(event);
 		String rawString = string.getSingle(event);
 		rawString = SkriptColor.replaceColorChar(rawString);
 		if (rawString.toLowerCase().contains("&x")) {

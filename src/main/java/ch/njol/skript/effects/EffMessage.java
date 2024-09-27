@@ -95,8 +95,8 @@ public class EffMessage extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
 		messageExpr = LiteralUtils.defendExpression(exprs[0]);
 
-		messages = messageExpr instanceof ExpressionList ?
-			((ExpressionList<?>) messageExpr).getExpressions() : new Expression[] {messageExpr};
+		messages = messageExpr instanceof ExpressionList<?> expressionList ?
+			expressionList.getExpressions() : new Expression[] {messageExpr};
 		recipients = (Expression<CommandSender>) exprs[1];
 		if (SUPPORTS_SENDER)
 			sender = (Expression<Player>) exprs[2];
@@ -115,27 +115,27 @@ public class EffMessage extends Effect {
 			List<MessageComponent> messageComponents = null;
 
 			for (CommandSender receiver : commandSenders) {
-				if (receiver instanceof Player && message instanceof VariableString) {
+				if (receiver instanceof Player && message instanceof VariableString variableString) {
 					if (messageComponents == null)
-						messageComponents = ((VariableString) message).getMessageComponents(e);
+						messageComponents = variableString.getMessageComponents(e);
 				} else {
 					if (messageArray == null)
 						messageArray = message.getArray(e);
 				}
 
-				if (receiver instanceof Player) { // Can use JSON formatting
+				if (receiver instanceof Player player) { // Can use JSON formatting
 					if (message instanceof VariableString) { // Process formatting that is safe
-						sendMessage((Player) receiver, sender,
+						sendMessage(player, sender,
 							BungeeConverter.convert(messageComponents)
 						);
-					} else if (message instanceof ExprColoured && ((ExprColoured) message).isUnsafeFormat()) { // Manually marked as trusted
+					} else if (message instanceof ExprColoured exprColoured && exprColoured.isUnsafeFormat()) { // Manually marked as trusted
 						for (Object object : messageArray) {
-							sendMessage((Player) receiver, sender, BungeeConverter.convert(ChatMessages.parse((String) object)));
+							sendMessage(player, sender, BungeeConverter.convert(ChatMessages.parse((String) object)));
 						}
 					} else { // It is just a string, no idea if it comes from a trusted source -> don't parse anything
 						for (Object object : messageArray) {
 							List<MessageComponent> components = ChatMessages.fromParsedString(toString(object));
-							sendMessage((Player) receiver, sender, BungeeConverter.convert(components));
+							sendMessage(player, sender, BungeeConverter.convert(components));
 						}
 					}
 				} else { // Not a player, send plain text with legacy formatting

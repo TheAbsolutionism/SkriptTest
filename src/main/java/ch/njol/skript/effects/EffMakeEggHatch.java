@@ -63,11 +63,10 @@ public class EffMakeEggHatch extends Effect {
 
 	@Override
 	protected void execute(Event e) {
-		if (e instanceof PlayerEggThrowEvent) {
-			PlayerEggThrowEvent event = (PlayerEggThrowEvent) e;
-			event.setHatching(!not);
-			if (!not && event.getNumHatches() == 0) // Make it hatch something!
-				event.setNumHatches((byte) 1);
+		if (e instanceof PlayerEggThrowEvent throwEvent) {
+			throwEvent.setHatching(!not);
+			if (!not && throwEvent.getNumHatches() == 0) // Make it hatch something!
+				throwEvent.setNumHatches((byte) 1);
 		}
 	}
 

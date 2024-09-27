@@ -257,17 +257,17 @@ public class EffChange extends Effect {
 			}
 
 			if (changed instanceof Variable && !changed.isSingle() && mode == ChangeMode.SET) {
-				if (ch instanceof ExprParse) {
-					((ExprParse) ch).flatten = false;
-				} else if (ch instanceof ExpressionList) {
-					for (Expression<?> expression : ((ExpressionList<?>) ch).getExpressions()) {
-						if (expression instanceof ExprParse)
-							((ExprParse) expression).flatten = false;
+				if (ch instanceof ExprParse exprParse) {
+					exprParse.flatten = false;
+				} else if (ch instanceof ExpressionList<?> expressionList) {
+					for (Expression<?> expression : expressionList.getExpressions()) {
+						if (expression instanceof ExprParse exprParse)
+							exprParse.flatten = false;
 					}
 				}
 			}
 
-			if (changed instanceof Variable && !((Variable<?>) changed).isLocal() && (mode == ChangeMode.SET || ((Variable<?>) changed).isList() && mode == ChangeMode.ADD)) {
+			if (changed instanceof Variable<?> variable && !variable.isLocal() && (mode == ChangeMode.SET || variable.isList() && mode == ChangeMode.ADD)) {
 				final ClassInfo<?> ci = Classes.getSuperClassInfo(ch.getReturnType());
 				if (ci.getC() != Object.class && ci.getSerializer() == null && ci.getSerializeAs() == null && !SkriptConfig.disableObjectCannotBeSavedWarnings.value()) {
 					if (getParser().isActive() && !getParser().getCurrentScript().suppressesWarning(ScriptWarning.VARIABLE_SAVE)) {

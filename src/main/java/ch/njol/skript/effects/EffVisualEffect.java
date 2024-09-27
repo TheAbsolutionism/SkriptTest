@@ -121,15 +121,15 @@ public class EffVisualEffect extends Effect {
 
 		for (Direction d : directions) {
 			for (Object o : os) {
-				if (o instanceof Entity) {
+				if (o instanceof Entity entity) {
 					for (VisualEffect eff : effects) {
-						eff.play(ps, d.getRelative((Entity) o), (Entity) o, cnt.intValue(), rad.intValue());
+						eff.play(ps, d.getRelative(entity), entity, cnt.intValue(), rad.intValue());
 					}
-				} else if (o instanceof Location) {
+				} else if (o instanceof Location location) {
 					for (VisualEffect eff : effects) {
 						if (eff.getType().isEntityEffect())
 							continue;
-						eff.play(ps, d.getRelative((Location) o), null, cnt.intValue(), rad.intValue());
+						eff.play(ps, d.getRelative(location), null, cnt.intValue(), rad.intValue());
 					}
 				} else {
 					assert false;

@@ -64,8 +64,8 @@ public class CondCanHold extends Condition {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
 		invis = (Expression<Inventory>) exprs[0];
 		items = (Expression<ItemType>) exprs[1];
-		if (items instanceof Literal) {
-			for (ItemType t : ((Literal<ItemType>) items).getAll()) {
+		if (items instanceof Literal<ItemType> literals) {
+			for (ItemType t : literals.getAll()) {
 				t = t.getItem();
 				if (!(t.isAll() || t.getTypes().size() == 1)) {
 					Skript.error("The condition 'can hold' can currently only be used with aliases that start with 'every' or 'all', or only represent one item.", ErrorQuality.SEMANTIC_ERROR);

@@ -274,14 +274,13 @@ public class ItemData implements Cloneable, YggdrasilExtendedSerializable {
 	public boolean equals(final @Nullable Object obj) {
 		if (obj == this)
 			return true;
-		if (!(obj instanceof ItemData))
+		if (!(obj instanceof ItemData itemData))
 			return false;
-		
-		ItemData other = (ItemData) obj;
+
 		if (isAlias()) { // This is alias, other item might not be
-			return other.matchAlias(this).isAtLeast(MatchQuality.SAME_ITEM);
+			return itemData.matchAlias(this).isAtLeast(MatchQuality.SAME_ITEM);
 		} else { // This is not alias, but other might be
-			return matchAlias(other).isAtLeast(MatchQuality.SAME_ITEM);
+			return matchAlias(itemData).isAtLeast(MatchQuality.SAME_ITEM);
 		}
 	}
 	

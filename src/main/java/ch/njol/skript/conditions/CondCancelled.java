@@ -55,7 +55,7 @@ public class CondCancelled extends Condition {
 
 	@Override
 	public boolean check(Event e) {
-		return (e instanceof Cancellable && ((Cancellable) e).isCancelled()) ^ isNegated();
+		return (e instanceof Cancellable cancellable && cancellable.isCancelled()) ^ isNegated();
 	}
 
 	@Override

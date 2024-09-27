@@ -397,8 +397,8 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 				continue;
 			if (BlockUtils.set(block, blockType, d.getBlockValues(), applyPhysics)) {
 				ItemMeta itemMeta = getItemMeta();
-				if (itemMeta instanceof SkullMeta) {
-					OfflinePlayer offlinePlayer = ((SkullMeta) itemMeta).getOwningPlayer();
+				if (itemMeta instanceof SkullMeta skullMeta) {
+					OfflinePlayer offlinePlayer = skullMeta.getOwningPlayer();
 					if (offlinePlayer == null)
 						continue;
 					Skull skull = (Skull) block.getState();
@@ -1013,14 +1013,13 @@ public class ItemType implements Unit, Iterable<ItemData>, Container<ItemStack>,
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof ItemType))
+		if (!(obj instanceof ItemType itemType))
 			return false;
-		final ItemType other = (ItemType) obj;
-		if (all != other.all)
+		if (all != itemType.all)
 			return false;
-		if (amount != other.amount)
+		if (amount != itemType.amount)
 			return false;
-		if (!types.equals(other.types))
+		if (!types.equals(itemType.types))
 			return false;
 		return true;
 	}

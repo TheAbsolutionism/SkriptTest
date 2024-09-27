@@ -70,12 +70,12 @@ public class CondIsOfType extends Condition {
 		return what.check(event,
 				(Checker<Object>) o1 -> types.check(event,
 						(Checker<Object>) o2 -> {
-							if (o2 instanceof ItemType && o1 instanceof ItemStack) {
-								return ((ItemType) o2).isSupertypeOf(new ItemType((ItemStack) o1));
-							} else if (o2 instanceof EntityData && o1 instanceof Entity) {
-								return ((EntityData<?>) o2).isInstance((Entity) o1);
-							} else if (o2 instanceof ItemType && o1 instanceof Entity) {
-								return Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity((Entity) o1), (ItemType) o2));
+							if (o2 instanceof ItemType itemType && o1 instanceof ItemStack itemStack) {
+								return itemType.isSupertypeOf(new ItemType(itemStack));
+							} else if (o2 instanceof EntityData<?> entityData && o1 instanceof Entity entity) {
+								return entityData.isInstance(entity);
+							} else if (o2 instanceof ItemType itemType && o1 instanceof Entity entity) {
+								return Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), itemType));
 							} else {
 								return false;
 							}

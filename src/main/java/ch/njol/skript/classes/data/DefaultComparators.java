@@ -124,8 +124,8 @@ public class DefaultComparators {
 
 			@Override
 			public Relation compare(Slot o1, Number o2) {
-				if (o1 instanceof SlotWithIndex) {
-					return Relation.get(((SlotWithIndex) o1).getIndex() - o2.intValue());
+				if (o1 instanceof SlotWithIndex slotWithIndex) {
+					return Relation.get(slotWithIndex.getIndex() - o2.intValue());
 				}
 				return Relation.NOT_EQUAL;
 			}
@@ -302,16 +302,16 @@ public class DefaultComparators {
 		public Relation compare(EntityData e, ItemType i) {
 			// TODO fix broken comparisions - will probably require updating potion API of Skript
 
-			if (e instanceof Item)
-				return Relation.get(i.isOfType(((Item) e).getItemStack()));
-//			if (e instanceof ThrownPotion)
-//				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData((ThrownPotion) e)));
+			if (e instanceof Item item)
+				return Relation.get(i.isOfType(item.getItemStack()));
+//			if (e instanceof ThrownPotion thrownPotion)
+//				return Relation.get(i.isOfType(Material.POTION.getId(), PotionEffectUtils.guessData(thrownPotion)));
 //			if (Skript.classExists("org.bukkit.entity.WitherSkull") && e instanceof WitherSkull)
 //				return Relation.get(i.isOfType(Material.SKULL_ITEM.getId(), (short) 1));
-			if (e instanceof BoatData)
-				return Relation.get(((BoatData)e).isOfItemType(i));
-			if (e instanceof BoatChestData)
-				return Relation.get(((BoatChestData) e).isOfItemType(i));
+			if (e instanceof BoatData boatData)
+				return Relation.get((boatData).isOfItemType(i));
+			if (e instanceof BoatChestData boatChestData)
+				return Relation.get((boatChestData).isOfItemType(i));
 			if (e instanceof RabbitData)
 				return Relation.get(i.isOfType(Material.RABBIT));
 			for (ItemData data : i.getTypes()) {
@@ -486,7 +486,7 @@ public class DefaultComparators {
 		Comparators.registerComparator(Object.class, ClassInfo.class, new Comparator<Object, ClassInfo>() {
 			@Override
 			public Relation compare(Object o, ClassInfo c) {
-				return Relation.get(c.getC().isInstance(o) || o instanceof ClassInfo && c.getC().isAssignableFrom(((ClassInfo<?>) o).getC()));
+				return Relation.get(c.getC().isInstance(o) || o instanceof ClassInfo<?> classInfo && c.getC().isAssignableFrom((classInfo).getC()));
 			}
 
 			@Override
@@ -558,8 +558,7 @@ public class DefaultComparators {
 		Comparators.registerComparator(GameruleValue.class, Number.class, new Comparator<GameruleValue, Number>() {
 			@Override
 			public Relation compare(GameruleValue o1, Number o2) {
-				if (!(o1.getGameruleValue() instanceof Number)) return Relation.NOT_EQUAL;
-				Number gameruleValue = (Number) o1.getGameruleValue();
+				if (!(o1.getGameruleValue() instanceof Number gameruleValue)) return Relation.NOT_EQUAL;
 				return Comparators.compare(gameruleValue, o2);
 			}
 

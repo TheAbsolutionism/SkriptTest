@@ -61,9 +61,9 @@ public class CondWillHatch extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		if (!(event instanceof PlayerEggThrowEvent))
+		if (!(event instanceof PlayerEggThrowEvent throwEvent))
 			return false;
-		return ((PlayerEggThrowEvent) event).isHatching() ^ isNegated();
+		return throwEvent.isHatching() ^ isNegated();
 	}
 
 	@Override

@@ -62,11 +62,11 @@ public class EvtTeleport extends SkriptEvent {
 
 	@Override
 	public boolean check(Event event) {
-		if (event instanceof EntityTeleportEvent) {
-			Entity entity = ((EntityTeleportEvent) event).getEntity();
+		if (event instanceof EntityTeleportEvent entityTeleportEvent) {
+			Entity entity = entityTeleportEvent.getEntity();
 			return checkEntity(entity);
-		} else if (event instanceof PlayerTeleportEvent) {
-			Entity entity = ((PlayerTeleportEvent) event).getPlayer();
+		} else if (event instanceof PlayerTeleportEvent playerTeleportEvent) {
+			Entity entity = playerTeleportEvent.getPlayer();
 			return checkEntity(entity);
 		} else {
 			return false;

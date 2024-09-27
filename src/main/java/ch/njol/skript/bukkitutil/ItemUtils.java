@@ -60,8 +60,8 @@ public class ItemUtils {
 	 * @return Damage.
 	 */
 	public static int getDamage(ItemMeta itemMeta) {
-		if (itemMeta instanceof Damageable)
-			return ((Damageable) itemMeta).getDamage();
+		if (itemMeta instanceof Damageable damageable)
+			return damageable.getDamage();
 		return 0; // Non damageable item
 	}
 
@@ -72,8 +72,8 @@ public class ItemUtils {
 	 */
 	public static int getMaxDamage(ItemStack itemStack) {
 		ItemMeta meta = itemStack.getItemMeta();
-		if (HAS_MAX_DAMAGE && meta instanceof Damageable && ((Damageable) meta).hasMaxDamage())
-			return ((Damageable) meta).getMaxDamage();
+		if (HAS_MAX_DAMAGE && meta instanceof Damageable damageable && damageable.hasMaxDamage())
+			return damageable.getMaxDamage();
 		return itemStack.getType().getMaxDurability();
 	}
 
@@ -85,8 +85,7 @@ public class ItemUtils {
 	 */
 	public static void setMaxDamage(ItemStack itemStack, int maxDamage) {
 		ItemMeta meta = itemStack.getItemMeta();
-		if (HAS_MAX_DAMAGE && meta instanceof Damageable) {
-			Damageable damageable = (Damageable) meta;
+		if (HAS_MAX_DAMAGE && meta instanceof Damageable damageable) {
 			if (HAS_RESET && maxDamage < 1) {
 				damageable.resetDamage();
 			} else {
@@ -104,8 +103,8 @@ public class ItemUtils {
 	 */
 	public static void setDamage(ItemStack itemStack, int damage) {
 		ItemMeta meta = itemStack.getItemMeta();
-		if (meta instanceof Damageable) {
-			((Damageable) meta).setDamage(Math.max(0, damage));
+		if (meta instanceof Damageable damageable) {
+			damageable.setDamage(Math.max(0, damage));
 			itemStack.setItemMeta(meta);
 		}
 	}
@@ -117,8 +116,8 @@ public class ItemUtils {
 	 */
 	public static int getDamage(ItemType itemType) {
 		ItemMeta meta = itemType.getItemMeta();
-		if (meta instanceof Damageable)
-			return ((Damageable) meta).getDamage();
+		if (meta instanceof Damageable damageable)
+			return damageable.getDamage();
 		return 0; // Non damageable item
 	}
 
@@ -142,8 +141,8 @@ public class ItemUtils {
 	 */
 	public static void setDamage(ItemType itemType, int damage) {
 		ItemMeta meta = itemType.getItemMeta();
-		if (meta instanceof Damageable) {
-			((Damageable) meta).setDamage(damage);
+		if (meta instanceof Damageable damageable) {
+			damageable.setDamage(damage);
 			itemType.setItemMeta(meta);
 		}
 	}
@@ -185,12 +184,12 @@ public class ItemUtils {
 	 */
 	@Nullable
 	public static ItemStack asItemStack(Object object) {
-		if (object instanceof ItemType)
-			return ((ItemType) object).getRandom();
-		else if (object instanceof Slot)
-			return ((Slot) object).getItem();
-		else if (object instanceof ItemStack)
-			return ((ItemStack) object);
+		if (object instanceof ItemType itemType)
+			return itemType.getRandom();
+		else if (object instanceof Slot slot)
+			return slot.getItem();
+		else if (object instanceof ItemStack itemStack)
+			return itemStack;
 		return null;
 	}
 	

@@ -535,8 +535,8 @@ public final class BukkitEventValues {
 			@Nullable
 			public Projectile get(final EntityDeathEvent e) {
 				final EntityDamageEvent ldc = e.getEntity().getLastDamageCause();
-				if (ldc instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ldc).getDamager() instanceof Projectile)
-					return (Projectile) ((EntityDamageByEntityEvent) ldc).getDamager();
+				if (ldc instanceof EntityDamageByEntityEvent damageByEntityEvent && damageByEntityEvent.getDamager() instanceof Projectile)
+					return (Projectile) damageByEntityEvent.getDamager();
 				return null;
 			}
 		}, 0);
@@ -1020,8 +1020,8 @@ public final class BukkitEventValues {
 			@Nullable
 			@Override
 			public Entity get(HangingBreakEvent e) {
-				if (e instanceof HangingBreakByEntityEvent)
-					return ((HangingBreakByEntityEvent) e).getRemover();
+				if (e instanceof HangingBreakByEntityEvent hangingBreakByEntityEvent)
+					return hangingBreakByEntityEvent.getRemover();
 				return null;
 			}
 		}, 0);
@@ -1116,7 +1116,7 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public World get(final CommandEvent e) {
-				return e.getSender() instanceof Player ? ((Player) e.getSender()).getWorld() : null;
+				return e.getSender() instanceof Player player ? player.getWorld() : null;
 			}
 		}, 0);
 
@@ -1166,8 +1166,8 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public ItemStack get(final InventoryClickEvent e) {
-				if (e instanceof CraftItemEvent)
-					return ((CraftItemEvent) e).getRecipe().getResult();
+				if (e instanceof CraftItemEvent craftItemEvent)
+					return craftItemEvent.getRecipe().getResult();
 				return e.getCurrentItem();
 			}
 		}, 0);
@@ -1182,8 +1182,8 @@ public final class BukkitEventValues {
 				int slotIndex = e.getSlot();
 
 				// Not all indices point to inventory slots. Equipment, for example
-				if (invi instanceof PlayerInventory && slotIndex >= 36) {
-					return new ch.njol.skript.util.slot.EquipmentSlot(((PlayerInventory) invi).getHolder(), slotIndex);
+				if (invi instanceof PlayerInventory playerInventory && slotIndex >= 36) {
+					return new ch.njol.skript.util.slot.EquipmentSlot(playerInventory.getHolder(), slotIndex);
 				} else {
 					return new InventorySlot(invi, slotIndex, e.getRawSlot());
 				}
@@ -1215,7 +1215,7 @@ public final class BukkitEventValues {
 			@Override
 			@Nullable
 			public Player get(InventoryDragEvent event) {
-				return event.getWhoClicked() instanceof Player ? (Player) event.getWhoClicked() : null;
+				return event.getWhoClicked() instanceof Player player ? player : null;
 			}
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(InventoryDragEvent.class, World.class, new Getter<World, InventoryDragEvent>() {
@@ -1358,8 +1358,8 @@ public final class BukkitEventValues {
 				if (viewers.size() == 0) // ... if we don't have any
 					return null;
 				HumanEntity first = viewers.get(0); // Get first viewer and hope it is crafter
-				if (first instanceof Player) // Needs to be player... Usually it is
-					return (Player) first;
+				if (first instanceof Player player) // Needs to be player... Usually it is
+					return player;
 				return null;
 			}
 		}, 0);
@@ -1369,8 +1369,8 @@ public final class BukkitEventValues {
 			@Override
 			public String get(CraftItemEvent e) {
 				Recipe recipe = e.getRecipe();
-				if (recipe instanceof Keyed)
-					return ((Keyed) recipe).getKey().toString();
+				if (recipe instanceof Keyed keyed)
+					return keyed.getKey().toString();
 				return null;
 			}
 		}, 0);
@@ -1379,8 +1379,8 @@ public final class BukkitEventValues {
 			@Override
 			public String get(PrepareItemCraftEvent e) {
 				Recipe recipe = e.getRecipe();
-				if (recipe instanceof Keyed)
-					return ((Keyed) recipe).getKey().toString();
+				if (recipe instanceof Keyed keyed)
+					return keyed.getKey().toString();
 				return null;
 			}
 		}, 0);

@@ -73,12 +73,12 @@ public class CondIncendiary extends Condition {
 	@Override
 	public boolean check(Event e) {
 		if (isEvent) {
-			if (!(e instanceof ExplosionPrimeEvent))
+			if (!(e instanceof ExplosionPrimeEvent primeEvent))
 				return isNegated();
 
-			return ((ExplosionPrimeEvent) e).getFire() ^ isNegated();
+			return primeEvent.getFire() ^ isNegated();
 		}
-		return entities.check(e, entity -> entity instanceof Explosive && ((Explosive) entity).isIncendiary(), isNegated());
+		return entities.check(e, entity -> entity instanceof Explosive explosive && explosive.isIncendiary(), isNegated());
 	}
 
 	@Override

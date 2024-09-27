@@ -77,10 +77,10 @@ public class EffPlayerInfoVisibility extends Effect {
 
 	@Override
 	protected void execute(Event e) {
-		if (!(e instanceof PaperServerListPingEvent))
+		if (!(e instanceof PaperServerListPingEvent listPingEvent))
 			return;
 
-		((PaperServerListPingEvent) e).setHidePlayers(shouldHide);
+		listPingEvent.setHidePlayers(shouldHide);
 	}
 
 	@Override

@@ -59,15 +59,15 @@ public class EvtCommand extends SkriptEvent { // TODO condition to check whether
 	@Override
 	@SuppressWarnings("null")
 	public boolean check(final Event e) {
-		if (e instanceof ServerCommandEvent && ((ServerCommandEvent) e).getCommand().isEmpty())
+		if (e instanceof ServerCommandEvent commandEvent && commandEvent.getCommand().isEmpty())
 			return false;
 
 		if (command == null)
 			return true;
 		final String message;
-		if (e instanceof PlayerCommandPreprocessEvent) {
-			assert ((PlayerCommandPreprocessEvent) e).getMessage().startsWith("/");
-			message = ((PlayerCommandPreprocessEvent) e).getMessage().substring(1);
+		if (e instanceof PlayerCommandPreprocessEvent preprocessEvent) {
+			assert preprocessEvent.getMessage().startsWith("/");
+			message = preprocessEvent.getMessage().substring(1);
 		} else {
 			message = ((ServerCommandEvent) e).getCommand();
 		}

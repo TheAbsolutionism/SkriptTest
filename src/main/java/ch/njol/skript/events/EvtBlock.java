@@ -91,8 +91,8 @@ public class EvtBlock extends SkriptEvent {
 	@SuppressWarnings("null")
 	@Override
 	public boolean check(final Event event) {
-		if (mine && event instanceof BlockBreakEvent) {
-			if (((BlockBreakEvent) event).getBlock().getDrops(((BlockBreakEvent) event).getPlayer().getItemInHand()).isEmpty())
+		if (mine && event instanceof BlockBreakEvent breakEvent) {
+			if (breakEvent.getBlock().getDrops((breakEvent).getPlayer().getItemInHand()).isEmpty())
 				return false;
 		}
 		if (types == null)
@@ -101,29 +101,25 @@ public class EvtBlock extends SkriptEvent {
 		ItemType item;
 		BlockData blockData = null;
 
-		if (event instanceof BlockFormEvent) {
-			BlockFormEvent blockFormEvent = (BlockFormEvent) event;
+		if (event instanceof BlockFormEvent blockFormEvent) {
 			BlockState newState = blockFormEvent.getNewState();
 			item = new ItemType(newState.getBlockData());
 			blockData = newState.getBlockData();
-		} else if (event instanceof BlockEvent) {
-			BlockEvent blockEvent = (BlockEvent) event;
+		} else if (event instanceof BlockEvent blockEvent) {
 			Block block = blockEvent.getBlock();
 			item = new ItemType(block);
 			blockData = block.getBlockData();
-		} else if (event instanceof PlayerBucketFillEvent) {
-			PlayerBucketFillEvent playerBucketFillEvent = ((PlayerBucketFillEvent) event);
+		} else if (event instanceof PlayerBucketFillEvent playerBucketFillEvent) {
 			Block block = playerBucketFillEvent.getBlockClicked();
 			item = new ItemType(block);
 			blockData = block.getBlockData();
-		} else if (event instanceof PlayerBucketEmptyEvent) {
-			PlayerBucketEmptyEvent playerBucketEmptyEvent = ((PlayerBucketEmptyEvent) event);
+		} else if (event instanceof PlayerBucketEmptyEvent playerBucketEmptyEvent) {
 			item = new ItemType(playerBucketEmptyEvent.getItemStack());
-		} else if (event instanceof HangingEvent) {
-			final EntityData<?> d = EntityData.fromEntity(((HangingEvent) event).getEntity());
+		} else if (event instanceof HangingEvent hangingEvent) {
+			final EntityData<?> d = EntityData.fromEntity(hangingEvent.getEntity());
 			return types.check(event, o -> {
-				if (o instanceof ItemType)
-					return Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(d, ((ItemType) o)));
+				if (o instanceof ItemType itemType)
+					return Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(d, itemType));
 				return false;
 			});
 		} else {
@@ -135,10 +131,10 @@ public class EvtBlock extends SkriptEvent {
 		BlockData finalBlockData = blockData;
 
 		return types.check(event, o -> {
-			if (o instanceof ItemType)
-				return ((ItemType) o).isSupertypeOf(itemF);
-			else if (o instanceof BlockData && finalBlockData != null)
-				return finalBlockData.matches(((BlockData) o));
+			if (o instanceof ItemType itemType)
+				return itemType.isSupertypeOf(itemF);
+			else if (o instanceof BlockData blockData1 && finalBlockData != null)
+				return finalBlockData.matches(blockData1);
 			return false;
 		});
 	}

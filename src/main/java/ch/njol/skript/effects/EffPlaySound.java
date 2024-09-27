@@ -193,26 +193,26 @@ public class EffPlaySound extends Effect {
 				for (Player player : players.getArray(event)) {
 					SoundReceiver receiver = SoundReceiver.of(player);
 					for (Object emitter : emitters.getArray(event)) {
-						if (emitter instanceof Location) {
+						if (emitter instanceof Location location) {
 							for (NamespacedKey sound : validSounds)
-								receiver.playSound(((Location) emitter), sound, category, volume, pitch, seed);
-						} else if (emitter instanceof Entity) {
+								receiver.playSound(location, sound, category, volume, pitch, seed);
+						} else if (emitter instanceof Entity entity) {
 							for (NamespacedKey sound : validSounds)
-								receiver.playSound(((Entity) emitter), sound, category, volume, pitch, seed);
+								receiver.playSound(entity, sound, category, volume, pitch, seed);
 						}
 					}
 				}
 			}
 		} else if (emitters != null) {
 			for (Object emitter : emitters.getArray(event)) {
-				if (ENTITY_EMITTER && emitter instanceof Entity) {
-					SoundReceiver receiver = SoundReceiver.of(((Entity) emitter).getWorld());
+				if (ENTITY_EMITTER && emitter instanceof Entity entity) {
+					SoundReceiver receiver = SoundReceiver.of(entity.getWorld());
 					for (NamespacedKey sound : validSounds)
-						receiver.playSound(((Entity) emitter), sound, category, volume, pitch, seed);
-				} else if (emitter instanceof Location) {
-					SoundReceiver receiver = SoundReceiver.of(((Location) emitter).getWorld());
+						receiver.playSound(entity, sound, category, volume, pitch, seed);
+				} else if (emitter instanceof Location location) {
+					SoundReceiver receiver = SoundReceiver.of(location.getWorld());
 					for (NamespacedKey sound : validSounds)
-						receiver.playSound(((Location) emitter), sound, category, volume, pitch, seed);
+						receiver.playSound(location, sound, category, volume, pitch, seed);
 				}
 			}
 		}

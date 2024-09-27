@@ -173,8 +173,8 @@ public class EvtItem extends SkriptEvent {
 	@Override
 	@SuppressWarnings("null")
 	public boolean check(final Event event) {
-		if (event instanceof ItemSpawnEvent) // To make 'last dropped item' possible.
-			EffSecSpawn.lastSpawned = ((ItemSpawnEvent) event).getEntity();
+		if (event instanceof ItemSpawnEvent itemSpawnEvent) // To make 'last dropped item' possible.
+			EffSecSpawn.lastSpawned = itemSpawnEvent.getEntity();
 		if (hasEntityPickupItemEvent && ((!entity && event instanceof EntityPickupItemEvent) || (entity && event instanceof PlayerPickupItemEvent)))
 			return false;
 		if ((!entity && event instanceof EntityDropItemEvent) || (entity && event instanceof PlayerDropItemEvent))
@@ -182,41 +182,41 @@ public class EvtItem extends SkriptEvent {
 		if (types == null)
 			return true;
 		final ItemStack itemStack;
-		if (event instanceof BlockDispenseEvent) {
-			itemStack = ((BlockDispenseEvent) event).getItem();
-		} else if (event instanceof ItemSpawnEvent) {
-			itemStack = ((ItemSpawnEvent) event).getEntity().getItemStack();
-		} else if (event instanceof PlayerDropItemEvent) {
-			itemStack = ((PlayerDropItemEvent) event).getItemDrop().getItemStack();
-		} else if (event instanceof EntityDropItemEvent) {
-			itemStack = ((EntityDropItemEvent) event).getItemDrop().getItemStack();
-		} else if (event instanceof CraftItemEvent) {
-			itemStack = ((CraftItemEvent) event).getRecipe().getResult();
-		} else if (hasPrepareCraftEvent && event instanceof PrepareItemCraftEvent) {
-			Recipe recipe = ((PrepareItemCraftEvent) event).getRecipe();
+		if (event instanceof BlockDispenseEvent blockDispenseEvent) {
+			itemStack = blockDispenseEvent.getItem();
+		} else if (event instanceof ItemSpawnEvent itemSpawnEvent) {
+			itemStack = itemSpawnEvent.getEntity().getItemStack();
+		} else if (event instanceof PlayerDropItemEvent playerDropItemEvent) {
+			itemStack = playerDropItemEvent.getItemDrop().getItemStack();
+		} else if (event instanceof EntityDropItemEvent entityDropItemEvent) {
+			itemStack = entityDropItemEvent.getItemDrop().getItemStack();
+		} else if (event instanceof CraftItemEvent craftItemEvent) {
+			itemStack = craftItemEvent.getRecipe().getResult();
+		} else if (hasPrepareCraftEvent && event instanceof PrepareItemCraftEvent prepareItemCraftEvent) {
+			Recipe recipe = prepareItemCraftEvent.getRecipe();
 			if (recipe != null) {
 				itemStack = recipe.getResult();
 			} else {
 				return false;
 			}
-		} else if (HAS_PLAYER_STONECUTTER_RECIPE_SELECT_EVENT && event instanceof PlayerStonecutterRecipeSelectEvent) {
-			itemStack = ((PlayerStonecutterRecipeSelectEvent) event).getStonecuttingRecipe().getResult();
-		} else if (event instanceof EntityPickupItemEvent) {
-			itemStack = ((EntityPickupItemEvent) event).getItem().getItemStack();
-		} else if (event instanceof PlayerPickupItemEvent) {
-			itemStack = ((PlayerPickupItemEvent) event).getItem().getItemStack();
-		} else if (hasConsumeEvent && event instanceof PlayerItemConsumeEvent) {
-			itemStack = ((PlayerItemConsumeEvent) event).getItem();
-//		} else if (e instanceof BrewEvent)
-//			itemStack = ((BrewEvent) e).getContents().getContents()
-		} else if (event instanceof InventoryClickEvent) {
-			itemStack = ((InventoryClickEvent) event).getCurrentItem();
-		} else if (event instanceof ItemDespawnEvent) {
-			itemStack = ((ItemDespawnEvent) event).getEntity().getItemStack();
-		} else if (event instanceof ItemMergeEvent) {
-			itemStack = ((ItemMergeEvent) event).getTarget().getItemStack();
-		} else if (event instanceof InventoryMoveItemEvent) {
-			itemStack = ((InventoryMoveItemEvent) event).getItem();
+		} else if (HAS_PLAYER_STONECUTTER_RECIPE_SELECT_EVENT && event instanceof PlayerStonecutterRecipeSelectEvent stonecutterRecipeSelectEvent) {
+			itemStack = stonecutterRecipeSelectEvent.getStonecuttingRecipe().getResult();
+		} else if (event instanceof EntityPickupItemEvent entityPickupItemEvent) {
+			itemStack = entityPickupItemEvent.getItem().getItemStack();
+		} else if (event instanceof PlayerPickupItemEvent playerPickupItemEvent) {
+			itemStack = playerPickupItemEvent.getItem().getItemStack();
+		} else if (hasConsumeEvent && event instanceof PlayerItemConsumeEvent itemConsumeEvent) {
+			itemStack = itemConsumeEvent.getItem();
+//		} else if (e instanceof BrewEvent brewEvent)
+//			itemStack = brewEvent.getContents().getContents()
+		} else if (event instanceof InventoryClickEvent inventoryClickEvent) {
+			itemStack = inventoryClickEvent.getCurrentItem();
+		} else if (event instanceof ItemDespawnEvent itemDespawnEvent) {
+			itemStack = itemDespawnEvent.getEntity().getItemStack();
+		} else if (event instanceof ItemMergeEvent itemMergeEvent) {
+			itemStack = itemMergeEvent.getTarget().getItemStack();
+		} else if (event instanceof InventoryMoveItemEvent inventoryMoveItemEvent) {
+			itemStack = inventoryMoveItemEvent.getItem();
 		} else {
 			assert false;
 			return false;

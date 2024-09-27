@@ -84,8 +84,7 @@ public class EffHealth extends Effect {
 		}
 
 		for (Object obj : this.damageables.getArray(event)) {
-			if (obj instanceof ItemType) {
-				ItemType itemType = (ItemType) obj;
+			if (obj instanceof ItemType itemType) {
 
 				if (this.amount == null) {
 					ItemUtils.setDamage(itemType, 0);
@@ -93,8 +92,7 @@ public class EffHealth extends Effect {
 					ItemUtils.setDamage(itemType, (int) Math2.fit(0, (ItemUtils.getDamage(itemType) + (isHealing ? -amount : amount)), ItemUtils.getMaxDamage(itemType)));
 				}
 
-			} else if (obj instanceof Slot) {
-				Slot slot = (Slot) obj;
+			} else if (obj instanceof Slot slot) {
 				ItemStack itemStack = slot.getItem();
 
 				if (itemStack == null)
@@ -109,9 +107,7 @@ public class EffHealth extends Effect {
 
 				slot.setItem(itemStack);
 
-			} else if (obj instanceof Damageable) {
-				Damageable damageable = (Damageable) obj;
-
+			} else if (obj instanceof Damageable damageable) {
 				if (this.amount == null) {
 					HealthUtils.heal(damageable, HealthUtils.getMaxHealth(damageable));
 				} else if (isHealing) {

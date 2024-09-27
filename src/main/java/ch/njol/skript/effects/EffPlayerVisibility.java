@@ -70,8 +70,8 @@ public class EffPlayerVisibility extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		reveal = matchedPattern == 1;
 		players = (Expression<Player>) exprs[0];
-		if (reveal && players instanceof ExprHiddenPlayers)
-			targetPlayers = exprs.length > 1 ? (Expression<Player>) exprs[1] : ((ExprHiddenPlayers) players).getPlayers();
+		if (reveal && players instanceof ExprHiddenPlayers hiddenPlayers)
+			targetPlayers = exprs.length > 1 ? (Expression<Player>) exprs[1] : hiddenPlayers.getPlayers();
 		else
 			targetPlayers = exprs.length > 1 ? (Expression<Player>) exprs[1] : null;
 		return true;

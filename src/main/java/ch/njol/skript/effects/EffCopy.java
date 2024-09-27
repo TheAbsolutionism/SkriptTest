@@ -67,10 +67,10 @@ public class EffCopy extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		source = exprs[0];
 		rawDestination = exprs[1];
-		if (exprs[1] instanceof Variable<?>) {
-			destinations = Collections.singletonList((Variable<?>) exprs[1]);
-		} else if (exprs[1] instanceof ExpressionList<?>) {
-			destinations = unwrapExpressionList((ExpressionList<?>) exprs[1]);
+		if (exprs[1] instanceof Variable<?> variable) {
+			destinations = Collections.singletonList(variable);
+		} else if (exprs[1] instanceof ExpressionList<?> expressionList) {
+			destinations = unwrapExpressionList(expressionList);
 		}
 		if (destinations == null) {
 			Skript.error("You can only copy objects into variables");
@@ -88,7 +88,7 @@ public class EffCopy extends Effect {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void execute(Event event) {
-		if (!(source instanceof Variable) || source.isSingle()) {
+		if (!(source instanceof Variable<?> variable) || source.isSingle()) {
 			ChangeMode mode = ChangeMode.SET;
 			Object[] clone = (Object[]) Classes.clone(source.getArray(event));
 			if (clone.length == 0)
@@ -98,7 +98,7 @@ public class EffCopy extends Effect {
             return;
 		}
 
-		Map<String, Object> source = copyMap((Map<String, Object>) ((Variable<?>) this.source).getRaw(event));
+		Map<String, Object> source = copyMap((Map<String, Object>) variable.getRaw(event));
 
 		// If we're copying {_foo::*} we don't want to also copy {_foo}
 		if (source != null)
@@ -152,13 +152,13 @@ public class EffCopy extends Effect {
 		Expression<?>[] expressions = expressionList.getExpressions();
 		List<Variable<?>> destinations = new ArrayList<>();
         for (Expression<?> expression : expressions) {
-            if (expression instanceof Variable<?>) {
-                destinations.add((Variable<?>) expression);
+            if (expression instanceof Variable<?> variable) {
+                destinations.add(variable);
                 continue;
             }
-            if (!(expression instanceof ExpressionList<?>))
+            if (!(expression instanceof ExpressionList<?> expressionList1))
                 return null;
-            destinations.addAll(unwrapExpressionList((ExpressionList<?>) expression));
+            destinations.addAll(unwrapExpressionList(expressionList1));
         }
 		return destinations;
 	}

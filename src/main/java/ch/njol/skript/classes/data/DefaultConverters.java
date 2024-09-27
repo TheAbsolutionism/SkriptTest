@@ -79,8 +79,8 @@ public class DefaultConverters {
 
 		// CommandSender - Player
 		Converters.registerConverter(CommandSender.class, Player.class, s -> {
-			if (s instanceof Player)
-				return (Player) s;
+			if (s instanceof Player player)
+				return player;
 			return null;
 		});
 
@@ -89,29 +89,29 @@ public class DefaultConverters {
 
 		// Entity - Player
 		Converters.registerConverter(Entity.class, Player.class, e -> {
-			if (e instanceof Player)
-				return (Player) e;
+			if (e instanceof Player player)
+				return player;
 			return null;
 		});
 
 		// Entity - LivingEntity // Entity->Player is used if this doesn't exist
 		Converters.registerConverter(Entity.class, LivingEntity.class, e -> {
-			if (e instanceof LivingEntity)
-				return (LivingEntity) e;
+			if (e instanceof LivingEntity livingEntity)
+				return livingEntity;
 			return null;
 		});
 		
 		// Block - Inventory
 		Converters.registerConverter(Block.class, Inventory.class, b -> {
-			if (b.getState() instanceof InventoryHolder)
-				return ((InventoryHolder) b.getState()).getInventory();
+			if (b.getState() instanceof InventoryHolder inventoryHolder)
+				return inventoryHolder.getInventory();
 			return null;
 		}, Commands.CONVERTER_NO_COMMAND_ARGUMENTS);
 		
 		// Entity - Inventory
 		Converters.registerConverter(Entity.class, Inventory.class, e -> {
-			if (e instanceof InventoryHolder)
-				return ((InventoryHolder) e).getInventory();
+			if (e instanceof InventoryHolder inventoryHolder)
+				return inventoryHolder.getInventory();
 			return null;
 		}, Commands.CONVERTER_NO_COMMAND_ARGUMENTS);
 		
@@ -147,14 +147,14 @@ public class DefaultConverters {
 		// Block - InventoryHolder
 		Converters.registerConverter(Block.class, InventoryHolder.class, b -> {
 			BlockState s = b.getState();
-			if (s instanceof InventoryHolder)
-				return (InventoryHolder) s;
+			if (s instanceof InventoryHolder inventoryHolder)
+				return inventoryHolder;
 			return null;
 		}, Converter.NO_RIGHT_CHAINING | Commands.CONVERTER_NO_COMMAND_ARGUMENTS);
 
 		Converters.registerConverter(InventoryHolder.class, Block.class, holder -> {
-			if (holder instanceof BlockState)
-				return new BlockInventoryHolder((BlockState) holder);
+			if (holder instanceof BlockState blockState)
+				return new BlockInventoryHolder(blockState);
 			if (holder instanceof DoubleChest)
 				return holder.getInventory().getLocation().getBlock();
 			return null;
@@ -162,22 +162,21 @@ public class DefaultConverters {
 
 		// InventoryHolder - Entity
 		Converters.registerConverter(InventoryHolder.class, Entity.class, holder -> {
-			if (holder instanceof Entity)
-				return (Entity) holder;
+			if (holder instanceof Entity entity)
+				return entity;
 			return null;
 		}, Converter.NO_CHAINING);
 
 		// InventoryHolder - Location
 		// since the individual ones can't be trusted to chain.
 		Converters.registerConverter(InventoryHolder.class, Location.class, holder -> {
-			if (holder instanceof Entity)
-				return ((Entity) holder).getLocation();
-			if (holder instanceof Block)
-				return ((Block) holder).getLocation();
-			if (holder instanceof BlockState)
-				return BlockUtils.getLocation(((BlockState) holder).getBlock());
-			if (holder instanceof DoubleChest) {
-				DoubleChest doubleChest = (DoubleChest) holder;
+			if (holder instanceof Entity entity)
+				return entity.getLocation();
+			if (holder instanceof Block block)
+				return block.getLocation();
+			if (holder instanceof BlockState blockState)
+				return BlockUtils.getLocation(blockState.getBlock());
+			if (holder instanceof DoubleChest doubleChest) {
 				if (doubleChest.getLeftSide() != null) {
 					return BlockUtils.getLocation(((BlockState) doubleChest.getLeftSide()).getBlock());
 				} else if (((DoubleChest) holder).getRightSide() != null) {

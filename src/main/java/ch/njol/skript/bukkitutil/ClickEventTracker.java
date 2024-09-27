@@ -97,10 +97,9 @@ public class ClickEventTracker {
 			}
 			
 			// Ignore this, but set its cancelled status based on one set to first event
-			if (event instanceof PlayerInteractEvent) { // Handle use item/block separately
+			if (event instanceof PlayerInteractEvent click) { // Handle use item/block separately
 				// Failing to do so caused issue SkriptLang/Skript#2303
 				PlayerInteractEvent firstClick = (PlayerInteractEvent) first.event;
-				PlayerInteractEvent click = (PlayerInteractEvent) event;
 				click.setUseInteractedBlock(firstClick.useInteractedBlock());
 				click.setUseItemInHand(firstClick.useItemInHand());
 			} else {

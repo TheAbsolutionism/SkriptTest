@@ -96,8 +96,7 @@ public class EffBan extends Effect {
 		final Date expires = ts != null ? new Date(System.currentTimeMillis() + ts.getMilliSeconds()) : null;
 		final String source = "Skript ban effect";
 		for (final Object o : players.getArray(e)) {
-			if (o instanceof Player) {
-				Player player = (Player) o;
+			if (o instanceof Player player) {
 				if (ipBan) {
 					InetSocketAddress addr = player.getAddress();
 					if (addr == null)
@@ -115,22 +114,21 @@ public class EffBan extends Effect {
 				}
 				if (kick)
 					player.kickPlayer(reason);
-			} else if (o instanceof OfflinePlayer) {
-				String name = ((OfflinePlayer) o).getName();
+			} else if (o instanceof OfflinePlayer offlinePlayer) {
+				String name = offlinePlayer.getName();
 				if (name == null)
 					return; // Can't ban, name unknown
 				if (ban)
 					Bukkit.getBanList(BanList.Type.NAME).addBan(name, reason, expires, source);
 				else
 					Bukkit.getBanList(BanList.Type.NAME).pardon(name);
-			} else if (o instanceof String) {
-				final String s = (String) o;
+			} else if (o instanceof String string) {
 				if (ban) {
-					Bukkit.getBanList(BanList.Type.IP).addBan(s, reason, expires, source);
-					Bukkit.getBanList(BanList.Type.NAME).addBan(s, reason, expires, source);
+					Bukkit.getBanList(BanList.Type.IP).addBan(string, reason, expires, source);
+					Bukkit.getBanList(BanList.Type.NAME).addBan(string, reason, expires, source);
 				} else {
-					Bukkit.getBanList(BanList.Type.IP).pardon(s);
-					Bukkit.getBanList(BanList.Type.NAME).pardon(s);
+					Bukkit.getBanList(BanList.Type.IP).pardon(string);
+					Bukkit.getBanList(BanList.Type.NAME).pardon(string);
 				}
 			} else {
 				assert false;

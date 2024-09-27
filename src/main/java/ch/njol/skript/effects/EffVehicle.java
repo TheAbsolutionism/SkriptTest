@@ -88,12 +88,12 @@ public class EffVehicle extends Effect {
 		if (ps.length == 0)
 			return;
 		for (final Object v : vs) {
-			if (v instanceof Entity) {
-				((Entity) v).eject();
+			if (v instanceof Entity entity) {
+				entity.eject();
 				for (Entity p : ps){
 					assert p != null;
 					p.leaveVehicle();
-					PassengerUtils.addPassenger((Entity)v, p); //For 1.9 and lower, it will only set the last one.
+					PassengerUtils.addPassenger(entity, p); //For 1.9 and lower, it will only set the last one.
 				}
 			} else {
 				for (final Entity p : ps) {

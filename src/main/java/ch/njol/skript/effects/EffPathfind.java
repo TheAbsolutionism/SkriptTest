@@ -76,14 +76,14 @@ public class EffPathfind extends Effect {
 		Object target = this.target != null ? this.target.getSingle(event) : null;
 		double speed = this.speed != null ? this.speed.getOptionalSingle(event).orElse(1).doubleValue() : 1;
 		for (LivingEntity entity : entities.getArray(event)) {
-			if (!(entity instanceof Mob))
+			if (!(entity instanceof Mob mob))
 				continue;
-			if (target instanceof LivingEntity) {
-				((Mob) entity).getPathfinder().moveTo((LivingEntity) target, speed);
-			} else if (target instanceof Location) {
-				((Mob) entity).getPathfinder().moveTo((Location) target, speed);
+			if (target instanceof LivingEntity livingEntity) {
+				mob.getPathfinder().moveTo(livingEntity, speed);
+			} else if (target instanceof Location location) {
+				mob.getPathfinder().moveTo(location, speed);
 			} else if (this.target == null) {
-				((Mob) entity).getPathfinder().stopPathfinding();
+				mob.getPathfinder().stopPathfinding();
 			}
 		}
 	}

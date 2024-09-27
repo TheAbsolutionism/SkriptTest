@@ -93,9 +93,8 @@ public class EffCommand extends Effect {
 			if (senders != null) {
 				for (CommandSender sender : senders.getArray(event)) {
 					if (bungeecord) {
-						if (!(sender instanceof Player))
+						if (!(sender instanceof Player player))
 							continue;
-						Player player = (Player) sender;
 						Utils.sendPluginMessage(player, EffConnect.BUNGEE_CHANNEL, MESSAGE_CHANNEL, player.getName(), "/" + command);
 						continue;
 					}

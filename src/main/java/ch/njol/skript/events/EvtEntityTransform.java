@@ -59,9 +59,8 @@ public class EvtEntityTransform extends SkriptEvent {
 
 	@Override
 	public boolean check(Event event) {
-		if (!(event instanceof EntityTransformEvent))
+		if (!(event instanceof EntityTransformEvent transformEvent))
 			return false;
-		EntityTransformEvent transformEvent = (EntityTransformEvent) event;
 		if (reasons != null && !reasons.check(event, reason -> transformEvent.getTransformReason().equals(reason)))
 			return false;
 		if (datas != null && !datas.check(event, data -> data.isInstance(transformEvent.getEntity())))

@@ -64,8 +64,8 @@ public class Delay extends Effect {
 		getParser().setHasDelayBefore(Kleenean.TRUE);
 
 		duration = (Expression<Timespan>) exprs[0];
-		if (duration instanceof Literal) { // If we can, do sanity check for delays
-			long millis = ((Literal<Timespan>) duration).getSingle().getMilliSeconds();
+		if (duration instanceof Literal<Timespan> timespanLiteral) { // If we can, do sanity check for delays
+			long millis = timespanLiteral.getSingle().getMilliSeconds();
 			if (millis < 50) {
 				Skript.warning("Delays less than one tick are not possible, defaulting to one tick.");
 			}

@@ -64,10 +64,10 @@ public class CondHasLineOfSight extends Condition {
 	@Override
 	public boolean check(Event event) {
 		return targets.check(event, (target) -> {
-			if (target instanceof Entity) {
-				return viewers.check(event, (viewer) -> viewer.hasLineOfSight((Entity) target));
-			} else if (target instanceof Location) {
-				return viewers.check(event, (viewer) -> viewer.hasLineOfSight((Location) target));
+			if (target instanceof Entity entity) {
+				return viewers.check(event, (viewer) -> viewer.hasLineOfSight(entity));
+			} else if (target instanceof Location location) {
+				return viewers.check(event, (viewer) -> viewer.hasLineOfSight(location));
 			} else {
 				return false;
 			}

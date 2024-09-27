@@ -77,13 +77,13 @@ public class EffDrop extends Effect {
 		for (Location l : locations.getArray(e)) {
 			Location itemDropLoc = l.clone().subtract(0.5, 0.5, 0.5); // dropItemNaturally adds 0.15 to 0.85 randomly to all coordinates
 			for (Object o : os) {
-				if (o instanceof Experience) {
+				if (o instanceof Experience experience) {
 					ExperienceOrb orb = l.getWorld().spawn(l, ExperienceOrb.class);
-					orb.setExperience(((Experience) o).getXP() + orb.getExperience()); // ensure we maintain previous experience, due to spigot xp merging behavior
+					orb.setExperience(experience.getXP() + orb.getExperience()); // ensure we maintain previous experience, due to spigot xp merging behavior
 					EffSecSpawn.lastSpawned = orb;
 				} else {
-					if (o instanceof ItemStack)
-						o = new ItemType((ItemStack) o);
+					if (o instanceof ItemStack itemStack)
+						o = new ItemType(itemStack);
 					for (ItemStack is : ((ItemType) o).getItem().getAll()) {
 						if (!ItemUtils.isAir(is.getType()) && is.getAmount() > 0) {
 							if (useVelocity) {

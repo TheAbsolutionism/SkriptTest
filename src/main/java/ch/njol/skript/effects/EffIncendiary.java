@@ -74,14 +74,14 @@ public class EffIncendiary extends Effect {
 	@Override
 	protected void execute(Event e) {
 		if (isEvent) {
-			if (!(e instanceof ExplosionPrimeEvent))
+			if (!(e instanceof ExplosionPrimeEvent primeEvent))
 				return;
 
-			((ExplosionPrimeEvent) e).setFire(causeFire);
+			primeEvent.setFire(causeFire);
 		} else {
 			for (Entity entity : entities.getArray(e)) {
-				if (entity instanceof Explosive)
-					((Explosive) entity).setIsIncendiary(causeFire);
+				if (entity instanceof Explosive explosive)
+					explosive.setIsIncendiary(causeFire);
 			}
 		}
 	}

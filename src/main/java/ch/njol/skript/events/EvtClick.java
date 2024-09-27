@@ -125,12 +125,11 @@ public class EvtClick extends SkriptEvent {
 		Block block;
 		Entity entity;
 		
-		if (event instanceof PlayerInteractEntityEvent) {
-			PlayerInteractEntityEvent clickEvent = ((PlayerInteractEntityEvent) event);
-			Entity clicked = clickEvent.getRightClicked();
+		if (event instanceof PlayerInteractEntityEvent interactEntityEvent) {
+			Entity clicked = interactEntityEvent.getRightClicked();
 			
 			// Usually, don't handle these events
-			if (clickEvent instanceof PlayerInteractAtEntityEvent) {
+			if (interactEntityEvent instanceof PlayerInteractAtEntityEvent) {
 				// But armor stands are an exception
 				// Later, there may be more exceptions...
 				if (!(clicked instanceof ArmorStand))
@@ -142,18 +141,17 @@ public class EvtClick extends SkriptEvent {
 			
 			// PlayerInteractAtEntityEvent called only once for armor stands
 			if (!(event instanceof PlayerInteractAtEntityEvent)) {
-				if (!interactTracker.checkEvent(clickEvent.getPlayer(), clickEvent, clickEvent.getHand())) {
+				if (!interactTracker.checkEvent(interactEntityEvent.getPlayer(), interactEntityEvent, interactEntityEvent.getHand())) {
 					return false; // Not first event this tick
 				}
 			}
 			
 			entity = clicked;
 			block = null;
-		} else if (event instanceof PlayerInteractEvent) {
-			PlayerInteractEvent clickEvent = ((PlayerInteractEvent) event);
+		} else if (event instanceof PlayerInteractEvent interactEvent) {
 			
 			// Figure out click type, filter non-click events
-			Action a = clickEvent.getAction();
+			Action a = interactEvent.getAction();
 			int click;
 			switch (a) {
 				case LEFT_CLICK_AIR:
@@ -171,13 +169,13 @@ public class EvtClick extends SkriptEvent {
 			if ((this.click & click) == 0)
 				return false; // We don't want to handle this kind of events
 			
-			EquipmentSlot hand = clickEvent.getHand();
+			EquipmentSlot hand = interactEvent.getHand();
 			assert hand != null; // Not PHYSICAL interaction
-			if (!interactTracker.checkEvent(clickEvent.getPlayer(), clickEvent, hand)) {
+			if (!interactTracker.checkEvent(interactEvent.getPlayer(), interactEvent, hand)) {
 				return false; // Not first event this tick
 			}
 			
-			block = clickEvent.getClickedBlock();
+			block = interactEvent.getClickedBlock();
 			entity = null;
 		} else {
 			assert false;
@@ -187,8 +185,8 @@ public class EvtClick extends SkriptEvent {
 		if (tools != null && !tools.check(event, new Checker<ItemType>() {
 			@Override
 			public boolean check(final ItemType t) {
-				if (event instanceof PlayerInteractEvent) {
-					return t.isOfType(((PlayerInteractEvent) event).getItem());
+				if (event instanceof PlayerInteractEvent interactEvent) {
+					return t.isOfType(interactEvent.getItem());
 				} else { // PlayerInteractEntityEvent doesn't have item associated with it
 					PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
 					ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
@@ -205,7 +203,7 @@ public class EvtClick extends SkriptEvent {
 				@Override
 				public boolean check(final Object o) {
 					if (entity != null) {
-						return o instanceof EntityData ? ((EntityData<?>) o).isInstance(entity) : Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) o));
+						return o instanceof EntityData<?> entityData ? entityData.isInstance(entity) : Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) o));
 					} else {
 						return o instanceof EntityData ? false : ((ItemType) o).isOfType(block);
 					}

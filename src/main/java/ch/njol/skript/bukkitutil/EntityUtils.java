@@ -73,15 +73,15 @@ public class EntityUtils {
 	 * @return Age of entity (if zombie/piglin/zoglin -1 = baby, 0 = adult) (if not ageable, will return 0)
 	 */
 	public static int getAge(Entity entity) {
-		if (entity instanceof Ageable)
-			return ((Ageable) entity).getAge();
-		else if (entity instanceof Zombie)
-			return ((Zombie) entity).isBaby() ? -1 : 0;
+		if (entity instanceof Ageable ageable)
+			return ageable.getAge();
+		else if (entity instanceof Zombie zombie)
+			return zombie.isBaby() ? -1 : 0;
 		else if (HAS_PIGLINS) {
-			if (entity instanceof Piglin)
-				return ((Piglin) entity).isBaby() ? -1 : 0;
-			else if (entity instanceof Zoglin)
-				return ((Zoglin) entity).isBaby() ? -1 : 0;
+			if (entity instanceof Piglin piglin)
+				return piglin.isBaby() ? -1 : 0;
+			else if (entity instanceof Zoglin zoglin)
+				return zoglin.isBaby() ? -1 : 0;
 		}
 		return 0;
 	}
@@ -94,15 +94,15 @@ public class EntityUtils {
 	 * @param age    Age to set
 	 */
 	public static void setAge(Entity entity, int age) {
-		if (entity instanceof Ageable)
-			((Ageable) entity).setAge(age);
-		else if (entity instanceof Zombie)
-			((Zombie) entity).setBaby(age < 0);
+		if (entity instanceof Ageable ageable)
+			ageable.setAge(age);
+		else if (entity instanceof Zombie zombie)
+			zombie.setBaby(age < 0);
 		else if (HAS_PIGLINS) {
-			if (entity instanceof Piglin)
-				((Piglin) entity).setBaby(age < 0);
-			else if (entity instanceof Zoglin)
-				((Zoglin) entity).setBaby(age < 0);
+			if (entity instanceof Piglin piglin)
+				piglin.setBaby(age < 0);
+			else if (entity instanceof Zoglin zoglin)
+				zoglin.setBaby(age < 0);
 		}
 	}
 

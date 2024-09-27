@@ -70,8 +70,7 @@ public class EffKeepInventory extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		if (event instanceof PlayerDeathEvent) {
-			PlayerDeathEvent deathEvent = (PlayerDeathEvent) event;
+		if (event instanceof PlayerDeathEvent deathEvent) {
 			if (keepItems)
 				deathEvent.setKeepInventory(true);
 			if (keepExp)

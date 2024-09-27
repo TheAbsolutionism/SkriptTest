@@ -86,16 +86,16 @@ public class EffExplodeCreeper extends Effect {
 	@Override
 	protected void execute(final Event e) {
 		for (final LivingEntity le : entities.getArray(e)) {
-			if (le instanceof Creeper) {
+			if (le instanceof Creeper creeper) {
 				if (instant) {
-					((Creeper) le).explode();
+					creeper.explode();
 				} else if (stop) {
-					((Creeper) le).setIgnited(false);
+					creeper.setIgnited(false);
 				} else {
 					if (paper) {
-						((Creeper) le).setIgnited(true);
+						creeper.setIgnited(true);
 					} else {
-						((Creeper) le).ignite();
+						creeper.ignite();
 					}
 				}
 			}

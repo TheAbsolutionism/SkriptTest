@@ -501,12 +501,12 @@ public abstract class Aliases {
 	 */
 	public static void load(Config config) {
 		for (Node n : config.getMainNode()) {
-			if (!(n instanceof SectionNode)) {
+			if (!(n instanceof SectionNode sectionNode)) {
 				Skript.error(m_outside_section.toString());
 				continue;
 			}
 			
-			parser.load((SectionNode) n);
+			parser.load(sectionNode);
 		}
 	}
 

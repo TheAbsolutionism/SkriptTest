@@ -115,8 +115,8 @@ public class HealthUtils {
 	public static void setDamage(EntityDamageEvent event, double damage) {
 		event.setDamage(damage * 2);
 		// Set last damage manually as Bukkit doesn't appear to do that
-		if (event.getEntity() instanceof LivingEntity)
-			((LivingEntity) event.getEntity()).setLastDamage(damage * 2);
+		if (event.getEntity() instanceof LivingEntity livingEntity)
+			livingEntity.setLastDamage(damage * 2);
 	}
 
 	@Nullable

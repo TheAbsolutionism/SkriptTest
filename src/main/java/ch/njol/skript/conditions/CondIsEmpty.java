@@ -44,18 +44,17 @@ public class CondIsEmpty extends PropertyCondition<Object> {
 	
 	@Override
 	public boolean check(final Object o) {
-		if (o instanceof String)
-			return ((String) o).isEmpty();
-		if (o instanceof Inventory) {
-			for (ItemStack s : ((Inventory) o).getContents()) {
+		if (o instanceof String string)
+			return string.isEmpty();
+		if (o instanceof Inventory inv) {
+			for (ItemStack s : inv.getContents()) {
 				if (s != null && s.getType() != Material.AIR)
 					return false; // There is an item here!
 			}
 			return true;
 		}
-		if (o instanceof Slot) {
-			final Slot s = (Slot) o;
-			final ItemStack i = s.getItem();
+		if (o instanceof Slot slot) {
+			final ItemStack i = slot.getItem();
 			return i == null || i.getType() == Material.AIR;
 		}
 		assert false;

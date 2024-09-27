@@ -79,18 +79,17 @@ public class EffShear extends Effect {
 	protected void execute(Event event) {
 		for (LivingEntity entity : entity.getArray(event)) {
 			if (shear && INTERFACE_METHOD) {
-				if (!(entity instanceof Shearable))
+				if (!(entity instanceof Shearable shearable))
 					continue;
-				Shearable shearable = ((Shearable) entity);
 				if (!force && !shearable.readyToBeSheared())
 					continue;
 				shearable.shear();
 				continue;
 			}
-			if (entity instanceof Sheep) {
-				((Sheep) entity).setSheared(shear);
-			} else if (entity instanceof Snowman) {
-				((Snowman) entity).setDerp(shear);
+			if (entity instanceof Sheep sheep) {
+				sheep.setSheared(shear);
+			} else if (entity instanceof Snowman snowman) {
+				snowman.setDerp(shear);
 			}
 		}
 	}

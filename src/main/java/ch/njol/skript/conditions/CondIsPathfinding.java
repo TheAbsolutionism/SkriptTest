@@ -77,9 +77,9 @@ public class CondIsPathfinding extends Condition {
 	@Override
 	public boolean check(Event event) {
 		return entities.check(event, entity -> {
-			if (!(entity instanceof Mob))
+			if (!(entity instanceof Mob mob))
 				return false;
-			Pathfinder pathfind = ((Mob) entity).getPathfinder();
+			Pathfinder pathfind = mob.getPathfinder();
 			if (target == null)
 				return pathfind.hasPath();
 

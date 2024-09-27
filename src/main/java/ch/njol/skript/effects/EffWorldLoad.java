@@ -79,13 +79,13 @@ public class EffWorldLoad extends Effect {
 	protected void execute(Event event) {
 		Environment environment = this.environment != null ? this.environment.getSingle(event) : null;
 		for (Object world : worlds.getArray(event)) {
-			if (load && world instanceof String) {
-				WorldCreator worldCreator = new WorldCreator((String) world);
+			if (load && world instanceof String string) {
+				WorldCreator worldCreator = new WorldCreator(string);
 				if (environment != null)
 					worldCreator.environment(environment);
 				worldCreator.createWorld();
-			} else if (!load && world instanceof World) {
-				Bukkit.unloadWorld((World) world, save);
+			} else if (!load && world instanceof World worldType) {
+				Bukkit.unloadWorld(worldType, save);
 			}
 		}
 	}

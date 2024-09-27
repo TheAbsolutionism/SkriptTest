@@ -66,17 +66,17 @@ public class CondIsBanned extends PropertyCondition<Object> {
 	
 	@Override
 	public boolean check(Object obj) {
-		if (obj instanceof Player) {
+		if (obj instanceof Player player) {
 			if (ipBanned) {
-				InetSocketAddress sockAddr = ((Player) obj).getAddress();
+				InetSocketAddress sockAddr = player.getAddress();
 				if (sockAddr == null)
 					return false; // Assume not banned, they've never played here
 				return Bukkit.getIPBans().contains(sockAddr.getAddress().getHostAddress());
 			} else {
 				return ((Player) obj).isBanned();
 			}
-		} else if (obj instanceof OfflinePlayer) {
-			return ((OfflinePlayer) obj).isBanned();
+		} else if (obj instanceof OfflinePlayer offlinePlayer) {
+			return offlinePlayer.isBanned();
 		} else if (obj instanceof String) {
 			return Bukkit.getIPBans().contains(obj) ||
 					!ipBanned && Bukkit.getBannedPlayers().stream()

@@ -49,8 +49,7 @@ public class PaperEntityUtils {
 		Bukkit.getMobGoals().getRunningGoals(mob, GoalType.LOOK).forEach(goal -> Bukkit.getMobGoals().removeGoal(mob, goal));
 		float speed = headRotationSpeed != null ? headRotationSpeed : mob.getHeadRotationSpeed();
 		float maxPitch = maxHeadPitch != null ? maxHeadPitch : mob.getMaxHeadPitch();
-		if (target instanceof Location && !((Location) target).isWorldLoaded()) {
-			Location location = (Location) target;
+		if (target instanceof Location location && !((Location) target).isWorldLoaded()) {
 			target = new Location(mob.getWorld(), location.getX(), location.getY(), location.getZ());
 		}
 		Bukkit.getMobGoals().addGoal(mob, 0, new LookGoal(target, mob, speed, maxPitch));
@@ -85,9 +84,9 @@ public class PaperEntityUtils {
 			return;
 		}
 		for (LivingEntity entity : entities) {
-			if (!(entity instanceof Mob))
+			if (!(entity instanceof Mob mob))
 				continue;
-			mobLookAt(target, headRotationSpeed, maxHeadPitch, (Mob) entity);
+			mobLookAt(target, headRotationSpeed, maxHeadPitch, mob);
 		}
 	}
 
@@ -106,25 +105,23 @@ public class PaperEntityUtils {
 		if (target == null || !LOOK_AT || !LOOK_ANCHORS)
 			return;
 		for (LivingEntity entity : entities) {
-			if (target instanceof Location && !((Location) target).isWorldLoaded()) {
-				Location location = (Location) target;
+			if (target instanceof Location location && !((Location) target).isWorldLoaded()) {
 				target = new Location(entity.getWorld(), location.getX(), location.getY(), location.getZ());
 			}
 			if (entity instanceof Player) {
 				Player player = (Player) entity;
-				if (target instanceof Vector) {
-					Vector vector = (Vector) target;
+				if (target instanceof Vector vector) {
 					player.lookAt(player.getEyeLocation().add(vector), LookAnchor.EYES);
 					player.lookAt(player.getEyeLocation().add(vector), LookAnchor.FEET);
-				} else if (target instanceof Location) {
-					player.lookAt((Location) target, LookAnchor.EYES);
-					player.lookAt((Location) target, LookAnchor.FEET);
-				} else if (target instanceof Entity) {
-					player.lookAt((Entity) target, LookAnchor.EYES, entityAnchor);
-					player.lookAt((Entity) target, LookAnchor.FEET, entityAnchor);
+				} else if (target instanceof Location location) {
+					player.lookAt(location, LookAnchor.EYES);
+					player.lookAt(location, LookAnchor.FEET);
+				} else if (target instanceof Entity entityCast) {
+					player.lookAt(entityCast, LookAnchor.EYES, entityAnchor);
+					player.lookAt(entityCast, LookAnchor.FEET, entityAnchor);
 				}
-			} else if (entity instanceof Mob) {
-				mobLookAt(target, headRotationSpeed, maxHeadPitch, (Mob) entity);
+			} else if (entity instanceof Mob mob) {
+				mobLookAt(target, headRotationSpeed, maxHeadPitch, mob);
 			}
 		}
 	}

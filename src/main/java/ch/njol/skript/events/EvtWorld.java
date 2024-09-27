@@ -74,8 +74,8 @@ public class EvtWorld extends SkriptEvent {
 	@SuppressWarnings("unchecked")
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
 		worlds = (Literal<World>) args[0];
-		if (worlds instanceof LiteralList<?> && worlds.getAnd()) {
-			((LiteralList<World>) worlds).invertAnd();
+		if (worlds instanceof LiteralList<?> literalList && worlds.getAnd()) {
+			literalList.invertAnd();
 		}
 		return true;
 	}

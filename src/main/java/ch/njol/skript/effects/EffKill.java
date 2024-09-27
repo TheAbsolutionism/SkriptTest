@@ -69,16 +69,16 @@ public class EffKill extends Effect {
 	protected void execute(final Event e) {
 		for (Entity entity : entities.getArray(e)) {
 
-			if (entity instanceof EnderDragonPart) {
-				entity = ((EnderDragonPart) entity).getParent();
+			if (entity instanceof EnderDragonPart dragonPart) {
+				entity = dragonPart.getParent();
 			}
 
-			if (entity instanceof Damageable) {
-				final boolean creative = entity instanceof Player && ((Player) entity).getGameMode() == GameMode.CREATIVE;
+			if (entity instanceof Damageable damageable) {
+				final boolean creative = entity instanceof Player player && player.getGameMode() == GameMode.CREATIVE;
 				if (creative) // Set player to survival before applying damage
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
 
-				HealthUtils.damage((Damageable) entity, HealthUtils.getMaxHealth((Damageable) entity) * 100); // just to make sure that it really dies >:)
+				HealthUtils.damage(damageable, HealthUtils.getMaxHealth(damageable) * 100); // just to make sure that it really dies >:)
 
 				if (creative) // Set creative player back to creative
 					((Player) entity).setGameMode(GameMode.CREATIVE);

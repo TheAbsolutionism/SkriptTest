@@ -40,10 +40,10 @@ public class CondIsCharged extends PropertyCondition<Entity> {
 
 	@Override
 	public boolean check(Entity entity) {
-		if (entity instanceof Creeper)
-			return ((Creeper) entity).isPowered();
-		else if (entity instanceof WitherSkull)
-			return ((WitherSkull) entity).isCharged();
+		if (entity instanceof Creeper creeper)
+			return creeper.isPowered();
+		else if (entity instanceof WitherSkull witherSkull)
+			return witherSkull.isCharged();
 		return false;
 	}
 

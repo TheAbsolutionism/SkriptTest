@@ -132,20 +132,17 @@ public class EffColorItems extends Effect {
 		for (ItemType item : items) {
 			ItemMeta meta = item.getItemMeta();
 			
-			if (meta instanceof LeatherArmorMeta) {
-				final LeatherArmorMeta m = (LeatherArmorMeta) meta;
-				m.setColor(c);
-				item.setItemMeta(m);
+			if (meta instanceof LeatherArmorMeta leatherArmorMeta) {
+				leatherArmorMeta.setColor(c);
+				item.setItemMeta(leatherArmorMeta);
 			} else if (MAPS_AND_POTIONS_COLORS) {
 				
-				if (meta instanceof MapMeta) {
-					final MapMeta m = (MapMeta) meta;
-					m.setColor(c);
-					item.setItemMeta(m);
-				} else if (meta instanceof PotionMeta) {
-					final PotionMeta m = (PotionMeta) meta;
-					m.setColor(c);
-					item.setItemMeta(m);
+				if (meta instanceof MapMeta mapMeta) {
+					mapMeta.setColor(c);
+					item.setItemMeta(mapMeta);
+				} else if (meta instanceof PotionMeta potionMeta) {
+					potionMeta.setColor(c);
+					item.setItemMeta(potionMeta);
 				}
 			}
 		}

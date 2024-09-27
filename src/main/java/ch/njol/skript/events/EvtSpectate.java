@@ -70,15 +70,14 @@ public class EvtSpectate extends SkriptEvent {
 		boolean swap = false;
 		Entity entity;
 		// Start or swap event, and must be PlayerStartSpectatingEntityEvent.
-		if (pattern != STOP && event instanceof PlayerStartSpectatingEntityEvent) {
-			PlayerStartSpectatingEntityEvent spectating = (PlayerStartSpectatingEntityEvent) event;
-			entity = spectating.getNewSpectatorTarget();
+		if (pattern != STOP && event instanceof PlayerStartSpectatingEntityEvent startSpectatingEntityEvent) {
+			entity = startSpectatingEntityEvent.getNewSpectatorTarget();
 
 			// If it's a swap event, we're checking for past target on entity data and no null targets in the event.
-			if (swap = pattern == SWAP && entity != null && spectating.getCurrentSpectatorTarget() != null)
-				entity = spectating.getCurrentSpectatorTarget();
-		} else if (event instanceof PlayerStopSpectatingEntityEvent) {
-			entity = ((PlayerStopSpectatingEntityEvent) event).getSpectatorTarget();
+			if (swap = pattern == SWAP && entity != null && startSpectatingEntityEvent.getCurrentSpectatorTarget() != null)
+				entity = startSpectatingEntityEvent.getCurrentSpectatorTarget();
+		} else if (event instanceof PlayerStopSpectatingEntityEvent stopSpectatingEntityEvent) {
+			entity = stopSpectatingEntityEvent.getSpectatorTarget();
 		} else {
 			// Swap event cannot be a stop spectating event.
 			return false;

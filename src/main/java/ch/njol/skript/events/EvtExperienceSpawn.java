@@ -80,27 +80,27 @@ public class EvtExperienceSpawn extends SkriptEvent {
 
 	private static final EventExecutor EXECUTOR = (listener, event) -> {
 		ExperienceSpawnEvent experienceEvent;
-		if (event instanceof BlockExpEvent) {
+		if (event instanceof BlockExpEvent blockExpEvent) {
 			experienceEvent = new ExperienceSpawnEvent(
-				((BlockExpEvent) event).getExpToDrop(),
-				((BlockExpEvent) event).getBlock().getLocation().add(0.5, 0.5, 0.5)
+				blockExpEvent.getExpToDrop(),
+				blockExpEvent.getBlock().getLocation().add(0.5, 0.5, 0.5)
 			);
-		} else if (event instanceof EntityDeathEvent) {
+		} else if (event instanceof EntityDeathEvent deathEvent) {
 			experienceEvent = new ExperienceSpawnEvent(
-				((EntityDeathEvent) event).getDroppedExp(),
-				((EntityDeathEvent) event).getEntity().getLocation()
+				deathEvent.getDroppedExp(),
+				deathEvent.getEntity().getLocation()
 			);
-		} else if (event instanceof ExpBottleEvent) {
+		} else if (event instanceof ExpBottleEvent bottleEvent) {
 			experienceEvent = new ExperienceSpawnEvent(
-				((ExpBottleEvent) event).getExperience(),
-				((ExpBottleEvent) event).getEntity().getLocation()
+				bottleEvent.getExperience(),
+				bottleEvent.getEntity().getLocation()
 			);
-		} else if (event instanceof PlayerFishEvent) {
-			if (((PlayerFishEvent) event).getState() != PlayerFishEvent.State.CAUGHT_FISH) // There is no EXP
+		} else if (event instanceof PlayerFishEvent fishEvent) {
+			if (fishEvent.getState() != PlayerFishEvent.State.CAUGHT_FISH) // There is no EXP
 				return;
 			experienceEvent = new ExperienceSpawnEvent(
-				((PlayerFishEvent) event).getExpToDrop(),
-				((PlayerFishEvent) event).getPlayer().getLocation()
+				fishEvent.getExpToDrop(),
+				fishEvent.getPlayer().getLocation()
 			);
 		} else {
 			assert false;
@@ -120,14 +120,14 @@ public class EvtExperienceSpawn extends SkriptEvent {
 		if (experienceEvent.isCancelled())
 			experienceEvent.setSpawnedXP(0);
 
-		if (event instanceof BlockExpEvent) {
-			((BlockExpEvent) event).setExpToDrop(experienceEvent.getSpawnedXP());
-		} else if (event instanceof EntityDeathEvent) {
-			((EntityDeathEvent) event).setDroppedExp(experienceEvent.getSpawnedXP());
-		} else if (event instanceof ExpBottleEvent) {
-			((ExpBottleEvent) event).setExperience(experienceEvent.getSpawnedXP());
-		} else if (event instanceof PlayerFishEvent) {
-			((PlayerFishEvent) event).setExpToDrop(experienceEvent.getSpawnedXP());
+		if (event instanceof BlockExpEvent blockExpEvent) {
+			blockExpEvent.setExpToDrop(experienceEvent.getSpawnedXP());
+		} else if (event instanceof EntityDeathEvent deathEvent) {
+			deathEvent.setDroppedExp(experienceEvent.getSpawnedXP());
+		} else if (event instanceof ExpBottleEvent bottleEvent) {
+			bottleEvent.setExperience(experienceEvent.getSpawnedXP());
+		} else if (event instanceof PlayerFishEvent fishEvent) {
+			fishEvent.setExpToDrop(experienceEvent.getSpawnedXP());
 		}
 	};
 	

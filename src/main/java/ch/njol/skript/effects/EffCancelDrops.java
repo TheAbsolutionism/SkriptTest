@@ -83,18 +83,16 @@ public class EffCancelDrops extends Effect {
 
 	@Override
 	protected void execute(Event e) {
-		if (e instanceof EntityDeathEvent) {
-			EntityDeathEvent event = (EntityDeathEvent) e;
+		if (e instanceof EntityDeathEvent deathEvent) {
 			if (cancelItems)
-				event.getDrops().clear();
+				deathEvent.getDrops().clear();
 			if (cancelExps)
-				event.setDroppedExp(0);
-		} else if (e instanceof BlockBreakEvent) {
-			BlockBreakEvent event = (BlockBreakEvent) e;
+				deathEvent.setDroppedExp(0);
+		} else if (e instanceof BlockBreakEvent breakEvent) {
 			if (cancelItems)
-				event.setDropItems(false);
+				breakEvent.setDropItems(false);
 			if (cancelExps)
-				event.setExpToDrop(0);
+				breakEvent.setExpToDrop(0);
 		}
 	}
 

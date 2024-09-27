@@ -42,10 +42,10 @@ public class EvtBookEdit extends SkriptEvent{
 	
 	@Override
 	public boolean check(Event e) {
-		if (!(e instanceof PlayerEditBookEvent)){
+		if (!(e instanceof PlayerEditBookEvent editBookEvent)){
 			return false;
 		}
-		return !((PlayerEditBookEvent) e).isSigning();
+		return !editBookEvent.isSigning();
 	}
 	
 	@Override

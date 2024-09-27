@@ -59,16 +59,15 @@ public class EvtDamage extends SkriptEvent {
 	@Override
 	public boolean check(Event evt) {
 		EntityDamageEvent e = (EntityDamageEvent) evt;
-		if (evt instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) evt;
-			if (!checkDamager(event.getDamager()))
+		if (evt instanceof EntityDamageByEntityEvent damageEvent) {
+			if (!checkDamager(damageEvent.getDamager()))
 				return false;
 		} else if (byTypes != null) {
 			return false;
 		}
 		if (!checkDamaged(e.getEntity()))
 			return false;
-		if (e instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) e).getDamager() instanceof EnderDragon && ((EntityDamageByEntityEvent) e).getEntity() instanceof EnderDragon)
+		if (e instanceof EntityDamageByEntityEvent damageByEntityEvent && damageByEntityEvent.getDamager() instanceof EnderDragon && damageByEntityEvent.getEntity() instanceof EnderDragon)
 			return false;
 		return checkDamage(e);
 	}
@@ -104,10 +103,9 @@ public class EvtDamage extends SkriptEvent {
 //	private final static WeakHashMap<LivingEntity, Integer> lastDamages = new WeakHashMap<LivingEntity, Integer>();
 	
 	private static boolean checkDamage(EntityDamageEvent e) {
-		if (!(e.getEntity() instanceof LivingEntity))
+		if (!(e.getEntity() instanceof LivingEntity livingEntity))
 			return true;
-		LivingEntity en = (LivingEntity) e.getEntity();
-		if (HealthUtils.getHealth(en) <= 0)
+		if (HealthUtils.getHealth(livingEntity) <= 0)
 			return false;
 //		if (en.getNoDamageTicks() <= en.getMaximumNoDamageTicks() / 2) {
 //			lastDamages.put(en, e.getDamage());

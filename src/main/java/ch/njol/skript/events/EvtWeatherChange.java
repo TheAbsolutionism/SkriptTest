@@ -59,8 +59,8 @@ public class EvtWeatherChange extends SkriptEvent {
 			return true;
 		if (!(e instanceof WeatherChangeEvent || e instanceof ThunderChangeEvent))
 			return false;
-		final boolean rain = e instanceof WeatherChangeEvent ? ((WeatherChangeEvent) e).toWeatherState() : ((ThunderChangeEvent) e).getWorld().hasStorm();
-		final boolean thunder = e instanceof ThunderChangeEvent ? ((ThunderChangeEvent) e).toThunderState() : ((WeatherChangeEvent) e).getWorld().isThundering();
+		final boolean rain = e instanceof WeatherChangeEvent weatherChangeEvent ? weatherChangeEvent.toWeatherState() : ((ThunderChangeEvent) e).getWorld().hasStorm();
+		final boolean thunder = e instanceof ThunderChangeEvent thunderChangeEvent ? thunderChangeEvent.toThunderState() : ((WeatherChangeEvent) e).getWorld().isThundering();
 		return types.check(e, new Checker<WeatherType>() {
 			@Override
 			public boolean check(final WeatherType t) {

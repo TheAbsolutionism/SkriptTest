@@ -92,7 +92,7 @@ public final class EvtEntity extends SkriptEvent {
 	public boolean check(final Event e) {
 		if (types == null)
 			return true;
-		final Entity en = e instanceof EntityDeathEvent ? ((EntityDeathEvent) e).getEntity() : ((EntitySpawnEvent) e).getEntity();
+		final Entity en = e instanceof EntityDeathEvent deathEvent ? deathEvent.getEntity() : ((EntitySpawnEvent) e).getEntity();
 		for (final EntityData<?> d : types) {
 			if (d.isInstance(en))
 				return true;

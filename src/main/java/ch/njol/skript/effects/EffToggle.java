@@ -74,20 +74,20 @@ public class EffToggle extends Effect {
 		for (Block b : blocks.getArray(e)) {
 			BlockData data = b.getBlockData();
 			if (toggle == -1) {
-				if (data instanceof Openable)
-					((Openable) data).setOpen(false);
-				else if (data instanceof Powerable)
-					((Powerable) data).setPowered(false);
+				if (data instanceof Openable openable)
+					openable.setOpen(false);
+				else if (data instanceof Powerable powerable)
+					powerable.setPowered(false);
 			} else if (toggle == 1) {
-				if (data instanceof Openable)
-					((Openable) data).setOpen(true);
-				else if (data instanceof Powerable)
-					((Powerable) data).setPowered(true);
+				if (data instanceof Openable openable)
+					openable.setOpen(true);
+				else if (data instanceof Powerable powerable)
+					powerable.setPowered(true);
 			} else {
-				if (data instanceof Openable) // open = NOT was open
-					((Openable) data).setOpen(!((Openable) data).isOpen());
-				else if (data instanceof Powerable) // power = NOT power
-					((Powerable) data).setPowered(!((Powerable) data).isPowered());
+				if (data instanceof Openable openable) // open = NOT was open
+					openable.setOpen(!openable.isOpen());
+				else if (data instanceof Powerable powerable) // power = NOT power
+					powerable.setPowered(!powerable.isPowered());
 			}
 			
 			b.setBlockData(data);

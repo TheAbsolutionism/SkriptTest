@@ -82,10 +82,10 @@ public class CondIsPreferredTool extends Condition {
 			items.check(event, item -> {
 				ItemStack stack = item.getRandom();
 				if (stack != null) {
-					if (block instanceof Block)
-						return ((Block) block).isPreferredTool(stack);
-					if (block instanceof BlockData)
-						return ((BlockData) block).isPreferredTool(stack);
+					if (block instanceof Block block1)
+						return block1.isPreferredTool(stack);
+					if (block instanceof BlockData blockData)
+						return blockData.isPreferredTool(stack);
 				}
 				return false;
 			}), isNegated());

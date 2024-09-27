@@ -63,8 +63,8 @@ public class CondIsSet extends Condition implements VerboseAssert {
 	}
 	
 	private boolean check(final Expression<?> expr, final Event e) {
-		if (expr instanceof ExpressionList) {
-			for (final Expression<?> ex : ((ExpressionList<?>) expr).getExpressions()) {
+		if (expr instanceof ExpressionList<?> expressionList) {
+			for (final Expression<?> ex : expressionList.getExpressions()) {
 				assert ex != null;
 				final boolean b = check(ex, e);
 				if (expr.getAnd() ^ b)
