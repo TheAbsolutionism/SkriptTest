@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-
 @Name("Beacon Effects")
 @Description({
 	"The active effects of a beacon.",
@@ -38,7 +37,7 @@ import java.util.function.Consumer;
 	"set primary beacon effect of {_block} to haste",
 	"add 1 to range of {_block}"
 })
-@RequiredPlugins("Paper (Range)")
+@RequiredPlugins("Paper (range)")
 @Events({"Beacon Effect", "Beacon Toggle", "Beacon Change Effect"})
 @Since("INSERT VERSION")
 public class ExprBeaconValues extends PropertyExpression<Block, Object> {
