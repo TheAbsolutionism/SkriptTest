@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"update {_blocks::*} as gravel",
-	"force update {_blocks::*} to be sand without physics updates",
+	"update {_blocks::*} to be sand without physics updates",
 	"update {_blocks::*} as stone without neighbouring updates"
 })
 @Since("INSERT VERSION")
@@ -33,17 +33,16 @@ public class EffBlockUpdate extends Effect {
 
 	static {
 		Skript.registerEffect(EffBlockUpdate.class,
-			"[:force] update %blocks% (as|to be) %blockdata% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]");
+			"update %blocks% (as|to be) %blockdata% [physics:without [neighbo[u]r[ing]|adjacent] [physic[s]] update[s]]");
 	}
 
-	private boolean force, physics;
+	private boolean physics;
 	private Expression<Block> blocks;
 	private Expression<BlockData> blockData;
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		this.force = parseResult.hasTag("force");
 		this.physics = !parseResult.hasTag("physics");
 		this.blocks = (Expression<Block>) exprs[0];
 		this.blockData = (Expression<BlockData>) exprs[1];
@@ -53,16 +52,15 @@ public class EffBlockUpdate extends Effect {
 	@Override
 	protected void execute(Event event) {
 		BlockData data = this.blockData.getSingle(event);
+		assert data != null;
 		for (Block block : this.blocks.getArray(event)) {
-			BlockState state = block.getState();
-			state.setBlockData(data);
-			state.update(this.force, this.physics);
+			block.setBlockData(data, this.physics);
 		}
 	}
 
 	@Override
 	public @NotNull String toString(@Nullable Event event, boolean debug) {
-		return (this.force ? "force " : "") + "update " + this.blocks.toString(event, debug) + " as " +
+		return "update " + this.blocks.toString(event, debug) + " as " +
 			this.blockData.toString(event, debug) + (this.physics ? "without neighbour updates" : "");
 	}
 
