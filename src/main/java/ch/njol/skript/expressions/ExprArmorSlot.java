@@ -31,6 +31,7 @@ import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
+import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.EntityEquipment;
@@ -60,8 +61,9 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 	private static final Set<Class<?>> bodyEntities = new HashSet<>(Arrays.asList(Horse.class, Llama.class, TraderLlama.class));
 
 	static {
-		if (Skript.isRunningMinecraft(1, 20, 5))
+		if (Material.getMaterial("WOLF_ARMOR") != null)
 			bodyEntities.add(Wolf.class);
+
 		register(ExprArmorSlot.class, Slot.class, "((boots:(boots|shoes)|leggings:leg[ging]s|chestplate:chestplate[s]|helmet:helmet[s]) [(item|:slot)]|armour:armo[u]r[s]|bodyarmor:body armo[u]r)", "livingentities");
 	}
 
