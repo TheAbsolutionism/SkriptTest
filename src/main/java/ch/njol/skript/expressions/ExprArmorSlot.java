@@ -66,9 +66,8 @@ public class ExprArmorSlot extends PropertyExpression<LivingEntity, Slot> {
 
 		register(ExprArmorSlot.class, Slot.class, "((boots:(boots|shoes)|leggings:leg[ging]s|chestplate:chestplate[s]|helmet:helmet[s]) [(item|:slot)]|armour:armo[u]r[s]|bodyarmor:body armo[u]r)", "livingentities");
 	}
-
-	@Nullable
-	private EquipSlot slot;
+	
+	private @Nullable EquipSlot slot;
 	private boolean explicitSlot;
 	private boolean isArmor;
 	private boolean isBody;
