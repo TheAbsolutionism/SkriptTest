@@ -3,6 +3,6 @@ test "block update":
 	set {_blocks::*} to blocks in radius 2 of block at {_loc}
 
 	update blocks at {_blocks::*} as sand without physics updates
-	assert blocks at {_blocks::*} is sand with "1 or more block did not update with or without physics"
+	assert blocks at {_blocks::*} is sand with "1 or more blocks did not update with or without physics"
 	update blocks at {_blocks::*} as air without physics updates
-	assert blocks at {_blocks::*} is air with "1 or more block did not update to air"
+	assert blocks at {_blocks::*} is air with "1 or more blocks did not update to air"

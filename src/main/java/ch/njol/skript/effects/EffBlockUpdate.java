@@ -52,7 +52,8 @@ public class EffBlockUpdate extends Effect {
 	@Override
 	protected void execute(Event event) {
 		BlockData data = this.blockData.getSingle(event);
-		assert data != null;
+		if (data == null)
+			return;
 		for (Block block : this.blocks.getArray(event)) {
 			block.setBlockData(data, this.physics);
 		}
