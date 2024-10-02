@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -24,13 +6,17 @@ import ch.njol.skript.doc.Events;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.effects.Delay;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
@@ -41,6 +27,7 @@ import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.inventory.FurnaceInventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -114,7 +101,11 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 			if (!(state instanceof Furnace))
 				continue;
 			FurnaceInventory furnaceInventory = ((Furnace) state).getInventory();
-			slots.add(new InventorySlot(furnaceInventory, slot));
+			if (isEvent && !Delay.isDelayed(event)) {
+				slots.add(new FurnaceEventSlot(event, furnaceInventory));
+			} else {
+				slots.add(new InventorySlot(furnaceInventory, slot));
+			}
 		}
 		return slots.toArray(new Slot[0]);
 	}
@@ -146,6 +137,97 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 			result += " of " + blocks.toString(event, debug);
 		}
 		return result;
+	}
+
+	@Override
+	public boolean setTime(int time) {
+		if (isEvent) { // getExpr will be null
+			if (slot == FUEL)
+				return setTime(time, FurnaceBurnEvent.class);
+			return setTime(time, FurnaceSmeltEvent.class);
+		}
+		return false;
+	}
+
+	private final class FurnaceEventSlot extends InventorySlot {
+
+		private final Event event;
+
+		public FurnaceEventSlot(Event event, FurnaceInventory furnaceInventory) {
+			super(furnaceInventory, slot);
+			this.event = event;
+		}
+
+		@Override
+		@Nullable
+		public ItemStack getItem() {
+            return switch (slot) {
+                case ORE -> {
+                    if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+                        ItemStack source = furnaceSmeltEvent.getSource().clone();
+                        if (getTime() != EventValues.TIME_FUTURE)
+                            yield source;
+                        source.setAmount(source.getAmount() - 1);
+                        yield source;
+                    }
+                    yield super.getItem();
+                }
+                case FUEL -> {
+                    if (event instanceof FurnaceBurnEvent furnaceBurnEvent) {
+                        ItemStack fuel = furnaceBurnEvent.getFuel().clone();
+                        if (getTime() != EventValues.TIME_FUTURE)
+                            yield fuel;
+                        // a single lava bucket becomes an empty bucket
+                        // see https://minecraft.wiki/w/Smelting#Fuel
+                        // this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
+                        Material newMaterial = fuel.getType() == Material.LAVA_BUCKET ? Material.BUCKET : Material.AIR;
+                        fuel.setAmount(fuel.getAmount() - 1);
+                        if (fuel.getAmount() == 0)
+                            fuel = new ItemStack(newMaterial);
+                        yield fuel;
+                    }
+                    yield super.getItem();
+                    // a single lava bucket becomes an empty bucket
+                    // see https://minecraft.wiki/w/Smelting#Fuel
+                    // this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
+                }
+                case RESULT -> {
+                    if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+                        ItemStack result = furnaceSmeltEvent.getResult().clone();
+						ItemStack currentResult = ((FurnaceInventory) getInventory()).getResult();
+						if (currentResult != null)
+							currentResult = currentResult.clone();
+						if (getTime() != EventValues.TIME_FUTURE) { // 'past result slot' and 'result slot'
+							yield currentResult;
+						} else if (currentResult != null && currentResult.isSimilar(result)) { // 'future result slot'
+							currentResult.setAmount(currentResult.getAmount() + result.getAmount());
+							yield currentResult;
+						} else {
+							yield result;
+						}
+                    }
+                    yield super.getItem(); // Special handling for getting the result slot
+                    // 'past result slot' and 'result slot'
+                    // 'future result slot'
+                    // 'the result'
+                }
+                default -> null;
+            };
+        }
+
+		@Override
+		public void setItem(@Nullable ItemStack item) {
+			if (slot == RESULT && event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+				furnaceSmeltEvent.setResult(item != null ? item : new ItemStack(Material.AIR));
+			} else {
+				if (getTime() == EventValues.TIME_FUTURE) { // Since this is a future expression, run it AFTER the event
+					Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), () -> FurnaceEventSlot.super.setItem(item));
+				} else {
+					super.setItem(item);
+				}
+			}
+		}
+
 	}
 
 }

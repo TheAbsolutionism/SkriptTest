@@ -46,9 +46,9 @@ test "furnace expressions":
 	clear the total cook time of {_furnace}
 	assert the total cook time of {_furnace} is 0 seconds with "Clear furnace total cook time"
 
-	set the burn time of {_furnace} to 50 seconds
-	assert the burn time of {_furnace} is 50 seconds with "Set furnace burn time to 50"
-	clear the burn time of {_furnace}
-	assert the burn time of {_furnace} is 0 seconds with "Clear furnace burn time"
+	set the fuel burn time of {_furnace} to 50 seconds
+	assert the fuel burn time of {_furnace} is 50 seconds with "Set furnace fuel burn time to 50"
+	clear the fuel burn time of {_furnace}
+	assert the fuel burn time of {_furnace} is 0 seconds with "Clear furnace fuel burn time"
 
 	set block at location(0, 0, 0, world) to air

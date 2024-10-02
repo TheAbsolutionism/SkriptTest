@@ -50,10 +50,10 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		TOTALCOOKTIME("total cook[ing] time", "total cook time"),
 		BURNTIME("fuel burn[ing] time", "fuel burn time");
 
-		private String name, toString;
+		private String pattern, toString;
 
-		FurnaceExpressions(String name, String toString) {
-			this.name = name;
+		FurnaceExpressions(String pattern, String toString) {
+			this.pattern = pattern;
 			this.toString = toString;
 		}
 
@@ -66,8 +66,8 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		int size = furnaceExprs.length;
 		String[] patterns = new String[size * 2];
 		for (FurnaceExpressions value : furnaceExprs) {
-			patterns[2 * value.ordinal()] = "[the] [furnace] " + value.name + " [of %blocks%]";
-			patterns[2 * value.ordinal() + 1] = "%blocks%['s]" + value.name;
+			patterns[2 * value.ordinal()] = "[the] [furnace] " + value.pattern + " [of %blocks%]";
+			patterns[2 * value.ordinal() + 1] = "%blocks%['s]" + value.pattern;
 		}
 
 		Skript.registerExpression(ExprFurnaceTime.class, Timespan.class, ExpressionType.PROPERTY, patterns);
@@ -113,10 +113,8 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 					}
 					case BURNTIME -> {
 						if (event instanceof FurnaceBurnEvent burnEvent && block.equals(burnEvent.getBlock())) {
-							Skript.adminBroadcast("Getting Event");
 							return new Timespan(Timespan.TimePeriod.TICK, burnEvent.getBurnTime());
 						} else {
-							Skript.adminBroadcast("Getting Furnace");
 							return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getBurnTime());
 						}
 					}
