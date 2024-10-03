@@ -53,19 +53,42 @@ public class EffOpenInventory extends Effect {
 	private static final boolean PAPER_LOOM = Skript.methodExists(HumanEntity.class, "openLoom");
 	private static final boolean PAPER_SMITHING = Skript.methodExists(HumanEntity.class, "openSmithingTable");
 	private static final boolean PAPER_STONECUTTER = Skript.methodExists(HumanEntity.class, "openStonecutter");
+
+	enum InventoryShorts {
+		WORKBENCH("(crafting [table]|workbench)", InventoryType.WORKBENCH),
+		CHEST("chest", InventoryType.CHEST),
+		ANVIL("anvil", InventoryType.ANVIL),
+		HOPPER("hopper", InventoryType.HOPPER),
+		DROPPER("dropper", InventoryType.DROPPER),
+		DISPENSER("dispenser", InventoryType.DISPENSER);
+
+		private final String pattern;
+		private final InventoryType invType;
+
+		InventoryShorts(String pattern, InventoryType invType) {
+			this.pattern = pattern;
+			this.invType = invType;
+		}
+
+	}
 	
 	static {
+		String combinedPattern = "(open|:show) ((";
+		int size = InventoryShorts.values().length;
+		for (InventoryShorts invShort : InventoryShorts.values()) {
+			combinedPattern += (invShort.ordinal() + 1) + "¦" + invShort.pattern;
+			if (invShort.ordinal() != size)
+				combinedPattern += "|";
+		}
+		combinedPattern += ") (view|window|inventory|)|%inventory/inventorytype%) (to|for) %players%";
 		Skript.registerEffect(EffOpenInventory.class,
-				"(open|:show) %inventory/inventorytype%) (to|for) %players%",
+				combinedPattern,
 				"close [the] inventory [view] (to|of|for) %players%", "close %players%'[s] inventory [view]");
 	}
 	
-
 	private @Nullable Expression<?> providedInv;
-	
+	private @Nullable InventoryType providedType;
 	boolean open;
-	
-	@SuppressWarnings("null")
 	private Expression<Player> players;
 	
 	@SuppressWarnings({"unchecked", "null"})
@@ -73,6 +96,8 @@ public class EffOpenInventory extends Effect {
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		if (matchedPattern == 0) {
 			open = true;
+			if (parseResult.mark > 0)
+				providedType = InventoryShorts.values()[parseResult.mark - 1].invType;
 			players = (Expression<Player>) exprs[1];
 		} else {
 			players = (Expression<Player>) exprs[0];
@@ -86,25 +111,31 @@ public class EffOpenInventory extends Effect {
 	}
 	
 	@Override
-	protected void execute(final Event e) {
-		Consumer<Player> changer = null;
-		if (providedInv != null) {
+	protected void execute(final Event event) {
+		if (open) {
+			Consumer<Player> changer = null;
 			InventoryType invType;
-
-			Object object = providedInv.getSingle(e);
-			if (object instanceof Inventory inventory) {
-				invType = inventory.getType();
-				changer = player -> player.openInventory(inventory);
-			} else if (object instanceof InventoryType inventoryType) {
-				invType = inventoryType;
-				changer = getInventoryChanger(inventoryType);
+			if (providedInv != null) {
+				Object object = providedInv.getSingle(event);
+				if (object instanceof Inventory inventory) {
+					invType = inventory.getType();
+					changer = player -> player.openInventory(inventory);
+				} else if (object instanceof InventoryType inventoryType) {
+					invType = inventoryType;
+					changer = getInventoryChanger(inventoryType);
+				} else {
+					return;
+				}
+			} else if (providedType != null) {
+				invType = providedType;
+				changer = getInventoryChanger(providedType);
 			} else {
 				return;
 			}
 			if (changer == null)
 				return;
 
-			for (final Player p : players.getArray(e)) {
+			for (final Player p : players.getArray(event)) {
 				try {
 					changer.accept(p);
 				} catch (IllegalArgumentException ex){
@@ -112,7 +143,7 @@ public class EffOpenInventory extends Effect {
 				}
 			}
 		} else {
-			for (final Player player : players.getArray(e)) {
+			for (final Player player : players.getArray(event)) {
 				player.closeInventory();
 			}
 		}
@@ -124,7 +155,7 @@ public class EffOpenInventory extends Effect {
 				if (PAPER_ANVIL)
 					return player -> player.openAnvil(null, true);
 			}
-			case CRAFTING,WORKBENCH -> {
+			case WORKBENCH -> {
 				return player -> player.openWorkbench(null, true);
 			}
 			case ENCHANTING -> {
@@ -155,8 +186,10 @@ public class EffOpenInventory extends Effect {
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return (open ? "open " + (providedInv != null ? providedInv.toString(e, debug) : "") + " to " : "close inventory view of ") + players.toString(e, debug);
+	public String toString(@Nullable Event event, boolean debug) {
+		return (open ?
+			"open " + (providedInv != null ? providedInv.toString(event, debug) : "") + (providedType != null ? providedType.toString() : "")
+			: "close inventory view of") + players.toString(event, debug);
 	}
 	
 }
