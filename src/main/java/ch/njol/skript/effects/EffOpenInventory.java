@@ -19,8 +19,10 @@
 package ch.njol.skript.effects;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.InventoryType;
@@ -44,20 +46,24 @@ import ch.njol.util.Kleenean;
 		"open the player's inventory for the player"})
 @Since("2.0, 2.1.1 (closing), 2.2-Fixes-V10 (anvil), 2.4 (hopper, dropper, dispenser")
 public class EffOpenInventory extends Effect {
-	
-	private final static int WORKBENCH = 0, CHEST = 1, ANVIL = 2, HOPPER = 3, DROPPER = 4, DISPENSER = 5;
+
+	private static final boolean PAPER_ANVIL = Skript.methodExists(HumanEntity.class, "openAnvil");
+	private static final boolean PAPER_CARTOGRAPHY = Skript.methodExists(HumanEntity.class, "openCartographyTable");
+	private static final boolean PAPER_GRINDSTONE = Skript.methodExists(HumanEntity.class, "openGrindstone");
+	private static final boolean PAPER_LOOM = Skript.methodExists(HumanEntity.class, "openLoom");
+	private static final boolean PAPER_SMITHING = Skript.methodExists(HumanEntity.class, "openSmithingTable");
+	private static final boolean PAPER_STONECUTTER = Skript.methodExists(HumanEntity.class, "openStonecutter");
 	
 	static {
 		Skript.registerEffect(EffOpenInventory.class,
-				"(open|show) ((0¦(crafting [table]|workbench)|1¦chest|2¦anvil|3¦hopper|4¦dropper|5¦dispenser) (view|window|inventory|)|%-inventory/inventorytype%) (to|for) %players%",
+				"(open|:show) %inventory/inventorytype%) (to|for) %players%",
 				"close [the] inventory [view] (to|of|for) %players%", "close %players%'[s] inventory [view]");
 	}
 	
-	@Nullable
-	private Expression<?> invi;
+
+	private @Nullable Expression<?> providedInv;
 	
 	boolean open;
-	private int invType;
 	
 	@SuppressWarnings("null")
 	private Expression<Player> players;
@@ -65,33 +71,15 @@ public class EffOpenInventory extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		int openFlag = 0;
-		if(parseResult.mark >= 5) {
-			openFlag = parseResult.mark ^ 5;
-			invType = DISPENSER;
-		} else if(parseResult.mark >= 4) {
-			openFlag = parseResult.mark ^ 4;
-			invType = DROPPER;
-		} else if(parseResult.mark >= 3) {
-			openFlag = parseResult.mark ^ 3;
-			invType = HOPPER;
-		} else if (parseResult.mark >= 2) {
-			openFlag = parseResult.mark ^ 2;
-			invType = ANVIL;
-		} else if (parseResult.mark >= 1) {
-			openFlag = parseResult.mark ^ 1;
-			invType = CHEST;
-		} else if (parseResult.mark >= 0) {
-			invType = WORKBENCH;
-			openFlag = parseResult.mark ^ 0;
+		if (matchedPattern == 0) {
+			open = true;
+			players = (Expression<Player>) exprs[1];
 		} else {
-			openFlag = parseResult.mark;
+			players = (Expression<Player>) exprs[0];
 		}
-		
-		open = matchedPattern == 0;
-		invi = open ? exprs[0] : null;
-		players = (Expression<Player>) exprs[exprs.length - 1];
-		if (openFlag == 1 && invi != null) {
+		providedInv = open ? exprs[0] : null;
+		boolean showSyntax = parseResult.hasTag("show");
+		if (showSyntax) {
 			Skript.warning("Using 'show' inventory instead of 'open' is not recommended as it will eventually show an unmodifiable view of the inventory in the future.");
 		}
 		return true;
@@ -99,60 +87,76 @@ public class EffOpenInventory extends Effect {
 	
 	@Override
 	protected void execute(final Event e) {
-		if (invi != null) {
-			Inventory i;
-			
-			assert invi != null;
-			Object o = invi.getSingle(e);
-			if (o instanceof Inventory) {
-				i = (Inventory) o;
-			} else if (o instanceof InventoryType) {
-				i = Bukkit.createInventory(null, (InventoryType) o);
+		Consumer<Player> changer = null;
+		if (providedInv != null) {
+			InventoryType invType;
+
+			Object object = providedInv.getSingle(e);
+			if (object instanceof Inventory inventory) {
+				invType = inventory.getType();
+				changer = player -> player.openInventory(inventory);
+			} else if (object instanceof InventoryType inventoryType) {
+				invType = inventoryType;
+				changer = getInventoryChanger(inventoryType);
 			} else {
 				return;
 			}
-			
-			if (i == null)
+			if (changer == null)
 				return;
+
 			for (final Player p : players.getArray(e)) {
 				try {
-					p.openInventory(i);
+					changer.accept(p);
 				} catch (IllegalArgumentException ex){
-					Skript.error("You can't open a " + i.getType().name().toLowerCase(Locale.ENGLISH).replaceAll("_", "") + " inventory to a player.");
+					Skript.error("You can't open a " + invType.name().toLowerCase(Locale.ENGLISH).replaceAll("_", "") + " inventory to a player.");
 				}
 			}
 		} else {
-			for (final Player p : players.getArray(e)) {
-				if (open) {
-					switch (invType) {
-						case WORKBENCH:
-							p.openWorkbench(null, true);
-							break;
-						case CHEST:
-							p.openInventory(Bukkit.createInventory(p, InventoryType.CHEST));
-							break;
-						case ANVIL:
-							p.openInventory(Bukkit.createInventory(p, InventoryType.ANVIL));
-							break;
-						case HOPPER:
-							p.openInventory(Bukkit.createInventory(p, InventoryType.HOPPER));
-							break;
-						case DROPPER:
-							p.openInventory(Bukkit.createInventory(p, InventoryType.DROPPER));
-							break;
-						case DISPENSER:
-							p.openInventory(Bukkit.createInventory(p, InventoryType.DISPENSER));
-					
-					}
-				} else
-					p.closeInventory();
+			for (final Player player : players.getArray(e)) {
+				player.closeInventory();
 			}
 		}
+	}
+
+	private static Consumer<Player> getInventoryChanger(InventoryType inventoryType) {
+		switch (inventoryType) {
+			case ANVIL -> {
+				if (PAPER_ANVIL)
+					return player -> player.openAnvil(null, true);
+			}
+			case CRAFTING,WORKBENCH -> {
+				return player -> player.openWorkbench(null, true);
+			}
+			case ENCHANTING -> {
+				return player -> player.openEnchanting(null, true);
+			}
+			case CARTOGRAPHY -> {
+				if (PAPER_CARTOGRAPHY)
+					return player -> player.openCartographyTable(null, true);
+			}
+			case GRINDSTONE -> {
+				if (PAPER_GRINDSTONE)
+					return player -> player.openGrindstone(null, true);
+			}
+			case LOOM -> {
+				if (PAPER_LOOM)
+					return player -> player.openLoom(null, true);
+			}
+			case STONECUTTER -> {
+				if (PAPER_STONECUTTER)
+					return player -> player.openSmithingTable(null, true);
+			}
+			case SMITHING -> {
+				if (PAPER_SMITHING)
+					return player -> player.openSmithingTable(null, true);
+			}
+		}
+		return player -> player.openInventory(Bukkit.createInventory(player, inventoryType));
 	}
 	
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
-		return (open ? "open " + (invi != null ? invi.toString(e, debug) : "crafting table") + " to " : "close inventory view of ") + players.toString(e, debug);
+		return (open ? "open " + (providedInv != null ? providedInv.toString(e, debug) : "") + " to " : "close inventory view of ") + players.toString(e, debug);
 	}
 	
 }

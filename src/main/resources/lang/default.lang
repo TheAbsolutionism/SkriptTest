@@ -2042,8 +2042,8 @@ inventory types:
 	dropper: dropper inventory @a
 	furnace: furnace inventory @a
 	workbench: workbench inventory @a
-	crafting: crafting table inventory @a
-	enchanting: enchanting table inventory @an
+	crafting: crafting [table] inventory @a
+	enchanting: enchant[ing|ment] table inventory @an
 	brewing: brewing stand inventory @a
 	player: player inventory @a
 	creative: creative inventory @a
