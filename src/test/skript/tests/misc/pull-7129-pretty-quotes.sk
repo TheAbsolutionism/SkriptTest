@@ -1,0 +1,4 @@
+test "pretty quote error":
+	parse:
+		broadcast “Pretty Quotes”
+	assert last parse logs contain "Pretty quotes are not allowed, change to regular quotes" with "Pretty quote usage did not produce expected error"

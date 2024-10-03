@@ -302,7 +302,7 @@ public class SkriptParser {
 	}
 
 	private static @Nullable Expression<?> parseExpression(Class<?>[] types, String expr) {;
-		if (expr.startsWith("”") || expr.endsWith("”")) {
+		if (expr.startsWith("“") || expr.startsWith("”") || expr.endsWith("”") || expr.endsWith("“")) {
 			Skript.error("Pretty quotes are not allowed, change to regular quotes (\")");
 			return null;
 		}
