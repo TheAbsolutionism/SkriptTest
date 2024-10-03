@@ -173,7 +173,7 @@ public class VariableString implements Expression<String> {
 				if (c == '%')
 					expression = !expression;
 
-				if (!expression && c == '"')
+				if (!expression && (c == '"' || c == '”'))
 					i++;
 			}
 			original = stringBuilder.toString();
@@ -269,7 +269,7 @@ public class VariableString implements Expression<String> {
 		for (char character : string.toCharArray()) {
 			if (character == '%') // If we are entering an expression, quotes should NOT be doubled
 				inExpression = !inExpression;
-			if (!inExpression && character == '"')
+			if (!inExpression && (character == '"' || character == '”'))
 				fixed.append('"');
 			fixed.append(character);
 		}
@@ -285,8 +285,13 @@ public class VariableString implements Expression<String> {
 	 * @return Whether the string is quoted correctly
 	 */
 	public static boolean isQuotedCorrectly(String string, boolean withQuotes) {
-		if (withQuotes && (!string.startsWith("\"") || !string.endsWith("\"") || string.length() < 2))
+		boolean prettyQuotes = string.startsWith("”") || string.endsWith("”");
+		if (prettyQuotes) {
+			Skript.adminBroadcast("Pretty Quote Detected - 3");
+		}
+		if (withQuotes && ((!string.startsWith("\"") && !string.endsWith("\"")) || (!string.endsWith("\"") || !string.endsWith("”"))) || string.length() < 2)
 			return false;
+		Skript.adminBroadcast("Passing 3rd check");
 		boolean quote = false;
 		boolean percentage = false;
 		if (withQuotes)
@@ -297,9 +302,9 @@ public class VariableString implements Expression<String> {
 					percentage = false;
 				continue;
 			}
-			if (quote && character != '"')
+			if (quote && (character != '"' && character != '”'))
 				return false;
-			if (character == '"') {
+			if (character == '"' || character == '”') {
 				quote = !quote;
 			} else if (character == '%') {
 				percentage = true;
@@ -363,7 +368,10 @@ public class VariableString implements Expression<String> {
 	public static VariableString @Nullable [] makeStringsFromQuoted(List<String> args) {
 		VariableString[] strings = new VariableString[args.size()];
 		for (int i = 0; i < args.size(); i++) {
-			assert args.get(i).startsWith("\"") && args.get(i).endsWith("\"");
+			if (args.get(i).startsWith("”") || args.get(i).endsWith("”")) {
+				Skript.adminBroadcast("Pretty Quote Detected - 4");
+			}
+			assert (args.get(i).startsWith("\"") || args.get(i).startsWith("”")) && (args.get(i).endsWith("\"") || args.get(i).endsWith("”"));
 			VariableString variableString = newInstance(args.get(i).substring(1, args.get(i).length() - 1));
 			if (variableString == null)
 				return null;
