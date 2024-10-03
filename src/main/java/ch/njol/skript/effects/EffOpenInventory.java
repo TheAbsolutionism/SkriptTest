@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.effects;
 
 import java.util.Locale;
@@ -66,26 +48,27 @@ public class EffOpenInventory extends Effect {
 		private final InventoryType invType;
 
 		InventoryShorts(String pattern, InventoryType invType) {
-			this.pattern = pattern;
+			this.pattern = "(open|:show) " + pattern + "(view|window|inventory|) (to|for) %players%";
 			this.invType = invType;
 		}
 
 	}
+
+	private static final InventoryShorts[] invShorts = InventoryShorts.values();
+	private static final int shortSize = invShorts.length;
 	
 	static {
-		String combinedPattern = "(open|:show) ((";
-		int size = InventoryShorts.values().length;
-		for (InventoryShorts invShort : InventoryShorts.values()) {
-			combinedPattern += (invShort.ordinal() + 1) + "¦" + invShort.pattern;
-			if (invShort.ordinal() != size)
-				combinedPattern += "|";
+		String[] patterns = new String[shortSize + 3];
+		for (InventoryShorts invShort : invShorts){
+			patterns[invShort.ordinal()] =  invShort.pattern;
 		}
-		combinedPattern += ") (view|window|inventory|)|%inventory/inventorytype%) (to|for) %players%";
-		Skript.registerEffect(EffOpenInventory.class,
-				combinedPattern,
-				"close [the] inventory [view] (to|of|for) %players%", "close %players%'[s] inventory [view]");
+		patterns[shortSize + 1] = "(open|:show) (%inventory%/%inventorytype%) (to|for) %players%";
+		patterns[shortSize + 2] = "close [the] inventory [view] (to|of|for) %players%";
+		patterns[shortSize + 3] = "close %players%'[s] inventory [view]";
+
+		Skript.registerEffect(EffOpenInventory.class, patterns);
 	}
-	
+
 	private @Nullable Expression<?> providedInv;
 	private @Nullable InventoryType providedType;
 	boolean open;
@@ -94,18 +77,21 @@ public class EffOpenInventory extends Effect {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (matchedPattern == 0) {
+		if (matchedPattern <= shortSize + 1) {
 			open = true;
-			if (parseResult.mark > 0)
-				providedType = InventoryShorts.values()[parseResult.mark - 1].invType;
-			players = (Expression<Player>) exprs[1];
+			if (matchedPattern == shortSize + 1) {
+				providedInv = exprs[0];
+				players = (Expression<Player>) exprs[1];
+			} else {
+				providedType = invShorts[matchedPattern].invType;
+				players = (Expression<Player>) exprs[0];
+			}
+			boolean showSyntax = parseResult.hasTag("show");
+			if (showSyntax) {
+				Skript.warning("Using 'show' inventory instead of 'open' is not recommended as it will eventually show an unmodifiable view of the inventory in the future.");
+			}
 		} else {
 			players = (Expression<Player>) exprs[0];
-		}
-		providedInv = open ? exprs[0] : null;
-		boolean showSyntax = parseResult.hasTag("show");
-		if (showSyntax) {
-			Skript.warning("Using 'show' inventory instead of 'open' is not recommended as it will eventually show an unmodifiable view of the inventory in the future.");
 		}
 		return true;
 	}
@@ -135,15 +121,15 @@ public class EffOpenInventory extends Effect {
 			if (changer == null)
 				return;
 
-			for (final Player p : players.getArray(event)) {
+			for (Player player : players.getArray(event)) {
 				try {
-					changer.accept(p);
+					changer.accept(player);
 				} catch (IllegalArgumentException ex){
 					Skript.error("You can't open a " + invType.name().toLowerCase(Locale.ENGLISH).replaceAll("_", "") + " inventory to a player.");
 				}
 			}
 		} else {
-			for (final Player player : players.getArray(event)) {
+			for (Player player : players.getArray(event)) {
 				player.closeInventory();
 			}
 		}
