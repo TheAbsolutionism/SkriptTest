@@ -285,13 +285,8 @@ public class VariableString implements Expression<String> {
 	 * @return Whether the string is quoted correctly
 	 */
 	public static boolean isQuotedCorrectly(String string, boolean withQuotes) {
-		boolean prettyQuotes = string.startsWith("”") || string.endsWith("”");
-		if (prettyQuotes) {
-			Skript.adminBroadcast("Pretty Quote Detected - 3");
-		}
 		if (withQuotes && ((!string.startsWith("\"") && !string.endsWith("\"")) || (!string.endsWith("\"") || !string.endsWith("”"))) || string.length() < 2)
 			return false;
-		Skript.adminBroadcast("Passing 3rd check");
 		boolean quote = false;
 		boolean percentage = false;
 		if (withQuotes)
@@ -368,9 +363,6 @@ public class VariableString implements Expression<String> {
 	public static VariableString @Nullable [] makeStringsFromQuoted(List<String> args) {
 		VariableString[] strings = new VariableString[args.size()];
 		for (int i = 0; i < args.size(); i++) {
-			if (args.get(i).startsWith("”") || args.get(i).endsWith("”")) {
-				Skript.adminBroadcast("Pretty Quote Detected - 4");
-			}
 			assert (args.get(i).startsWith("\"") || args.get(i).startsWith("”")) && (args.get(i).endsWith("\"") || args.get(i).endsWith("”"));
 			VariableString variableString = newInstance(args.get(i).substring(1, args.get(i).length() - 1));
 			if (variableString == null)
