@@ -173,7 +173,7 @@ public class VariableString implements Expression<String> {
 				if (c == '%')
 					expression = !expression;
 
-				if (!expression && (c == '"' || c == '”'))
+				if (!expression && c == '"')
 					i++;
 			}
 			original = stringBuilder.toString();
@@ -269,7 +269,7 @@ public class VariableString implements Expression<String> {
 		for (char character : string.toCharArray()) {
 			if (character == '%') // If we are entering an expression, quotes should NOT be doubled
 				inExpression = !inExpression;
-			if (!inExpression && (character == '"' || character == '”'))
+			if (!inExpression && character == '"')
 				fixed.append('"');
 			fixed.append(character);
 		}
@@ -285,7 +285,7 @@ public class VariableString implements Expression<String> {
 	 * @return Whether the string is quoted correctly
 	 */
 	public static boolean isQuotedCorrectly(String string, boolean withQuotes) {
-		if (withQuotes && ((!string.startsWith("\"") && !string.endsWith("\"")) || (!string.endsWith("\"") || !string.endsWith("”"))) || string.length() < 2)
+		if (withQuotes && (!string.startsWith("\"") || !string.endsWith("\"") || string.length() < 2))
 			return false;
 		boolean quote = false;
 		boolean percentage = false;
@@ -297,9 +297,9 @@ public class VariableString implements Expression<String> {
 					percentage = false;
 				continue;
 			}
-			if (quote && (character != '"' && character != '”'))
+			if (quote && character != '"')
 				return false;
-			if (character == '"' || character == '”') {
+			if (character == '"') {
 				quote = !quote;
 			} else if (character == '%') {
 				percentage = true;
@@ -363,7 +363,7 @@ public class VariableString implements Expression<String> {
 	public static VariableString @Nullable [] makeStringsFromQuoted(List<String> args) {
 		VariableString[] strings = new VariableString[args.size()];
 		for (int i = 0; i < args.size(); i++) {
-			assert (args.get(i).startsWith("\"") || args.get(i).startsWith("”")) && (args.get(i).endsWith("\"") || args.get(i).endsWith("”"));
+			assert args.get(i).startsWith("\"") && args.get(i).endsWith("\"");
 			VariableString variableString = newInstance(args.get(i).substring(1, args.get(i).length() - 1));
 			if (variableString == null)
 				return null;

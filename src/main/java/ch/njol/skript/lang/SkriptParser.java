@@ -303,9 +303,10 @@ public class SkriptParser {
 
 	private static @Nullable Expression<?> parseExpression(Class<?>[] types, String expr) {;
 		if (expr.startsWith("”") || expr.endsWith("”")) {
-			Skript.warning("Please defer from using pretty quotes");
+			Skript.error("Pretty quotes are not allowed, change to regular quotes (\")");
+			return null;
 		}
-		if ((expr.startsWith("\"") || expr.startsWith("”")) && expr.length() != 1 && nextQuote(expr, 1) == expr.length() - 1) {
+		if (expr.startsWith("\"") && expr.length() != 1 && nextQuote(expr, 1) == expr.length() - 1) {
 			return VariableString.newInstance("" + expr.substring(1, expr.length() - 1));
 		} else {
 			//noinspection unchecked,rawtypes
@@ -584,7 +585,7 @@ public class SkriptParser {
 					return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(expr));
 				}
 			}
-			if ((expr.startsWith("\"") || expr.startsWith("”")) && (expr.endsWith("\"") || expr.endsWith("”")) && expr.length() > 1) {
+			if (expr.startsWith("\"") && expr.endsWith("\"") && expr.length() > 1) {
 				for (ClassInfo<?> aClass : exprInfo.classes) {
 					if (!aClass.getC().isAssignableFrom(String.class))
 						continue;
@@ -1116,8 +1117,8 @@ public class SkriptParser {
 		int length = string.length();
 		for (int i = start; i < length; i++) {
 			char character = string.charAt(i);
-			if ((character == '"' || character == '”') && !inExpression) {
-				if (i == length - 1 || (string.charAt(i + 1) != '"' && string.charAt(i + 1) != '”'))
+			if (character == '"' && !inExpression) {
+				if (i == length - 1 || string.charAt(i + 1) != '"')
 					return i;
 				i++;
 			} else if (character == '%') {

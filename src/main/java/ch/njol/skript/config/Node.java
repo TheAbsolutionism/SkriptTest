@@ -160,7 +160,7 @@ public abstract class Node {
 		for (int i = 0; i < length; i++) {
 			char c = line.charAt(i);
 			// check for things that can be escaped by doubling
-			if (c == '%' || c == '"' || c == '#' || c == '”') {
+			if (c == '%' || c == '"' || c == '#') {
 				// skip if doubled (only skip ## outside of strings)
 				if ((c != '#' || state != SplitLineState.STRING) && i + 1 < length && line.charAt(i + 1) == c) {
 					if (c == '#') { // remove duplicate #
@@ -213,7 +213,7 @@ public abstract class Node {
 					if (state == CODE)
 						return previousState;
 					return CODE;
-				case '"','”':
+				case '"':
 					switch (state) {
 						case CODE:
 							return STRING;
@@ -307,7 +307,7 @@ public abstract class Node {
 		for (int i = 0; i < length; i++) {
 			char c = input.charAt(i);
 			// check for things that can be escaped by doubling
-			if (c == '%' || c == '"' || c == '#' || c == '”') {
+			if (c == '%' || c == '"' || c == '#') {
 				// escaped #s outside of strings
 				if (c == '#' && state != SplitLineState.STRING) {
 					output.insert(i + numAdded, "#");
