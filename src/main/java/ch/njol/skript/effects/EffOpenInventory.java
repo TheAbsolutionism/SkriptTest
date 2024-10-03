@@ -86,8 +86,7 @@ public class EffOpenInventory extends Effect {
 				providedType = invShorts[matchedPattern].invType;
 				players = (Expression<Player>) exprs[0];
 			}
-			boolean showSyntax = parseResult.hasTag("show");
-			if (showSyntax) {
+			if (parseResult.hasTag("show")) {
 				Skript.warning("Using 'show' inventory instead of 'open' is not recommended as it will eventually show an unmodifiable view of the inventory in the future.");
 			}
 		} else {
