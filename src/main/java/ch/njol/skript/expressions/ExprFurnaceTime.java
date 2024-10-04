@@ -67,7 +67,7 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		String[] patterns = new String[size * 2];
 		for (FurnaceExpressions value : furnaceExprs) {
 			patterns[2 * value.ordinal()] = "[the] [furnace] " + value.pattern + " [of %blocks%]";
-			patterns[2 * value.ordinal() + 1] = "%blocks%['s]" + value.pattern;
+			patterns[2 * value.ordinal() + 1] = "%blocks%'[s]" + value.pattern;
 		}
 
 		Skript.registerExpression(ExprFurnaceTime.class, Timespan.class, ExpressionType.PROPERTY, patterns);
@@ -140,8 +140,20 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 
 		switch (type) {
 			case COOKTIME -> changeCookTime(event, providedTime, mode);
-			case TOTALCOOKTIME -> changeTotalCookTime(event, providedTime, mode);
-			case BURNTIME -> changeBurnTime(event, providedTime, mode);
+			case TOTALCOOKTIME -> {
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startSmeltEvent) {
+					changeTotalCookTimeEvent(startSmeltEvent, mode, providedTime);
+				} else {
+					changeTotalCookTimeBlock(event, providedTime, mode);
+				}
+			}
+			case BURNTIME -> {
+				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
+					changeBurnTimeEvent(burnEvent, mode, providedTime);
+				} else {
+					changeBurnTimeBlock(event, providedTime, mode);
+				}
+			}
 		}
 	}
 
@@ -162,69 +174,39 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		}
 	}
 
-	private void changeTotalCookTime(Event event, int providedTime, ChangeMode mode) {
+	private void changeTotalCookTimeBlock(Event event, int providedTime, ChangeMode mode) {
 		switch (mode) {
-			case SET -> {
-				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-					startEvent.setTotalCookTime(providedTime);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setCookTimeTotal(providedTime));
-				}
-			}
-			case DELETE -> {
-				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-					startEvent.setTotalCookTime(0);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setCookTimeTotal(0));
-				}
-			}
-			case REMOVE -> {
-				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-					startEvent.setTotalCookTime(Math.min(startEvent.getTotalCookTime() - providedTime, 0));
-				} else {
-					changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() - providedTime, Integer.MAX_VALUE)));
-				}
-			}
-			case ADD -> {
-				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startEvent) {
-					startEvent.setTotalCookTime(startEvent.getTotalCookTime() + providedTime);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() + providedTime, Integer.MAX_VALUE)));
-				}
-			}
+			case SET -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(providedTime));
+			case DELETE -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(0));
+			case REMOVE -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() - providedTime, Integer.MAX_VALUE)));
+			case ADD -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() + providedTime, Integer.MAX_VALUE)));
 		}
 	}
 
-	private void changeBurnTime(Event event, int providedTime, ChangeMode mode) {
+	private void changeBurnTimeBlock(Event event, int providedTime, ChangeMode mode) {
 		switch (mode) {
-			case SET -> {
-				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-					burnEvent.setBurnTime(providedTime);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setBurnTime((short) providedTime));
-				}
-			}
-			case DELETE -> {
-				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-					burnEvent.setBurnTime(0);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setBurnTime((short) 0));
-				}
-			}
-			case REMOVE -> {
-				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-					burnEvent.setBurnTime(Math.min(burnEvent.getBurnTime() - providedTime, 0));
-				} else {
-					changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() - providedTime, Integer.MAX_VALUE)));
-				}
-			}
-			case ADD -> {
-				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-					burnEvent.setBurnTime(burnEvent.getBurnTime() + providedTime);
-				} else {
-					changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() + providedTime, Integer.MAX_VALUE)));
-				}
-			}
+			case SET -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) providedTime));
+			case DELETE -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) 0));
+			case REMOVE -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() - providedTime, Integer.MAX_VALUE)));
+			case ADD -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() + providedTime, Integer.MAX_VALUE)));
+		}
+	}
+
+	private void changeTotalCookTimeEvent(FurnaceStartSmeltEvent startSmeltEvent, ChangeMode mode, int providedTime) {
+		switch (mode) {
+			case SET -> startSmeltEvent.setTotalCookTime(providedTime);
+			case ADD -> startSmeltEvent.setTotalCookTime(Math2.fit(0, startSmeltEvent.getTotalCookTime() + providedTime, Integer.MAX_VALUE));
+			case REMOVE -> startSmeltEvent.setTotalCookTime(Math2.fit(0, startSmeltEvent.getTotalCookTime() - providedTime, Integer.MAX_VALUE));
+			case DELETE -> startSmeltEvent.setTotalCookTime(0);
+		}
+	}
+
+	private void changeBurnTimeEvent(FurnaceBurnEvent burnEvent, ChangeMode mode, int providedTime) {
+		switch (mode) {
+			case SET -> burnEvent.setBurnTime(providedTime);
+			case ADD -> burnEvent.setBurnTime(Math2.fit(0, burnEvent.getBurnTime() + providedTime, Integer.MAX_VALUE));
+			case REMOVE -> burnEvent.setBurnTime(Math2.fit(0, burnEvent.getBurnTime() - providedTime, Integer.MAX_VALUE));
+			case DELETE -> burnEvent.setBurnTime(0);
 		}
 	}
 

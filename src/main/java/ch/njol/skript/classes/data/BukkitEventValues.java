@@ -1957,13 +1957,13 @@ public final class BukkitEventValues {
 		// FurnaceExtractEvent
 		EventValues.registerEventValue(FurnaceExtractEvent.class, Player.class, new Getter<Player, FurnaceExtractEvent>() {
 			@Override
-			public @Nullable Player get(FurnaceExtractEvent event) {
+			public Player get(FurnaceExtractEvent event) {
 				return event.getPlayer();
 			}
 		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(FurnaceExtractEvent.class, ItemStack[].class, new Getter<ItemStack[], FurnaceExtractEvent>() {
 			@Override
-			public ItemStack @Nullable [] get(FurnaceExtractEvent event) {
+			public ItemStack[] get(FurnaceExtractEvent event) {
 				return new ItemStack[]{ItemStack.of(event.getItemType(), event.getItemAmount())};
 			}
 		}, EventValues.TIME_NOW);

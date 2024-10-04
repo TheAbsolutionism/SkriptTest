@@ -53,8 +53,8 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	static {
 		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY,
-			"[the] (0:ore|1:fuel|2:result) slot[s] [of %blocks%]",
-			"%blocks%['s] (0:ore|1:fuel|2:result) slot[s]"
+			"[the] (0:ore|input|1:fuel|2:result|output) slot[s] [of %blocks%]",
+			"%blocks%['s] (0:ore|input|1:fuel|2:result|output) slot[s]"
 		);
 	}
 
@@ -127,7 +127,7 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	public String toString(@Nullable Event event, boolean debug) {
 		String result = "";
 		switch (slot) {
-			case ORE -> result = "ore slot";
+			case ORE -> result = "input slot";
 			case FUEL -> result = "fuel slot";
 			case RESULT -> result = "result slot";
 		}
@@ -177,9 +177,6 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
                         ItemStack fuel = furnaceBurnEvent.getFuel().clone();
                         if (getTime() != EventValues.TIME_FUTURE)
                             yield fuel;
-                        // a single lava bucket becomes an empty bucket
-                        // see https://minecraft.wiki/w/Smelting#Fuel
-                        // this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
                         Material newMaterial = fuel.getType() == Material.LAVA_BUCKET ? Material.BUCKET : Material.AIR;
                         fuel.setAmount(fuel.getAmount() - 1);
                         if (fuel.getAmount() == 0)
@@ -203,13 +200,10 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 							currentResult.setAmount(currentResult.getAmount() + result.getAmount());
 							yield currentResult;
 						} else {
-							yield result;
+							yield result; // 'the result'
 						}
                     }
-                    yield super.getItem(); // Special handling for getting the result slot
-                    // 'past result slot' and 'result slot'
-                    // 'future result slot'
-                    // 'the result'
+                    yield super.getItem();
                 }
                 default -> null;
             };

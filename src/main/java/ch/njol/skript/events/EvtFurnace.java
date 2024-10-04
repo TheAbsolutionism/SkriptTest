@@ -28,6 +28,7 @@ public class EvtFurnace extends SkriptEvent {
 					"\tset the smelted item to iron block"
 			)
 			.since("1.0, INSERT VERSION (specific item)");
+
 		Skript.registerEvent("Fuel Burn", EvtFurnace.class, FurnaceBurnEvent.class, "[furnace] fuel burn[ing] [of %-itemtypes%]")
 			.description("Called when a furnace burns an item from its <a href='expressions.html#ExprFurnaceSlot'>fuel slot</a>.")
 			.examples(
@@ -37,6 +38,7 @@ public class EvtFurnace extends SkriptEvent {
 						"\t\tadd 20 seconds to burn time"
 			)
 			.since("1.0, INSERT VERSION (specific item)");
+
 		Skript.registerEvent("Furnace Item Extract", EvtFurnace.class, FurnaceExtractEvent.class, "furnace [item] extract[ion] [of %-itemtypes%]")
 			.description("Called when a player takes any item out of the furnace.")
 			.examples(
@@ -45,6 +47,7 @@ public class EvtFurnace extends SkriptEvent {
 						"\t\tremove event-items from event-player's inventory"
 			)
 			.since("INSERT VERSION");
+
 		Skript.registerEvent("Start Smelt", EvtFurnace.class, FurnaceStartSmeltEvent.class,
 			"[furnace] start [of] smelt[ing] [[of] %-itemtypes%]",
 			"[furnace] smelting start [of %-itemtypes%]")
@@ -59,12 +62,13 @@ public class EvtFurnace extends SkriptEvent {
 			.since("INSERT VERSION");
 	}
 
-	private @Nullable Literal<Object> types;
+	private @Nullable Literal<ItemType> types;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
 		if (exprs[0] != null)
-			types = (Literal<Object>) exprs[0];
+			types = (Literal<ItemType>) exprs[0];
 		return true;
 	}
 
@@ -88,11 +92,7 @@ public class EvtFurnace extends SkriptEvent {
 			return false;
 		}
 
-		return types.check(event, o -> {
-			if (o instanceof ItemType itemType)
-				return itemType.isSupertypeOf(item);
-			return false;
-		});
+		return types.check(event, itemType -> itemType.isSupertypeOf(item));
 	}
 
 	@Override
