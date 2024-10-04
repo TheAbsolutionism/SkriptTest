@@ -1605,6 +1605,8 @@ public final class BukkitEventValues {
 						colors.add(SkriptColor.fromBukkitColor(color));
 					}
 				}
+				if (colors.isEmpty())
+					return null;
 				return colors.toArray(Color[]::new);
 			}
 		}, EventValues.TIME_NOW);
