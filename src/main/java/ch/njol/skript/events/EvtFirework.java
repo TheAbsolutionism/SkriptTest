@@ -24,6 +24,7 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Color;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,11 +46,10 @@ public class EvtFirework extends SkriptEvent {
 							"on firework exploding colored red, light green and black",
 							"on firework explosion colored light green:",
 							"	broadcast \"A firework colored %colors% was exploded at %location%!\"")//TODO fix 
-					.since("2.4");
+					.since("2.4, INSERT VERSION (fix colored)");
 	}
-	
-	@Nullable
-	private Literal<Color> colors;
+
+	private @Nullable Literal<Color> colors;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -61,13 +61,16 @@ public class EvtFirework extends SkriptEvent {
 	
 	@SuppressWarnings("null")
 	@Override
-	public boolean check(Event e) {
+	public boolean check(Event event) {
+		if (!(event instanceof FireworkExplodeEvent fireworkExplodeEvent))
+			return false;
+
 		if (colors == null)
 			return true;
-		List<org.bukkit.Color> colours = Arrays.stream(colors.getArray(e))
-				.map(color -> color.asBukkitColor())
-				.collect(Collectors.toList());
-		FireworkMeta meta = ((FireworkExplodeEvent)e).getEntity().getFireworkMeta();
+		List<org.bukkit.Color> colours = Arrays.stream(colors.getArray(event))
+				.map(color -> color.asDyeColor().getFireworkColor())
+				.toList();
+		FireworkMeta meta = fireworkExplodeEvent.getEntity().getFireworkMeta();
 		for (FireworkEffect effect : meta.getEffects()) {
 			if (colours.containsAll(effect.getColors()))
 				return true;

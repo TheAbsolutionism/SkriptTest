@@ -178,6 +178,8 @@ public enum SkriptColor implements Color {
 		for (SkriptColor c : colors) {
 			if (c.asBukkitColor().equals(color))
 				return c;
+			else if (c.asDyeColor().getFireworkColor().equals(color))
+				return c;
 		}
 		assert false;
 		return null;
