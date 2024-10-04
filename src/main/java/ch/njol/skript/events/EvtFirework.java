@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.events;
 
 import ch.njol.skript.Skript;
@@ -24,9 +6,7 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Color;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bukkit.FireworkEffect;
 import org.bukkit.event.Event;
@@ -42,10 +22,11 @@ public class EvtFirework extends SkriptEvent {
 			//Making the event argument type fireworkeffects, led to Skript having troubles parsing for some reason.
 			Skript.registerEvent("Firework Explode", EvtFirework.class, FireworkExplodeEvent.class, "[a] firework explo(d(e|ing)|sion) [colo[u]red %-colors%]")
 					.description("Called when a firework explodes.")
-					.examples("on firework explode",
-							"on firework exploding colored red, light green and black",
+					.examples("on firework explode:",
+								"\tif event-colors contains red:",
+							"on firework exploding colored red, light green and black:",
 							"on firework explosion colored light green:",
-							"	broadcast \"A firework colored %colors% was exploded at %location%!\"")//TODO fix 
+								"\tbroadcast \"A firework colored %colors% was exploded at %location%!\"")
 					.since("2.4, INSERT VERSION (fix colored)");
 	}
 
