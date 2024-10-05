@@ -33,12 +33,12 @@ public class EvtClick extends SkriptEvent {
 	/**
 	 * Click types.
 	 */
-	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
+	private static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 
 	/**
 	 * Tracks PlayerInteractEvents to deduplicate them.
 	 */
-	public static final ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
+	public static ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
 
 	static {
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(
@@ -55,7 +55,8 @@ public class EvtClick extends SkriptEvent {
 						"on leftclick on a stone or obsidian:",
 						"on rightclick on a creeper:",
 						"on click with a sword:",
-						"on click on chest[facing=north]:")
+						"on click on chest[facing=north]:",
+						"on click on campfire[lit=true]:")
 				.since("1.0, INSERT VERSION (blockdata)");
 	}
 
@@ -65,7 +66,7 @@ public class EvtClick extends SkriptEvent {
 	private @Nullable Literal<?> type;
 
 	/**
-	 * Only trigger when then item player clicks with is one of these.
+	 * Only trigger when the item that the player clicks with is one of these.
 	 */
 	private @Nullable Literal<ItemType> tools;
 
@@ -132,9 +133,9 @@ public class EvtClick extends SkriptEvent {
 			block = null;
 		} else if (event instanceof PlayerInteractEvent interactEvent) {
 			// Figure out click type, filter non-click events
-			Action a = interactEvent.getAction();
+			Action action = interactEvent.getAction();
 			int click;
-			switch (a) {
+			switch (action) {
 				case LEFT_CLICK_AIR:
 				case LEFT_CLICK_BLOCK:
 					click = LEFT;
@@ -165,14 +166,14 @@ public class EvtClick extends SkriptEvent {
 		
 		if (tools != null && !tools.check(event, new Checker<ItemType>() {
 			@Override
-			public boolean check(final ItemType t) {
+			public boolean check(ItemType itemType) {
 				if (event instanceof PlayerInteractEvent interactEvent) {
-					return t.isOfType(interactEvent.getItem());
+					return itemType.isOfType(interactEvent.getItem());
 				} else { // PlayerInteractEntityEvent doesn't have item associated with it
 					PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
 					ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
 							? invi.getItemInMainHand() : invi.getItemInOffHand();
-					return t.isOfType(item);
+					return itemType.isOfType(item);
 				}
 			}
 		})) {
@@ -183,12 +184,12 @@ public class EvtClick extends SkriptEvent {
 			BlockData blockDataCheck = block != null ? block.getBlockData() : null;
 			return type.check(event, new Checker<Object>() {
 				@Override
-				public boolean check(final Object o) {
+				public boolean check(Object object) {
 					if (entity != null) {
-						return o instanceof EntityData ? ((EntityData<?>) o).isInstance(entity) : Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) o));
-					} else if (o instanceof ItemType itemType) {
+						return object instanceof EntityData ? ((EntityData<?>) object).isInstance(entity) : Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) object));
+					} else if (object instanceof ItemType itemType) {
 						return itemType.isOfType(block);
-					} else if (blockDataCheck != null && o instanceof BlockData blockData)  {
+					} else if (blockDataCheck != null && object instanceof BlockData blockData)  {
 						return blockDataCheck.matches(blockData);
 					}
 					return false;
