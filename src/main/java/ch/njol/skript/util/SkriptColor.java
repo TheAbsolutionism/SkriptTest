@@ -176,9 +176,7 @@ public enum SkriptColor implements Color {
 	
 	public static SkriptColor fromBukkitColor(org.bukkit.Color color) {
 		for (SkriptColor c : colors) {
-			if (c.asBukkitColor().equals(color))
-				return c;
-			else if (c.asDyeColor().getFireworkColor().equals(color))
+			if (c.asBukkitColor().equals(color) || c.asDyeColor().getFireworkColor().equals(color))
 				return c;
 		}
 		assert false;

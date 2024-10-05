@@ -4,24 +4,24 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.test.runner.SkriptJUnitTest;
 import ch.njol.skript.util.SkriptColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class EvtFireworkTest extends SkriptJUnitTest {
 
 	private EntityType entityType;
+	private List<Firework> fireworkList = new ArrayList<>();
+
 	@Before
 	public void getEntity() {
 		if (Skript.isRunningMinecraft(1, 20, 5)){
@@ -40,11 +40,19 @@ public class EvtFireworkTest extends SkriptJUnitTest {
 			FireworkMeta fireworkMeta = firework.getFireworkMeta();
 			fireworkMeta.addEffects(fireworkEffect);
 			firework.setFireworkMeta(fireworkMeta);
+			fireworkList.add(firework);
 			events.add(new FireworkExplodeEvent(firework));
 		}
 
 		for (Event event : events) {
 			Bukkit.getPluginManager().callEvent(event);
+		}
+	}
+
+	@After
+	public void cleanUp() {
+		for (Firework firework : fireworkList) {
+			firework.remove();
 		}
 	}
 

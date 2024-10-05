@@ -27,7 +27,7 @@ public class EvtFirework extends SkriptEvent {
 							"on firework exploding colored red, light green and black:",
 							"on firework explosion colored light green:",
 								"\tbroadcast \"A firework colored %colors% was exploded at %location%!\"")
-					.since("2.4, INSERT VERSION (fix colored)");
+					.since("2.4");
 	}
 
 	private @Nullable Literal<Color> colors;
