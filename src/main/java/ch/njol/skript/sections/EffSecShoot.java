@@ -91,24 +91,13 @@ public class EffSecShoot extends EffectSection {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked","rawtypes"})
 	protected @Nullable TriggerItem walk(Event event) {
 		lastSpawned = null;
 		Number finalVelocity = velocity != null ? velocity.getSingle(event) : DEFAULT_SPEED;
 		Direction finalDirection = direction != null ? direction.getSingle(event) : Direction.IDENTITY;
 		if (finalVelocity == null || finalDirection == null)
 			return null;
-
-		Consumer<ShootEvent> consumer = null;
-		if (trigger != null) {
-			consumer = shootEvent -> {
-				lastSpawned = shootEvent.getProjectile();
-				Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
-				TriggerItem.walk(trigger, shootEvent);
-				Variables.setLocalVariables(event, Variables.copyLocalVariables(event));
-				Variables.removeLocals(shootEvent);
-			};
-		}
 
 		for (Object shooter : shooters.getArray(event)) {
 			for (EntityData<?> entityData : types.getArray(event)) {
@@ -118,41 +107,75 @@ public class EffSecShoot extends EffectSection {
 					vector = finalDirection.getDirection(livingShooter.getLocation()).multiply(finalVelocity.doubleValue());
 					Class<? extends Entity> type = entityData.getType();
 					if (Fireball.class.isAssignableFrom(type)) {
-						Fireball fireball = (Fireball) livingShooter.getWorld().spawn(livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)), type);
-						fireball.setShooter((ProjectileSource) shooter);
-						finalProjectile = fireball;
+						if (trigger != null) {
+							livingShooter.getWorld().spawn(
+								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
+								type,
+								(Consumer) getConsumer(event, vector, entityData, livingShooter)
+							);
+						} else {
+							finalProjectile = livingShooter.getWorld().spawn(
+								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
+								type
+							);
+						}
 					} else if (Projectile.class.isAssignableFrom(type)) {
-						Projectile projectile =  livingShooter.launchProjectile((Class<? extends Projectile>) type);
-						set(projectile, entityData);
-						finalProjectile = projectile;
+						if (trigger != null) {
+							livingShooter.launchProjectile(
+								(Class<? extends Projectile>) type,
+								vector,
+								(Consumer) getConsumer(event, vector, entityData, livingShooter)
+							);
+						} else {
+							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
+							set(finalProjectile, entityData);
+						}
 					} else {
 						Location location = livingShooter.getLocation();
 						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
-						Entity projectile = entityData.spawn(location);
-						finalProjectile = projectile;
+						if (trigger != null) {
+							entityData.spawn(location, (Consumer) getConsumer(event, vector, entityData, livingShooter));
+						} else {
+							finalProjectile = entityData.spawn(location);
+						}
 					}
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
-					Entity projectile = entityData.spawn((Location) shooter);
-					finalProjectile = projectile;
+					if (trigger != null) {
+						entityData.spawn((Location) shooter, (Consumer) getConsumer(event, vector, entityData, null));
+					} else {
+						finalProjectile = entityData.spawn((Location) shooter);
+					}
 				}
 				if (finalProjectile != null) {
 					finalProjectile.setVelocity(vector);
-					if (consumer != null) {
-						consumer.accept(new ShootEvent(finalProjectile, shooter instanceof LivingEntity livingEntity ? livingEntity : null));
-					} else {
-						lastSpawned = finalProjectile;
-					}
+					lastSpawned = finalProjectile;
 				}
 			}
 		}
 
-		return null;
+		return super.walk(event, false);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <E extends Entity> void set(final Entity e, final EntityData<E> d) {
-		d.set((E) e);
+	private static <E extends Entity> void set(Entity entity, EntityData<E> entityData) {
+		entityData.set((E) entity);
+	}
+
+	private Consumer<? extends Entity> getConsumer(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
+		return entity -> {
+			if (entity instanceof Fireball fireball)
+				fireball.setShooter(shooter);
+			else if (entity instanceof Projectile projectile && shooter != null)
+				set(projectile, entityData);
+			entity.setVelocity(vector);
+			ShootEvent shootEvent = new ShootEvent(entity, shooter);
+			lastSpawned = entity;
+			Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
+			TriggerItem.walk(trigger, shootEvent);
+			Variables.setLocalVariables(event, Variables.copyLocalVariables(event));
+			Variables.removeLocals(shootEvent);
+		};
 	}
 
 	@Override
