@@ -235,8 +235,8 @@ public abstract class VariablesStorage implements Closeable {
 						removeBackups = true;
 					}
 					if (startBackup) {
-                        startBackupTask(backupInterval, removeBackups, toKeep);
-                    } else {
+						startBackupTask(backupInterval, removeBackups, toKeep);
+					} else {
 						try {
 							FileUtils.backupPurge(file, toKeep);
 						} catch (IOException e) {
