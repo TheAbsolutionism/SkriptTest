@@ -4,7 +4,9 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.*;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Direction;
+import ch.njol.skript.util.Getter;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Location;
@@ -26,8 +28,9 @@ import java.util.function.Consumer;
 public class EffSecShoot extends EffectSection {
 
 	public static class ShootEvent extends Event {
-		private Entity projectile, shooter;
-		public ShootEvent(Entity projectile, @Nullable Entity shooter) {
+		private Entity projectile;
+		private @Nullable LivingEntity shooter;
+		public ShootEvent(Entity projectile, @Nullable LivingEntity shooter) {
 			this.projectile = projectile;
 			this.shooter = shooter;
 		}
@@ -35,7 +38,7 @@ public class EffSecShoot extends EffectSection {
 		public Entity getProjectile() {
 			return projectile;
 		}
-		public Entity getShooter() {
+		public @Nullable LivingEntity getShooter() {
 			return shooter;
 		}
 
@@ -51,6 +54,12 @@ public class EffSecShoot extends EffectSection {
 			"shoot %entitydatas% [from %livingentities/locations%] [(at|with) (speed|velocity) %-number%] [%-direction%]",
 			"(make|let) %livingentities/locations% shoot %entitydatas% [(at|with) (speed|velocity) %-number%] [%-direction%]"
 		);
+		EventValues.registerEventValue(ShootEvent.class, Entity.class, new Getter<Entity, ShootEvent>() {
+			@Override
+			public @Nullable Entity get(ShootEvent shootEvent) {
+				return shootEvent.getProjectile();
+			}
+		}, EventValues.TIME_NOW);
 	}
 
 	private final static Double DEFAULT_SPEED = 5.;

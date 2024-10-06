@@ -28,6 +28,7 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.sections.EffSecShoot;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -46,16 +47,26 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	static {
 		Skript.registerExpression(ExprShooter.class, LivingEntity.class, ExpressionType.SIMPLE, "[the] shooter [of %projectile%]");
 	}
-	
+
+	private boolean withinShootEvent;
+
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		setExpr((Expression<? extends Projectile>) exprs[0]);
+		if (getParser().isCurrentEvent(EffSecShoot.ShootEvent.class)) {
+			withinShootEvent = true;
+		} else {
+			setExpr((Expression<? extends Projectile>) exprs[0]);
+		}
 		return true;
 	}
 	
 	@Override
-	protected LivingEntity[] get(final Event e, final Projectile[] source) {
+	protected LivingEntity @Nullable [] get(final Event event, final Projectile[] source) {
+		if (withinShootEvent && event instanceof EffSecShoot.ShootEvent shootEvent) {
+			return new LivingEntity[]{shootEvent.getShooter()};
+		}
+
 		return get(source, projectile -> {
 			Object shooter = projectile != null ? projectile.getShooter() : null;
 			if (shooter instanceof LivingEntity)
