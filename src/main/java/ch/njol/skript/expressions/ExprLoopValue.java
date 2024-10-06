@@ -56,8 +56,27 @@ import java.util.regex.Pattern;
 })
 @Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous+next)")
 public class ExprLoopValue extends SimpleExpression<Object> {
+
+	enum LoopStates {
+		CURRENT("[current]"),
+		NEXT("next"),
+		PREVIOUS("previous");
+
+		private String pattern;
+
+		LoopStates(String pattern) {
+			this.pattern = pattern;
+		}
+	}
+
+	private static final LoopStates[] loopStates = LoopStates.values();
+
 	static {
-		Skript.registerExpression(ExprLoopValue.class, Object.class, ExpressionType.SIMPLE, "[the] [:next|:previous] loop-<.+>");
+		String[] patterns = new String[loopStates.length];
+		for (LoopStates state : loopStates) {
+			patterns[state.ordinal()] = "[the] " + state.pattern + " loop-<.+>";
+		}
+		Skript.registerExpression(ExprLoopValue.class, Object.class, ExpressionType.SIMPLE, patterns);
 	}
 	
 	@SuppressWarnings("NotNullFieldNotInitialized")
@@ -71,7 +90,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	// if this loops a variable and isIndex is true, return the index of the variable instead of the value
 	boolean isIndex = false;
 
-	private boolean getNext, getPrevious;
+	private LoopStates selectedState;
 
 	private static final Pattern LOOP_PATTERN = Pattern.compile("^(.+)-(\\d+)$");
 
@@ -118,10 +137,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 				isIndex = true;
 		}
 		this.loop = loop;
-		if (parser.hasTag("next"))
-			this.getNext = true;
-		else if (parser.hasTag("previous"))
-			this.getPrevious = true;
+		selectedState = loopStates[matchedPattern];
 		return true;
 	}
 	
@@ -160,14 +176,12 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	@SuppressWarnings("unchecked")
 	protected Object @Nullable [] get(Event event) {
 		if (isVariableLoop) {
-			Entry<String, Object> value;
-			if (getNext) {
-				value = (Entry<String, Object>) loop.getNext(event);
-			} else if (getPrevious) {
-				value = (Entry<String, Object>) loop.getPrevious(event);
-			} else {
-				value = (Entry<String, Object>) loop.getCurrent(event);
-			}
+			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+				case CURRENT ->  loop.getCurrent(event);
+				case NEXT -> loop.getNext(event);
+				case PREVIOUS -> loop.getPrevious(event);
+				default -> null;
+			};
 			if (value == null)
 				return null;
 			if (isIndex)
@@ -178,13 +192,12 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		}
 
 		Object[] one = (Object[]) Array.newInstance(getReturnType(), 1);
-		if (getNext) {
-			one[0] = loop.getNext(event);
-		} else if (getPrevious) {
-			one[0] = loop.getPrevious(event);
-		} else {
-			one[0] = loop.getCurrent(event);
-		}
+		one[0] = switch (selectedState) {
+			case CURRENT -> loop.getCurrent(event);
+			case NEXT -> loop.getNext(event);
+			case PREVIOUS -> loop.getPrevious(event);
+			default -> null;
+		};
 		return one;
 	}
 	
@@ -194,25 +207,22 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		if (event == null)
 			return name;
 		if (isVariableLoop) {
-			Entry<String, Object> value;
-			if (getNext) {
-				value = (Entry<String, Object>) loop.getNext(event);
-			} else if (getPrevious) {
-				value = (Entry<String, Object>) loop.getPrevious(event);
-			} else {
-				value = (Entry<String, Object>) loop.getCurrent(event);
-			}
+			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+				case CURRENT ->  loop.getCurrent(event);
+				case NEXT -> loop.getNext(event);
+				case PREVIOUS -> loop.getPrevious(event);
+				default -> null;
+			};
 			if (value == null)
 				return Classes.getDebugMessage(null);
 			return isIndex ? "\"" + value.getKey() + "\"" : Classes.getDebugMessage(value.getValue());
 		}
-		if (getNext) {
-			return Classes.getDebugMessage(loop.getNext(event));
-		} else if (getPrevious) {
-			return Classes.getDebugMessage(loop.getPrevious(event));
-		} else {
-			return Classes.getDebugMessage(loop.getCurrent(event));
-		}
+		return Classes.getDebugMessage(switch (selectedState) {
+			case CURRENT -> loop.getCurrent(event);
+			case NEXT -> loop.getNext(event);
+			case PREVIOUS -> loop.getPrevious(event);
+			default -> null;
+		});
 	}
 	
 }

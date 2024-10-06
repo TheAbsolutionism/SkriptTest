@@ -42,3 +42,16 @@ test "previous+next loop value":
 			assert loop-index = {_next} with "current loop index does not match the expected next loop index"
 		set {_last} to loop-index
 		set {_next} to next loop-index
+
+	clear {_list::*}
+
+	set {_count} to 0
+	loop {_list::*}:
+		set {_count} to loop-iteration
+	assert {_count} = 0 with "Looping nothing should not be more than 0"
+
+	add diamond to {_list::*}
+	loop {_list::*}:
+		assert previous loop-value is not set with "Looping one object should not have a previous loop-value"
+		assert next loop-value is not set with "Looping one object should not have a next loop-value"
+		assert loop-value is a diamond with "Current loop-value should be a diamond"
