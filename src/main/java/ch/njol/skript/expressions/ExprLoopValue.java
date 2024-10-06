@@ -64,10 +64,10 @@ import java.util.regex.Pattern;
 		"\tloop-iteration <= 10",
 		"\tsend \"#%loop-iteration% %loop-index% has $%loop-value%\"",
 })
-@Since("1.0, 2.8.0 (loop-counter)")
+@Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous+next)")
 public class ExprLoopValue extends SimpleExpression<Object> {
 	static {
-		Skript.registerExpression(ExprLoopValue.class, Object.class, ExpressionType.SIMPLE, "[the] loop-<.+>");
+		Skript.registerExpression(ExprLoopValue.class, Object.class, ExpressionType.SIMPLE, "[the] [:next|:previous] loop-<.+>");
 	}
 	
 	@SuppressWarnings("NotNullFieldNotInitialized")
@@ -80,6 +80,8 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	boolean isVariableLoop = false;
 	// if this loops a variable and isIndex is true, return the index of the variable instead of the value
 	boolean isIndex = false;
+
+	private boolean getNext, getPrevious;
 
 	private static final Pattern LOOP_PATTERN = Pattern.compile("^(.+)-(\\d+)$");
 
@@ -126,6 +128,10 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 				isIndex = true;
 		}
 		this.loop = loop;
+		if (parser.hasTag("next"))
+			this.getNext = true;
+		else if (parser.hasTag("previous"))
+			this.getPrevious = true;
 		return true;
 	}
 	
@@ -161,21 +167,34 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	}
 	
 	@Override
-	@Nullable
-	protected Object[] get(Event e) {
+	@SuppressWarnings("unchecked")
+	protected Object @Nullable [] get(Event e) {
 		if (isVariableLoop) {
-			@SuppressWarnings("unchecked") Entry<String, Object> current = (Entry<String, Object>) loop.getCurrent(e);
-			if (current == null)
+			Entry<String, Object> value;
+			if (getNext) {
+				value = (Entry<String, Object>) loop.getNext(e);
+			} else if (getPrevious) {
+				value = (Entry<String, Object>) loop.getPrevious(e);
+			} else {
+				value = (Entry<String, Object>) loop.getCurrent(e);
+			}
+			if (value == null)
 				return null;
 			if (isIndex)
-				return new String[] {current.getKey()};
+				return new String[] {value.getKey()};
 			Object[] one = (Object[]) Array.newInstance(getReturnType(), 1);
-			one[0] = current.getValue();
+			one[0] = value.getValue();
 			return one;
 		}
 
 		Object[] one = (Object[]) Array.newInstance(getReturnType(), 1);
-		one[0] = loop.getCurrent(e);
+		if (getNext) {
+			one[0] = loop.getNext(e);
+		} else if (getPrevious) {
+			one[0] = loop.getPrevious(e);
+		} else {
+			one[0] = loop.getCurrent(e);
+		}
 		return one;
 	}
 	

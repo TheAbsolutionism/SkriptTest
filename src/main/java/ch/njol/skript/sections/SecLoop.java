@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.sections;
 
 import ch.njol.skript.Skript;
@@ -91,6 +73,9 @@ public class SecLoop extends LoopSection {
 
 	private final transient Map<Event, Object> current = new WeakHashMap<>();
 	private final transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
+	private final transient Map<Event, Iterator<?>> nextIter = new WeakHashMap<>();
+	private final transient Map<Event, Object> next = new WeakHashMap<>();
+	private final transient Map<Event, Object> previous = new WeakHashMap<>();
 
 	@Nullable
 	private TriggerItem actualNext;
@@ -130,22 +115,32 @@ public class SecLoop extends LoopSection {
 	@Override
 	@Nullable
 	protected TriggerItem walk(Event event) {
-		Iterator<?> iter = currentIter.get(event);
-		if (iter == null) {
-			iter = expr instanceof Variable ? ((Variable<?>) expr).variablesIterator(event) : expr.iterator(event);
-			if (iter != null) {
-				if (iter.hasNext())
-					currentIter.put(event, iter);
-				else
-					iter = null;
+		Iterator<?> cIter = currentIter.get(event);
+		Iterator<?> nIter = nextIter.get(event);
+		if (cIter == null) {
+			if (expr instanceof Variable<?> variable) {
+				cIter = variable.variablesIterator(event);
+				nIter = variable.variablesIterator(event);
+			} else {
+				cIter = expr.iterator(event);
+				nIter = expr.iterator(event);
 			}
+			Object filler = nIter.next(); //So the next iterator can already be 1 ahead
 		}
-		if (iter == null || !iter.hasNext()) {
+		if (!cIter.hasNext()) {
 			exit(event);
 			debug(event, false);
 			return actualNext;
 		} else {
-			current.put(event, iter.next());
+			currentIter.put(event, cIter);
+			nextIter.put(event, nIter);
+			previous.put(event, current.get(event));
+			current.put(event, cIter.next());
+			if (cIter.hasNext()) {
+				next.put(event, nIter.next());
+			} else {
+				next.put(event, null);
+			}
 			currentLoopCounter.put(event, (currentLoopCounter.getOrDefault(event, 0L)) + 1);
 			return walk(event, true);
 		}
@@ -159,6 +154,16 @@ public class SecLoop extends LoopSection {
 	@Nullable
 	public Object getCurrent(Event event) {
 		return current.get(event);
+	}
+
+	@Nullable
+	public Object getNext(Event event) {
+		return next.get(event);
+	}
+
+	@Nullable
+	public Object getPrevious(Event event) {
+		return previous.get(event);
 	}
 
 	public Expression<?> getLoopedExpression() {
@@ -181,6 +186,9 @@ public class SecLoop extends LoopSection {
 	public void exit(Event event) {
 		current.remove(event);
 		currentIter.remove(event);
+		previous.remove(event);
+		next.remove(event);
+		nextIter.remove(event);
 		super.exit(event);
 	}
 
