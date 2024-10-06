@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -48,7 +30,7 @@ import java.util.regex.Pattern;
  * Used to access a loop's current value.
  */
 @Name("Loop value")
-@Description("Returns the currently looped value.")
+@Description("Returns the previous, current, or next looped value.")
 @Examples({
 	"# Countdown",
 	"loop 10 times:",
@@ -63,6 +45,14 @@ import java.util.regex.Pattern;
 	"loop {top-balances::*}:",
 		"\tloop-iteration <= 10",
 		"\tsend \"#%loop-iteration% %loop-index% has $%loop-value%\"",
+	"",
+	"loop shuffled (integers between 0 and 8):",
+		"\tif all:",
+			"\t\tprevious loop-value = 1",
+			"\t\tloop-value = 4",
+			"\t\tnext loop-value = 8",
+		"\tthen:",
+			"\t\t kill all players"
 })
 @Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous+next)")
 public class ExprLoopValue extends SimpleExpression<Object> {
@@ -168,15 +158,15 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Object @Nullable [] get(Event e) {
+	protected Object @Nullable [] get(Event event) {
 		if (isVariableLoop) {
 			Entry<String, Object> value;
 			if (getNext) {
-				value = (Entry<String, Object>) loop.getNext(e);
+				value = (Entry<String, Object>) loop.getNext(event);
 			} else if (getPrevious) {
-				value = (Entry<String, Object>) loop.getPrevious(e);
+				value = (Entry<String, Object>) loop.getPrevious(event);
 			} else {
-				value = (Entry<String, Object>) loop.getCurrent(e);
+				value = (Entry<String, Object>) loop.getCurrent(event);
 			}
 			if (value == null)
 				return null;
@@ -189,26 +179,40 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 
 		Object[] one = (Object[]) Array.newInstance(getReturnType(), 1);
 		if (getNext) {
-			one[0] = loop.getNext(e);
+			one[0] = loop.getNext(event);
 		} else if (getPrevious) {
-			one[0] = loop.getPrevious(e);
+			one[0] = loop.getPrevious(event);
 		} else {
-			one[0] = loop.getCurrent(e);
+			one[0] = loop.getCurrent(event);
 		}
 		return one;
 	}
 	
 	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		if (e == null)
+	@SuppressWarnings("unchecked")
+	public String toString(@Nullable Event event, boolean debug) {
+		if (event == null)
 			return name;
 		if (isVariableLoop) {
-			@SuppressWarnings("unchecked") Entry<String, Object> current = (Entry<String, Object>) loop.getCurrent(e);
-			if (current == null)
+			Entry<String, Object> value;
+			if (getNext) {
+				value = (Entry<String, Object>) loop.getNext(event);
+			} else if (getPrevious) {
+				value = (Entry<String, Object>) loop.getPrevious(event);
+			} else {
+				value = (Entry<String, Object>) loop.getCurrent(event);
+			}
+			if (value == null)
 				return Classes.getDebugMessage(null);
-			return isIndex ? "\"" + current.getKey() + "\"" : Classes.getDebugMessage(current.getValue());
+			return isIndex ? "\"" + value.getKey() + "\"" : Classes.getDebugMessage(value.getValue());
 		}
-		return Classes.getDebugMessage(loop.getCurrent(e));
+		if (getNext) {
+			return Classes.getDebugMessage(loop.getNext(event));
+		} else if (getPrevious) {
+			return Classes.getDebugMessage(loop.getPrevious(event));
+		} else {
+			return Classes.getDebugMessage(loop.getCurrent(event));
+		}
 	}
 	
 }

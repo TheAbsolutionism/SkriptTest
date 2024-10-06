@@ -13,7 +13,11 @@ test "previous+next loop value":
 	clear {_last}
 	clear {_next}
 
-	set {_list::*} to iron ingot, gold ingot, diamond, emerald and netherite ingot
+	set {_list::iron} to iron ingot
+	set {_list::gold} to gold ingot
+	set {_list::diamond} to diamond
+	set {_list::emerald} to emerald
+	set {_list::netherite} to netherite ingot
 	loop {_list::*}:
 		if any:
 			{_last} is set
@@ -24,3 +28,17 @@ test "previous+next loop value":
 			assert loop-value = {_next} with "current loop value does not match the expected next loop value"
 		set {_last} to loop-value
 		set {_next} to next loop-value
+
+	clear {_last}
+	clear {_next}
+
+	loop {_list::*}:
+		if any:
+			{_last} is set
+			previous loop-index is set
+		then:
+			assert {_last} = previous loop-index with "previous loop index does not match"
+		if {_next} is set:
+			assert loop-index = {_next} with "current loop index does not match the expected next loop index"
+		set {_last} to loop-index
+		set {_next} to next loop-index

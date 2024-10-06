@@ -59,7 +59,14 @@ import java.util.WeakHashMap;
 	"",
 	"loop {Coins::*}:",
 	"\tset {Coins::%loop-index%} to loop-value + 5 # Same as \"add 5 to {Coins::%loop-index%}\" where loop-index is the uuid of " +
-		"the player and loop-value is the actually coins value such as 200"
+		"the player and loop-value is the actually coins value such as 200",
+	"loop shuffled (integers between 0 and 8):",
+		"\tif all:",
+			"\t\tprevious loop-value = 1",
+			"\t\tloop-value = 4",
+			"\t\tnext loop-value = 8",
+		"\tthen:",
+			"\t\t kill all players"
 })
 @Since("1.0")
 public class SecLoop extends LoopSection {
@@ -73,7 +80,6 @@ public class SecLoop extends LoopSection {
 
 	private final transient Map<Event, Object> current = new WeakHashMap<>();
 	private final transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
-	private final transient Map<Event, Iterator<?>> nextIter = new WeakHashMap<>();
 	private final transient Map<Event, Object> next = new WeakHashMap<>();
 	private final transient Map<Event, Object> previous = new WeakHashMap<>();
 
@@ -115,29 +121,24 @@ public class SecLoop extends LoopSection {
 	@Override
 	@Nullable
 	protected TriggerItem walk(Event event) {
-		Iterator<?> cIter = currentIter.get(event);
-		Iterator<?> nIter = nextIter.get(event);
-		if (cIter == null) {
-			if (expr instanceof Variable<?> variable) {
-				cIter = variable.variablesIterator(event);
-				nIter = variable.variablesIterator(event);
-			} else {
-				cIter = expr.iterator(event);
-				nIter = expr.iterator(event);
+		Iterator<?> iter = currentIter.get(event);
+		if (iter == null) {
+			iter = expr instanceof Variable<?> variable ? variable.variablesIterator(event) : expr.iterator(event);
+			if (iter != null && iter.hasNext()) {
+				currentIter.put(event, iter);
+				next.put(event, iter.next());
 			}
-			Object filler = nIter.next(); //So the next iterator can already be 1 ahead
 		}
-		if (!cIter.hasNext()) {
+
+		if (iter == null || next.get(event) == null) {
 			exit(event);
 			debug(event, false);
 			return actualNext;
 		} else {
-			currentIter.put(event, cIter);
-			nextIter.put(event, nIter);
 			previous.put(event, current.get(event));
-			current.put(event, cIter.next());
-			if (cIter.hasNext()) {
-				next.put(event, nIter.next());
+			current.put(event, next.get(event));
+			if (iter.hasNext()) {
+				next.put(event, iter.next());
 			} else {
 				next.put(event, null);
 			}
@@ -188,7 +189,6 @@ public class SecLoop extends LoopSection {
 		currentIter.remove(event);
 		previous.remove(event);
 		next.remove(event);
-		nextIter.remove(event);
 		super.exit(event);
 	}
 
