@@ -3,6 +3,7 @@ package ch.njol.skript.sections;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Direction;
@@ -28,8 +29,10 @@ import java.util.function.Consumer;
 public class EffSecShoot extends EffectSection {
 
 	public static class ShootEvent extends Event {
+
 		private Entity projectile;
 		private @Nullable LivingEntity shooter;
+
 		public ShootEvent(Entity projectile, @Nullable LivingEntity shooter) {
 			this.projectile = projectile;
 			this.shooter = shooter;
@@ -38,13 +41,13 @@ public class EffSecShoot extends EffectSection {
 		public Entity getProjectile() {
 			return projectile;
 		}
+
 		public @Nullable LivingEntity getShooter() {
 			return shooter;
 		}
 
 		@Override
-		@NotNull
-		public HandlerList getHandlers() {
+		public @NotNull HandlerList getHandlers() {
 			throw new IllegalStateException();
 		}
 	}
@@ -72,7 +75,7 @@ public class EffSecShoot extends EffectSection {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult, @Nullable SectionNode sectionNode, @Nullable List<TriggerItem> triggerItems) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, @Nullable SectionNode sectionNode, @Nullable List<TriggerItem> triggerItems) {
 		types = (Expression<EntityData<?>>) exprs[matchedPattern];
 		shooters = exprs[1 - matchedPattern];
 		velocity = (Expression<Number>) exprs[2];
@@ -83,7 +86,7 @@ public class EffSecShoot extends EffectSection {
 			Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
 			trigger = loadCode(sectionNode, "shoot", afterLoading, ShootEvent.class);
 			if (delayed.get()) {
-				Skript.error("Delays can't be used within a Shoot Effect Section");
+				Skript.error("Delays cannot be used within a 'shoot' effect section");
 				return false;
 			}
 		}
@@ -111,7 +114,7 @@ public class EffSecShoot extends EffectSection {
 							livingShooter.getWorld().spawn(
 								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
 								type,
-								(Consumer) getConsumer(event, vector, entityData, livingShooter)
+								(Consumer) getSpawnConsumer(event, vector, entityData, livingShooter)
 							);
 						} else {
 							Fireball fireball = (Fireball) livingShooter.getWorld().spawn(
@@ -126,7 +129,7 @@ public class EffSecShoot extends EffectSection {
 							livingShooter.launchProjectile(
 								(Class<? extends Projectile>) type,
 								vector,
-								(Consumer) getConsumer(event, vector, entityData, livingShooter)
+								(Consumer) getSpawnConsumer(event, vector, entityData, livingShooter)
 							);
 						} else {
 							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
@@ -136,7 +139,7 @@ public class EffSecShoot extends EffectSection {
 						Location location = livingShooter.getLocation();
 						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
 						if (trigger != null) {
-							entityData.spawn(location, (Consumer) getConsumer(event, vector, entityData, livingShooter));
+							entityData.spawn(location, (Consumer) getSpawnConsumer(event, vector, entityData, livingShooter));
 						} else {
 							finalProjectile = entityData.spawn(location);
 						}
@@ -144,7 +147,7 @@ public class EffSecShoot extends EffectSection {
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
 					if (trigger != null) {
-						entityData.spawn((Location) shooter, (Consumer) getConsumer(event, vector, entityData, null));
+						entityData.spawn((Location) shooter, (Consumer) getSpawnConsumer(event, vector, entityData, null));
 					} else {
 						finalProjectile = entityData.spawn((Location) shooter);
 					}
@@ -164,7 +167,7 @@ public class EffSecShoot extends EffectSection {
 		entityData.set((E) entity);
 	}
 
-	private Consumer<? extends Entity> getConsumer(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
+	private Consumer<? extends Entity> getSpawnConsumer(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
 		return entity -> {
 			if (entity instanceof Fireball fireball)
 				fireball.setShooter(shooter);
@@ -182,7 +185,9 @@ public class EffSecShoot extends EffectSection {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "shoot " + types.toString(event, debug) + " from " + shooters.toString(event, debug) + (velocity != null ? " at speed " + velocity.toString(event, debug) : "") + (direction != null ? " " + direction.toString(event, debug) : "");
+		return "shoot " + types.toString(event, debug) + " from " + shooters.toString(event, debug) +
+			(velocity != null ? " at speed " + velocity.toString(event, debug) : "") +
+			(direction != null ? " " + direction.toString(event, debug) : "");
 	}
 
 }

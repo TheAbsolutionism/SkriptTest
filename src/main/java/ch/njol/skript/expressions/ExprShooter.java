@@ -60,7 +60,7 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	}
 	
 	@Override
-	protected LivingEntity @Nullable [] get(final Event event, final Projectile[] source) {
+	protected LivingEntity @Nullable [] get(Event event, Projectile[] source) {
 		if (withinShootEvent && event instanceof EffSecShoot.ShootEvent shootEvent) {
 			return new LivingEntity[]{shootEvent.getShooter()};
 		}
