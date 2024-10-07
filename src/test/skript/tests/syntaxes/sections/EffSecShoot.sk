@@ -6,6 +6,7 @@ test "EffSecShoot":
 
 	shoot a pig from {_shooter}
 	assert last shot entity is a pig with "Last shot entity is not a pig"
+	clear last shot entity
 
 	spawn cow at {_loc}:
 		set ai of entity to false
