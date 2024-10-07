@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 		"\tthen:",
 			"\t\t kill all players"
 })
-@Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous+next)")
+@Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous, next)")
 public class ExprLoopValue extends SimpleExpression<Object> {
 
 	enum LoopStates {
@@ -173,14 +173,12 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	protected Object @Nullable [] get(Event event) {
 		if (isVariableLoop) {
-			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+			@SuppressWarnings("unchecked") Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
 				case CURRENT ->  loop.getCurrent(event);
 				case NEXT -> loop.getNext(event);
 				case PREVIOUS -> loop.getPrevious(event);
-				default -> null;
 			};
 			if (value == null)
 				return null;
@@ -196,22 +194,19 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 			case CURRENT -> loop.getCurrent(event);
 			case NEXT -> loop.getNext(event);
 			case PREVIOUS -> loop.getPrevious(event);
-			default -> null;
 		};
 		return one;
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public String toString(@Nullable Event event, boolean debug) {
 		if (event == null)
 			return name;
 		if (isVariableLoop) {
-			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+			@SuppressWarnings("unchecked") Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
 				case CURRENT ->  loop.getCurrent(event);
 				case NEXT -> loop.getNext(event);
 				case PREVIOUS -> loop.getPrevious(event);
-				default -> null;
 			};
 			if (value == null)
 				return Classes.getDebugMessage(null);
@@ -221,7 +216,6 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 			case CURRENT -> loop.getCurrent(event);
 			case NEXT -> loop.getNext(event);
 			case PREVIOUS -> loop.getPrevious(event);
-			default -> null;
 		});
 	}
 	

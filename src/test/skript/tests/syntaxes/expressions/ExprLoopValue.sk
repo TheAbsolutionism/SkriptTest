@@ -1,4 +1,4 @@
-test "previous+next loop value":
+test "previous and next loop value":
 	loop 5 times:
 		if any:
 			{_last} is set

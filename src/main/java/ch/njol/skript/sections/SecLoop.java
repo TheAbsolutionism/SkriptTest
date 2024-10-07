@@ -60,6 +60,7 @@ import java.util.WeakHashMap;
 	"loop {Coins::*}:",
 		"\tset {Coins::%loop-index%} to loop-value + 5 # Same as \"add 5 to {Coins::%loop-index%}\" where loop-index is the uuid of " +
 		"the player and loop-value is the number of coins for the player",
+	"",
 	"loop shuffled (integers between 0 and 8):",
 		"\tif all:",
 			"\t\tprevious loop-value = 1",
