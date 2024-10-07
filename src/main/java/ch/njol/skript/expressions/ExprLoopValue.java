@@ -175,7 +175,8 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	@Override
 	protected Object @Nullable [] get(Event event) {
 		if (isVariableLoop) {
-			@SuppressWarnings("unchecked") Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+			//noinspection unchecked
+			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
 				case CURRENT ->  loop.getCurrent(event);
 				case NEXT -> loop.getNext(event);
 				case PREVIOUS -> loop.getPrevious(event);
@@ -203,7 +204,8 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 		if (event == null)
 			return name;
 		if (isVariableLoop) {
-			@SuppressWarnings("unchecked") Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
+			//noinspection unchecked
+			Entry<String, Object> value = (Entry<String, Object>) switch (selectedState) {
 				case CURRENT ->  loop.getCurrent(event);
 				case NEXT -> loop.getNext(event);
 				case PREVIOUS -> loop.getPrevious(event);
