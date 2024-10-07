@@ -7,6 +7,18 @@ test "EffSecShoot":
 	shoot a pig from {_shooter}
 	assert last shot entity is a pig with "Last shot entity is not a pig"
 
+	spawn cow at {_loc}:
+		set ai of entity to false
+		set {_shooter2} to entity
+
+	shoot an arrow from {_shooter2}:
+		set {_other} to event-projectile
+	shoot a pig from {_shooter}:
+		assert (shooter of {_other}) = {_shooter2} with "ExprShooter did not get shooter of other projectile"
+		set {_projectile} to entity
+	clear entity within {_other}
+	clear entity within {_projectile}
+
 	set {_pigs::*} to pig, pig, pig, pig and pig
 	shoot {_pigs::*} from {_shooter}:
 		add entity to {_projectiles::*}
@@ -18,3 +30,4 @@ test "EffSecShoot":
 	clear {_projectiles::*}
 
 	clear entity within {_shooter}
+	clear entity within {_shooter2}

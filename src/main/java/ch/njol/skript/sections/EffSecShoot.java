@@ -177,8 +177,10 @@ public class EffSecShoot extends EffectSection {
 		return entity -> {
 			if (entity instanceof Fireball fireball)
 				fireball.setShooter(shooter);
-			else if (entity instanceof Projectile projectile && shooter != null)
+			else if (entity instanceof Projectile projectile && shooter != null) {
+				projectile.setShooter(shooter);
 				set(projectile, entityData);
+			}
 			entity.setVelocity(vector);
 			ShootEvent shootEvent = new ShootEvent(entity, shooter);
 			lastSpawned = entity;
