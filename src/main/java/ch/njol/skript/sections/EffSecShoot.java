@@ -63,6 +63,12 @@ public class EffSecShoot extends EffectSection {
 				return shootEvent.getProjectile();
 			}
 		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(ShootEvent.class, Projectile.class, new Getter<Projectile, ShootEvent>() {
+			@Override
+			public @Nullable Projectile get(ShootEvent shootEvent) {
+				return shootEvent.getProjectile() instanceof Projectile projectile ? projectile : null;
+			}
+		}, EventValues.TIME_NOW);
 	}
 
 	private final static Double DEFAULT_SPEED = 5.;

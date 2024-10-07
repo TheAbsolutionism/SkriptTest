@@ -48,20 +48,16 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 		Skript.registerExpression(ExprShooter.class, LivingEntity.class, ExpressionType.SIMPLE, "[the] shooter [of %projectile%]");
 	}
 
-	private boolean withinShootEvent;
-
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (getParser().isCurrentEvent(EffSecShoot.ShootEvent.class) && exprs[0] == null)
-			withinShootEvent = true;
 		setExpr((Expression<? extends Projectile>) exprs[0]);
 		return true;
 	}
 	
 	@Override
 	protected LivingEntity @Nullable [] get(Event event, Projectile[] source) {
-		if (withinShootEvent && event instanceof EffSecShoot.ShootEvent shootEvent) {
+		if (event instanceof EffSecShoot.ShootEvent shootEvent && !(shootEvent.getProjectile() instanceof Projectile)) {
 			return new LivingEntity[]{shootEvent.getShooter()};
 		}
 
