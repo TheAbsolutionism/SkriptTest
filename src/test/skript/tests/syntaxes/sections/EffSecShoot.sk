@@ -1,0 +1,20 @@
+test "EffSecShoot":
+	set {_loc} to spawn of world "world"
+	spawn pig at {_loc}:
+		set ai of entity to false
+		set {_shooter} to entity
+
+	shoot a pig from {_shooter}
+	assert last shot entity is a pig with "Last shot entity is not a pig"
+
+	set {_pigs::*} to pig, pig, pig, pig and pig
+	shoot {_pigs::*} from {_shooter}:
+		add entity to {_projectiles::*}
+		assert shooter = {_shooter} with "ExprShooter does not return shooter used in effect"
+	assert size of {_projectiles::*} = 5 with "1 or more projectiles did not spawn"
+	loop {_projectiles::*}:
+		assert loop-value is a pig with "Projectile on loop %loop-iteration% is not a pig"
+	clear entities within {_projectiles::*}
+	clear {_projectiles::*}
+
+	clear entity within {_shooter}

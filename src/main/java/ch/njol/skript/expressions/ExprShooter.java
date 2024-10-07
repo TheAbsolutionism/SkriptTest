@@ -53,11 +53,9 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
-		if (getParser().isCurrentEvent(EffSecShoot.ShootEvent.class)) {
+		if (getParser().isCurrentEvent(EffSecShoot.ShootEvent.class) && exprs[0] == null)
 			withinShootEvent = true;
-		} else {
-			setExpr((Expression<? extends Projectile>) exprs[0]);
-		}
+		setExpr((Expression<? extends Projectile>) exprs[0]);
 		return true;
 	}
 	

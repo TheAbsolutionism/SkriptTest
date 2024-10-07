@@ -114,10 +114,12 @@ public class EffSecShoot extends EffectSection {
 								(Consumer) getConsumer(event, vector, entityData, livingShooter)
 							);
 						} else {
-							finalProjectile = livingShooter.getWorld().spawn(
+							Fireball fireball = (Fireball) livingShooter.getWorld().spawn(
 								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
 								type
 							);
+							fireball.setShooter(livingShooter);
+							finalProjectile = fireball;
 						}
 					} else if (Projectile.class.isAssignableFrom(type)) {
 						if (trigger != null) {
@@ -173,7 +175,7 @@ public class EffSecShoot extends EffectSection {
 			lastSpawned = entity;
 			Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
 			TriggerItem.walk(trigger, shootEvent);
-			Variables.setLocalVariables(event, Variables.copyLocalVariables(event));
+			Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
 			Variables.removeLocals(shootEvent);
 		};
 	}
