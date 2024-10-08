@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -50,7 +32,7 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 
 	@SuppressWarnings({"unchecked", "null"})
 	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		setExpr((Expression<? extends Projectile>) exprs[0]);
 		return true;
 	}
@@ -63,30 +45,30 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 
 		return get(source, projectile -> {
 			Object shooter = projectile != null ? projectile.getShooter() : null;
-			if (shooter instanceof LivingEntity)
-				return (LivingEntity) shooter;
+			if (shooter instanceof LivingEntity livingShooter)
+				return livingShooter;
 			return null;
 		});
 	}
 	
 	@Override
 	@Nullable
-	public Class<?>[] acceptChange(final ChangeMode mode) {
+	public Class<?>[] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
 			return new Class[] {LivingEntity.class};
 		return super.acceptChange(mode);
 	}
 	
 	@Override
-	public void change(final Event e, final @Nullable Object[] delta, final ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (mode == ChangeMode.SET) {
 			assert delta != null;
-			for (final Projectile p : getExpr().getArray(e)) {
+			for (Projectile p : getExpr().getArray(event)) {
 				assert p != null : getExpr();
 				p.setShooter((ProjectileSource) delta[0]);
 			}
 		} else {
-			super.change(e, delta, mode);
+			super.change(event, delta, mode);
 		}
 	}
 	
@@ -96,8 +78,8 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	}
 	
 	@Override
-	public String toString(final @Nullable Event e, final boolean debug) {
-		return "the shooter" + (getExpr().isDefault() ? "" : " of " + getExpr().toString(e, debug));
+	public String toString(@Nullable Event event, boolean debug) {
+		return "the shooter" + (getExpr().isDefault() ? "" : " of " + getExpr().toString(event, debug));
 	}
 	
 }
