@@ -8,7 +8,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.RegisterRecipeEvent;
 import ch.njol.skript.util.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RegisterRecipeEvent.CraftingEventRecipe.*;
+import ch.njol.skript.util.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import org.bukkit.Material;
 import org.bukkit.event.Event;

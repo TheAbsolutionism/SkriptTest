@@ -10,7 +10,7 @@ import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.util.RegisterRecipeEvent;
 import ch.njol.skript.util.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RegisterRecipeEvent.CraftingEventRecipe.*;
+import ch.njol.skript.util.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
@@ -120,7 +120,7 @@ public class SecRegisterRecipe extends Section {
 			Bukkit.removeRecipe(namespacedKey);
 		switch (recipeType) {
 			case SHAPED, SHAPELESS -> {
-				if (!(recipeEvent instanceof CraftingEventRecipe craftingRecipe))
+				if (!(recipeEvent instanceof CraftingRecipeEvent craftingRecipe))
 					return super.walk(event, false);
 				ItemStack[] ingredients = craftingRecipe.getIngredients();
 				if (ingredients.length < recipeType.minIngredients || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < recipeType.minIngredients) {

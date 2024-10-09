@@ -8,7 +8,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.RegisterRecipeEvent;
 import ch.njol.skript.util.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RegisterRecipeEvent.CraftingEventRecipe.*;
+import ch.njol.skript.util.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
@@ -21,7 +21,7 @@ public class EffCraftingRecipeValues extends Effect {
 
 	enum RecipeValues {
 		INGREDIENTS("set [the] recipe ingredients to %itemstacks/itemtypes%", "recipe ingredients",
-			CraftingEventRecipe.class, "This can only be used when registering a Crafting, Shaped, or Shapeless Recipe"),
+			CraftingRecipeEvent.class, "This can only be used when registering a Crafting, Shaped, or Shapeless Recipe"),
 		FIRSTROW("set [the] recipe ingredients of (first|1st) row to %itemstacks/itemtypes%", "recipe ingredients first row",
 			ShapedRecipeEvent.class, "This can only be used when registering a Shaped Recipe."),
 		SECONDROW("set [the] recipe ingredients of (second|2nd) row to %itemstacks/itemtypes%", "recipe ingredients second row",
@@ -74,7 +74,7 @@ public class EffCraftingRecipeValues extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		if (!(event instanceof CraftingEventRecipe recipeEvent))
+		if (!(event instanceof CraftingRecipeEvent recipeEvent))
 			return;
 
 		switch (selectedValue) {

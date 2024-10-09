@@ -44,12 +44,12 @@ public class RegisterRecipeEvent extends Event {
 		return recipeType.getToString();
 	}
 
-	public static class CraftingEventRecipe extends RegisterRecipeEvent {
+	public static class CraftingRecipeEvent extends RegisterRecipeEvent {
 		private ItemStack[] ingredients = new ItemStack[9];
 		private CraftingBookCategory category = CraftingBookCategory.MISC;
 		private String group;
 
-		public CraftingEventRecipe(RecipeTypes recipeType) {
+		public CraftingRecipeEvent(RecipeTypes recipeType) {
 			super(recipeType);
 		};
 
@@ -89,13 +89,13 @@ public class RegisterRecipeEvent extends Event {
 			return group;
 		}
 
-		public static class ShapedRecipeEvent extends CraftingEventRecipe {
+		public static class ShapedRecipeEvent extends CraftingRecipeEvent {
 			public ShapedRecipeEvent(RecipeTypes recipeType) {
 				super(recipeType);
 			};
 		}
 
-		public static class ShapelessRecipeEvent extends CraftingEventRecipe {
+		public static class ShapelessRecipeEvent extends CraftingRecipeEvent {
 			public ShapelessRecipeEvent(RecipeTypes recipeType) {
 				super(recipeType);
 			};
