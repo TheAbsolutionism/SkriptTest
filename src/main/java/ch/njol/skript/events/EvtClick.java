@@ -33,12 +33,12 @@ public class EvtClick extends SkriptEvent {
 	/**
 	 * Click types.
 	 */
-	private static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
+	private final static int RIGHT = 1, LEFT = 2, ANY = RIGHT | LEFT;
 
 	/**
 	 * Tracks PlayerInteractEvents to deduplicate them.
 	 */
-	public static ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
+	public final static ClickEventTracker interactTracker = new ClickEventTracker(Skript.getInstance());
 
 	static {
 		Class<? extends PlayerEvent>[] eventTypes = CollectionUtils.array(
@@ -135,18 +135,15 @@ public class EvtClick extends SkriptEvent {
 			// Figure out click type, filter non-click events
 			Action action = interactEvent.getAction();
 			int click;
-			switch (action) {
-				case LEFT_CLICK_AIR:
-				case LEFT_CLICK_BLOCK:
-					click = LEFT;
-					break;
-				case RIGHT_CLICK_AIR:
-				case RIGHT_CLICK_BLOCK:
-					click = RIGHT;
-					break;
-				case PHYSICAL: // Not a click event
-				default:
+			switch (action)  {
+				case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> click = LEFT;
+				case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> click = RIGHT;
+				case PHYSICAL -> {
 					return false;
+				}
+				default -> {
+					return false;
+				}
 			}
 			if ((this.click & click) == 0)
 				return false; // We don't want to handle this kind of events
