@@ -7,19 +7,22 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.sections.SecRegisterRecipe;
 import ch.njol.util.Kleenean;
+import ch.njol.util.Predicate;
+import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public class EffRegisterRecipeValues extends Effect {
 
 	enum RecipeValues {
-		PATTERNS("set [the] recipe pattern[s] to %-strings%", "recipe patterns"),
-		FIRSTROW("set [the] recipe pattern[s] (first|1st) row to %-string%", "recipe pattern first row"),
-		SECONDROW("set [the] recipe pattern[s] (second|2nd) row to %-string%", "recipe pattern second row"),
-		THIRDROW("set [the] recipe pattern[s] (third|3rd) row to %-string%", "recipe pattern third row"),
-		ITEMSET("set [the] recipe char[acter] %string% to %itemstack/itemtype%", "recipe character"),
+		INGREDIENTS("set [the] recipe ingredient[s] to %itemstacks/itemtypes%", "recipe ingredients"),
+		FIRSTROW("set [the] recipe ingredients of (first|1st) row to %itemstacks/itemtypes%", "recipe pattern first row"),
+		SECONDROW("set [the] recipe ingredients of (second|2nd) row to %itemstacks/itemtypes%", "recipe pattern second row"),
+		THIRDROW("set [the] recipe ingredients of (third|3rd) row to %itemstacks/itemtypes%", "recipe pattern third row"),
 		RESULT("set [the] recipe result to %itemstack/itemtype%", "recipe result");
 
 		private String pattern, toString;
@@ -41,26 +44,16 @@ public class EffRegisterRecipeValues extends Effect {
 	}
 
 	private RecipeValues selectedValue;
-	private Expression<String> stringValues;
-	private @Nullable Expression<?> itemValues;
+	private Expression<?> itemValues;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedValue = recipeValues[matchedPattern];
 		if (!getParser().isCurrentEvent(SecRegisterRecipe.RegisterRecipeEvent.class)) {
 			Skript.error("You can only use '" + selectedValue.toString + "' in a Register Recipe Section.");
 			return false;
 		}
-
-		if (selectedValue == RecipeValues.ITEMSET) {
-			stringValues = (Expression<String>) exprs[0];
-			itemValues = exprs[1];
-		} else if (selectedValue == RecipeValues.RESULT) {
-			itemValues = exprs[0];
-		} else {
-			stringValues = (Expression<String>) exprs[0];
-		}
+		itemValues = exprs[0];
 		return true;
 	}
 
@@ -70,37 +63,45 @@ public class EffRegisterRecipeValues extends Effect {
 			return;
 
 		switch (selectedValue) {
-			case PATTERNS -> {
-				for (String string : stringValues.getArray(event)) {
-					if (string.length() > 3) {
-						Skript.error("Recipe pattern can only contain up to 3 characters.");
-						return;
+			case INGREDIENTS -> {
+				Object[] items = itemValues.getArray(event);
+				if (items.length > recipeEvent.getMaxIngredients()) {
+					Skript.adminBroadcast("You can only provide up to " + recipeEvent.getMaxIngredients() +
+						" items when setting the ingredients for a '" + recipeEvent.getRecipeType() + "' recipe.");
+					return;
+				}
+				for (int i = 0; i < items.length; i++) {
+					Object thisItem = items[i];
+					if (thisItem instanceof ItemStack itemStack) {
+						recipeEvent.setIngredients(i, itemStack);
+					} else if (thisItem instanceof ItemType itemType) {
+						ItemStack stack = new ItemStack(itemType.getMaterial());
+						stack.setItemMeta(itemType.getItemMeta());
+						recipeEvent.setIngredients(i, stack);
 					}
 				}
-				recipeEvent.setRecipePatterns(stringValues.getArray(event), null);
 			}
 			case FIRSTROW, SECONDROW, THIRDROW -> {
-				String string = stringValues.getSingle(event);
-				if (string.length() > 3) {
-					Skript.error("Recipe pattern can only contain up to 3 characters.");
+				Object[] items = itemValues.getArray(event);
+				if (items.length > recipeEvent.getMaxRowIngredients()) {
+					if (recipeEvent.getMaxRowIngredients() == 0) {
+						Skript.error("You can not use '" + selectedValue.toString + "' when registering a '" + recipeEvent.getRecipeType() + "' recipe.");
+					} else {
+						Skript.error("You can only provide up to " + recipeEvent.getMaxRowIngredients() +
+							" items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
+					}
 					return;
 				}
-				recipeEvent.setRecipePatterns(new String[]{string}, selectedValue.ordinal() - 1);
-			}
-			case ITEMSET -> {
-				String string = stringValues.getSingle(event);
-				if (string.length() > 1) {
-					Skript.error("You can only set one character at a time to an item.");
-					return;
-				}
-				Character character = string.charAt(0);
-				Object item = itemValues.getSingle(event);
-				if (item instanceof ItemStack itemStack) {
-					recipeEvent.setIngredients(character, itemStack);
-				} else if (item instanceof ItemType itemType) {
-					ItemStack stack = new ItemStack(itemType.getMaterial());
-					stack.setItemMeta(itemType.getItemMeta());
-					recipeEvent.setIngredients(character, stack);
+				for (int i = 0; i  < items.length; i++) {
+					Object thisItem = items[i];
+					int placement = (3 * (selectedValue.ordinal() - 1)) + i;
+					if (thisItem instanceof ItemStack itemStack) {
+						recipeEvent.setIngredients(placement, itemStack);
+					} else if (thisItem instanceof ItemType itemType) {
+						ItemStack stack = new ItemStack(itemType.getMaterial());
+						stack.setItemMeta(itemType.getItemMeta());
+						recipeEvent.setIngredients(placement, stack);
+					}
 				}
 			}
 			case RESULT -> {
