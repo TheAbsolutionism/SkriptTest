@@ -15,13 +15,11 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 public class EffCraftingRecipeValues extends Effect {
 
-	enum RecipeValues {
+	enum CraftingRecipeValues {
 		INGREDIENTS("set [the] recipe ingredients to %itemstacks/itemtypes%", "recipe ingredients",
-			CraftingRecipeEvent.class, "This can only be used when registering a Crafting, Shaped, or Shapeless Recipe"),
+			CraftingRecipeEvent.class, "This can only be used when registering a Shaped or Shapeless Recipe"),
 		FIRSTROW("set [the] recipe ingredients of (first|1st) row to %itemstacks/itemtypes%", "recipe ingredients first row",
 			ShapedRecipeEvent.class, "This can only be used when registering a Shaped Recipe."),
 		SECONDROW("set [the] recipe ingredients of (second|2nd) row to %itemstacks/itemtypes%", "recipe ingredients second row",
@@ -32,7 +30,7 @@ public class EffCraftingRecipeValues extends Effect {
 		private String pattern, toString, error;
 		private Class<? extends Event> eventClass;
 
-		RecipeValues(String pattern, String toString, Class<? extends Event> eventClass, String error) {
+		CraftingRecipeValues(String pattern, String toString, Class<? extends Event> eventClass, String error) {
 			this.pattern = pattern;
 			this.toString = toString;
 			this.eventClass = eventClass;
@@ -40,18 +38,18 @@ public class EffCraftingRecipeValues extends Effect {
 		}
 	}
 
-	private static RecipeValues[] recipeValues = RecipeValues.values();
+	private static CraftingRecipeValues[] recipeValues = CraftingRecipeValues.values();
 
 	static {
 		String[] patterns = new String[recipeValues.length];
-		for (RecipeValues value : recipeValues) {
+		for (CraftingRecipeValues value : recipeValues) {
 			patterns[value.ordinal()] = value.pattern;
 		}
 		Skript.registerEffect(EffCraftingRecipeValues.class, patterns);
 	}
 
-	private RecipeValues selectedValue;
-	private Expression<?> itemValues;
+	private CraftingRecipeValues selectedValue;
+	private Expression<?> itemExpr;
 	private Node thisNode;
 	private String thisScript;
 
@@ -66,7 +64,7 @@ public class EffCraftingRecipeValues extends Effect {
 			Skript.error(selectedValue.error);
 			return false;
 		}
-		itemValues = exprs[0];
+		itemExpr = exprs[0];
 		thisNode = getParser().getNode();
 		thisScript = getParser().getCurrentScript().getConfig().getFileName();
 		return true;
@@ -79,7 +77,7 @@ public class EffCraftingRecipeValues extends Effect {
 
 		switch (selectedValue) {
 			case INGREDIENTS -> {
-				Object[] items = itemValues.getArray(event);
+				Object[] items = itemExpr.getArray(event);
 				if (items.length > recipeEvent.getMaxIngredients()) {
 					customError("You can only provide up to " + recipeEvent.getMaxIngredients() +
 						" items when setting the ingredients for a '" + recipeEvent.getRecipeName() + "' recipe.");
@@ -98,7 +96,7 @@ public class EffCraftingRecipeValues extends Effect {
 				}
 			}
 			case FIRSTROW, SECONDROW, THIRDROW -> {
-				Object[] items = itemValues.getArray(event);
+				Object[] items = itemExpr.getArray(event);
 				if (items.length > recipeEvent.getMaxRowIngredients()) {
 					if (recipeEvent.getMaxRowIngredients() == 0) {
 						customError("You can not use '" + selectedValue.toString + "' when registering a '" + recipeEvent.getRecipeName() + "' recipe.");

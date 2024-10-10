@@ -1,6 +1,5 @@
 package ch.njol.skript.util;
 
-import ch.njol.skript.sections.SecRegisterRecipe.RecipeTypes;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -11,6 +10,59 @@ import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.NotNull;
 
 public class RegisterRecipeEvent extends Event {
+
+	public enum RecipeTypes {
+		SHAPED("shaped [crafting]", 9, 3, "shaped", CraftingRecipeEvent.ShapedRecipeEvent.class),
+		SHAPELESS("shapeless [crafting]", 9, 0, "shapeless", CraftingRecipeEvent.ShapelessRecipeEvent.class),
+		BLASTING("blast[ing]", "blasting", CookingRecipeEvent.BlastingRecipeEvent.class),
+		CAMPFIRE("campfire", "campfire", CookingRecipeEvent.CampfireRecipeEvent.class),
+		FURNACE("furnace", "furnace", CookingRecipeEvent.FurnaceRecipeEvent.class),
+		SMOKING("smoking", "smoking", CookingRecipeEvent.SmokingRecipeEvent.class),
+		COOKING("cooking", "cooking", CookingRecipeEvent.class),
+		SMITHINGTRANSFORM("smith[ing] transform", "smithing transform", SmithingRecipeEvent.SmithingTransformRecipeEvent.class),
+		SMITHINGTRIM("smith[ing] trim", "smithing trim", SmithingRecipeEvent.SmithingTrimRecipeEvent.class),
+		STONECUTTING("stone cutting", "stone cutting", StonecuttingRecipeEvent.class);
+
+
+		private String pattern, toString;
+		private int maxIngredients, maxRowIngredients;
+		private Class<? extends Event> eventClass;
+
+		RecipeTypes(String pattern, int maxIngredients, int maxRowIngredients, String toString, Class<? extends Event> eventClass) {
+			this.pattern = pattern;
+			this.maxIngredients = maxIngredients;
+			this.maxRowIngredients = maxRowIngredients;
+			this.toString = toString;
+			this.eventClass = eventClass;
+		}
+
+		RecipeTypes(String pattern, String toString, Class<? extends Event> eventClass) {
+			this.pattern = pattern;
+			this.toString = toString;
+			this.eventClass = eventClass;
+		}
+
+		public String getPattern() {
+			return pattern;
+		}
+
+		public Class<? extends Event> getEventClass() {
+			return eventClass;
+		}
+
+		public String getToString() {
+			return toString;
+		}
+
+		public int getMaxIngredients() {
+			return maxIngredients;
+		}
+
+		public int getMaxRowIngredients() {
+			return maxRowIngredients;
+		}
+
+	}
 
 	private ItemStack resultItem;
 	private boolean errorInEffect = false;
@@ -75,10 +127,6 @@ public class RegisterRecipeEvent extends Event {
 
 		public int getMaxRowIngredients() {
 			return getRecipeType().getMaxRowIngredients();
-		}
-
-		public int getMinIngredients() {
-			return getRecipeType().getMinIngredients();
 		}
 
 		public CraftingBookCategory getCategory() {
@@ -225,18 +273,18 @@ public class RegisterRecipeEvent extends Event {
 
 	public static class StonecuttingRecipeEvent extends RegisterRecipeEvent {
 
-		private Material inputItem;
+		private RecipeChoice input;
 
 		public StonecuttingRecipeEvent(RecipeTypes recipeType) {
 			super(recipeType);
 		}
 
-		public void setInputItem(Material item) {
-			this.inputItem = item;
+		public void setInput(RecipeChoice input) {
+			this.input = input;
 		}
 
-		public Material getInputItem() {
-			return inputItem;
+		public RecipeChoice getInput() {
+			return input;
 		}
 	}
 
