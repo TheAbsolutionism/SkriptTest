@@ -3,8 +3,7 @@ package ch.njol.skript.util;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.NotNull;
@@ -12,34 +11,27 @@ import org.jetbrains.annotations.NotNull;
 public class RegisterRecipeEvent extends Event {
 
 	public enum RecipeTypes {
-		SHAPED("shaped [crafting]", 9, 3, "shaped", CraftingRecipeEvent.ShapedRecipeEvent.class),
-		SHAPELESS("shapeless [crafting]", 9, 0, "shapeless", CraftingRecipeEvent.ShapelessRecipeEvent.class),
-		BLASTING("blast[ing]", "blasting", CookingRecipeEvent.BlastingRecipeEvent.class),
-		CAMPFIRE("campfire", "campfire", CookingRecipeEvent.CampfireRecipeEvent.class),
-		FURNACE("furnace", "furnace", CookingRecipeEvent.FurnaceRecipeEvent.class),
-		SMOKING("smoking", "smoking", CookingRecipeEvent.SmokingRecipeEvent.class),
-		COOKING("cooking", "cooking", CookingRecipeEvent.class),
-		SMITHINGTRANSFORM("smith[ing] transform", "smithing transform", SmithingRecipeEvent.SmithingTransformRecipeEvent.class),
-		SMITHINGTRIM("smith[ing] trim", "smithing trim", SmithingRecipeEvent.SmithingTrimRecipeEvent.class),
-		STONECUTTING("stone cutting", "stone cutting", StonecuttingRecipeEvent.class);
+		SHAPED("shaped [crafting]", "shaped", CraftingRecipeEvent.ShapedRecipeEvent.class, ShapedRecipe.class),
+		SHAPELESS("shapeless [crafting]", "shapeless", CraftingRecipeEvent.ShapelessRecipeEvent.class, ShapelessRecipe.class),
+		BLASTING("blast[ing]", "blasting", CookingRecipeEvent.BlastingRecipeEvent.class, BlastingRecipe.class),
+		CAMPFIRE("campfire", "campfire", CookingRecipeEvent.CampfireRecipeEvent.class, CampfireRecipe.class),
+		FURNACE("furnace", "furnace", CookingRecipeEvent.FurnaceRecipeEvent.class, FurnaceRecipe.class),
+		SMOKING("smoking", "smoking", CookingRecipeEvent.SmokingRecipeEvent.class, SmokingRecipe.class),
+		COOKING("cooking", "cooking", CookingRecipeEvent.class, CookingRecipe.class),
+		SMITHINGTRANSFORM("smith[ing] transform", "smithing transform", SmithingRecipeEvent.SmithingTransformRecipeEvent.class, SmithingTransformRecipe.class),
+		SMITHINGTRIM("smith[ing] trim", "smithing trim", SmithingRecipeEvent.SmithingTrimRecipeEvent.class, SmithingTrimRecipe.class),
+		STONECUTTING("stone cutting", "stone cutting", StonecuttingRecipeEvent.class, StonecuttingRecipe.class);
 
 
 		private String pattern, toString;
-		private int maxIngredients, maxRowIngredients;
 		private Class<? extends Event> eventClass;
+		private Class<? extends Recipe> recipeClass;
 
-		RecipeTypes(String pattern, int maxIngredients, int maxRowIngredients, String toString, Class<? extends Event> eventClass) {
-			this.pattern = pattern;
-			this.maxIngredients = maxIngredients;
-			this.maxRowIngredients = maxRowIngredients;
-			this.toString = toString;
-			this.eventClass = eventClass;
-		}
-
-		RecipeTypes(String pattern, String toString, Class<? extends Event> eventClass) {
+		RecipeTypes(String pattern, String toString, Class<? extends Event> eventClass, Class<? extends Recipe> recipeClass) {
 			this.pattern = pattern;
 			this.toString = toString;
 			this.eventClass = eventClass;
+			this.recipeClass = recipeClass;
 		}
 
 		public String getPattern() {
@@ -52,14 +44,6 @@ public class RegisterRecipeEvent extends Event {
 
 		public String getToString() {
 			return toString;
-		}
-
-		public int getMaxIngredients() {
-			return maxIngredients;
-		}
-
-		public int getMaxRowIngredients() {
-			return maxRowIngredients;
 		}
 
 	}
@@ -93,11 +77,15 @@ public class RegisterRecipeEvent extends Event {
 	}
 
 	public String getRecipeName() {
-		return recipeType.getToString();
+		return recipeType.toString;
+	}
+
+	public Class<? extends Recipe> getRecipeClass() {
+		return recipeType.recipeClass;
 	}
 
 	public static class CraftingRecipeEvent extends RegisterRecipeEvent {
-		private ItemStack[] ingredients = new ItemStack[9];
+		private RecipeChoice[] ingredients = new RecipeChoice[9];
 		private CraftingBookCategory category = CraftingBookCategory.MISC;
 		private String group;
 
@@ -105,7 +93,7 @@ public class RegisterRecipeEvent extends Event {
 			super(recipeType);
 		};
 
-		public void setIngredients(int placement, ItemStack item) {
+		public void setIngredients(int placement, RecipeChoice item) {
 			ingredients[placement] = item;
 		}
 
@@ -117,16 +105,8 @@ public class RegisterRecipeEvent extends Event {
 			this.group = group;
 		}
 
-		public ItemStack[] getIngredients() {
+		public RecipeChoice[] getIngredients() {
 			return ingredients;
-		}
-
-		public int getMaxIngredients() {
-			return getRecipeType().getMaxIngredients();
-		}
-
-		public int getMaxRowIngredients() {
-			return getRecipeType().getMaxRowIngredients();
 		}
 
 		public CraftingBookCategory getCategory() {
@@ -151,7 +131,7 @@ public class RegisterRecipeEvent extends Event {
 	}
 
 	public static class CookingRecipeEvent extends RegisterRecipeEvent {
-		private Material inputItem;
+		private RecipeChoice input;
 		private CookingBookCategory category = CookingBookCategory.MISC;
 		private String group;
 		private int cookingTime = 10;
@@ -161,8 +141,8 @@ public class RegisterRecipeEvent extends Event {
 			super(recipeType);
 		};
 
-		public void setInputItem(Material item) {
-			inputItem = item;
+		public void setInput(RecipeChoice input) {
+			this.input = input;
 		}
 
 		public void setCategory(CookingBookCategory category) {
@@ -189,8 +169,8 @@ public class RegisterRecipeEvent extends Event {
 			return group;
 		}
 
-		public Material getInputItem() {
-			return inputItem;
+		public RecipeChoice getInput() {
+			return input;
 		}
 
 		public int getCookingTime() {

@@ -3,11 +3,17 @@ package ch.njol.skript.sections;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Section;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.RegisterRecipeEvent;
 import ch.njol.skript.util.RegisterRecipeEvent.RecipeTypes;
 import ch.njol.skript.util.RegisterRecipeEvent.*;
@@ -26,18 +32,64 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Name("Register Recipe")
+@Description({
+	"Create a custom recipe for any of the following types:",
+	"Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting",
+	"NOTES:",
+	"All recipes except Smithing Trim require a 'result item'",
+	"Shaped and Shapeless Ingredients allows custom items only on Paper",
+	"Shaped and Shapeless have a maximum of 9 and minimum requirement of 2 ingredients",
+	"Blasting, Furnace, Campfire and Smoking all fall under Cooking",
+	"Groups only apply to Shaped, Shapeless and Cooking Recipes",
+	"Category only applies to Shaped, Shapeless and Cooking Recipes"
+})
+@Examples({
+	"register a new shaped recipe with the name \"my_recipe\":",
+		"\tset the recipe ingredients to diamond, air, diamond, air, emerald, air, diamond and diamond #OR",
+		"\tset recipe ingredients of 1st row to diamond, air and diamond",
+		"\tset recipe ingredients of second row to air, emerald and air",
+		"\tset recipe ingredients of 3rd row to diamond, air and diamond",
+		"\tset recipe group to \"my group\"",
+		"\tset recipe category to crafting.misc",
+		"\tset recipe result to diamond sword named \"Heavenly Sword\"",
+	"",
+	"register a shapeless recipe with namespace \"my_recipe\":",
+		"\tset recipe ingredients to 3 diamonds, 3 emeralds and 3 iron ingots",
+		"\tset the recipe group to \"custom group\"",
+		"\tset the recipe category to crafting category misc",
+		"\tset the recipe result item to diamond helmet named \"Heavenly Helm\"",
+	"",
+	"#Blasting, Furnace, Campfire and Smoking follow same format as Cooking",
+	"create new cooking recipe with the namespacekey \"my_recipe\":",
+		"\tset the recipe experience to 5",
+		"\tset the recipe cooking time to 10 seconds",
+		"\tset the recipe group to \"custom group\"",
+		"\tset the recipe category to cooking.misc",
+		"\tset the recipe input item to coal named \"Ash\"",
+		"\tset the recipe resulting item to gunpowder named \"Dust\"",
+	"",
+	"#Smithing Trim follows the same format, except for 'result item'",
+	"create smithing transform recipe with name \"my_recipe\":",
+		"\tset the recipe base item to diamond",
+		"\tset the recipe template item to emerald",
+		"\tset the recipe additional item to netherite ingot",
+		"\tset the recipe result to ...",
+	"",
+	"create a new stonecutting recipe with namespacekey \"my_recipe\":",
+		"\tset the recipe source item to cobblestone named \"Cracked Stone\"",
+		"\tset the recipe result to stone named \"Refurnished Stone\""
+})
+@Since("INSERT VERSION")
 public class SecRegisterRecipe extends Section {
 	/*
 	TODO:
-		set category effect
-		CondDiscoveredRecipe
-		EffDiscoverRecipe
 		Tests
-		Maybe CraftingBookCategory and CookingBookCategory lang
+		ExprAllRecipes (Including of recipe type)
+		ExprRecipeName (Get recipe via name)
+		ExprRecipeFor (Get all recipes for item)
+		Rewrite Sec to provide a valid recipe as event value (Including RegisterRecipeEvent.java)
 	 */
-	private static final boolean SUPPORT_SHAPED_ITEMSTACK = Skript.methodExists(ShapedRecipe.class, "setIngredient", Character.class, ItemStack.class);
-	private static final boolean SUPPORT_SHAPELESS_ITEMSTACK = Skript.methodExists(ShapelessRecipe.class, "addIngredient", ItemStack.class);
-
 	private static final RecipeTypes[] recipeTypes = RecipeTypes.values();
 
 	static {
@@ -46,6 +98,12 @@ public class SecRegisterRecipe extends Section {
 			patterns[type.ordinal()] = "(register|create) [a] [new] " + type.getPattern() + " recipe with [the] name[space[key]] %string%";
 		}
 		Skript.registerSection(SecRegisterRecipe.class, patterns);
+		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
+			@Override
+			public @Nullable Recipe get(RegisterRecipeEvent recipe) {
+				return null;
+			}
+		}, EventValues.TIME_NOW);
 	}
 
 	private RecipeTypes recipeType;
@@ -96,7 +154,7 @@ public class SecRegisterRecipe extends Section {
 		switch (recipeType) {
 			case SHAPED, SHAPELESS -> {
 				if (recipeEvent instanceof CraftingRecipeEvent craftingRecipe) {
-					ItemStack[] ingredients = craftingRecipe.getIngredients();
+					RecipeChoice[] ingredients = craftingRecipe.getIngredients();
 					if (ingredients.length < 2 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
 						customError("You must have at least 2 ingredients when registering a '" + recipeType.getToString() + "' recipe.");
 						return super.walk(event, false);
@@ -111,12 +169,12 @@ public class SecRegisterRecipe extends Section {
 			}
 			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> {
 				if (recipeEvent instanceof CookingRecipeEvent cookingRecipe) {
-					Material inputItem = cookingRecipe.getInputItem();
+					RecipeChoice input = cookingRecipe.getInput();
 					String group = cookingRecipe.getGroup();
 					CookingBookCategory category = cookingRecipe.getCategory();
 					int cookingTime = cookingRecipe.getCookingTime();
 					float experience = cookingRecipe.getExperience();
-					createCookingRecipe(recipeType, key, result, inputItem, group, category, cookingTime, experience);
+					createCookingRecipe(recipeType, key, result, input, group, category, cookingTime, experience);
 				}
 			}
 			case SMITHINGTRANSFORM, SMITHINGTRIM -> {
@@ -144,7 +202,7 @@ public class SecRegisterRecipe extends Section {
 		Bukkit.addRecipe(recipe);
 	}
 
-	private void createShapedRecipe(NamespacedKey key, ItemStack result, ItemStack[] ingredients, String group, CraftingBookCategory category) {
+	private void createShapedRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
 		ShapedRecipe shapedRecipe = new ShapedRecipe(key, result);
 		if (category != null)
 			shapedRecipe.setCategory(category);
@@ -153,43 +211,33 @@ public class SecRegisterRecipe extends Section {
 		Character[] characters = new Character[]{'a','b','c','d','e','f','g','h','i'};
 		shapedRecipe.shape("abc","def","ghi");
 		for (int i = 0; i < ingredients.length; i++) {
-			ItemStack thisItem = ingredients[i];
-			if (thisItem != null) {
-				if (SUPPORT_SHAPED_ITEMSTACK) {
-					shapedRecipe.setIngredient(characters[i], thisItem);
-				} else {
-					shapedRecipe.setIngredient(characters[i], thisItem.getType());
-				}
-			}
+			RecipeChoice thisChoice = ingredients[i];
+			if (thisChoice != null)
+				shapedRecipe.setIngredient(characters[i], thisChoice);
 		}
 		completeRecipe(key, shapedRecipe);
 	}
 
-	private void createShapelessRecipe(NamespacedKey key, ItemStack result, ItemStack[] ingredients, String group, CraftingBookCategory category) {
+	private void createShapelessRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
 		ShapelessRecipe shapelessRecipe = new ShapelessRecipe(key, result);
 		if (category != null)
 			shapelessRecipe.setCategory(category);
 		if (group != null && !group.isEmpty())
 			shapelessRecipe.setGroup(group);
 		for (int i = 0; i < ingredients.length; i++) {
-			ItemStack thisItem = ingredients[i];
-			if (thisItem != null) {
-				if (SUPPORT_SHAPELESS_ITEMSTACK) {
-					shapelessRecipe.addIngredient(thisItem);
-				} else {
-					shapelessRecipe.addIngredient(thisItem.getAmount(), thisItem.getType());
-				}
-			}
+			RecipeChoice thisChoice = ingredients[i];
+			if (thisChoice != null)
+				shapelessRecipe.addIngredient(thisChoice);
 		}
 		completeRecipe(key, shapelessRecipe);
 	}
 
-	private void createCookingRecipe(RecipeTypes recipeType, NamespacedKey key, ItemStack result, Material inputItem, String group, CookingBookCategory category, int cookingTime, float experience) {
+	private void createCookingRecipe(RecipeTypes recipeType, NamespacedKey key, ItemStack result, RecipeChoice input, String group, CookingBookCategory category, int cookingTime, float experience) {
 		var recipe = switch (recipeType) {
-			case BLASTING -> new BlastingRecipe(key, result, inputItem, experience, cookingTime);
-			case CAMPFIRE -> new CampfireRecipe(key, result, inputItem, experience, cookingTime);
-			case FURNACE -> new FurnaceRecipe(key, result, inputItem, experience, cookingTime);
-			case SMOKING -> new SmokingRecipe(key, result, inputItem, experience, cookingTime);
+			case BLASTING -> new BlastingRecipe(key, result, input, experience, cookingTime);
+			case CAMPFIRE -> new CampfireRecipe(key, result, input, experience, cookingTime);
+			case FURNACE -> new FurnaceRecipe(key, result, input, experience, cookingTime);
+			case SMOKING -> new SmokingRecipe(key, result, input, experience, cookingTime);
 			default -> null;
 		};
 		if (recipe == null)
@@ -203,7 +251,7 @@ public class SecRegisterRecipe extends Section {
 
 	private void createSmithingRecipe(RecipeTypes recipeType, NamespacedKey key, ItemStack result, RecipeChoice base, RecipeChoice template, RecipeChoice addition) {
 		if (base == null || template == null || addition == null) {
-			customError("Unable to create " + recipeType.getToString() + " recipe, missing data.");
+			customError("Unable to create '" + recipeType.getToString() + "' recipe, missing data.");
 			return;
 		}
 		var recipe = switch (recipeType) {
@@ -218,7 +266,7 @@ public class SecRegisterRecipe extends Section {
 
 	private void createStonecuttingRecipe(NamespacedKey key, ItemStack result, RecipeChoice input) {
 		if (input == null) {
-			customError("Unable to create a stonecutting recipe, missing data.");
+			customError("Unable to create a 'stonecutting' recipe, missing data.");
 			return;
 		}
 		StonecuttingRecipe recipe = new StonecuttingRecipe(key, result, input);

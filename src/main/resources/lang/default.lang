@@ -2303,6 +2303,19 @@ transform reasons:
 	unknown: unknown
 	infection: infection, villager infection
 
+# -- Crafting Book Categories --
+crafting book categories:
+	building: crafting.building, crafting building, craftingcategory.building, craftingcategory building, crafting category.building, crafting category building
+	equipment: crafting.equipment, crafting equipment, craftingcategory.equipment, craftingcategory equipment, crafting category.equipment, crafting category equipment
+	misc: crafting.misc, crafting misc, craftingcategory.misc, craftingcategory misc, crafting category.misc, crafting category misc
+	redstone: crafting.redstone, crafting redstone, craftingcategory.redstone, craftingcategory redstone, crafting category.redstone, crafting category redstone
+
+# -- Cooking Book Categories --
+cooking book categories:
+	blocks: cooking.blocks, cooking blocks, cookingcategory.blocks, cookingcategory blocks, cooking category.blocks, cooking category blocks
+	food: cooking.food, cooking food, cookingcategory.food, cookingcategory food, cooking category.food, cooking category food
+	misc: cooking.misc, cooking misc, cookingcategory.misc, cookingcategory misc, cooking category.misc, cooking category misc
+
 # -- Boolean --
 boolean:
 	true:
@@ -2383,6 +2396,9 @@ types:
 	quitreason: quit reason¦s @a
 	inventoryclosereason: inventory close reason¦s @an
 	transformreason: transform reason¦s @a
+	recipe: recipe¦s @a
+	craftingbookcategory: crafting book categor¦y¦ies @a
+	cookingbookcategory: cooking book categor¦y¦ies @a
 
 	# Skript
 	weathertype: weather type¦s @a

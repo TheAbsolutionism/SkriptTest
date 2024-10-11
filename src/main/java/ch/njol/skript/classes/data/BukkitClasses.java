@@ -71,10 +71,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerQuitEvent.QuitReason;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.BlockInventoryHolder;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
+import org.bukkit.inventory.recipe.CookingBookCategory;
+import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -1532,6 +1531,29 @@ public class BukkitClasses {
 				.name("Entity Potion Cause")
 				.description("Represents the cause of the action of a potion effect on an entity, e.g. arrow, command")
 				.since("INSERT VERSION"));
+
+		Classes.registerClass(new ClassInfo<>(Recipe.class, "recipe")
+			.user("recipes?")
+			.name("Recipe")
+			.description("")
+			.usage("")
+			.examples("")
+			.since("INSERT VERSION")
+			.defaultExpression(new EventValueExpression<>(Recipe.class)));
+
+		Classes.registerClass(new EnumClassInfo<>(CraftingBookCategory.class, "craftingbookcategory", "crafting book categories")
+			.user("crafting book category")
+			.name("Crafting Book Category")
+			.description("Represents a category for crafting recipe types")
+			.since("INSERT VERSION")
+		);
+
+		Classes.registerClass(new EnumClassInfo<>(CookingBookCategory.class, "cookingbookcategory", "cooking book categories")
+			.user("cooking book category")
+			.name("Cooking Book Category")
+			.description("Represents a category for cooking recipe types")
+			.since("INSERT VERSION")
+		);
 	}
 
 }
