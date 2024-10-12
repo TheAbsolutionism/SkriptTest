@@ -39,8 +39,7 @@ public class EvtFirework extends SkriptEvent {
 			colors = (Literal<Color>) args[0];
 		return true;
 	}
-	
-	@SuppressWarnings("null")
+
 	@Override
 	public boolean check(Event event) {
 		if (!(event instanceof FireworkExplodeEvent fireworkExplodeEvent))

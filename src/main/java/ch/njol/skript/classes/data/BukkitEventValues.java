@@ -1635,7 +1635,7 @@ public final class BukkitEventValues {
 		}, 0);
 		EventValues.registerEventValue(FireworkExplodeEvent.class, Color[].class, new Getter<Color[], FireworkExplodeEvent>() {
 			@Override
-			public @Nullable Color[] get(FireworkExplodeEvent event) {
+			public Color @Nullable [] get(FireworkExplodeEvent event) {
 				List<FireworkEffect> effects = event.getEntity().getFireworkMeta().getEffects();
 				if (effects.isEmpty())
 					return null;
