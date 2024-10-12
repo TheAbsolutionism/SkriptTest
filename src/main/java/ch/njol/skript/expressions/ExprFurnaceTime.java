@@ -20,9 +20,12 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Name("Furnace Times")
 @Description({
@@ -136,21 +139,37 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		int providedTime = 0;
 		if (delta != null && delta[0] instanceof Timespan span)
 			providedTime = (int) span.get(Timespan.TimePeriod.TICK);
+		int finalTime = providedTime;
+
+		Function<Integer, Integer> calculateTime = switch (mode) {
+			case SET -> time -> finalTime;
+			case ADD -> time -> Math2.fit(0, time + finalTime, Integer.MAX_VALUE);
+			case REMOVE -> time -> Math2.fit(0, time - finalTime, Integer.MAX_VALUE);
+			case DELETE -> time -> 0;
+			default -> throw new IllegalStateException("Unexpected value: " + mode);
+		};
+		Function<Short, Short> calculateTimeShort = switch (mode) {
+			case SET -> time -> (short) finalTime;
+			case ADD -> time -> (short) Math2.fit(0, time + finalTime, Short.MAX_VALUE);
+			case REMOVE -> time -> (short) Math2.fit(0, time - finalTime, Short.MAX_VALUE);
+			case DELETE -> time -> (short) 0;
+			default -> throw new IllegalStateException("Unexpected value: " + mode);
+		};
 
 		switch (type) {
-			case COOKTIME -> changeCookTime(event, providedTime, mode);
+			case COOKTIME -> changeFurnaces(event, furnace -> change(furnace::setCookTime, furnace::getCookTime, calculateTimeShort));
 			case TOTALCOOKTIME -> {
-				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent startSmeltEvent) {
-					changeTotalCookTimeEvent(startSmeltEvent, mode, providedTime);
+				if (!explicitlyBlock && event instanceof FurnaceStartSmeltEvent smeltEvent) {
+					change(smeltEvent::setTotalCookTime, smeltEvent::getTotalCookTime, calculateTime);
 				} else {
-					changeTotalCookTimeBlock(event, providedTime, mode);
+					changeFurnaces(event, furnace -> change(furnace::setCookTimeTotal, furnace::getCookTimeTotal, calculateTime));
 				}
 			}
 			case BURNTIME -> {
 				if (!explicitlyBlock && event instanceof FurnaceBurnEvent burnEvent) {
-					changeBurnTimeEvent(burnEvent, mode, providedTime);
+					change(burnEvent::setBurnTime, burnEvent::getBurnTime, calculateTime);
 				} else {
-					changeBurnTimeBlock(event, providedTime, mode);
+					changeFurnaces(event, furnace -> change(furnace::setBurnTime, furnace::getBurnTime, calculateTimeShort));
 				}
 			}
 		}
@@ -164,49 +183,8 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		}
 	}
 
-	private void changeCookTime(Event event, int providedTime, ChangeMode mode) {
-		switch (mode) {
-			case SET -> changeFurnaces(event, furnace -> furnace.setCookTime((short) providedTime));
-			case DELETE -> changeFurnaces(event, furnace -> furnace.setCookTime((short) 0));
-			case REMOVE -> changeFurnaces(event, furnace -> furnace.setCookTime((short) Math2.fit(0, furnace.getCookTime() - providedTime, Integer.MAX_VALUE)));
-			case ADD -> changeFurnaces(event, furnace -> furnace.setCookTime((short) Math2.fit(0, furnace.getCookTime() + providedTime, Integer.MAX_VALUE)));
-		}
-	}
-
-	private void changeTotalCookTimeBlock(Event event, int providedTime, ChangeMode mode) {
-		switch (mode) {
-			case SET -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(providedTime));
-			case DELETE -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(0));
-			case REMOVE -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() - providedTime, Integer.MAX_VALUE)));
-			case ADD -> changeFurnaces(event, furnace -> furnace.setCookTimeTotal(Math2.fit(0, furnace.getCookTimeTotal() + providedTime, Integer.MAX_VALUE)));
-		}
-	}
-
-	private void changeBurnTimeBlock(Event event, int providedTime, ChangeMode mode) {
-		switch (mode) {
-			case SET -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) providedTime));
-			case DELETE -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) 0));
-			case REMOVE -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() - providedTime, Integer.MAX_VALUE)));
-			case ADD -> changeFurnaces(event, furnace -> furnace.setBurnTime((short) Math2.fit(0, furnace.getBurnTime() + providedTime, Integer.MAX_VALUE)));
-		}
-	}
-
-	private void changeTotalCookTimeEvent(FurnaceStartSmeltEvent startSmeltEvent, ChangeMode mode, int providedTime) {
-		switch (mode) {
-			case SET -> startSmeltEvent.setTotalCookTime(providedTime);
-			case ADD -> startSmeltEvent.setTotalCookTime(Math2.fit(0, startSmeltEvent.getTotalCookTime() + providedTime, Integer.MAX_VALUE));
-			case REMOVE -> startSmeltEvent.setTotalCookTime(Math2.fit(0, startSmeltEvent.getTotalCookTime() - providedTime, Integer.MAX_VALUE));
-			case DELETE -> startSmeltEvent.setTotalCookTime(0);
-		}
-	}
-
-	private void changeBurnTimeEvent(FurnaceBurnEvent burnEvent, ChangeMode mode, int providedTime) {
-		switch (mode) {
-			case SET -> burnEvent.setBurnTime(providedTime);
-			case ADD -> burnEvent.setBurnTime(Math2.fit(0, burnEvent.getBurnTime() + providedTime, Integer.MAX_VALUE));
-			case REMOVE -> burnEvent.setBurnTime(Math2.fit(0, burnEvent.getBurnTime() - providedTime, Integer.MAX_VALUE));
-			case DELETE -> burnEvent.setBurnTime(0);
-		}
+	private static <T extends Number> void change(@NotNull Consumer<T> set, @NotNull Supplier<T> get, @NotNull Function<T, T> calculateTime) {
+		set.accept(calculateTime.apply(get.get()));
 	}
 
 	@Override
