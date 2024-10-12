@@ -15,6 +15,7 @@ import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +49,11 @@ public class EvtFurnaceTest extends SkriptJUnitTest {
 		Bukkit.getPluginManager().callEvent(smeltEvent);
 		Bukkit.getPluginManager().callEvent(startEvent);
 		Bukkit.getPluginManager().callEvent(extractEvent);
+	}
+
+	@After
+	public void cleanUp() {
+		furnace.setType(Material.AIR);
 	}
 
 }

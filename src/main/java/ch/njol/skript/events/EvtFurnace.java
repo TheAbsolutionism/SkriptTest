@@ -50,7 +50,7 @@ public class EvtFurnace extends SkriptEvent {
 
 		Skript.registerEvent("Start Smelt", EvtFurnace.class, FurnaceStartSmeltEvent.class,
 			"[furnace] start [of] smelt[ing] [[of] %-itemtypes%]",
-			"[furnace] smelting start [of %-itemtypes%]")
+			"[furnace] smelt[ing] start [of %-itemtypes%]")
 			.description("Called when a furnace starts smelting an item in its ore slot.")
 			.examples(
 				"on smelting start:",
@@ -97,7 +97,17 @@ public class EvtFurnace extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "smelt/burn/extract/start smelt of " + Classes.toString(types);
+		String result = "";
+		if (event instanceof FurnaceSmeltEvent) {
+			result = "smelt";
+		} else if (event instanceof FurnaceBurnEvent) {
+			result = "burn";
+		} else if (event instanceof FurnaceExtractEvent) {
+			result = "extract";
+		} else if (event instanceof FurnaceStartSmeltEvent) {
+			result = "start smelt";
+		}
+		return result + " of " + Classes.toString(types);
 	}
 
 }

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-
 @Name("Furnace Times")
 @Description({
 	"The cook time, total cook time, and burn time of a furnace. Can be changed.",

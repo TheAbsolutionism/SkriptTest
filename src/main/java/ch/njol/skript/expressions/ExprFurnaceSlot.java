@@ -159,38 +159,37 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 		}
 
 		@Override
-		@Nullable
-		public ItemStack getItem() {
-            return switch (slot) {
-                case ORE -> {
-                    if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
-                        ItemStack source = furnaceSmeltEvent.getSource().clone();
-                        if (getTime() != EventValues.TIME_FUTURE)
-                            yield source;
-                        source.setAmount(source.getAmount() - 1);
-                        yield source;
-                    }
-                    yield super.getItem();
-                }
-                case FUEL -> {
-                    if (event instanceof FurnaceBurnEvent furnaceBurnEvent) {
-                        ItemStack fuel = furnaceBurnEvent.getFuel().clone();
-                        if (getTime() != EventValues.TIME_FUTURE)
-                            yield fuel;
-                        Material newMaterial = fuel.getType() == Material.LAVA_BUCKET ? Material.BUCKET : Material.AIR;
-                        fuel.setAmount(fuel.getAmount() - 1);
-                        if (fuel.getAmount() == 0)
-                            fuel = new ItemStack(newMaterial);
-                        yield fuel;
-                    }
-                    yield super.getItem();
-                    // a single lava bucket becomes an empty bucket
-                    // see https://minecraft.wiki/w/Smelting#Fuel
-                    // this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
-                }
-                case RESULT -> {
-                    if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
-                        ItemStack result = furnaceSmeltEvent.getResult().clone();
+		public @Nullable ItemStack getItem() {
+			return switch (slot) {
+				case ORE -> {
+					if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+						ItemStack source = furnaceSmeltEvent.getSource().clone();
+						if (getTime() != EventValues.TIME_FUTURE)
+							yield source;
+						source.setAmount(source.getAmount() - 1);
+						yield source;
+					}
+					yield super.getItem();
+				}
+				case FUEL -> {
+					if (event instanceof FurnaceBurnEvent furnaceBurnEvent) {
+						ItemStack fuel = furnaceBurnEvent.getFuel().clone();
+						if (getTime() != EventValues.TIME_FUTURE)
+							yield fuel;
+						Material newMaterial = fuel.getType() == Material.LAVA_BUCKET ? Material.BUCKET : Material.AIR;
+						fuel.setAmount(fuel.getAmount() - 1);
+						if (fuel.getAmount() == 0)
+							fuel = new ItemStack(newMaterial);
+						yield fuel;
+					}
+					yield super.getItem();
+					// a single lava bucket becomes an empty bucket
+					// see https://minecraft.wiki/w/Smelting#Fuel
+					// this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
+				}
+				case RESULT -> {
+					if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+						ItemStack result = furnaceSmeltEvent.getResult().clone();
 						ItemStack currentResult = ((FurnaceInventory) getInventory()).getResult();
 						if (currentResult != null)
 							currentResult = currentResult.clone();
@@ -202,12 +201,12 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 						} else {
 							yield result; // 'the result'
 						}
-                    }
-                    yield super.getItem();
-                }
-                default -> null;
-            };
-        }
+					}
+					yield super.getItem();
+				}
+				default -> null;
+			};
+		}
 
 		@Override
 		public void setItem(@Nullable ItemStack item) {

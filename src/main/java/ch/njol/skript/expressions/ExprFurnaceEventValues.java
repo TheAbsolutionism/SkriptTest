@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack> {
 
 	enum FurnaceValues {
-		SMELTED("(smelted item|result [item])", "smelted item", FurnaceSmeltEvent.class, "'smelted item' can only be used in a smelting event."),
+		SMELTED("(smelted item|result[ item])", "smelted item", FurnaceSmeltEvent.class, "'smelted item' can only be used in a smelting event."),
 		EXTRACTED("extracted item[s]", "extracted item", FurnaceExtractEvent.class, "'extracted item' can only be used in a furnace extract event."),
 		SMELTING("smelting item", "smelting item", FurnaceStartSmeltEvent.class, "'smelting item' can only be used in a start smelting event"),
 		BURNED("burned (fuel|item)", "burned fuel item", FurnaceBurnEvent.class, "'burned fuel' can only be used in a fuel burning event.");
@@ -63,12 +63,12 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 
 	}
 
-	private static final FurnaceValues[] furnaceValues = FurnaceValues.values();
+	private static final FurnaceValues[] FURNACE_VALUES = FurnaceValues.values();
 
 	static {
-		int size = furnaceValues.length;
+		int size = FURNACE_VALUES.length;
 		String[] patterns  = new String[size];
-		for (FurnaceValues value : furnaceValues) {
+		for (FurnaceValues value : FURNACE_VALUES) {
 			patterns[value.ordinal()] = value.pattern;
 		}
 
@@ -80,7 +80,7 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = furnaceValues[matchedPattern];
+		type = FURNACE_VALUES[matchedPattern];
 		if (!getParser().isCurrentEvent(type.clazz)) {
 			Skript.error(type.error);
 			return false;
