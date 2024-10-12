@@ -112,7 +112,6 @@ public class EffSecShoot extends EffectSection {
 	}
 
 	@Override
-	@SuppressWarnings({"unchecked","rawtypes"})
 	protected @Nullable TriggerItem walk(Event event) {
 		lastSpawned = null;
 		Number finalVelocity = velocity != null ? velocity.getSingle(event) : DEFAULT_SPEED;
@@ -129,6 +128,7 @@ public class EffSecShoot extends EffectSection {
 					Class<? extends Entity> type = entityData.getType();
 					if (Fireball.class.isAssignableFrom(type)) {
 						if (trigger != null) {
+							//noinspection unchecked,rawtypes
 							livingShooter.getWorld().spawn(
 								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
 								type,
@@ -144,12 +144,14 @@ public class EffSecShoot extends EffectSection {
 						}
 					} else if (Projectile.class.isAssignableFrom(type)) {
 						if (trigger != null) {
+							//noinspection unchecked,rawtypes
 							livingShooter.launchProjectile(
 								(Class<? extends Projectile>) type,
 								vector,
 								(Consumer) afterSpawn(event, vector, entityData, livingShooter)
 							);
 						} else {
+							//noinspection unchecked
 							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
 							set(finalProjectile, entityData);
 						}
@@ -157,6 +159,7 @@ public class EffSecShoot extends EffectSection {
 						Location location = livingShooter.getLocation();
 						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
 						if (trigger != null) {
+							//noinspection unchecked,rawtypes
 							entityData.spawn(location, (Consumer) afterSpawn(event, vector, entityData, livingShooter));
 						} else {
 							finalProjectile = entityData.spawn(location);
@@ -165,6 +168,7 @@ public class EffSecShoot extends EffectSection {
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
 					if (trigger != null) {
+						//noinspection unchecked,rawtypes
 						entityData.spawn((Location) shooter, (Consumer) afterSpawn(event, vector, entityData, null));
 					} else {
 						finalProjectile = entityData.spawn((Location) shooter);
