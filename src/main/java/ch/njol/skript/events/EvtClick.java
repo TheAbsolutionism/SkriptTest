@@ -84,18 +84,18 @@ public class EvtClick extends SkriptEvent {
 			Literal<EntityData<?>> entitydata = (Literal<EntityData<?>>) type;
 			if (click == LEFT) {
 				if (Vehicle.class.isAssignableFrom(entitydata.getSingle().getType())) {
-					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, use the 'vehicle damage' event.");
+					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, but the 'vehicle damage' event.");
 				} else {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, use the 'damage' event.");
+					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event.");
 				}
 				return false;
 			} else if (click == ANY) {
 				if (Vehicle.class.isAssignableFrom(entitydata.getSingle().getType())) {
-					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, use the 'vehicle damage' event for left clicks " +
-							"or change this event to a rightclick.");
+					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, but the 'vehicle damage' event. " +
+						"Change this event to a rightclick to fix this warning message.");
 				} else {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, use the 'damage' event for left clicks " +
-							"or change this event to a rightclick.");
+					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event. " +
+						"Change this event to a rightclick to fix this warning message.");
 				}
 			}
 		}
@@ -160,23 +160,18 @@ public class EvtClick extends SkriptEvent {
 			assert false;
 			return false;
 		}
-		
-		if (tools != null && !tools.check(event, new Checker<ItemType>() {
-			@Override
-			public boolean check(ItemType itemType) {
-				if (event instanceof PlayerInteractEvent interactEvent) {
-					return itemType.isOfType(interactEvent.getItem());
-				} else { // PlayerInteractEntityEvent doesn't have item associated with it
-					PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
-					ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
-							? invi.getItemInMainHand() : invi.getItemInOffHand();
-					return itemType.isOfType(item);
-				}
+
+		if (tools != null && !tools.check(event, itemType -> {
+			if (event instanceof PlayerInteractEvent interactEvent) {
+				return itemType.isOfType(interactEvent.getItem());
+			} else {
+				PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
+				ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
+					? invi.getItemInMainHand() : invi.getItemInOffHand();
+				return itemType.isOfType(item);
 			}
-		})) {
-			return false;
-		}
-		
+		})) { return false; }
+
 		if (type != null) {
 			BlockData blockDataCheck = block != null ? block.getBlockData() : null;
 			return type.check(event, new Checker<Object>() {
