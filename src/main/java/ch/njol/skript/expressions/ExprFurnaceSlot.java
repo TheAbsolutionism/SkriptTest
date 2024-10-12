@@ -53,8 +53,8 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	static {
 		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY,
-			"[the] (0:ore|input|1:fuel|2:result|output) slot[s] [of %blocks%]",
-			"%blocks%['s] (0:ore|input|1:fuel|2:result|output) slot[s]"
+			"[the] (0:(ore|input)|1:fuel|2:(result|output)) slot[s] [of %blocks%]",
+			"%blocks%['s] (0:(ore|input)|1:fuel|2:(result|output)) slot[s]"
 		);
 	}
 
@@ -125,18 +125,12 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		String result = "";
-		switch (slot) {
-			case ORE -> result = "input slot";
-			case FUEL -> result = "fuel slot";
-			case RESULT -> result = "result slot";
-		}
-		if (isEvent) {
-			result += " of " + event.getEventName();
-		} else {
-			result += " of " + blocks.toString(event, debug);
-		}
-		return result;
+		return switch (slot) {
+			case ORE -> "input";
+			case FUEL -> "fuel";
+			case RESULT -> "result";
+			default -> ""; // switch errors with 'not all possible inputs are covered'
+		} + " slot of " + (isEvent ? event.getEventName() : blocks.toString(event, debug));
 	}
 
 	@Override
@@ -183,9 +177,6 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 						yield fuel;
 					}
 					yield super.getItem();
-					// a single lava bucket becomes an empty bucket
-					// see https://minecraft.wiki/w/Smelting#Fuel
-					// this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
 				}
 				case RESULT -> {
 					if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {

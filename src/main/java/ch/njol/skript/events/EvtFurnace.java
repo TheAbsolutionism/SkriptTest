@@ -19,7 +19,7 @@ public class EvtFurnace extends SkriptEvent {
 		Skript.registerEvent("Smelt", EvtFurnace.class, FurnaceSmeltEvent.class,
 				"[furnace] [ore] smelt[ed|ing] [of %-itemtypes%]",
 				"[furnace] smelt[ed|ing] of ore")
-			.description("Called when a furnace smelts an item in its <a href='expressions.html#ExprFurnaceSlot'>ore slot</a>.")
+			.description("Called when a furnace smelts an item in its <a href='expressions.html#ExprFurnaceSlot'>input slot</a>.")
 			.examples(
 				"on smelt:",
 					"\tclear the smelted item",
