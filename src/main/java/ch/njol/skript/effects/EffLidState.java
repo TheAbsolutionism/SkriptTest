@@ -25,8 +25,8 @@ public class EffLidState extends Effect {
 
 	static {
 		Skript.registerEffect(EffLidState.class,
-			"(open|:close) [the] lid (of|for) %blocks%",
-			"(open|:close) %blocks%'[s] lid"
+			"(open|:close) [the] lid[s] (of|for) %blocks%",
+			"(open|:close) %blocks%'[s] lid[s]"
 		);
 	}
 
