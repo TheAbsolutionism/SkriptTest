@@ -34,7 +34,7 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 
 	static {
 		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
-			"[the] recipe cook[ing] time [of %recipes%]");
+			"[the] recipe cook[ing] time [of %-recipes%]");
 	}
 
 	private boolean isEvent = false;
@@ -42,7 +42,7 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {

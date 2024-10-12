@@ -19,6 +19,7 @@ import org.bukkit.event.Event;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,11 +68,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 		INPUT("recipe (input|source) [item]", "recipe input item", new Class[]{CookingRecipeEvent.class, StonecuttingRecipeEvent.class},
 			"This can only be used when registering a Cooking, Blasting, Furnace, Campfire, Smoking or Stonecutting Recipe."),
 		BASE("[recipe] base item['s]", "recipe base item's", SmithingRecipeEvent.class,
-			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe."),
-		TEMPLATE("[recipe] template item['s]", "recipe template item's", SmithingRecipeEvent.class,
+			"This can only be used when registering a Smithing, Smithing Transform, or Smithing Trim Recipe."),
+		TEMPLATE("[recipe] template item['s]", "recipe template item's", new Class[]{SmithingTransformRecipeEvent.class, SmithingTrimRecipeEvent.class},
 			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe."),
 		ADDITION("[recipe] addition[al] item['s]", "recipe additional item's", SmithingRecipeEvent.class,
-			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe.");
+			"This can only be used when registering a Smithing, Smithing Transform or Smithing Trim Recipe.");
 
 
 		private String pattern, toString, error;
@@ -79,14 +80,14 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 		private Class<? extends Event>[] eventClasses;
 
 		RecipePattern(String pattern, String toString, Class<? extends Event> eventClass, String error) {
-			this.pattern = "[the] " + pattern + " [of %recipes%]";
+			this.pattern = "[the] " + pattern + " [of %-recipes%]";
 			this.toString = toString;
 			this.eventClass = eventClass;
 			this.error = error;
 		}
 
 		RecipePattern(String pattern, String toString, Class<? extends Event>[] eventClasses, String error) {
-			this.pattern = "[the] " + pattern + " [of %recipes%]";
+			this.pattern = "[the] " + pattern + " [of %-recipes%]";
 			this.toString = toString;
 			this.eventClasses = eventClasses;
 			this.error = error;
@@ -112,7 +113,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedChoice = recipePatterns[matchedPattern];
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
@@ -163,6 +164,8 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							}).toList());
 					} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
 						ingredients.addAll(shapelessRecipe.getIngredientList());
+					} else {
+						customError("You can only get the ingredients of a Shaped or Shapeless Recipe.");
 					}
 				}
 				case FIRSTROW, SECONDROW, THIRDROW -> {
@@ -175,6 +178,8 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							if (stack == null) stack = new ItemStack(Material.AIR);
 							ingredients.add(stack);
 						}
+					} else {
+						customError("You can only get the ingredients of a row for a Shaped Recipe.");
 					}
 				}
 				case BASE, TEMPLATE, ADDITION -> {
@@ -182,8 +187,10 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						RecipeChoice choice = switch (selectedChoice) {
 							case BASE -> smithingRecipe.getBase();
 							case TEMPLATE -> {
-								if (recipe instanceof SmithingTransformRecipe transformRecipe) yield transformRecipe.getTemplate();
-								else if (recipe instanceof SmithingTrimRecipe trimRecipe) yield trimRecipe.getTemplate();
+								if (recipe instanceof SmithingTransformRecipe transformRecipe)
+									yield transformRecipe.getTemplate();
+								else if (recipe instanceof SmithingTrimRecipe trimRecipe)
+									yield trimRecipe.getTemplate();
 								yield null;
 							}
 							case ADDITION -> smithingRecipe.getAddition();
@@ -196,6 +203,8 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 								materialChoice.getChoices().stream().map(ItemStack::new).toList()
 							);
 						}
+					} else {
+						customError("You can only get the base, template, and addition items of a Smithing, Ssmithing Transform and Smithing Trim Recipe.");
 					}
 				}
 				case INPUT -> {
@@ -204,6 +213,8 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						choice = cookingRecipe.getInputChoice();
 					} else if  (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
 						choice = stonecuttingRecipe.getInputChoice();
+					} else {
+						customError("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
 					}
 					if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
 						ingredients.addAll(exactChoice.getChoices());

@@ -45,8 +45,8 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 
 	static {
 		Skript.registerExpression(ExprRecipeCategory.class, String.class, ExpressionType.PROPERTY,
-			"[the] [recipe] crafting category [of %recipes%]",
-			"[the] [recipe] cooking category [of %recipes%]");
+			"[the] [recipe] crafting category [of %-recipes%]",
+			"[the] [recipe] cooking category [of %-recipes%]");
 	}
 
 	private boolean isCrafting = false;
@@ -56,7 +56,7 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		isCrafting = matchedPattern == 0;
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {

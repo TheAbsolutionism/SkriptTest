@@ -19,6 +19,7 @@ public class RecipeUtils {
 		FURNACE(FurnaceRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class),
 		CAMPFIRE(CampfireRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class),
 		SMOKING(SmokingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent.class),
+		SMITHING(SmithingRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.class),
 		SMITHING_TRANSFORM(SmithingTransformRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent.class),
 		SMITHING_TRIM(SmithingTrimRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent.class),
 		STONECUTTING(StonecuttingRecipe.class, RegisterRecipeEvent.StonecuttingRecipeEvent.class);
@@ -284,6 +285,7 @@ public class RecipeUtils {
 			case CAMPFIRE -> RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class;
 			case FURNACE -> RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class;
 			case SMOKING -> RegisterRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent.class;
+			case SMITHING -> RegisterRecipeEvent.SmithingRecipeEvent.class;
 			case SMITHING_TRANSFORM -> RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent.class;
 			case SMITHING_TRIM -> RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent.class;
 			case STONECUTTING -> RegisterRecipeEvent.StonecuttingRecipeEvent.class;

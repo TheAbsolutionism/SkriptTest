@@ -2325,6 +2325,7 @@ recipe types:
 	furnace: furnace recipe, furnace recipes
 	campfire: campfire recipe, campfire recipes
 	smoking: smoking recipe, smoking recipes
+	smithing: smithing recipe, smithing recipes
 	smithing_transform: smithing transform recipe, smithing transform recipes
 	smithing_trim: smithing trim recipe, smithing trim recipes
 	stonecutting: stonecutting recipe, stonecutting recipes

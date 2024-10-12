@@ -31,7 +31,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 
 	static {
 		Skript.registerExpression(ExprRecipeResult.class, ItemStack.class, ExpressionType.PROPERTY,
-			"[the] recipe result[ing] [item] [of %recipes%]");
+			"[the] recipe result[ing] [item] [of %-recipes%]");
 	}
 
 	private boolean isEvent = false;
@@ -39,7 +39,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {

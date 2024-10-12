@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 
 	static {
-		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY, "[the] recipe group [of %recipes%]");
+		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY, "[the] recipe group [of %-recipes%]");
 	}
 
 	private boolean isEvent = false;
@@ -41,7 +41,7 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {

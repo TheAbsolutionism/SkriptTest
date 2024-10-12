@@ -84,19 +84,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SecRegisterRecipe extends Section {
 	/*
 	TODO:
-		Tests
-		Rewrite Sec to provide a valid recipe as event value (Including rewrite of RecipeUtils.java)
-		Add Smithing Recipe (Enum, Ingredients, blah)
+		Fix Tests and expressions
 	 */
 
 	static {
 		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
-		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
-			@Override
-			public @Nullable Recipe get(RegisterRecipeEvent recipe) {
-				return null;
-			}
-		}, EventValues.TIME_NOW);
 	}
 
 	private Expression<String> providedName;
@@ -104,6 +96,7 @@ public class SecRegisterRecipe extends Section {
 	private Trigger trigger;
 	private Node thisNode;
 	private String thisScript;
+	public static Recipe lastRegistered;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -132,8 +125,9 @@ public class SecRegisterRecipe extends Section {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);
 			case SHAPELESS -> new ShapelessRecipeEvent(recipeType);
 			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(recipeType);
-			case SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(recipeType);
+			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(recipeType);
 			case STONECUTTING -> new StonecuttingRecipeEvent(recipeType);
+			default -> throw new IllegalStateException("Unexpected vale: " + recipeType);
 		};
 		Variables.setLocalVariables(recipeEvent, Variables.copyLocalVariables(event));
 		TriggerItem.walk(trigger, recipeEvent);
@@ -148,14 +142,14 @@ public class SecRegisterRecipe extends Section {
 		}
 		switch (recipeType) {
 			case SHAPED, SHAPELESS -> {
-				if (recipeEvent instanceof CraftingRecipeEvent craftingRecipe) {
-					RecipeChoice[] ingredients = craftingRecipe.getIngredients();
+				if (recipeEvent instanceof CraftingRecipeEvent craftingEvent) {
+					RecipeChoice[] ingredients = craftingEvent.getIngredients();
 					if (ingredients.length < 2 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
 						customError("You must have at least 2 ingredients when registering a '" + recipeType + "' recipe.");
 						return super.walk(event, false);
 					}
-					String group = craftingRecipe.getGroup();
-					CraftingBookCategory category = craftingRecipe.getCategory();
+					String group = craftingEvent.getGroup();
+					CraftingBookCategory category = craftingEvent.getCategory();
 					switch (recipeType) {
 						case SHAPED -> createShapedRecipe(key, result, ingredients, group, category);
 						case SHAPELESS -> createShapelessRecipe(key, result, ingredients, group, category);
@@ -163,26 +157,26 @@ public class SecRegisterRecipe extends Section {
 				}
 			}
 			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> {
-				if (recipeEvent instanceof CookingRecipeEvent cookingRecipe) {
-					RecipeChoice input = cookingRecipe.getInput();
-					String group = cookingRecipe.getGroup();
-					CookingBookCategory category = cookingRecipe.getCategory();
-					int cookingTime = cookingRecipe.getCookingTime();
-					float experience = cookingRecipe.getExperience();
+				if (recipeEvent instanceof CookingRecipeEvent cookingEvent) {
+					RecipeChoice input = cookingEvent.getInput();
+					String group = cookingEvent.getGroup();
+					CookingBookCategory category = cookingEvent.getCategory();
+					int cookingTime = cookingEvent.getCookingTime();
+					float experience = cookingEvent.getExperience();
 					createCookingRecipe(recipeType, key, result, input, group, category, cookingTime, experience);
 				}
 			}
-			case SMITHING_TRANSFORM, SMITHING_TRIM -> {
-				if (recipeEvent instanceof SmithingRecipeEvent smithingRecipe) {
-					RecipeChoice base = smithingRecipe.getBase();
-					RecipeChoice template = smithingRecipe.getTemplate();
-					RecipeChoice addition = smithingRecipe.getAddition();
+			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> {
+				if (recipeEvent instanceof SmithingRecipeEvent smithingEvent) {
+					RecipeChoice base = smithingEvent.getBase();
+					RecipeChoice template = smithingEvent.getTemplate();
+					RecipeChoice addition = smithingEvent.getAddition();
 					createSmithingRecipe(recipeType, key, result, base, template, addition);
 				}
 			}
 			case STONECUTTING -> {
-				if (recipeEvent instanceof StonecuttingRecipeEvent stonecuttingRecipe) {
-					RecipeChoice input = stonecuttingRecipe.getInput();
+				if (recipeEvent instanceof StonecuttingRecipeEvent stonecuttingEvent) {
+					RecipeChoice input = stonecuttingEvent.getInput();
 					createStonecuttingRecipe(key, result, input);
 				}
 			}
@@ -195,6 +189,7 @@ public class SecRegisterRecipe extends Section {
 		if (Bukkit.getRecipe(key) != null)
 			Bukkit.removeRecipe(key);
 		Bukkit.addRecipe(recipe);
+		lastRegistered = recipe;
 	}
 
 	private void createShapedRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {

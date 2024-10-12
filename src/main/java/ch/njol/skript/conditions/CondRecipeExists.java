@@ -24,7 +24,9 @@ import org.jetbrains.annotations.Nullable;
 public class CondRecipeExists extends Condition {
 
 	static {
-		Skript.registerCondition(CondRecipeExists.class, "[the] recipe[s] %strings% exist[s]");
+		Skript.registerCondition(CondRecipeExists.class,
+			"[the] recipe[s] %strings% exist[s]",
+			"[the] recipe[s] %strings% (doesn't|does not) exist[s]");
 	}
 
 	private Expression<String> recipes;
@@ -33,6 +35,7 @@ public class CondRecipeExists extends Condition {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		recipes = (Expression<String>) exprs[0];
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -43,6 +46,6 @@ public class CondRecipeExists extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "recipes " + recipes.toString(event, debug) + "exists";
+		return "recipes " + recipes.toString(event, debug) + (isNegated() ? "does not" : "") + "exists";
 	}
 }

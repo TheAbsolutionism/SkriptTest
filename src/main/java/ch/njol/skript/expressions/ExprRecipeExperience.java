@@ -33,7 +33,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	static {
 		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY,
-			"[the] recipe [e]xp[erience] [of %recipes%]");
+			"[the] recipe [e]xp[erience] [of %-recipes%]");
 	}
 
 	private boolean isEvent = false;
@@ -41,7 +41,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
+		if (exprs[0] != null) {
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
