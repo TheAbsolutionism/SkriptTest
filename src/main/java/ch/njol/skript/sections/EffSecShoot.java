@@ -2,6 +2,10 @@ package ch.njol.skript.sections;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.*;
@@ -26,6 +30,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+@Name("Shoot")
+@Description("Shoots a projectile (or any other entity) from a given entity or location.")
+@Examples({
+	"shoot arrow from all players at speed 2",
+	"shoot a pig from all players:",
+		"\tadd event-entity to {_projectiles::*}"
+})
+@Since("INSERT VERSION")
 public class EffSecShoot extends EffectSection {
 
 	public static class ShootEvent extends Event {
@@ -120,7 +132,7 @@ public class EffSecShoot extends EffectSection {
 							livingShooter.getWorld().spawn(
 								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
 								type,
-								(Consumer) getSpawnConsumer(event, vector, entityData, livingShooter)
+								(Consumer) afterSpawn(event, vector, entityData, livingShooter)
 							);
 						} else {
 							Fireball fireball = (Fireball) livingShooter.getWorld().spawn(
@@ -135,7 +147,7 @@ public class EffSecShoot extends EffectSection {
 							livingShooter.launchProjectile(
 								(Class<? extends Projectile>) type,
 								vector,
-								(Consumer) getSpawnConsumer(event, vector, entityData, livingShooter)
+								(Consumer) afterSpawn(event, vector, entityData, livingShooter)
 							);
 						} else {
 							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
@@ -145,7 +157,7 @@ public class EffSecShoot extends EffectSection {
 						Location location = livingShooter.getLocation();
 						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
 						if (trigger != null) {
-							entityData.spawn(location, (Consumer) getSpawnConsumer(event, vector, entityData, livingShooter));
+							entityData.spawn(location, (Consumer) afterSpawn(event, vector, entityData, livingShooter));
 						} else {
 							finalProjectile = entityData.spawn(location);
 						}
@@ -153,7 +165,7 @@ public class EffSecShoot extends EffectSection {
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
 					if (trigger != null) {
-						entityData.spawn((Location) shooter, (Consumer) getSpawnConsumer(event, vector, entityData, null));
+						entityData.spawn((Location) shooter, (Consumer) afterSpawn(event, vector, entityData, null));
 					} else {
 						finalProjectile = entityData.spawn((Location) shooter);
 					}
@@ -173,7 +185,7 @@ public class EffSecShoot extends EffectSection {
 		entityData.set((E) entity);
 	}
 
-	private Consumer<? extends Entity> getSpawnConsumer(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
+	private Consumer<? extends Entity> afterSpawn(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
 		return entity -> {
 			if (entity instanceof Fireball fireball)
 				fireball.setShooter(shooter);

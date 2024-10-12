@@ -52,8 +52,7 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	}
 	
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
 			return new Class[] {LivingEntity.class};
 		return super.acceptChange(mode);
@@ -63,9 +62,9 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (mode == ChangeMode.SET) {
 			assert delta != null;
-			for (Projectile p : getExpr().getArray(event)) {
-				assert p != null : getExpr();
-				p.setShooter((ProjectileSource) delta[0]);
+			for (Projectile projectile : getExpr().getArray(event)) {
+				assert projectile != null : getExpr();
+				projectile.setShooter((ProjectileSource) delta[0]);
 			}
 		} else {
 			super.change(event, delta, mode);
