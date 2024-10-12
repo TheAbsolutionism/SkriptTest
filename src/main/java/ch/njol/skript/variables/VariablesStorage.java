@@ -70,12 +70,12 @@ public abstract class VariablesStorage implements Closeable {
 	protected volatile boolean closed = false;
 
 	/**
-	 * The name of the database, i.e. this storage.
+	 * The name of the database
 	 */
 	private String databaseName;
 
 	/**
-	 * The type of the database, i.e. this storage.
+	 * The type of the database, i.e. CSV.
 	 */
 	private final String databaseType;
 
