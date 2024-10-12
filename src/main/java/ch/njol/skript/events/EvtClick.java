@@ -84,18 +84,18 @@ public class EvtClick extends SkriptEvent {
 			Literal<EntityData<?>> entitydata = (Literal<EntityData<?>>) type;
 			if (click == LEFT) {
 				if (Vehicle.class.isAssignableFrom(entitydata.getSingle().getType())) {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'vehicle damage' event.");
+					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, use the 'vehicle damage' event.");
 				} else {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event.");
+					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, use the 'damage' event.");
 				}
 				return false;
 			} else if (click == ANY) {
 				if (Vehicle.class.isAssignableFrom(entitydata.getSingle().getType())) {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'vehicle damage' event. " +
-							"Change this event to a rightclick to fix this warning message.");
+					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, use the 'vehicle damage' event for left clicks " +
+							"or change this event to a rightclick.");
 				} else {
-					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event. " +
-							"Change this event to a rightclick to fix this warning message.");
+					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, use the 'damage' event for left clicks " +
+							"or change this event to a rightclick.");
 				}
 			}
 		}
