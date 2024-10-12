@@ -2316,6 +2316,19 @@ cooking book categories:
 	food: cooking.food, cooking food, cookingcategory.food, cookingcategory food, cooking category.food, cooking category food
 	misc: cooking.misc, cooking misc, cookingcategory.misc, cookingcategory misc, cooking category.misc, cooking category misc
 
+# -- Recipe Types --
+recipe types:
+	shaped: shaped recipe, shaped crafting recipe
+	shapeless: shapeless recipe, shapeless crafting recipe
+	cooking: cooking recipe
+	blasting: blasting recipe
+	furnace: furnace recipe
+	campfire: campfire recipe
+	smoking: smoking recipe
+	smithing_transform: smithing transform recipe
+	smithing_trim: smithing trim recipe
+	stonecutting: stonecutting recipe
+
 # -- Boolean --
 boolean:
 	true:
@@ -2418,6 +2431,7 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
+	recipetype: recipe type¦s @a
 
 	# Hooks
 	money: money

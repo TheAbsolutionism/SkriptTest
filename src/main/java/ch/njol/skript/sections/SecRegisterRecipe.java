@@ -7,17 +7,17 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Section;
+import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.Trigger;
-import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import ch.njol.skript.util.RegisterRecipeEvent;
-import ch.njol.skript.util.RegisterRecipeEvent.RecipeTypes;
-import ch.njol.skript.util.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RegisterRecipeEvent.CraftingRecipeEvent.*;
+import ch.njol.skript.util.LiteralUtils;
+import ch.njol.skript.util.RecipeUtils;
+import ch.njol.skript.util.RecipeUtils.*;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
+import ch.njol.skript.util.RecipeUtils.RecipeType;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
@@ -51,13 +51,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset recipe ingredients of second row to air, emerald and air",
 		"\tset recipe ingredients of 3rd row to diamond, air and diamond",
 		"\tset recipe group to \"my group\"",
-		"\tset recipe category to crafting.misc",
+		"\tset recipe crafting category to crafting.misc",
 		"\tset recipe result to diamond sword named \"Heavenly Sword\"",
 	"",
 	"register a shapeless recipe with namespace \"my_recipe\":",
 		"\tset recipe ingredients to 3 diamonds, 3 emeralds and 3 iron ingots",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe category to crafting category misc",
+		"\tset the recipe crafting category to crafting category misc",
 		"\tset the recipe result item to diamond helmet named \"Heavenly Helm\"",
 	"",
 	"#Blasting, Furnace, Campfire and Smoking follow same format as Cooking",
@@ -65,7 +65,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe experience to 5",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe category to cooking.misc",
+		"\tset the recipe cooking category to cooking.misc",
 		"\tset the recipe input item to coal named \"Ash\"",
 		"\tset the recipe resulting item to gunpowder named \"Dust\"",
 	"",
@@ -85,19 +85,14 @@ public class SecRegisterRecipe extends Section {
 	/*
 	TODO:
 		Tests
-		ExprAllRecipes (Including of recipe type)
-		ExprRecipeName (Get recipe via name)
-		ExprRecipeFor (Get all recipes for item)
-		Rewrite Sec to provide a valid recipe as event value (Including RegisterRecipeEvent.java)
+		Rewrite Sec to provide a valid recipe as event value (Including rewrite of RecipeUtils.java)
+		Omit "Recipe" as optional in some of the expressions (Make sure to change examples)
+		Change category langs
+		Add "'" to smithing ingredients pattern
 	 */
-	private static final RecipeTypes[] recipeTypes = RecipeTypes.values();
 
 	static {
-		String[] patterns = new String[recipeTypes.length];
-		for (RecipeTypes type : recipeTypes) {
-			patterns[type.ordinal()] = "(register|create) [a] [new] " + type.getPattern() + " recipe with [the] name[space[key]] %string%";
-		}
-		Skript.registerSection(SecRegisterRecipe.class, patterns);
+		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %-recipetype% with [the] name[space[key]] %string%");
 		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
 			@Override
 			public @Nullable Recipe get(RegisterRecipeEvent recipe) {
@@ -106,8 +101,8 @@ public class SecRegisterRecipe extends Section {
 		}, EventValues.TIME_NOW);
 	}
 
-	private RecipeTypes recipeType;
 	private Expression<String> providedName;
+	private Expression<RecipeType> providedType;
 	private Trigger trigger;
 	private Node thisNode;
 	private String thisScript;
@@ -115,11 +110,12 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
-		recipeType = recipeTypes[matchedPattern];
-		providedName = (Expression<String>) exprs[0];
+		providedType = (Expression<RecipeType>) exprs[0];
+		providedName = (Expression<String>) exprs[1];
+		Class<? extends Event> eventClass = ((Literal<RecipeType>) exprs[0]).getSingle().getEventClass();
 		AtomicBoolean delayed = new AtomicBoolean(false);
 		Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
-		trigger = loadCode(sectionNode, "register recipe", afterLoading, recipeType.getEventClass());
+		trigger = loadCode(sectionNode, "register recipe", afterLoading, eventClass);
 		if (delayed.get()) {
 			Skript.error("Delays cannot be used within a 'register recipe' section.");
 			return false;
@@ -133,11 +129,12 @@ public class SecRegisterRecipe extends Section {
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
 		NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
+		RecipeType recipeType = providedType.getSingle(event);
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);
 			case SHAPELESS -> new ShapelessRecipeEvent(recipeType);
 			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(recipeType);
-			case SMITHINGTRANSFORM, SMITHINGTRIM -> new SmithingRecipeEvent(recipeType);
+			case SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(recipeType);
 			case STONECUTTING -> new StonecuttingRecipeEvent(recipeType);
 		};
 		Variables.setLocalVariables(recipeEvent, Variables.copyLocalVariables(event));
@@ -147,7 +144,7 @@ public class SecRegisterRecipe extends Section {
 		if (recipeEvent.getErrorInEffect())
 			return super.walk(event, false);
 		ItemStack result = recipeEvent.getResultItem();
-		if (result == null && (recipeType != RecipeTypes.SMITHINGTRIM)) {
+		if (result == null && (recipeType != RecipeType.SMITHING_TRIM)) {
 			customError("You must provide a result item when registering a recipe.");
 			return super.walk(event, false);
 		}
@@ -156,7 +153,7 @@ public class SecRegisterRecipe extends Section {
 				if (recipeEvent instanceof CraftingRecipeEvent craftingRecipe) {
 					RecipeChoice[] ingredients = craftingRecipe.getIngredients();
 					if (ingredients.length < 2 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
-						customError("You must have at least 2 ingredients when registering a '" + recipeType.getToString() + "' recipe.");
+						customError("You must have at least 2 ingredients when registering a '" + recipeType + "' recipe.");
 						return super.walk(event, false);
 					}
 					String group = craftingRecipe.getGroup();
@@ -177,7 +174,7 @@ public class SecRegisterRecipe extends Section {
 					createCookingRecipe(recipeType, key, result, input, group, category, cookingTime, experience);
 				}
 			}
-			case SMITHINGTRANSFORM, SMITHINGTRIM -> {
+			case SMITHING_TRANSFORM, SMITHING_TRIM -> {
 				if (recipeEvent instanceof SmithingRecipeEvent smithingRecipe) {
 					RecipeChoice base = smithingRecipe.getBase();
 					RecipeChoice template = smithingRecipe.getTemplate();
@@ -232,7 +229,7 @@ public class SecRegisterRecipe extends Section {
 		completeRecipe(key, shapelessRecipe);
 	}
 
-	private void createCookingRecipe(RecipeTypes recipeType, NamespacedKey key, ItemStack result, RecipeChoice input, String group, CookingBookCategory category, int cookingTime, float experience) {
+	private void createCookingRecipe(RecipeType recipeType, NamespacedKey key, ItemStack result, RecipeChoice input, String group, CookingBookCategory category, int cookingTime, float experience) {
 		var recipe = switch (recipeType) {
 			case BLASTING -> new BlastingRecipe(key, result, input, experience, cookingTime);
 			case CAMPFIRE -> new CampfireRecipe(key, result, input, experience, cookingTime);
@@ -249,14 +246,14 @@ public class SecRegisterRecipe extends Section {
 		completeRecipe(key, recipe);
 	}
 
-	private void createSmithingRecipe(RecipeTypes recipeType, NamespacedKey key, ItemStack result, RecipeChoice base, RecipeChoice template, RecipeChoice addition) {
+	private void createSmithingRecipe(RecipeType recipeType, NamespacedKey key, ItemStack result, RecipeChoice base, RecipeChoice template, RecipeChoice addition) {
 		if (base == null || template == null || addition == null) {
-			customError("Unable to create '" + recipeType.getToString() + "' recipe, missing data.");
+			customError("Unable to create '" + recipeType + "' recipe, missing data.");
 			return;
 		}
 		var recipe = switch (recipeType) {
-			case SMITHINGTRANSFORM -> new SmithingTransformRecipe(key, result, template, base, addition);
-			case SMITHINGTRIM -> new SmithingTrimRecipe(key, template, base, addition);
+			case SMITHING_TRANSFORM -> new SmithingTransformRecipe(key, result, template, base, addition);
+			case SMITHING_TRIM -> new SmithingTrimRecipe(key, template, base, addition);
 			default -> null;
 		};
 		if (recipe == null)
@@ -279,7 +276,7 @@ public class SecRegisterRecipe extends Section {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "register a new " + recipeType.getToString() + " recipe with the namespacekey " + providedName.toString(event, debug);
+		return "register a new " + providedType.toString(event, debug) + " recipe with the namespacekey " + providedName.toString(event, debug);
 	}
 
 }

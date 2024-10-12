@@ -29,8 +29,8 @@ public class CondDiscoveredRecipes extends Condition {
 
 	static {
 		Skript.registerCondition(CondDiscoveredRecipes.class,
-			"%players% (has|have) (discovered|unlocked| recipe[s] %strings%",
-			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked| recipe[s] %strings%");
+			"%players% (has|have) (discovered|unlocked) recipe[s] %strings%",
+			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) recipe[s] %strings%");
 	}
 
 	private Expression<Player> players;

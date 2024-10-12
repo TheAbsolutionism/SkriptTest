@@ -1,11 +1,11 @@
-package ch.njol.skript.effects;
+package ch.njol.skript.conditions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Effect;
+import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -14,18 +14,17 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Remove Recipe")
-@Description({
-	"Remove a recipe or multiple recipes from the server",
-	"Removing a recipe from a server will cause all players who have discovered the recipe to be undiscovered."
+@Name("Recipe Exists")
+@Description("Checks to see if a recipe exists using the name")
+@Examples({
+	"if the recipe \"my_recipe\" exists:",
+		"\tremove the recipe \"my_recipe\" from the server"
 })
-@Examples("remove the recipe \"my_recipe\" from the server")
 @Since("INSERT VERSION")
-public class EffRemoveRecipe extends Effect {
+public class CondRecipeExists extends Condition {
 
 	static {
-		Skript.registerEffect(EffRemoveRecipe.class,
-			"(remove|delete|clear) [the] recipe[s] %strings% [from the server]");
+		Skript.registerCondition(CondRecipeExists.class, "[the] recipe[s] %strings% exist[s]");
 	}
 
 	private Expression<String> recipes;
@@ -38,16 +37,12 @@ public class EffRemoveRecipe extends Effect {
 	}
 
 	@Override
-	protected void execute(Event event) {
-		for (String recipe : recipes.getArray(event)) {
-			NamespacedKey key = NamespacedKey.fromString(recipe, Skript.getInstance());
-			if (Bukkit.getRecipe(key) != null)
-				Bukkit.removeRecipe(key);
-		}
+	public boolean check(Event event) {
+		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedKey.fromString(recipe, Skript.getInstance())) != null);
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "remove recipes " + recipes.toString(event, debug) + " from the server";
+		return "recipes " + recipes.toString(event, debug) + "exists";
 	}
 }

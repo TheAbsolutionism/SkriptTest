@@ -16,9 +16,9 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
-import ch.njol.skript.util.RegisterRecipeEvent;
-import ch.njol.skript.util.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RegisterRecipeEvent.CraftingRecipeEvent.*;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
+import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -249,7 +249,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					return;
 
 				if (items.size() > 9) {
-					customError("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeName()  + "' recipe.");
+					customError("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeType()  + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -272,7 +272,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				if (!(event instanceof ShapedRecipeEvent shapedEvent))
 					return;
 				if (items.size() > 3) {
-					customError("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeName() + "' recipe.");
+					customError("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
