@@ -92,10 +92,10 @@ public class EvtClick extends SkriptEvent {
 			} else if (click == ANY) {
 				if (Vehicle.class.isAssignableFrom(entitydata.getSingle().getType())) {
 					Skript.error("A leftclick on a vehicle entity is an attack and thus not covered by the 'click' event, but the 'vehicle damage' event. " +
-						"Change this event to a rightclick to fix this warning message.");
+							"Change this event to a rightclick to fix this warning message.");
 				} else {
 					Skript.error("A leftclick on an entity is an attack and thus not covered by the 'click' event, but the 'damage' event. " +
-						"Change this event to a rightclick to fix this warning message.");
+							"Change this event to a rightclick to fix this warning message.");
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class EvtClick extends SkriptEvent {
 			} else {
 				PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
 				ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
-					? invi.getItemInMainHand() : invi.getItemInOffHand();
+						? invi.getItemInMainHand() : invi.getItemInOffHand();
 				return itemType.isOfType(item);
 			}
 		})) { return false; }
@@ -178,7 +178,12 @@ public class EvtClick extends SkriptEvent {
 				@Override
 				public boolean check(Object object) {
 					if (entity != null) {
-						return object instanceof EntityData ? ((EntityData<?>) object).isInstance(entity) : Relation.EQUAL.isImpliedBy(DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) object));
+						if (object instanceof EntityData<?> entityData) {
+							return entityData.isInstance(entity);
+						} else {
+							Relation compare = DefaultComparators.entityItemComparator.compare(EntityData.fromEntity(entity), (ItemType) object);
+							return Relation.EQUAL.isImpliedBy(compare);
+						}
 					} else if (object instanceof ItemType itemType) {
 						return itemType.isOfType(block);
 					} else if (blockDataCheck != null && object instanceof BlockData blockData)  {
@@ -193,7 +198,12 @@ public class EvtClick extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (click == LEFT ? "left" : click == RIGHT ? "right" : "") + "click" + (type != null ? " on " + type.toString(event, debug) : "") + (tools != null ? " holding " + tools.toString(event, debug) : "");
+		return switch (click) {
+			case LEFT -> "left";
+			case RIGHT -> "right";
+			default -> "";
+		} + "click" + (type != null ? " on " + type.toString(event, debug) : "") +
+			(tools != null ? " holding " + tools.toString(event, debug) : "");
 	}
 
 }
