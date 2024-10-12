@@ -25,20 +25,22 @@ public class CondLidState extends PropertyCondition<Block> {
 
 	static {
 		Skript.registerCondition(CondLidState.class, ConditionType.PROPERTY,
-			"[the] lid [state[s]] of %blocks% (is|are) (open[ed]|:close[d])",
-			"[the] lid [state[s]] of %blocks% (isn't|is not|aren't|are not) (open[ed]|:close[d])",
-			"%blocks%'[s] lid [state[s]] (is|are) (open[ed]|:close[d])",
-			"%blocks%'[s] lid [state[s]] (isn't|is not|aren't|are not) (open[ed]|:close[d])"
+			"[the] lid[s] of %blocks% (is|are) (open[ed]|:close[d])",
+			"[the] lid[s] of %blocks% (isn't|is not|aren't|are not) (open[ed]|:close[d])",
+			"%blocks%'[s] lid[s] (is|are) (open[ed]|:close[d])",
+			"%blocks%'[s] lid[s] (isn't|is not|aren't|are not) (open[ed]|:close[d])"
 		);
 	}
 
 	private boolean checkOpen;
+	private Expression<Block> blocks;
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		checkOpen = !parseResult.hasTag("close");
-		setExpr((Expression<Block>) exprs[0]);
+		blocks = (Expression<Block>) exprs[0];
+		setExpr(blocks);
 		setNegated(matchedPattern == 1 || matchedPattern == 3);
 		return true;
 	}
@@ -53,4 +55,8 @@ public class CondLidState extends PropertyCondition<Block> {
 		return (checkOpen ? "opened" : "closed") + " lid state";
 	}
 
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return blocks.toString(event, debug) + " lids " + (isNegated() ? "are not " : "are ") + (checkOpen ? "opened" : "closed");
+	}
 }
