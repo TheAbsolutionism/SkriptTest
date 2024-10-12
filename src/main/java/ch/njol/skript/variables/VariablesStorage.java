@@ -105,7 +105,7 @@ public abstract class VariablesStorage implements Closeable {
 	 * This will also create the {@link #writeThread}, but it must be started
 	 * with {@link #load(SectionNode)}.
 	 *
-	 * @param type the name.
+	 * @param type the database type i.e. CSV.
 	 */
 	protected VariablesStorage(String type) {
 		assert type != null;

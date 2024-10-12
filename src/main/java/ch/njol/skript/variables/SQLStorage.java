@@ -79,7 +79,7 @@ public abstract class SQLStorage extends VariablesStorage {
 	/**
 	 * Creates a SQLStorage with a create table query.
 	 * 
-	 * @param type The name to be sent through this constructor when newInstance creates this class.
+	 * @param type The database type i.e. CSV.
 	 * @param createTableQuery The create table query to send to the SQL engine.
 	 */
 	public SQLStorage(String type, String createTableQuery) {

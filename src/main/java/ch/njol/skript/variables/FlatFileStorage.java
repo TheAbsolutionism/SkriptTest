@@ -126,7 +126,7 @@ public class FlatFileStorage extends VariablesStorage {
 	/**
 	 * Create a new CSV storage of the given name.
 	 *
-	 * @param name the name.
+	 * @param type the databse type i.e. CSV.
 	 */
 	FlatFileStorage(String type) {
 		super(type);
