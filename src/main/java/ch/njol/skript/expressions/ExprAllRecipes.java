@@ -42,9 +42,9 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprAllRecipes.class, Recipe.class, ExpressionType.SIMPLE,
-			"all [of the] recipes [types:of type %recipetypes%] [items:for %itemstacks/itemtypes%]",
-			"all [of the] (mc|minecraft|vanilla) recipes [types:of type %recipetypes%] [items:for %itemstacks/itemtypes%]",
-			"all [of the] custom recipes [types:of type %recipetypes%] [items:for %itemstacks/itemtypes%]");
+			"all [of the] (%recipetype%|recipes) [items:for %itemstacks/itemtypes%]",
+			"all [of the] (mc|minecraft|vanilla) (%recipetype%|recipes) [items:for %itemstacks/itemtypes%]",
+			"all [of the] custom (%recipetype%|recipes) [items:for %itemstacks/itemtypes%]");
 	}
 
 	private Expression<RecipeUtils.RecipeType> recipeTypeExpr;
@@ -54,7 +54,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		recipeTypeExpr = parseResult.hasTag("types") ? (Expression<RecipeUtils.RecipeType>) exprs[0] : null;
+		recipeTypeExpr = exprs[0] != null ? (Expression<RecipeUtils.RecipeType>) exprs[0] : null;
 		itemExpr = parseResult.hasTag("items") ? exprs[1] : null;
 		getMinecraft = matchedPattern == 1;
 		getCustom = matchedPattern == 2;
@@ -96,10 +96,9 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 					return;
 
 				if (recipeTypeExpr != null) {
-					for (RecipeUtils.RecipeType type : recipeTypeExpr.getArray(event)) {
-						if (recipe.getClass().equals(type.getRecipeClass()))
-							recipeList.add(recipe);
-					}
+					RecipeUtils.RecipeType type = recipeTypeExpr.getSingle(event);
+					if (recipe.getClass().equals(type.getRecipeClass()) || type.getRecipeClass().isInstance(recipe))
+						recipeList.add(recipe);
 				} else {
 					recipeList.add(recipe);
 				}

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Recipe Experience")
 @Description("The experience of a Cooking, Blasting, Furnace, Campfire, and Smoking Recipe.")
 @Examples({
-	"register a new blasting recipe with the name \"my_recipe\":",
+	"register a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to a raw copper named \"Impure Copper\"",
 		"\tset the recipe experience to 20",
 		"\tset the recipe result to copper ingot named \"Pure Copper\""
@@ -32,7 +32,8 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	static {
-		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY, "[the] recipe [e]xp[erience] [of %recipes%]");
+		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY,
+			"[the] recipe [e]xp[erience] [of %recipes%]");
 	}
 
 	private boolean isEvent = false;

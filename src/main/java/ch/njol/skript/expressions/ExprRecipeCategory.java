@@ -2,6 +2,9 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -19,12 +22,31 @@ import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Recipe Category")
+@Description("The recipe category of a Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
+@Examples({
+	"register a new shaped recipe with the key \"my_recipe\":",
+		"\tset the recipe ingredients to diamond, air, diamond, air, emerald, air, diamond, air and diamond",
+		"\tset the recipe crafting category to crafting misc",
+		"\tset the recipe result item to nether star",
+	"",
+	"register a new blasting recipe with the id \"my_recipe\":",
+		"\tset the recipe input item to coal",
+		"\tset the recipe cooking category to cooking misc",
+		"\tset the recipe result item to gunpowder",
+	"",
+	"loop all recipes:",
+		"\tif recipe type of loop-recipe is shaped recipe:",
+			"\t\tbroadcast recipe crafting category of loop-recipe",
+		"\telse if recipe type of loop-recipe is cooking recipe:",
+			"\t\tbroadcast recipe cooking category of loop-recipe"
+})
 public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 
 	static {
 		Skript.registerExpression(ExprRecipeCategory.class, String.class, ExpressionType.PROPERTY,
-			"[the] recipe crafting category [of %recipes%]",
-			"[the] recipe cooking category [of %recipes%]");
+			"[the] [recipe] crafting category [of %recipes%]",
+			"[the] [recipe] cooking category [of %recipes%]");
 	}
 
 	private boolean isCrafting = false;
@@ -100,6 +122,6 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return null;
+		return "the recipe " + (isCrafting ? "crafting" : "cooking") + " category of " + getExpr().toString(event, debug);
 	}
 }

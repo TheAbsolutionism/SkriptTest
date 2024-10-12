@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Recipe Group")
 @Description("The recipe group of a Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
 @Examples({
-	"register a new shapeless recipe with the name \"my_recipe\":",
+	"register a new shapeless recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to 3 diamonds, 3 emeralds and 3 netherite ingots",
 		"\tset the recipe group to \"my group\"",
 		"\tset the recipe result to nether star"

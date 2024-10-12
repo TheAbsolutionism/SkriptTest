@@ -2305,29 +2305,29 @@ transform reasons:
 
 # -- Crafting Book Categories --
 crafting book categories:
-	building: crafting.building, crafting building, craftingcategory.building, craftingcategory building, crafting category.building, crafting category building
-	equipment: crafting.equipment, crafting equipment, craftingcategory.equipment, craftingcategory equipment, crafting category.equipment, crafting category equipment
-	misc: crafting.misc, crafting misc, craftingcategory.misc, craftingcategory misc, crafting category.misc, crafting category misc
-	redstone: crafting.redstone, crafting redstone, craftingcategory.redstone, craftingcategory redstone, crafting category.redstone, crafting category redstone
+	building: crafting building, craftingcategory building, crafting category building
+	equipment: crafting equipment, craftingcategory equipment, crafting category equipment
+	misc: crafting misc, craftingcategory misc, crafting category misc
+	redstone: crafting redstone, craftingcategory redstone, crafting category redstone
 
 # -- Cooking Book Categories --
 cooking book categories:
-	blocks: cooking.blocks, cooking blocks, cookingcategory.blocks, cookingcategory blocks, cooking category.blocks, cooking category blocks
-	food: cooking.food, cooking food, cookingcategory.food, cookingcategory food, cooking category.food, cooking category food
-	misc: cooking.misc, cooking misc, cookingcategory.misc, cookingcategory misc, cooking category.misc, cooking category misc
+	blocks: cooking blocks, cookingcategory blocks, cooking category blocks
+	food: cooking food, cookingcategory food, cooking category food
+	misc: cooking misc, cookingcategory misc, cooking category misc
 
 # -- Recipe Types --
 recipe types:
-	shaped: shaped recipe, shaped crafting recipe
-	shapeless: shapeless recipe, shapeless crafting recipe
-	cooking: cooking recipe
-	blasting: blasting recipe
-	furnace: furnace recipe
-	campfire: campfire recipe
-	smoking: smoking recipe
-	smithing_transform: smithing transform recipe
-	smithing_trim: smithing trim recipe
-	stonecutting: stonecutting recipe
+	shaped: shaped recipe, shaped crafting recipe, shaped recipes, shaped crafting recipes
+	shapeless: shapeless recipe, shapeless crafting recipe, shapeless recipes, shapeless crafting recipes
+	cooking: cooking recipe, cooking recipes
+	blasting: blasting recipe, blasting recipes
+	furnace: furnace recipe, furnace recipes
+	campfire: campfire recipe, campfire recipes
+	smoking: smoking recipe, smoking recipes
+	smithing_transform: smithing transform recipe, smithing transform recipes
+	smithing_trim: smithing trim recipe, smithing trim recipes
+	stonecutting: stonecutting recipe, stonecutting recipes
 
 # -- Boolean --
 boolean:

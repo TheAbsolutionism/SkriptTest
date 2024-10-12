@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset recipe ingredients of second row to air, emerald and air",
 		"\tset recipe ingredients of 3rd row to diamond, air and diamond",
 		"\tset recipe group to \"my group\"",
-		"\tset recipe crafting category to crafting.misc",
+		"\tset recipe crafting category to crafting misc",
 		"\tset recipe result to diamond sword named \"Heavenly Sword\"",
 	"",
 	"register a shapeless recipe with namespace \"my_recipe\":",
@@ -65,16 +65,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe experience to 5",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe cooking category to cooking.misc",
+		"\tset the recipe cooking category to cooking misc",
 		"\tset the recipe input item to coal named \"Ash\"",
 		"\tset the recipe resulting item to gunpowder named \"Dust\"",
 	"",
 	"#Smithing Trim follows the same format, except for 'result item'",
-	"create smithing transform recipe with name \"my_recipe\":",
-		"\tset the recipe base item to diamond",
-		"\tset the recipe template item to emerald",
-		"\tset the recipe additional item to netherite ingot",
-		"\tset the recipe result to ...",
+	"create smithing transform recipe with key \"my_recipe\":",
+		"\tset the recipe base item to diamond helmet",
+		"\tset the recipe template item to paper named \"Blueprint\"",
+		"\tset the recipe addition item to netherite ingot named \"Pure Netherite\"",
+		"\tset the recipe result to netherite helmet named \"Pure Helmet\"",
 	"",
 	"create a new stonecutting recipe with namespacekey \"my_recipe\":",
 		"\tset the recipe source item to cobblestone named \"Cracked Stone\"",
@@ -86,13 +86,11 @@ public class SecRegisterRecipe extends Section {
 	TODO:
 		Tests
 		Rewrite Sec to provide a valid recipe as event value (Including rewrite of RecipeUtils.java)
-		Omit "Recipe" as optional in some of the expressions (Make sure to change examples)
-		Change category langs
-		Add "'" to smithing ingredients pattern
+		Add Smithing Recipe (Enum, Ingredients, blah)
 	 */
 
 	static {
-		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %-recipetype% with [the] name[space[key]] %string%");
+		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
 		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
 			@Override
 			public @Nullable Recipe get(RegisterRecipeEvent recipe) {

@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Recipe Result")
 @Description("The result item for a recipe")
 @Examples({
-	"register a new shaped recipe with the name \"my_recipe\":",
+	"register a new shaped recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients of 1st row to diamond, air and diamond",
 		"\tset the recipe result to diamond sword named \"Chosen One\""
 })
@@ -30,7 +30,8 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 
 	static {
-		Skript.registerExpression(ExprRecipeResult.class, ItemStack.class, ExpressionType.PROPERTY, "[the] recipe result[ing] [item] [of %recipes%]");
+		Skript.registerExpression(ExprRecipeResult.class, ItemStack.class, ExpressionType.PROPERTY,
+			"[the] recipe result[ing] [item] [of %recipes%]");
 	}
 
 	private boolean isEvent = false;

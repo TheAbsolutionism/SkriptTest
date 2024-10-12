@@ -32,7 +32,7 @@ import java.util.*;
 	"The base, template, addition items of a Smithing Transform and Smithing Trim recipe"
 })
 @Examples({
-	"register a new shaped recipe with the name \"my_recipe\":",
+	"register a new shaped recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to diamond, air, diamond, air, emerald, air, diamond, air and diamond",
 		"\t#OR",
 		"\tset the recipe ingredients of the 1st row to diamond, air and diamond",
@@ -40,15 +40,15 @@ import java.util.*;
 		"\tset the recipe ingredients of the third row to diamond, air and diamond",
 		"\tset the recipe result to beacon",
 	"",
-	"create a shapeless recipe with namespace \"my_recipe\":",
+	"create a shapeless recipe with id \"my_recipe\":",
 		"\tset recipe ingredients to iron ingot, gold ingot, iron ingot, nether star, 5 obsidian, nether star, iron ingot, gold ingot and iron ingot",
 		"\tset recipe resulting item to beacon named \"OP Beacon\"",
 	"",
-	"register new cooking recipe with the namespacekey \"my_recipe\":",
+	"register new cooking recipe with the id \"my_recipe\":",
 		"\tset the recipe input item to netherite ingot named \"Impure Netherite\"",
 		"\tset the recipe result item to netherite ingot named \"Pure Netherite\"",
 	"",
-	"create a new smithing transform recipe with name \"my_recipe\":",
+	"create a new smithing transform recipe with key \"my_recipe\":",
 		"\tset the recipe base item to diamond helmet",
 		"\tset the recipe template item to paper named \"Blueprint\"",
 		"\tset the recipe addition item to netherite ingot named \"Pure Netherite\"",
@@ -66,11 +66,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 			"This can only be used when registering a Shaped Recipe."),
 		INPUT("recipe (input|source) [item]", "recipe input item", new Class[]{CookingRecipeEvent.class, StonecuttingRecipeEvent.class},
 			"This can only be used when registering a Cooking, Blasting, Furnace, Campfire, Smoking or Stonecutting Recipe."),
-		BASE("recipe base item[s]", "recipe base items", SmithingRecipeEvent.class,
+		BASE("[recipe] base item['s]", "recipe base item's", SmithingRecipeEvent.class,
 			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe."),
-		TEMPLATE("recipe template item[s]", "recipe template items", SmithingRecipeEvent.class,
+		TEMPLATE("[recipe] template item['s]", "recipe template item's", SmithingRecipeEvent.class,
 			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe."),
-		ADDITION("recipe addition[al] item[s]", "recipe additional items", SmithingRecipeEvent.class,
+		ADDITION("[recipe] addition[al] item['s]", "recipe additional item's", SmithingRecipeEvent.class,
 			"This can only be used when registering a Smithing Transform or Smithing Trim Recipe.");
 
 
@@ -332,15 +332,6 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe " + switch (selectedChoice) {
-			case INGREDIENTS -> "ingredients";
-			case FIRSTROW -> "ingredients of first row";
-			case SECONDROW -> "ingredients of second row";
-			case THIRDROW -> "ingredients of third row";
-			case BASE -> "base item";
-			case TEMPLATE -> "template item";
-			case ADDITION -> "addition item";
-			case INPUT -> "input item";
-		} + " of " + getExpr().toString(event, debug);
+		return "the " + selectedChoice.toString + " of " + getExpr().toString(event, debug);
 	}
 }

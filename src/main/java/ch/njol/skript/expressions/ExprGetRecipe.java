@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Name("Get Recipe")
-@Description("Get a recipe matching the corresponding name")
+@Description("Get a recipe registered under the provided key")
 @Examples({
-	"set {_recipe} to recipe with the name \"my_recipe\"",
-	"set {_recipes::*} to recipes with the names \"my_recipe\" and \"custom_recipe\""
+	"set {_recipe} to recipe with the key \"my_recipe\"",
+	"set {_recipes::*} to recipes with the ids \"my_recipe\" and \"custom_recipe\""
 })
 @Since("INSERT VERSION")
 public class ExprGetRecipe extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprGetRecipe.class, Recipe.class, ExpressionType.SIMPLE,
-			"recipe[s] with [the] name[s] %strings%");
+			"recipe[s] with [the] (key|id)[s] %strings%");
 	}
 
 	private Expression<String> recipeNames;
@@ -66,6 +66,6 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "recipes with the names " + recipeNames.toString(event, debug);
+		return "recipes with the keys " + recipeNames.toString(event, debug);
 	}
 }

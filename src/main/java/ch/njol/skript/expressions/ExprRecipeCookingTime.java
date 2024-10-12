@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
 @Examples({
-	"register a new cooking recipe with the name \"my_recipe\":",
+	"register a new cooking recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to raw gold named \"Impure Gold\"",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe result to gold ingot named \"Pure Gold\""
@@ -33,7 +33,8 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY, "[the] recipe cook[ing] time [of %recipes%]");
+		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
+			"[the] recipe cook[ing] time [of %recipes%]");
 	}
 
 	private boolean isEvent = false;

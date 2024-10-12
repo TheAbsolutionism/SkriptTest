@@ -22,16 +22,16 @@ import java.util.List;
 @Description("Get the namespacekey of a recipe")
 @Examples({
 	"loop all recipes:",
-		"\tbroadcast the recipe name of loop-recipe",
-		"\tadd loop-recipe's namespacekey to {_list::*}"
+		"\tbroadcast the recipe key of loop-recipe",
+		"\tadd loop-recipe's id to {_list::*}"
 })
 @Since("INSERT VERSION")
-public class ExprRecipeName extends PropertyExpression<Recipe, String> {
+public class ExprRecipeKey extends PropertyExpression<Recipe, String> {
 
 	static {
-		Skript.registerExpression(ExprRecipeName.class, String.class, ExpressionType.PROPERTY,
-			"[the] recipe name[space[key]][s] of %recipes%",
-			"[the] %recipes%'[s] name[space[key][s]");
+		Skript.registerExpression(ExprRecipeKey.class, String.class, ExpressionType.PROPERTY,
+			"[the] recipe (key|id)[s] of %recipes%",
+			"[the] %recipes%'[s] (key|id)[s]");
 	}
 
 	private Expression<Recipe> recipes;
@@ -60,6 +60,6 @@ public class ExprRecipeName extends PropertyExpression<Recipe, String> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe namespacekeys of " + recipes.toString(event, debug);
+		return "the recipe keys of " + recipes.toString(event, debug);
 	}
 }
