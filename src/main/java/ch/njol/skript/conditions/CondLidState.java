@@ -59,4 +59,5 @@ public class CondLidState extends PropertyCondition<Block> {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the lids of " + blocks.toString(event, debug) + (isNegated() ? "are not " : "are ") + (checkOpen ? "opened" : "closed");
 	}
+
 }
