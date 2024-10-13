@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -50,7 +51,7 @@ public class CondDiscoveredRecipes extends Condition {
 		return players.check(event,
 			player -> recipes.check(event,
 				recipe -> {
-					NamespacedKey key = NamespacedKey.fromString(recipe, Skript.getInstance());
+					NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe);
 					if (Bukkit.getRecipe(key) != null)
 						return player.hasDiscoveredRecipe(key);
 					return false;

@@ -10,10 +10,10 @@ test "recipe crafting category":
 
 test "recipe cooking category":
 	register a new cooking recipe with the key "test_recipe_cooking_category":
-		set the input item to raw copper named "test_recipe_cooking_category"
+		set the recipe input item to raw copper named "test_recipe_cooking_category"
 		set the recipe cooking category to cooking misc
-		set the result to copper ingot named "test_recipe_cooking_category"
+		set the recipe result to copper ingot named "test_recipe_cooking_category"
 	set {_last} to last registered recipe
 	set {_get} to recipe with the key "test_recipe_cooking_category"
-	assert the recipe crafting category of {_last} = cooking misc with "Cooking category mismatch of last registered recipe"
-	assert the recipe crafting category of {_get} = cooking misc with "Cooking category mismatch of get recipe"
+	assert the recipe cooking category of {_last} = cooking misc with "Cooking category mismatch of last registered recipe"
+	assert the recipe cooking category of {_get} = cooking misc with "Cooking category mismatch of get recipe"

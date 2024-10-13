@@ -4,5 +4,5 @@ test "get recipe":
 		set the recipe result to netherite sword named "test_get_recipe"
 	set {_last} to last registered recipe
 	set {_get} to recipe with the key "test_get_recipe"
-	assert {_get} != null with "Could not retrieve recipe"
+	assert {_get} is set with "Could not retrieve recipe"
 	assert {_get} = {_last} with "Retrieved recipe does not match from last registered"

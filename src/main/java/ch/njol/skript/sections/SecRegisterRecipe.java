@@ -12,6 +12,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.LiteralUtils;
+import ch.njol.skript.util.NamespacedUtils;
 import ch.njol.skript.util.RecipeUtils;
 import ch.njol.skript.util.RecipeUtils.*;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
@@ -119,7 +120,7 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
-		NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
+		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
 		RecipeType recipeType = providedType.getSingle(event);
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);
@@ -206,6 +207,7 @@ public class SecRegisterRecipe extends Section {
 				shapedRecipe.setIngredient(characters[i], thisChoice);
 		}
 		completeRecipe(key, shapedRecipe);
+		return;
 	}
 
 	private void createShapelessRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
@@ -228,6 +230,7 @@ public class SecRegisterRecipe extends Section {
 			case CAMPFIRE -> new CampfireRecipe(key, result, input, experience, cookingTime);
 			case FURNACE -> new FurnaceRecipe(key, result, input, experience, cookingTime);
 			case SMOKING -> new SmokingRecipe(key, result, input, experience, cookingTime);
+			case COOKING -> new CookingRecipe<>(key, result, input, experience, cookingTime) {};
 			default -> null;
 		};
 		if (recipe == null)
@@ -240,13 +243,14 @@ public class SecRegisterRecipe extends Section {
 	}
 
 	private void createSmithingRecipe(RecipeType recipeType, NamespacedKey key, ItemStack result, RecipeChoice base, RecipeChoice template, RecipeChoice addition) {
-		if (base == null || template == null || addition == null) {
+		if (base == null || (template == null && recipeType != RecipeType.SMITHING) || addition == null) {
 			customError("Unable to create '" + recipeType + "' recipe, missing data.");
 			return;
 		}
 		var recipe = switch (recipeType) {
 			case SMITHING_TRANSFORM -> new SmithingTransformRecipe(key, result, template, base, addition);
 			case SMITHING_TRIM -> new SmithingTrimRecipe(key, template, base, addition);
+			case SMITHING -> new SmithingRecipe(key, result, base, addition);
 			default -> null;
 		};
 		if (recipe == null)

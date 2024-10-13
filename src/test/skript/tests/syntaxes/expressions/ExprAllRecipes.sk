@@ -7,7 +7,7 @@ test "all recipes":
 	set {_custom_shaped} to size of all custom shaped recipes
 
 	register a new shaped recipe with the key "test_all_recipes":
-		set the recipe ingredients to coal, charcoal and copper
+		set the recipe ingredients to raw iron, raw gold and raw copper
 		set the recipe result to lightning rod
 
 	assert (size of all recipes) = ({_all} + 1) with "Mismatching size of all comparison"

@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -41,7 +42,7 @@ public class CondRecipeExists extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedKey.fromString(recipe, Skript.getInstance())) != null);
+		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedUtils.getNamespacedKey(recipe)) != null);
 	}
 
 	@Override

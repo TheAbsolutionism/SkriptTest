@@ -40,6 +40,7 @@ public class ExprRecipeKey extends PropertyExpression<Recipe, String> {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		recipes = (Expression<Recipe>) exprs[0];
+		setExpr(recipes);
 		return true;
 	}
 

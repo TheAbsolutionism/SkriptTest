@@ -41,10 +41,10 @@ import org.jetbrains.annotations.Nullable;
 		"\telse if recipe type of loop-recipe is cooking recipe:",
 			"\t\tbroadcast recipe cooking category of loop-recipe"
 })
-public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
+public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCategory.class, String.class, ExpressionType.PROPERTY,
+		Skript.registerExpression(ExprRecipeCategory.class, Object.class, ExpressionType.PROPERTY,
 			"[the] [recipe] crafting category [of %-recipes%]",
 			"[the] [recipe] cooking category [of %-recipes%]");
 	}
@@ -77,15 +77,15 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 	}
 
 	@Override
-	protected String @Nullable [] get(Event event, Recipe[] source) {
+	protected Object @Nullable [] get(Event event, Recipe[] source) {
 		if (isEvent)
 			return null;
 
 		return get(source, recipe -> {
 			if (isCrafting && recipe instanceof CraftingRecipe craftingRecipe) {
-				return craftingRecipe.getCategory().name();
+				return craftingRecipe.getCategory();
 			} else if (!isCrafting && recipe instanceof CookingRecipe<?> cookingRecipe) {
-				return cookingRecipe.getCategory().name();
+				return cookingRecipe.getCategory();
 			}
 			return null;
 		});
@@ -116,8 +116,8 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, String> {
 	}
 
 	@Override
-	public Class<String> getReturnType() {
-		return String.class;
+	public Class<? extends Object> getReturnType() {
+		return isCrafting ? CraftingBookCategory.class : CookingBookCategory.class;
 	}
 
 	@Override

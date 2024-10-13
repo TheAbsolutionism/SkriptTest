@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -40,7 +41,7 @@ public class EffRemoveRecipe extends Effect {
 	@Override
 	protected void execute(Event event) {
 		for (String recipe : recipes.getArray(event)) {
-			NamespacedKey key = NamespacedKey.fromString(recipe, Skript.getInstance());
+			NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe);
 			if (Bukkit.getRecipe(key) != null)
 				Bukkit.removeRecipe(key);
 		}

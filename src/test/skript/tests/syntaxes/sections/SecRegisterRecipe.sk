@@ -8,7 +8,7 @@ test "register shapeless recipe":
 	register a new shapeless recipe with the key "test_register_shapeless_recipe":
 		set the recipe ingredients to diamond, iron ingot and netherite ingot
 		set the recipe result to netherite sword named "test_register_shapeless_recipe"
-	assert the recipe "test_register_shapeless_recipe" exists
+	assert the recipe "test_register_shapeless_recipe" exists with "Shapeless recipe does not exist"
 
 test "register shapeless recipe fail":
 	parse:

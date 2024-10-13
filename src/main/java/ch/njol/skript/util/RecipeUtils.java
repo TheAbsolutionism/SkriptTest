@@ -14,14 +14,14 @@ public class RecipeUtils {
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
-		COOKING(CookingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.class),
 		BLASTING(BlastingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent.class),
 		FURNACE(FurnaceRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class),
 		CAMPFIRE(CampfireRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class),
 		SMOKING(SmokingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent.class),
-		SMITHING(SmithingRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.class),
+		COOKING(CookingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.class), // Having 'COOKING' under the subclasses allows for proper ExprRecipeType
 		SMITHING_TRANSFORM(SmithingTransformRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent.class),
 		SMITHING_TRIM(SmithingTrimRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent.class),
+		SMITHING(SmithingRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.class), // Having 'SMITHING' under the subclasses allows for proper ExprRecipeType
 		STONECUTTING(StonecuttingRecipe.class, RegisterRecipeEvent.StonecuttingRecipeEvent.class);
 
 		private final Class<? extends Recipe> recipeClass;
@@ -45,7 +45,7 @@ public class RecipeUtils {
 
 	public static RecipeType getRecipeTypeFromRecipeClass(Class<? extends Recipe> providedClass) {
 		for (RecipeType type : recipeTypes) {
-			if (type.recipeClass.equals(providedClass))
+			if (type.recipeClass.equals(providedClass) || type.recipeClass.isAssignableFrom(providedClass))
 				return type;
 		}
 		return null;

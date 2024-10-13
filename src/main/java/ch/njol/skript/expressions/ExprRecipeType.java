@@ -39,6 +39,7 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		recipes = (Expression<Recipe>) exprs[0];
+		setExpr(recipes);
 		return true;
 	}
 
