@@ -48,13 +48,14 @@ public class EvtFirework extends SkriptEvent {
 
 		if (colors == null)
 			return true;
-		List<org.bukkit.Color> colours = Arrays.stream(colors.getArray(event))
-				.map(color -> {
-					if (color instanceof ColorRGB)
-						return color.asBukkitColor();
-					return color.asDyeColor().getFireworkColor();
-				})
-				.toList();
+
+		List<org.bukkit.Color> colours = colors.stream(event)
+			.map(color -> {
+				if (color instanceof ColorRGB)
+					return color.asBukkitColor();
+				return color.asDyeColor().getFireworkColor();
+			})
+			.toList();
 		FireworkMeta meta = fireworkExplodeEvent.getEntity().getFireworkMeta();
 		for (FireworkEffect effect : meta.getEffects()) {
 			if (colours.containsAll(effect.getColors()))
