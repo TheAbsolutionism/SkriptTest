@@ -98,31 +98,28 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 
 	@Override
 	protected Timespan @Nullable [] get(Event event, Block[] source) {
-		return get(source, new Getter<Timespan, Block>() {
-			@Override
-			public @Nullable Timespan get(Block block) {
-				Furnace furnace = (block != null && block.getState() instanceof Furnace furnaceCheck) ? furnaceCheck : null;
-				switch (type) {
-					case COOKTIME -> {
-						return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getCookTime());
-					}
-					case TOTALCOOKTIME -> {
-						if (event instanceof FurnaceStartSmeltEvent startEvent && block.equals(startEvent.getBlock())) {
-							return new Timespan(Timespan.TimePeriod.TICK, startEvent.getTotalCookTime());
-						} else {
-							return new Timespan(Timespan.TimePeriod.TICK, furnace.getCookTimeTotal());
-						}
-					}
-					case BURNTIME -> {
-						if (event instanceof FurnaceBurnEvent burnEvent && block.equals(burnEvent.getBlock())) {
-							return new Timespan(Timespan.TimePeriod.TICK, burnEvent.getBurnTime());
-						} else {
-							return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getBurnTime());
-						}
+		return get(source, block -> {
+			Furnace furnace = (block != null && block.getState() instanceof Furnace furnaceCheck) ? furnaceCheck : null;
+			switch (type) {
+				case COOKTIME -> {
+					return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getCookTime());
+				}
+				case TOTALCOOKTIME -> {
+					if (event instanceof FurnaceStartSmeltEvent startEvent && block.equals(startEvent.getBlock())) {
+						return new Timespan(Timespan.TimePeriod.TICK, startEvent.getTotalCookTime());
+					} else {
+						return new Timespan(Timespan.TimePeriod.TICK, furnace.getCookTimeTotal());
 					}
 				}
-				return null;
+				case BURNTIME -> {
+					if (event instanceof FurnaceBurnEvent burnEvent && block.equals(burnEvent.getBlock())) {
+						return new Timespan(Timespan.TimePeriod.TICK, burnEvent.getBurnTime());
+					} else {
+						return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getBurnTime());
+					}
+				}
 			}
+			return null;
 		});
 	}
 
@@ -175,6 +172,11 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 		}
 	}
 
+	/**
+	 * Handler for setting data of furnace blocks
+	 * @param event Event
+	 * @param changer The consumer used to apply to the furnace blocks
+	 */
 	private void changeFurnaces(Event event, Consumer<Furnace> changer) {
 		for (Block block : getExpr().getArray(event)) {
 			Furnace furnace = (Furnace) block.getState();

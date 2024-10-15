@@ -15,6 +15,7 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
+import ch.njol.util.Math2;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -49,24 +50,39 @@ import java.util.List;
 @Since("1.0, 2.8.0 (syntax rework)")
 public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
-	private static final int ORE = 0, FUEL = 1, RESULT = 2;
+	private enum FurnaceSlot {
+		INPUT("(ore|input)", "input"),
+		FUEL("fuel", "fuel"),
+		OUTPUT("(result|output)", "output");
+
+		private String pattern, toString;
+
+		FurnaceSlot(String pattern, String toString) {
+			this.pattern = pattern;
+			this.toString = toString;
+		}
+	}
+
+	private static final FurnaceSlot[] furnaceSlots = FurnaceSlot.values();
 
 	static {
-		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY,
-			"[the] (0:(ore|input)|1:fuel|2:(result|output)) slot[s] [of %blocks%]",
-			"%blocks%['s] (0:(ore|input)|1:fuel|2:(result|output)) slot[s]"
-		);
+		String[] patterns = new String[furnaceSlots.length * 2];
+		for (FurnaceSlot slot : furnaceSlots) {
+			patterns[2 * slot.ordinal()] = "[the] " + slot.pattern + " slot[s] [of %blocks%]";
+			patterns[2 * slot.ordinal() + 1] = "%blocks%'[s] " + slot.pattern + " slot[s]";
+		}
+		Skript.registerExpression(ExprFurnaceSlot.class, Slot.class, ExpressionType.PROPERTY, patterns);
 	}
 
 
 	private @Nullable Expression<Block> blocks;
+	private FurnaceSlot selectedSlot;
 	private boolean isEvent;
-	private int slot;
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-
+		selectedSlot = furnaceSlots[(int) Math2.floor(matchedPattern / 2)];
 		if (exprs[0] != null) {
 			blocks = (Expression<Block>) exprs[0];
 		} else {
@@ -76,7 +92,6 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 			}
 			isEvent = true;
 		}
-		slot = parseResult.mark;
 		return true;
 	}
 
@@ -104,7 +119,7 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 			if (isEvent && !Delay.isDelayed(event)) {
 				slots.add(new FurnaceEventSlot(event, furnaceInventory));
 			} else {
-				slots.add(new InventorySlot(furnaceInventory, slot));
+				slots.add(new InventorySlot(furnaceInventory, selectedSlot.ordinal()));
 			}
 		}
 		return slots.toArray(new Slot[0]);
@@ -125,18 +140,13 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return switch (slot) {
-			case ORE -> "input";
-			case FUEL -> "fuel";
-			case RESULT -> "result";
-			default -> ""; // switch errors with 'not all possible inputs are covered'
-		} + " slot of " + (isEvent ? event.getEventName() : blocks.toString(event, debug));
+		return selectedSlot.toString + " slot of " + (isEvent ? event.getEventName() : blocks.toString(event, debug));
 	}
 
 	@Override
 	public boolean setTime(int time) {
 		if (isEvent) { // getExpr will be null
-			if (slot == FUEL)
+			if (selectedSlot == FurnaceSlot.FUEL)
 				return setTime(time, FurnaceBurnEvent.class);
 			return setTime(time, FurnaceSmeltEvent.class);
 		}
@@ -148,14 +158,14 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 		private final Event event;
 
 		public FurnaceEventSlot(Event event, FurnaceInventory furnaceInventory) {
-			super(furnaceInventory, slot);
+			super(furnaceInventory, selectedSlot.ordinal());
 			this.event = event;
 		}
 
 		@Override
 		public @Nullable ItemStack getItem() {
-			return switch (slot) {
-				case ORE -> {
+			return switch (selectedSlot) {
+				case INPUT -> {
 					if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
 						ItemStack source = furnaceSmeltEvent.getSource().clone();
 						if (getTime() != EventValues.TIME_FUTURE)
@@ -170,6 +180,9 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 						ItemStack fuel = furnaceBurnEvent.getFuel().clone();
 						if (getTime() != EventValues.TIME_FUTURE)
 							yield fuel;
+						// a single lava bucket becomes an empty bucket
+						// see https://minecraft.wiki/w/Smelting#Fuel
+						// this is declared here because setting the amount to 0 may cause the ItemStack to become AIR
 						Material newMaterial = fuel.getType() == Material.LAVA_BUCKET ? Material.BUCKET : Material.AIR;
 						fuel.setAmount(fuel.getAmount() - 1);
 						if (fuel.getAmount() == 0)
@@ -178,7 +191,7 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 					}
 					yield super.getItem();
 				}
-				case RESULT -> {
+				case OUTPUT -> {
 					if (event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
 						ItemStack result = furnaceSmeltEvent.getResult().clone();
 						ItemStack currentResult = ((FurnaceInventory) getInventory()).getResult();
@@ -201,7 +214,7 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 
 		@Override
 		public void setItem(@Nullable ItemStack item) {
-			if (slot == RESULT && event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
+			if (selectedSlot == FurnaceSlot.OUTPUT && event instanceof FurnaceSmeltEvent furnaceSmeltEvent) {
 				furnaceSmeltEvent.setResult(item != null ? item : new ItemStack(Material.AIR));
 			} else {
 				if (getTime() == EventValues.TIME_FUTURE) { // Since this is a future expression, run it AFTER the event

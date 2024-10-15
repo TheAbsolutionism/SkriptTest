@@ -43,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @Events({"smelt", "fuel burn", "smelting start", "furnace extract"})
 @Since("INSERT VERSION")
-public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack> {
+public class ExprFurnaceEventItems extends PropertyExpression<Block, ItemStack> {
 
 	enum FurnaceValues {
 		SMELTED("(smelted item|result[ item])", "smelted item", FurnaceSmeltEvent.class, "'smelted item' can only be used in a smelting event."),
@@ -72,7 +72,7 @@ public class ExprFurnaceEventValues extends PropertyExpression<Block, ItemStack>
 			patterns[value.ordinal()] = value.pattern;
 		}
 
-		Skript.registerExpression(ExprFurnaceEventValues.class, ItemStack.class, ExpressionType.PROPERTY, patterns);
+		Skript.registerExpression(ExprFurnaceEventItems.class, ItemStack.class, ExpressionType.PROPERTY, patterns);
 	}
 
 	private FurnaceValues type;
