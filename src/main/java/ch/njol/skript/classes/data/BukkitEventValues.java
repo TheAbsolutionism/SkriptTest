@@ -1966,6 +1966,8 @@ public final class BukkitEventValues {
 			@Override
 			public ItemStack[] get(FurnaceExtractEvent event) {
 				return new ItemStack[]{ItemStack.of(event.getItemType(), event.getItemAmount())};
+			}
+		}, EventValues.TIME_NOW);
 
 		// BlockDropItemEvent
 		EventValues.registerEventValue(BlockDropItemEvent.class, Block.class, new Getter<Block, BlockDropItemEvent>() {
