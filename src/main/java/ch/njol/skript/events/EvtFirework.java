@@ -8,6 +8,7 @@ import ch.njol.skript.util.Color;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.njol.skript.util.ColorRGB;
 import org.bukkit.FireworkEffect;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.FireworkExplodeEvent;
@@ -25,7 +26,7 @@ public class EvtFirework extends SkriptEvent {
 					.examples("on firework explode:",
 								"\tif event-colors contains red:",
 							"on firework exploding colored red, light green and black:",
-							"on firework explosion colored light green:",
+							"on firework explosion colored rgb 0, 255, 0:",
 								"\tbroadcast \"A firework colored %colors% was exploded at %location%!\"")
 					.since("2.4");
 	}
@@ -48,7 +49,11 @@ public class EvtFirework extends SkriptEvent {
 		if (colors == null)
 			return true;
 		List<org.bukkit.Color> colours = Arrays.stream(colors.getArray(event))
-				.map(color -> color.asDyeColor().getFireworkColor())
+				.map(color -> {
+					if (color instanceof ColorRGB)
+						return color.asBukkitColor();
+					return color.asDyeColor().getFireworkColor();
+				})
 				.toList();
 		FireworkMeta meta = fireworkExplodeEvent.getEntity().getFireworkMeta();
 		for (FireworkEffect effect : meta.getEffects()) {

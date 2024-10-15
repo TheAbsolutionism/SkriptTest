@@ -41,6 +41,7 @@ import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.SkriptColor;
+import ch.njol.skript.util.ColorRGB;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
@@ -1643,7 +1644,10 @@ public final class BukkitEventValues {
 				List<Color> colors = new ArrayList<>();
 				for (FireworkEffect fireworkEffect : effects) {
 					for (org.bukkit.Color color : fireworkEffect.getColors()) {
-						colors.add(SkriptColor.fromBukkitColor(color));
+						if (SkriptColor.fromBukkitColor(color) != null)
+							colors.add(SkriptColor.fromBukkitColor(color));
+						else
+							colors.add(ColorRGB.fromBukkitColor(color));
 					}
 				}
 				if (colors.isEmpty())
