@@ -24,7 +24,7 @@ public class EvtFireworkTest extends SkriptJUnitTest {
 
 	@Before
 	public void getEntity() {
-		if (Skript.isRunningMinecraft(1, 20, 5)){
+		if (Skript.isRunningMinecraft(1, 20, 5)) {
 			entityType = EntityType.FIREWORK_ROCKET;
 		} else {
 			entityType = EntityType.valueOf("FIREWORK");
