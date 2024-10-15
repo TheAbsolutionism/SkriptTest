@@ -21,7 +21,7 @@ public class EffResetRecipes extends Effect {
 
 	static {
 		Skript.registerEffect(EffResetRecipes.class,
-			"reset server recipes");
+			"reset [the] server['s] recipes");
 	}
 
 	@Override

@@ -15,9 +15,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @Name("Recipe Type")
 @Description("Get the recipe type of a recipe")
@@ -43,7 +41,7 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 
 	@Override
 	protected RecipeUtils.RecipeType @Nullable [] get(Event event, Recipe[] source) {
-		return Arrays.stream(getExpr().getArray(event)).map(RecipeUtils::getRecipeTypeFromRecipe).toArray(RecipeUtils.RecipeType[]::new);
+		return get(source, recipe -> RecipeUtils.getRecipeTypeFromRecipe(recipe));
 	}
 
 	@Override

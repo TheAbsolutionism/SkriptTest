@@ -71,7 +71,7 @@ public class NamespacedUtils {
 					encodedKeyBuilder.append('.');
 			}
 		}
-		return new NamespacedKey(Skript.getInstance(), encodedKeyBuilder.toString());
+		return NamespacedKey.fromString(encodedKeyBuilder.toString(), Skript.getInstance());
 	}
 
 	/**

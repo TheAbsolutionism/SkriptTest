@@ -26,7 +26,7 @@ public class EffRemoveRecipe extends Effect {
 
 	static {
 		Skript.registerEffect(EffRemoveRecipe.class,
-			"(remove|delete|clear) [the] recipe[s] %strings% [from the server]");
+			"(remove|delete|clear) [the] recipe[s] [with [the] key] %strings% [from the server]");
 	}
 
 	private Expression<String> recipes;

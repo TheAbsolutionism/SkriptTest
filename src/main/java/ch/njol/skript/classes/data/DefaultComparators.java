@@ -29,15 +29,14 @@ import ch.njol.skript.entity.BoatData;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.entity.RabbitData;
 import ch.njol.skript.util.*;
+import ch.njol.skript.util.StructureType;
+import ch.njol.skript.util.WeatherType;
 import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.skript.util.slot.SlotWithIndex;
 import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
@@ -52,6 +51,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.potion.PotionEffectType;
 import org.skriptlang.skript.lang.comparator.Comparator;
 import org.skriptlang.skript.lang.comparator.Comparators;
@@ -649,20 +649,11 @@ public class DefaultComparators {
 		// Potion Effect Type
 		Comparators.registerComparator(PotionEffectType.class, PotionEffectType.class, (one, two) -> Relation.get(one.equals(two)));
 
-		Comparators.registerComparator(Recipe.class, Recipe.class, new Comparator<Recipe, Recipe>() {
+		Comparators.registerComparator(RecipeUtils.RecipeType.class, RecipeUtils.RecipeType.class, new Comparator<RecipeUtils.RecipeType, RecipeUtils.RecipeType>() {
 			@Override
-			public Relation compare(Recipe o1, Recipe o2) {
-				Recipe first = null;
-				Recipe second = null;
-				if (o1.getClass().getSuperclass().equals(o2.getClass())) {
-					first = (Recipe) o1;
-					second = o2;
-				} else if (o2.getClass().getSuperclass().equals(o1.getClass())) {
-					first =  o1.getClass().cast(o2);
-					second = o1;
-				}
-				Skript.adminBroadcast("Compare 1: " + first);
-				Skript.adminBroadcast("Compare 2: " + second);
+			public Relation compare(RecipeUtils.RecipeType type1, RecipeUtils.RecipeType type2) {
+				if (type1.getRecipeClass() != null && type2.getRecipeClass() != null)
+					return Relation.get(type2.getRecipeClass().isAssignableFrom(type1.getRecipeClass()));
 				return Relation.NOT_EQUAL;
 			}
 		});

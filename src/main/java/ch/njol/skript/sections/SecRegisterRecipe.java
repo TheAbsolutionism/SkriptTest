@@ -9,12 +9,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.registrations.EventValues;
-import ch.njol.skript.util.Getter;
-import ch.njol.skript.util.LiteralUtils;
 import ch.njol.skript.util.NamespacedUtils;
-import ch.njol.skript.util.RecipeUtils;
-import ch.njol.skript.util.RecipeUtils.*;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.skript.util.RecipeUtils.RecipeType;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
@@ -22,7 +17,6 @@ import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
@@ -44,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type",
 	"Groups only apply to Shaped, Shapeless and Cooking Recipes",
 	"Category only applies to Shaped, Shapeless and Cooking Recipes",
-	"You can not create a Cooking Recipe type."
+	"You can not create a Cooking and Crafting Recipe type."
 })
 @Examples({
 	"register a new shaped recipe with the name \"my_recipe\":",
@@ -86,13 +80,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SecRegisterRecipe extends Section {
 	/*
 	TODO:
-		Fix comparing recipe to recipe
-		add comparing recipe type to recipe type (sub -> super)
 		Comparing key of recipe to a string
-		Cond tests
-		Eff tests
 		Recipe event values
 		Maybe Complex Recipe?
+		ExprRecipeIngredients Test
 	 */
 
 	private static final boolean RUNNING_1_20 = Skript.isRunningMinecraft(1, 20, 0);
@@ -112,8 +103,8 @@ public class SecRegisterRecipe extends Section {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
 		providedType = ((Literal<RecipeType>) exprs[0]).getSingle();
-		if (providedType == RecipeType.COOKING) {
-			Skript.error("You can not register a 'cooking' recipe type.");
+		if (providedType == RecipeType.COOKING || providedType == RecipeType.CRAFTING) {
+			Skript.error("You can not register a '" + providedType + "' recipe type.");
 			return false;
 		} else if (providedType == RecipeType.SMITHING && RUNNING_1_20) {
 			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+");

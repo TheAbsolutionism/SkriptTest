@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
 @Examples({
-	"register a new cooking recipe with the key \"my_recipe\":",
+	"register a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to raw gold named \"Impure Gold\"",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe result to gold ingot named \"Pure Gold\""

@@ -45,7 +45,7 @@ import java.util.*;
 		"\tset recipe ingredients to iron ingot, gold ingot, iron ingot, nether star, 5 obsidian, nether star, iron ingot, gold ingot and iron ingot",
 		"\tset recipe resulting item to beacon named \"OP Beacon\"",
 	"",
-	"register new cooking recipe with the id \"my_recipe\":",
+	"register new blasting recipe with the id \"my_recipe\":",
 		"\tset the recipe input item to netherite ingot named \"Impure Netherite\"",
 		"\tset the recipe result item to netherite ingot named \"Pure Netherite\"",
 	"",

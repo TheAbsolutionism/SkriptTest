@@ -7,13 +7,22 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class RecipeUtils {
 
-	// Custom enum for registering a 'recipetype' class
+	private static Class<? extends Recipe> CRAFTING_CLASS = null;
+
+	// Due to 1.19 not having 'CraftingRecipe.class'
+	static {
+		if (Skript.classExists("org.bukkit.inventory.CraftingRecipe")) {
+			CRAFTING_CLASS = CraftingRecipe.class;
+		}
+	}
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
+		CRAFTING(CRAFTING_CLASS, RegisterRecipeEvent.CraftingRecipeEvent.class),
 		BLASTING(BlastingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent.class),
 		FURNACE(FurnaceRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class),
 		CAMPFIRE(CampfireRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class),
@@ -24,10 +33,10 @@ public class RecipeUtils {
 		SMITHING(SmithingRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.class), // Having 'SMITHING' under the subclasses allows for proper ExprRecipeType
 		STONECUTTING(StonecuttingRecipe.class, RegisterRecipeEvent.StonecuttingRecipeEvent.class);
 
-		private final Class<? extends Recipe> recipeClass;
+		private final @Nullable Class<? extends Recipe> recipeClass;
 		private final Class<? extends Event> eventClass;
 
-		RecipeType(Class<? extends Recipe> recipeClass, Class<? extends Event> eventClass) {
+		RecipeType(@Nullable Class<? extends Recipe> recipeClass, Class<? extends Event> eventClass) {
 			this.recipeClass = recipeClass;
 			this.eventClass = eventClass;
 		}
@@ -41,11 +50,9 @@ public class RecipeUtils {
 		}
 	}
 
-	private static final RecipeType[] recipeTypes = RecipeType.values();
-
 	public static RecipeType getRecipeTypeFromRecipeClass(Class<? extends Recipe> providedClass) {
-		for (RecipeType type : recipeTypes) {
-			if (type.recipeClass.isAssignableFrom(providedClass)) {
+		for (RecipeType type : RecipeType.values()) {
+			if (type.recipeClass != null && type.recipeClass.isAssignableFrom(providedClass)) {
 				return type;
 			}
 		}
@@ -278,23 +285,7 @@ public class RecipeUtils {
 	}
 
 	public Class<? extends Event> getRecipeEventFromRecipeType(RecipeType recipeType) {
-		return switch (recipeType) {
-			case SHAPED -> RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class;
-			case SHAPELESS -> RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class;
-			case COOKING -> RegisterRecipeEvent.CookingRecipeEvent.class;
-			case BLASTING -> RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent.class;
-			case CAMPFIRE -> RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class;
-			case FURNACE -> RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class;
-			case SMOKING -> RegisterRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent.class;
-			case SMITHING -> RegisterRecipeEvent.SmithingRecipeEvent.class;
-			case SMITHING_TRANSFORM -> RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent.class;
-			case SMITHING_TRIM -> RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent.class;
-			case STONECUTTING -> RegisterRecipeEvent.StonecuttingRecipeEvent.class;
-		};
-	}
-
-	public Class<? extends Event> getRecipeEventFromRecipeClass(Class<? extends Recipe> recipeClass) {
-		return getRecipeEventFromRecipeType(getRecipeTypeFromRecipeClass(recipeClass));
+		return recipeType.getEventClass();
 	}
 
 }
