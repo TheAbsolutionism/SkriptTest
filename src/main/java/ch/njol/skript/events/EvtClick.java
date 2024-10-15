@@ -1,5 +1,6 @@
 package ch.njol.skript.events;
 
+import ch.njol.util.Predicate;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.ArmorStand;
@@ -138,9 +139,6 @@ public class EvtClick extends SkriptEvent {
 			switch (action)  {
 				case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> click = LEFT;
 				case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> click = RIGHT;
-				case PHYSICAL -> {
-					return false;
-				}
 				default -> {
 					return false;
 				}
@@ -161,16 +159,19 @@ public class EvtClick extends SkriptEvent {
 			return false;
 		}
 
-		if (tools != null && !tools.check(event, itemType -> {
+		Checker<ItemType> checker = itemType -> {
 			if (event instanceof PlayerInteractEvent interactEvent) {
 				return itemType.isOfType(interactEvent.getItem());
 			} else {
 				PlayerInventory invi = ((PlayerInteractEntityEvent) event).getPlayer().getInventory();
 				ItemStack item = ((PlayerInteractEntityEvent) event).getHand() == EquipmentSlot.HAND
-						? invi.getItemInMainHand() : invi.getItemInOffHand();
+					? invi.getItemInMainHand() : invi.getItemInOffHand();
 				return itemType.isOfType(item);
 			}
-		})) { return false; }
+		};
+
+		if (tools != null && !tools.check(event, checker))
+			return false;
 
 		if (type != null) {
 			BlockData blockDataCheck = block != null ? block.getBlockData() : null;
