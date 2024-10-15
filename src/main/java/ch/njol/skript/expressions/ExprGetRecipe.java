@@ -31,7 +31,7 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprGetRecipe.class, Recipe.class, ExpressionType.SIMPLE,
-			"recipe[s] with [the] (key|id)[s] %strings%");
+			"[the] recipe[s] with [the] (key|id)[s] %strings%");
 	}
 
 	private Expression<String> recipeNames;

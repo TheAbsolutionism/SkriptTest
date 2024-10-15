@@ -1,5 +1,5 @@
 test "recipe cooking time":
-	register a new cooking recipe with the key "test_recipe_cooking_time":
+	register a new blasting recipe with the key "test_recipe_cooking_time":
 		set the recipe input item to raw copper named "test_recipe_cooking_time"
 		set the recipe cooking time to 20 seconds
 		set the recipe result to copper ingot named "test_recipe_cooking_time"

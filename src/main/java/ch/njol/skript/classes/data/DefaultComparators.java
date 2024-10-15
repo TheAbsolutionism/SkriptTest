@@ -28,16 +28,7 @@ import ch.njol.skript.entity.BoatChestData;
 import ch.njol.skript.entity.BoatData;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.entity.RabbitData;
-import ch.njol.skript.util.BlockUtils;
-import ch.njol.skript.util.Date;
-import ch.njol.skript.util.EnchantmentType;
-import ch.njol.skript.util.Experience;
-import ch.njol.skript.util.GameruleValue;
-import ch.njol.skript.util.StructureType;
-import ch.njol.skript.util.Time;
-import ch.njol.skript.util.Timeperiod;
-import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.WeatherType;
+import ch.njol.skript.util.*;
 import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.skript.util.slot.SlotWithIndex;
@@ -60,6 +51,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.potion.PotionEffectType;
 import org.skriptlang.skript.lang.comparator.Comparator;
 import org.skriptlang.skript.lang.comparator.Comparators;
@@ -656,6 +648,24 @@ public class DefaultComparators {
 
 		// Potion Effect Type
 		Comparators.registerComparator(PotionEffectType.class, PotionEffectType.class, (one, two) -> Relation.get(one.equals(two)));
+
+		Comparators.registerComparator(Recipe.class, Recipe.class, new Comparator<Recipe, Recipe>() {
+			@Override
+			public Relation compare(Recipe o1, Recipe o2) {
+				Recipe first = null;
+				Recipe second = null;
+				if (o1.getClass().getSuperclass().equals(o2.getClass())) {
+					first = (Recipe) o1;
+					second = o2;
+				} else if (o2.getClass().getSuperclass().equals(o1.getClass())) {
+					first =  o1.getClass().cast(o2);
+					second = o1;
+				}
+				Skript.adminBroadcast("Compare 1: " + first);
+				Skript.adminBroadcast("Compare 2: " + second);
+				return Relation.NOT_EQUAL;
+			}
+		});
 	}
 	
 }

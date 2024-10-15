@@ -19,6 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Name("Recipe Result")
 @Description("The result item for a recipe")
 @Examples({

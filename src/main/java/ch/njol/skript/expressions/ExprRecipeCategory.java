@@ -15,9 +15,7 @@ import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.CookingRecipe;
-import org.bukkit.inventory.CraftingRecipe;
-import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
 			"\t\tbroadcast recipe cooking category of loop-recipe"
 })
 public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
+
+	private static final boolean SUPPORT_CRAFTING_TYPE = Skript.classExists("org.bukkit.inventory.CraftingRecipe");
 
 	static {
 		Skript.registerExpression(ExprRecipeCategory.class, Object.class, ExpressionType.PROPERTY,
@@ -82,8 +82,16 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 			return null;
 
 		return get(source, recipe -> {
-			if (isCrafting && recipe instanceof CraftingRecipe craftingRecipe) {
-				return craftingRecipe.getCategory();
+			if (isCrafting) {
+				if (SUPPORT_CRAFTING_TYPE && recipe instanceof CraftingRecipe craftingRecipe) {
+					return craftingRecipe.getCategory();
+				} else if (!SUPPORT_CRAFTING_TYPE) {
+					if (recipe instanceof ShapedRecipe shapedRecipe) {
+						return shapedRecipe.getCategory();
+					} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+						return shapelessRecipe.getCategory();
+					}
+				}
 			} else if (!isCrafting && recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getCategory();
 			}

@@ -18,12 +18,6 @@ test "register shapeless recipe fail":
 	assert last parse logs contains "This can only be used when registering a Shaped Recipe." with "Ingredients of a row did not fail for Shapeless recipe"
 	assert the recipe "test_register_shapeless_recipe_fail" does not exist with "Shapeless recipe should not have registered after failing"
 
-test "register cooking recipe":
-	register a new cooking recipe with the key "test_register_cooking_recipe":
-		set the recipe input item to raw copper named "test_register_cooking_recipe"
-		set the recipe result to copper ingot named "test_register_cooking_recipe"
-	assert the recipe "test_register_cooking_recipe" exists with "Cooking recipe does not exist"
-
 test "register blasting recipe":
 	register a new blasting recipe with the key "test_register_blasting_recipe":
 		set the recipe input item to raw iron named "test_register_blasting_recipe"
@@ -48,7 +42,7 @@ test "register smoking recipe":
 		set the recipe result to iron ingot named "test_register_smoking_recipe"
 	assert the recipe "test_register_smoking_recipe" exists with "Smoking recipe does not exist"
 
-test "register smithing recipe":
+test "register smithing recipe" when running below minecraft "1.20":
 	register a new smithing recipe with the key "test_register_smithing_recipe":
 		set the recipe base item to iron ingot named "test_register_smithing_recipe"
 		set the recipe additional item to gold ingot named "test_register_smithing_recipe"

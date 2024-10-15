@@ -36,14 +36,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Name("Register Recipe")
 @Description({
 	"Create a custom recipe for any of the following types:",
-	"Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting",
+	"Shaped, Shapeless, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting",
 	"NOTES:",
 	"All recipes except Smithing Trim require a 'result item'",
 	"Shaped and Shapeless Ingredients allows custom items only on Paper",
 	"Shaped and Shapeless have a maximum of 9 and minimum requirement of 2 ingredients",
-	"Blasting, Furnace, Campfire and Smoking all fall under Cooking",
+	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type",
 	"Groups only apply to Shaped, Shapeless and Cooking Recipes",
-	"Category only applies to Shaped, Shapeless and Cooking Recipes"
+	"Category only applies to Shaped, Shapeless and Cooking Recipes",
+	"You can not create a Cooking Recipe type."
 })
 @Examples({
 	"register a new shaped recipe with the name \"my_recipe\":",
@@ -61,8 +62,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe crafting category to crafting category misc",
 		"\tset the recipe result item to diamond helmet named \"Heavenly Helm\"",
 	"",
-	"#Blasting, Furnace, Campfire and Smoking follow same format as Cooking",
-	"create new cooking recipe with the namespacekey \"my_recipe\":",
+	"#Furnace, Campfire and Smoking follow same format as Cooking",
+	"create new blasting recipe with the namespacekey \"my_recipe\":",
 		"\tset the recipe experience to 5",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe group to \"custom group\"",
@@ -85,15 +86,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SecRegisterRecipe extends Section {
 	/*
 	TODO:
-		Fix Tests and expressions
+		Fix comparing recipe to recipe
+		add comparing recipe type to recipe type (sub -> super)
+		Comparing key of recipe to a string
+		Cond tests
+		Eff tests
+		Recipe event values
+		Maybe Complex Recipe?
 	 */
+
+	private static final boolean RUNNING_1_20 = Skript.isRunningMinecraft(1, 20, 0);
 
 	static {
 		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
 	}
 
 	private Expression<String> providedName;
-	private Expression<RecipeType> providedType;
+	private RecipeType providedType;
 	private Trigger trigger;
 	private Node thisNode;
 	private String thisScript;
@@ -102,12 +111,18 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
-		providedType = (Expression<RecipeType>) exprs[0];
+		providedType = ((Literal<RecipeType>) exprs[0]).getSingle();
+		if (providedType == RecipeType.COOKING) {
+			Skript.error("You can not register a 'cooking' recipe type.");
+			return false;
+		} else if (providedType == RecipeType.SMITHING && RUNNING_1_20) {
+			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+");
+			return false;
+		}
 		providedName = (Expression<String>) exprs[1];
-		Class<? extends Event> eventClass = ((Literal<RecipeType>) exprs[0]).getSingle().getEventClass();
 		AtomicBoolean delayed = new AtomicBoolean(false);
 		Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
-		trigger = loadCode(sectionNode, "register recipe", afterLoading, eventClass);
+		trigger = loadCode(sectionNode, "register recipe", afterLoading, providedType.getEventClass());
 		if (delayed.get()) {
 			Skript.error("Delays cannot be used within a 'register recipe' section.");
 			return false;
@@ -121,11 +136,11 @@ public class SecRegisterRecipe extends Section {
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
 		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
-		RecipeType recipeType = providedType.getSingle(event);
+		RecipeType recipeType = providedType;
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);
 			case SHAPELESS -> new ShapelessRecipeEvent(recipeType);
-			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(recipeType);
+			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(recipeType);
 			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(recipeType);
 			case STONECUTTING -> new StonecuttingRecipeEvent(recipeType);
 			default -> throw new IllegalStateException("Unexpected vale: " + recipeType);
@@ -157,7 +172,7 @@ public class SecRegisterRecipe extends Section {
 					}
 				}
 			}
-			case COOKING, BLASTING, FURNACE, CAMPFIRE, SMOKING -> {
+			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> {
 				if (recipeEvent instanceof CookingRecipeEvent cookingEvent) {
 					RecipeChoice input = cookingEvent.getInput();
 					String group = cookingEvent.getGroup();
@@ -207,7 +222,6 @@ public class SecRegisterRecipe extends Section {
 				shapedRecipe.setIngredient(characters[i], thisChoice);
 		}
 		completeRecipe(key, shapedRecipe);
-		return;
 	}
 
 	private void createShapelessRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
@@ -230,11 +244,8 @@ public class SecRegisterRecipe extends Section {
 			case CAMPFIRE -> new CampfireRecipe(key, result, input, experience, cookingTime);
 			case FURNACE -> new FurnaceRecipe(key, result, input, experience, cookingTime);
 			case SMOKING -> new SmokingRecipe(key, result, input, experience, cookingTime);
-			case COOKING -> new CookingRecipe<>(key, result, input, experience, cookingTime) {};
-			default -> null;
+			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
 		};
-		if (recipe == null)
-			return;
 		if (category != null)
 			recipe.setCategory(category);
 		if (group != null && !group.isEmpty())
@@ -251,10 +262,8 @@ public class SecRegisterRecipe extends Section {
 			case SMITHING_TRANSFORM -> new SmithingTransformRecipe(key, result, template, base, addition);
 			case SMITHING_TRIM -> new SmithingTrimRecipe(key, template, base, addition);
 			case SMITHING -> new SmithingRecipe(key, result, base, addition);
-			default -> null;
+			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
 		};
-		if (recipe == null)
-			return;
 		completeRecipe(key, recipe);
 	}
 
@@ -273,7 +282,7 @@ public class SecRegisterRecipe extends Section {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "register a new " + providedType.toString(event, debug) + " recipe with the namespacekey " + providedName.toString(event, debug);
+		return "register a new " + providedType + " recipe with the namespacekey " + providedName.toString(event, debug);
 	}
 
 }

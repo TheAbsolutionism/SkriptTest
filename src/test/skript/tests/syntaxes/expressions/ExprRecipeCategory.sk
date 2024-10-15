@@ -9,7 +9,7 @@ test "recipe crafting category":
 	assert the recipe crafting category of {_get} = crafting misc with "Crafting category mismatch of get recipe"
 
 test "recipe cooking category":
-	register a new cooking recipe with the key "test_recipe_cooking_category":
+	register a new blasting recipe with the key "test_recipe_cooking_category":
 		set the recipe input item to raw copper named "test_recipe_cooking_category"
 		set the recipe cooking category to cooking misc
 		set the recipe result to copper ingot named "test_recipe_cooking_category"

@@ -26,7 +26,7 @@ public class CondRecipeExists extends Condition {
 
 	static {
 		Skript.registerCondition(CondRecipeExists.class,
-			"[the] recipe[s] %strings% exist[s]",
+			"[the] recipe[s] %strings% [does] exist[s]",
 			"[the] recipe[s] %strings% (doesn't|does not) exist[s]");
 	}
 
@@ -42,7 +42,7 @@ public class CondRecipeExists extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedUtils.getNamespacedKey(recipe)) != null);
+		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedUtils.getNamespacedKey(recipe)) != null, isNegated());
 	}
 
 	@Override

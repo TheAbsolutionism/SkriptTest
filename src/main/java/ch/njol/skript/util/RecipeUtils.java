@@ -1,5 +1,6 @@
 package ch.njol.skript.util;
 
+import ch.njol.skript.Skript;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.*;
@@ -10,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 public class RecipeUtils {
 
 	// Custom enum for registering a 'recipetype' class
-	// TODO: If and when Bukkit creates a RecipeType enum, remove this and change lang
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
@@ -45,8 +45,9 @@ public class RecipeUtils {
 
 	public static RecipeType getRecipeTypeFromRecipeClass(Class<? extends Recipe> providedClass) {
 		for (RecipeType type : recipeTypes) {
-			if (type.recipeClass.equals(providedClass) || type.recipeClass.isAssignableFrom(providedClass))
+			if (type.recipeClass.isAssignableFrom(providedClass)) {
 				return type;
+			}
 		}
 		return null;
 	}

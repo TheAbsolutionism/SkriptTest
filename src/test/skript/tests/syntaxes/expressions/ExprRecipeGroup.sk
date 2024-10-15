@@ -1,5 +1,5 @@
 test "recipe group":
-	register a new cooking recipe with the key "test_recipe_group":
+	register a new blasting recipe with the key "test_recipe_group":
 		set the recipe input item to raw copper named "test_recipe_group"
 		set the recipe group to "test_group"
 		set the recipe result to copper ingot named "test_recipe_group"

@@ -16,15 +16,6 @@ test "shapeless recipe type":
 	assert the recipe type of {_last} = shapeless recipe with "Shapeless recipe type mismatch of last registered recipe"
 	assert the recipe type of {_get} = shapeless recipe with "Shapeless recipe type mismatch of get recipe"
 
-test "cooking recipe type":
-	register a new cooking recipe with the key "test_cooking_recipe_type":
-		set the recipe input item to raw copper named "test_cooking_recipe_type"
-		set the recipe result to copper ingot named "test_cooking_recipe_type"
-	set {_last} to last registered recipe
-	set {_get} to recipe with the key "test_cooking_recipe_type"
-	assert the recipe type of {_last} = cooking recipe with "Cooking recipe type mismatch of last registered recipe"
-	assert the recipe type of {_get} = cooking recipe with "Cooking recipe type mismatch of get recipe"
-
 test "blasting recipe type":
 	register a new blasting recipe with the key "test_blasting_recipe_type":
 		set the recipe input item to raw iron named "test_blasting_recipe_type"
@@ -61,7 +52,7 @@ test "smoking recipe type":
 	assert the recipe type of {_last} = smoking recipe with "Smoking recipe type mismatch of last registered recipe"
 	assert the recipe type of {_get} = smoking recipe with "Smoking recipe type mismatch of get recipe"
 
-test "smithing recipe type":
+test "smithing recipe type" when running below minecraft "1.20":
 	register a new smithing recipe with the key "test_smithing_recipe_type":
 		set the recipe base item to iron ingot named "test_smithing_recipe_type"
 		set the recipe additional item to gold ingot named "test_smithing_recipe_type"
@@ -80,7 +71,10 @@ test "smithing transform recipe type":
 	set {_last} to last registered recipe
 	set {_get} to recipe with the key "test_smithing_transform_recipe_type"
 	assert the recipe type of {_last} = smithing transform recipe with "Smithing Transform recipe type mismatch of last registered recipe"
-	assert the recipe type of {_get} = smithing transform recipe with "Smithing Transform recipe type mismatch of get recipe"
+	if running below minecraft "1.20":
+		assert the recipe type of {_get} = smithing recipe with "Smithing Transform recipe type mismatch of get recipe"
+	else:
+		assert the recipe type of {_get} = smithing transform recipe with "Smithing Transform recipe type mismatch of get recipe"
 
 test "smithing trim recipe type":
 	register a new smithing trim recipe with the key "test_smithing_trim_recipe_type":
@@ -91,7 +85,10 @@ test "smithing trim recipe type":
 	set {_last} to last registered recipe
 	set {_get} to recipe with the key "test_smithing_trim_recipe_type"
 	assert the recipe type of {_last} = smithing trim recipe with "Smithing Trim recipe type mismatch of last registered recipe"
-	assert the recipe type of {_get} = smithing trim recipe with "Smithing Trim recipe type mismatch of get recipe"
+	if running below minecraft "1.20.0":
+		assert the recipe type of {_get} = smithing recipe with "Smithing Trim recipe type mismatch of get recipe"
+	else:
+		assert the recipe type of {_get} = smithing trim recipe with "Smithing Trim recipe type mismatch of get recipe"
 
 test "stonecutting recipe type":
 	register a new stonecutting recipe with the key "test_stonecutting_recipe_type":

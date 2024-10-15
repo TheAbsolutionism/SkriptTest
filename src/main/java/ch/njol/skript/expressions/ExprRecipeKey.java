@@ -34,20 +34,17 @@ public class ExprRecipeKey extends PropertyExpression<Recipe, String> {
 			"[the] %recipes%'[s] (key|id)[s]");
 	}
 
-	private Expression<Recipe> recipes;
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		recipes = (Expression<Recipe>) exprs[0];
-		setExpr(recipes);
+		setExpr((Expression<Recipe>) exprs[0]);
 		return true;
 	}
 
 	@Override
 	protected String @Nullable [] get(Event event, Recipe[] source) {
 		List<String> names = new ArrayList<>();
-		for (Recipe recipe : recipes.getArray(event)) {
+		for (Recipe recipe : getExpr().getArray(event)) {
 			if (recipe instanceof Keyed key)
 				names.add(key.getKey().toString());
 		}
@@ -61,6 +58,6 @@ public class ExprRecipeKey extends PropertyExpression<Recipe, String> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe keys of " + recipes.toString(event, debug);
+		return "the recipe keys of " + getExpr().toString(event, debug);
 	}
 }

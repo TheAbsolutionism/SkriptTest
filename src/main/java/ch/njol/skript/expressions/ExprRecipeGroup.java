@@ -16,9 +16,7 @@ import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.CookingRecipe;
-import org.bukkit.inventory.CraftingRecipe;
-import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Group")
@@ -31,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
 })
 @Since("INSERT VERSION")
 public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
+
+	private static final boolean SUPPORT_CRAFTING_TYPE = Skript.classExists("org.bukkit.inventory.CraftingRecipe");
 
 	static {
 		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY, "[the] recipe group [of %-recipes%]");
@@ -64,10 +64,15 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 			return null;
 
 		return get(source, recipe -> {
-			if (recipe instanceof CraftingRecipe craftingRecipe) {
-				return craftingRecipe.getGroup();
-			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+
+			if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getGroup();
+			} else if (SUPPORT_CRAFTING_TYPE && recipe instanceof CraftingRecipe craftingRecipe) {
+				return craftingRecipe.getGroup();
+			} else if (recipe instanceof ShapedRecipe shapedRecipe) {
+				return shapedRecipe.getGroup();
+			} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+				return shapelessRecipe.getGroup();
 			}
 			return null;
 		});

@@ -16,6 +16,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Name("Recipe Type")
@@ -33,23 +34,16 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 			"[the] %recipes%'[s] recipe type");
 	}
 
-	private Expression<Recipe> recipes;
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		recipes = (Expression<Recipe>) exprs[0];
-		setExpr(recipes);
+		setExpr((Expression<Recipe>) exprs[0]);
 		return true;
 	}
 
 	@Override
 	protected RecipeUtils.RecipeType @Nullable [] get(Event event, Recipe[] source) {
-		List<RecipeUtils.RecipeType> types = new ArrayList<>();
-		for (Recipe recipe : recipes.getArray(event)) {
-			types.add(RecipeUtils.getRecipeTypeFromRecipe(recipe));
-		}
-		return types.toArray(new RecipeUtils.RecipeType[0]);
+		return Arrays.stream(getExpr().getArray(event)).map(RecipeUtils::getRecipeTypeFromRecipe).toArray(RecipeUtils.RecipeType[]::new);
 	}
 
 	@Override
@@ -59,6 +53,6 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe type of " + recipes.toString(event, debug);
+		return "the recipe type of " + getExpr().toString(event, debug);
 	}
 }
