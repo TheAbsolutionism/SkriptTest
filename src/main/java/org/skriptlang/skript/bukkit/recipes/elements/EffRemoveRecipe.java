@@ -1,4 +1,4 @@
-package ch.njol.skript.effects;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Remove Recipe")
 @Description({
-	"Remove a recipe or multiple recipes from the server",
-	"Removing a recipe from a server will cause all players who have discovered the recipe to be undiscovered."
+	"Remove the specified recipes from the server.",
+	"This will cause all players who have discovered the recipe to forget it."
 })
 @Examples("remove the recipe \"my_recipe\" from the server")
 @Since("INSERT VERSION")
@@ -32,8 +32,8 @@ public class EffRemoveRecipe extends Effect {
 	private Expression<String> recipes;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		recipes = (Expression<String>) exprs[0];
 		return true;
 	}

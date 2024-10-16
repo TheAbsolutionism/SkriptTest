@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
@@ -27,10 +27,12 @@ import java.util.List;
 @Name("All Recipes")
 @Description({
 	"Retrieve all recipes registered in the server",
-	"You can retrieve all recipes of a recipe type",
-	"You can retrieve all recipes of an item, including custom items",
-	"You can retrieve all minecraft recipes",
-	"You can retrieve all custom recipes made by any and all plugins"
+	"<ul>",
+	"<li>You can retrieve all recipes of a recipe type.</li>",
+	"<li>You can retrieve all recipes of an item, including custom items.</li>",
+	"<li>You can retrieve all minecraft recipes.</li>",
+	"<li>You can retrieve all custom recipes made by any and all plugins.</li>",
+	"</ul>"
 })
 @Examples({
 	"set {_list::*} to all of the recipe of type shaped recipe for netherite ingot",
@@ -55,8 +57,8 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 	private boolean getMinecraft, getCustom;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		recipeTypeExpr = matchedPattern >= 3 ? (Expression<RecipeUtils.RecipeType>) exprs[0] : null;
 		itemExpr = parseResult.hasTag("items") ? exprs[1] : null;
 		getMinecraft = matchedPattern == 1 || matchedPattern == 4;
@@ -66,7 +68,6 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	protected Recipe @Nullable [] get(Event event) {
-
 		List<Recipe> recipeList = new ArrayList<>();
 		Iterator<Recipe> iterator = null;
 		if (itemExpr != null) {

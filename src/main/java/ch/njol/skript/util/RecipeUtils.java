@@ -15,10 +15,10 @@ public class RecipeUtils {
 
 	// Due to 1.19 not having 'CraftingRecipe.class'
 	static {
-		if (Skript.classExists("org.bukkit.inventory.CraftingRecipe")) {
+		if (Skript.classExists("org.bukkit.inventory.CraftingRecipe"))
 			CRAFTING_CLASS = CraftingRecipe.class;
-		}
 	}
+
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
@@ -65,7 +65,6 @@ public class RecipeUtils {
 	}
 
 	// Custom Events used for SecRegisterRecipe
-
 	public static class RegisterRecipeEvent extends Event {
 		private ItemStack resultItem;
 		private boolean errorInEffect = false;

@@ -1,4 +1,4 @@
-package ch.njol.skript.conditions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Exists")
-@Description("Checks to see if a recipe exists using the name")
+@Description("Checks to see if the specified recipe exists.")
 @Examples({
 	"if the recipe \"my_recipe\" exists:",
 		"\tremove the recipe \"my_recipe\" from the server"
@@ -32,8 +32,8 @@ public class CondRecipeExists extends Condition {
 	private Expression<String> recipes;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		recipes = (Expression<String>) exprs[0];
 		setNegated(matchedPattern == 1);
 		return true;

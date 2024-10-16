@@ -1,4 +1,4 @@
-package ch.njol.skript.events;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Player Discover Recipe")
-@Description("Called when a player discovers a recipe")
+@Description("Called when a player discovers a new recipe.")
 @Examples({
 	"on player discovered recipe:",
 		"\tbroadcast event-recipe",
@@ -28,14 +28,14 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Player Discover Recipe", EvtDiscoverRecipe.class, PlayerRecipeDiscoverEvent.class,
-			"[player] discover[ed] recipe [of %strings%]");
+			"[player] discover[ed|ing] recipe[s] [of %-strings%]");
 	}
 
-	private Expression<String> recipes;
+	private @Nullable Expression<String> recipes;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
+		//noinspection unchecked
 		recipes = (Expression<String>) exprs[0];
 		return true;
 	}
@@ -52,6 +52,6 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "player discovered" + (recipes == null ? "" : " of " + recipes.toString(event, debug));
+		return "player discovered recipes" + (recipes == null ? "" : " of " + recipes.toString(event, debug));
 	}
 }

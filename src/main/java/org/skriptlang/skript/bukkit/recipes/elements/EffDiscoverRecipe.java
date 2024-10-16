@@ -1,4 +1,4 @@
-package ch.njol.skript.effects;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Discover Recipe")
-@Description("Discover or undiscover recipes for players.")
+@Description("Discovers or forgets the recipes for the specified players.")
 @Examples({
 	"make player discover recipe \"my_recipe\"",
 	"make player undiscover recipe \"my_recipe\"",
@@ -30,9 +30,9 @@ public class EffDiscoverRecipe extends Effect {
 	static {
 		Skript.registerEffect(EffDiscoverRecipe.class,
 			"make %players% (discover|unlock) recipe[s] %strings%",
-			"make %players% (undiscover|lock) recipe[s] %strings%",
+			"make %players% (undiscover|lock|forget) recipe[s] %strings%",
 			"(discover|unlock) recipe[s] %strings% for %players%",
-			"(undiscover|lock) recipe[s] %strings% for %players%");
+			"(undiscover|lock|forget) recipe[s] %strings% for %players%");
 	}
 
 	private Expression<Player> players;
@@ -40,26 +40,25 @@ public class EffDiscoverRecipe extends Effect {
 	private boolean isDiscover = false;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		isDiscover = matchedPattern == 0 || matchedPattern == 2;
+		//noinspection unchecked
 		players = (Expression<Player>) (matchedPattern <= 1 ? exprs[0] : exprs[1]);
+		//noinspection unchecked
 		recipes = (Expression<String>) (matchedPattern <= 1 ? exprs[1] : exprs[0]);
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
-		for (Player player : players.getArray(event)) {
-			for (String recipe : recipes.getArray(event)) {
-				NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe, false);
-				if (Bukkit.getRecipe(key) != null) {
+		for (String recipe : recipes.getArray(event)) {
+			NamespacedKey  key = NamespacedUtils.getNamespacedKey(recipe, false);
+			if (Bukkit.getRecipe(key) != null) {
+				for (Player player : players.getArray(event)) {
 					if (isDiscover)
 						player.discoverRecipe(key);
 					else
 						player.undiscoverRecipe(key);
-				} else {
-					break;
 				}
 			}
 		}
@@ -69,4 +68,5 @@ public class EffDiscoverRecipe extends Effect {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "make " + players.toString(event, debug) + (isDiscover ? " discover" : " undiscover") + " recipes " + recipes.toString(event, debug);
 	}
+
 }

@@ -38,7 +38,6 @@ import ch.njol.skript.util.StructureType;
 import ch.njol.skript.util.Time;
 import ch.njol.skript.util.Timeperiod;
 import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.RecipeUtils;
 import ch.njol.skript.util.WeatherType;
 import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.Slot;
@@ -671,15 +670,6 @@ public class DefaultComparators {
 		Comparators.registerComparator(Color.class, Color.class, (one, two) -> Relation.get(one.asBukkitColor().equals(two.asBukkitColor())));
 		Comparators.registerComparator(Color.class, org.bukkit.Color.class, (one, two) -> Relation.get(one.asBukkitColor().equals(two)));
 		Comparators.registerComparator(org.bukkit.Color.class, org.bukkit.Color.class, (one, two) -> Relation.get(one.equals(two)));
-
-		Comparators.registerComparator(RecipeUtils.RecipeType.class, RecipeUtils.RecipeType.class, new Comparator<RecipeUtils.RecipeType, RecipeUtils.RecipeType>() {
-			@Override
-			public Relation compare(RecipeUtils.RecipeType type1, RecipeUtils.RecipeType type2) {
-				if (type1.getRecipeClass() != null && type2.getRecipeClass() != null)
-					return Relation.get(type2.getRecipeClass().isAssignableFrom(type1.getRecipeClass()));
-				return Relation.NOT_EQUAL;
-			}
-		});
 	}
 	
 }

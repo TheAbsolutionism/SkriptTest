@@ -1,4 +1,4 @@
-package ch.njol.skript.conditions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -38,9 +38,10 @@ public class CondDiscoveredRecipes extends Condition {
 	private Expression<String> recipes;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		players = (Expression<Player>) exprs[0];
+		//noinspection unchecked
 		recipes = (Expression<String>) exprs[1];
 		setNegated(matchedPattern == 1);
 		return true;

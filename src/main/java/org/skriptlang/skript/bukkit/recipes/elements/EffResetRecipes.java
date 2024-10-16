@@ -1,4 +1,4 @@
-package ch.njol.skript.effects;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Reset Recipes")
-@Description("Resets recipes of server to default.")
+@Description("Resets the recipes to the Minecraft-provided defaults.")
 @Examples("reset server recipes")
 @Since("INSERT VERSION")
 public class EffResetRecipes extends Effect {

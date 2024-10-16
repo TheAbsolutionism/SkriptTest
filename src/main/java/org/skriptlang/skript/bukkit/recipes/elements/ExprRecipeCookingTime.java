@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -22,7 +22,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Cooking Time")
-@Description("The cooking time of a Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
+@Description("The cooking time of a blasting, furnace, campfire or smoking recipe.")
 @Examples({
 	"register a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to raw gold named \"Impure Gold\"",
@@ -33,24 +33,23 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
-			"[the] recipe cook[ing] time [of %-recipes%]");
+		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY, "[the] recipe cook[ing] time [of %-recipes%]");
 	}
 
 	private boolean isEvent = false;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (exprs[0] != null) {
+			//noinspection unchecked
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
-				Skript.error("There is no 'recipe' in a " + getParser().getCurrentEventName() + " event.");
+				Skript.error("There is no recipe in a " + getParser().getCurrentEventName() + " event.");
 				return false;
 			}
 			if (!getParser().isCurrentEvent(CookingRecipeEvent.class)) {
-				Skript.error("This can only be used when registering a Cooking, Blasting, Furnace, Campfire or Smoking Recipe.");
+				Skript.error("This can only be used when registering a blasting, furnace, campfire or smoking Recipe.");
 				return false;
 			}
 			isEvent = true;
@@ -97,4 +96,5 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the recipe cooking time of " + getExpr().toString(event, debug);
 	}
+
 }

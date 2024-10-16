@@ -91,9 +91,6 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.recipe.CookingBookCategory;
-import org.bukkit.inventory.recipe.CraftingBookCategory;
-import org.bukkit.inventory.Recipe;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -1552,29 +1549,6 @@ public class BukkitClasses {
 			.since("@VERSION")
 			.requiredPlugins("Minecraft 1.21+")
 			.documentationId("WolfVariant"));
-
-		Classes.registerClass(new ClassInfo<>(Recipe.class, "recipe")
-			.user("recipes?")
-			.name("Recipe")
-			.description("")
-			.usage("")
-			.examples("")
-			.since("INSERT VERSION")
-			.defaultExpression(new EventValueExpression<>(Recipe.class)));
-
-		Classes.registerClass(new EnumClassInfo<>(CraftingBookCategory.class, "craftingbookcategory", "crafting book categories")
-			.user("crafting book category")
-			.name("Crafting Book Category")
-			.description("Represents a category for crafting recipe types")
-			.since("INSERT VERSION")
-		);
-
-		Classes.registerClass(new EnumClassInfo<>(CookingBookCategory.class, "cookingbookcategory", "cooking book categories")
-			.user("cooking book category")
-			.name("Cooking Book Category")
-			.description("Represents a category for cooking recipe types")
-			.since("INSERT VERSION")
-		);
 	}
 
 }

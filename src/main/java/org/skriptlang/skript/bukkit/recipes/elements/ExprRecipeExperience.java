@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -21,7 +21,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Experience")
-@Description("The experience of a Cooking, Blasting, Furnace, Campfire, and Smoking Recipe.")
+@Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
 @Examples({
 	"register a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to a raw copper named \"Impure Copper\"",
@@ -49,7 +49,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 				return false;
 			}
 			if (!getParser().isCurrentEvent(CookingRecipeEvent.class)) {
-				Skript.error("This can only be used when registering a Cooking, Blasting, Furnace, Campfire or Smoking Recipe.");
+				Skript.error("This can only be used when registering a blasting, furnace, campfire or smoking recipe.");
 				return false;
 			}
 			isEvent = true;
@@ -96,4 +96,5 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the recipe experience of " + getExpr().toString(event, debug);
 	}
+
 }

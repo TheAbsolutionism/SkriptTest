@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -20,7 +20,7 @@ import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Group")
-@Description("The recipe group of a Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
+@Description("The recipe group of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
 @Examples({
 	"register a new shapeless recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to 3 diamonds, 3 emeralds and 3 netherite ingots",
@@ -64,7 +64,6 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 			return null;
 
 		return get(source, recipe -> {
-
 			if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getGroup();
 			} else if (SUPPORT_CRAFTING_TYPE && recipe instanceof CraftingRecipe craftingRecipe) {
@@ -91,10 +90,11 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 		if (group.isEmpty())
 			return;
 
-		if (event instanceof CookingRecipeEvent cookingEvent)
+		if (event instanceof CookingRecipeEvent cookingEvent) {
 			cookingEvent.setGroup(group);
-		else if (event instanceof CraftingRecipeEvent craftingEvent)
+		} else if (event instanceof CraftingRecipeEvent craftingEvent) {
 			craftingEvent.setGroup(group);
+		}
 	}
 
 	@Override
@@ -106,4 +106,5 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the recipe group of " + getExpr().toString(event, debug);
 	}
+
 }

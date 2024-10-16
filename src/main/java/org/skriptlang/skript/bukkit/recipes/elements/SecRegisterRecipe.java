@@ -1,4 +1,4 @@
-package ch.njol.skript.sections;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;

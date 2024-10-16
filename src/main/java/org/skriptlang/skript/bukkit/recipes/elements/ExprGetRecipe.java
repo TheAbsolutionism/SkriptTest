@@ -1,4 +1,4 @@
-package ch.njol.skript.expressions;
+package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
@@ -20,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Name("Get Recipe")
-@Description("Get a recipe registered under the provided key")
+@Name("Recipe")
+@Description("Returns the recipe registered with the provided name.")
 @Examples({
 	"set {_recipe} to recipe with the key \"my_recipe\"",
 	"set {_recipes::*} to recipes with the ids \"my_recipe\" and \"custom_recipe\""
@@ -37,8 +37,8 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 	private Expression<String> recipeNames;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		recipeNames = (Expression<String>) exprs[0];
 		return true;
 	}
