@@ -1999,12 +1999,6 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_NOW);
 
 		// PlayerExpCooldownChangeEvent
-		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, Player.class, new Getter<Player, PlayerExpCooldownChangeEvent>() {
-			@Override
-			public Player get(PlayerExpCooldownChangeEvent event) {
-				return event.getPlayer();
-			}
-		}, EventValues.TIME_NOW);
 		EventValues.registerEventValue(PlayerExpCooldownChangeEvent.class, ChangeReason.class, new Getter<ChangeReason, PlayerExpCooldownChangeEvent>() {
 			@Override
 			public ChangeReason get(PlayerExpCooldownChangeEvent event) {
