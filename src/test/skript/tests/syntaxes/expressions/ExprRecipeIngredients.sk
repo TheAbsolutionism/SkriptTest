@@ -46,7 +46,7 @@ test "recipe stonecutting input":
 	assert the recipe input item of {_last} = {_input} with "Mismatch of recipe input item from last registered recipe"
 	assert the recipe input item of {_get} = {_input} with "Mismatch of recipe input item from get recipe"
 
-test "recipe base, template and addition item":
+test "recipe base, template and addition item" when running minecraft "1.20":
 	set {_base} to diamond named "test_recipe_base_template_addition"
 	set {_template} to netherite ingot named "test_recipe_base_template_addition"
 	set {_addition} to emerald named "test_recipe_base_template_addition"
