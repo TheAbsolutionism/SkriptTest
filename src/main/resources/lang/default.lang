@@ -2382,7 +2382,7 @@ cooking book categories:
 
 # -- Recipe Types --
 recipe types:
-	crafting: crafting recipe
+	crafting: crafting recipe, crafting recipes
 	shaped: shaped recipe, shaped crafting recipe, shaped recipes, shaped crafting recipes
 	shapeless: shapeless recipe, shapeless crafting recipe, shapeless recipes, shapeless crafting recipes
 	cooking: cooking recipe, cooking recipes

@@ -1394,12 +1394,14 @@ public final class BukkitEventValues {
 				return null;
 			}
 		}, 0);
+
 		EventValues.registerEventValue(PrepareItemCraftEvent.class, Recipe.class, new Getter<Recipe, PrepareItemCraftEvent>() {
 			@Override
 			public @Nullable Recipe get(PrepareItemCraftEvent event) {
 				return event.getRecipe();
 			}
 		}, EventValues.TIME_NOW);
+
 		// CraftEvents - recipe namespaced key strings
 		EventValues.registerEventValue(CraftItemEvent.class, String.class, new Getter<String, CraftItemEvent>() {
 			@Nullable
@@ -1429,12 +1431,14 @@ public final class BukkitEventValues {
 				return e.getRecipe().getResult();
 			}
 		}, 0);
+
 		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, new Getter<Recipe, CraftItemEvent>() {
 			@Override
 			public @Nullable Recipe get(CraftItemEvent event) {
 				return event.getRecipe();
 			}
 		}, EventValues.TIME_NOW);
+
 		//InventoryOpenEvent
 		EventValues.registerEventValue(InventoryOpenEvent.class, Player.class, new Getter<Player, InventoryOpenEvent>() {
 			@Override

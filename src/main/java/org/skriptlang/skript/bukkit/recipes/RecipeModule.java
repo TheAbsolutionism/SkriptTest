@@ -21,33 +21,33 @@ public class RecipeModule {
 		if (!Skript.classExists("org.bukkit.inventory.Recipe"))
 			return;
 
-		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit", "recipes");
+		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.recipes", "elements");
 
 		Classes.registerClass(new ClassInfo<>(Recipe.class, "recipe")
 			.user("recipes?")
 			.name("Recipe")
-			.description("Represents a recipe type")
+			.description("Represents a recipe")
 			.usage("recipes")
 			.examples("all recipes")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(Recipe.class)));
 
 		Classes.registerClass(new EnumClassInfo<>(CraftingBookCategory.class, "craftingbookcategory", "crafting book categories")
-			.user("crafting book category")
+			.user("crafting ?book ?categor(y|ies)")
 			.name("Crafting Book Category")
 			.description("Represents the different categories of crafting recipes")
 			.since("INSERT VERSION")
 		);
 
 		Classes.registerClass(new EnumClassInfo<>(CookingBookCategory.class, "cookingbookcategory", "cooking book categories")
-			.user("cooking book category")
+			.user("cooking ?book ?categor(y|ies)")
 			.name("Cooking Book Category")
 			.description("Represents the different categories of cooking recipes")
 			.since("INSERT VERSION")
 		);
 
 		Classes.registerClass(new EnumClassInfo<>(RecipeUtils.RecipeType.class, "recipetype", "recipe types")
-			.user("recipe type")
+			.user("recipe ?types?")
 			.name("Recipe Type")
 			.description("Represents recipe types")
 			.since("INSERT VERSION")
