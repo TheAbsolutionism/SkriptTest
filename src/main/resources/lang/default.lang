@@ -2330,6 +2330,7 @@ recipe types:
 	smithing_transform: smithing transform recipe, smithing transform recipes
 	smithing_trim: smithing trim recipe, smithing trim recipes
 	stonecutting: stonecutting recipe, stonecutting recipes
+	complex: complex recipe, complex recipes
 
 # -- Boolean --
 boolean:

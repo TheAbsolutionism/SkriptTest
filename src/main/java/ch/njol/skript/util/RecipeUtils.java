@@ -31,21 +31,22 @@ public class RecipeUtils {
 		SMITHING_TRANSFORM(SmithingTransformRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent.class),
 		SMITHING_TRIM(SmithingTrimRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent.class),
 		SMITHING(SmithingRecipe.class, RegisterRecipeEvent.SmithingRecipeEvent.class), // Having 'SMITHING' under the subclasses allows for proper ExprRecipeType
-		STONECUTTING(StonecuttingRecipe.class, RegisterRecipeEvent.StonecuttingRecipeEvent.class);
+		STONECUTTING(StonecuttingRecipe.class, RegisterRecipeEvent.StonecuttingRecipeEvent.class),
+		COMPLEX(ComplexRecipe.class, null);
 
 		private final @Nullable Class<? extends Recipe> recipeClass;
-		private final Class<? extends Event> eventClass;
+		private final @Nullable Class<? extends Event> eventClass;
 
-		RecipeType(@Nullable Class<? extends Recipe> recipeClass, Class<? extends Event> eventClass) {
+		RecipeType(@Nullable Class<? extends Recipe> recipeClass, @Nullable Class<? extends Event> eventClass) {
 			this.recipeClass = recipeClass;
 			this.eventClass = eventClass;
 		}
 
-		public Class<? extends Recipe> getRecipeClass() {
+		public @Nullable Class<? extends Recipe> getRecipeClass() {
 			return recipeClass;
 		}
 
-		public Class<? extends Event> getEventClass() {
+		public @Nullable Class<? extends Event> getEventClass() {
 			return eventClass;
 		}
 	}
@@ -218,7 +219,9 @@ public class RecipeUtils {
 
 		public static class SmithingRecipeEvent extends RegisterRecipeEvent {
 
-			private RecipeChoice base, addition, template;
+			private RecipeChoice base;
+			private RecipeChoice template;
+			private RecipeChoice addition;
 
 			public SmithingRecipeEvent(RecipeType recipeType) {
 				super(recipeType);
@@ -241,11 +244,11 @@ public class RecipeUtils {
 			}
 
 			public RecipeChoice getAddition() {
-				return base;
+				return addition;
 			}
 
 			public RecipeChoice getTemplate() {
-				return base;
+				return template;
 			}
 
 			public static class SmithingTransformRecipeEvent extends SmithingRecipeEvent {
@@ -282,10 +285,6 @@ public class RecipeUtils {
 		public @NotNull HandlerList getHandlers() {
 			throw new IllegalStateException();
 		}
-	}
-
-	public Class<? extends Event> getRecipeEventFromRecipeType(RecipeType recipeType) {
-		return recipeType.getEventClass();
 	}
 
 }

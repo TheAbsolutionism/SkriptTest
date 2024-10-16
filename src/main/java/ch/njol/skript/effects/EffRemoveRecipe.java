@@ -41,7 +41,7 @@ public class EffRemoveRecipe extends Effect {
 	@Override
 	protected void execute(Event event) {
 		for (String recipe : recipes.getArray(event)) {
-			NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe);
+			NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe, false);
 			if (Bukkit.getRecipe(key) != null)
 				Bukkit.removeRecipe(key);
 		}

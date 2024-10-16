@@ -42,7 +42,7 @@ public class CondRecipeExists extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedUtils.getNamespacedKey(recipe)) != null, isNegated());
+		return recipes.check(event, recipe -> Bukkit.getRecipe(NamespacedUtils.getNamespacedKey(recipe, false)) != null, isNegated());
 	}
 
 	@Override

@@ -18,13 +18,18 @@ public class NamespacedUtils {
 	 * @param key the unparsed key
 	 * @return the resulting NamespacedKey
 	 */
-	public static NamespacedKey getNamespacedKey(String key) {
-		NamespacedKey namespacedKey = NamespacedKey.fromString(key, Skript.getInstance());
+	public static NamespacedKey getNamespacedKey(String key, Boolean usingMinecraft) {
+		NamespacedKey namespacedKey;
+		if (usingMinecraft)
+			namespacedKey = NamespacedKey.fromString(key);
+		else
+			namespacedKey = NamespacedKey.fromString(key, Skript.getInstance());
 		if (namespacedKey != null)
 			return namespacedKey;
-		NamespacedKey convertedKey = createNamespacedKey(key);
-		Skript.info("The key provided '" + key + "' has been converted to '" + convertedKey + "' due to invalid characters." +
-				"\n\tValid characters are a-z, 0-9, -, _ and .");
+		NamespacedKey convertedKey = createNamespacedKey(key, usingMinecraft);
+		if (!Skript.testing())
+			Skript.info("The key provided '" + key + "' has been converted to '" + convertedKey.toString() + "' due to invalid characters." +
+					"\n\tValid characters are a-z, 0-9, -, _ and .");
 		return convertedKey;
 	}
 
@@ -35,7 +40,7 @@ public class NamespacedUtils {
 	 * @param key The key to use
 	 * @return a NamespacedKey with the encoded key in Skript's namespace
 	 */
-	public static NamespacedKey createNamespacedKey(String key) {
+	public static NamespacedKey createNamespacedKey(String key, Boolean usingMinecraft) {
 		// TODO: add tests for this
 		StringBuilder encodedKeyBuilder = new StringBuilder();
 		// keys must be all lowercase
@@ -71,6 +76,8 @@ public class NamespacedUtils {
 					encodedKeyBuilder.append('.');
 			}
 		}
+		if (usingMinecraft)
+			return NamespacedKey.fromString(encodedKeyBuilder.toString());
 		return NamespacedKey.fromString(encodedKeyBuilder.toString(), Skript.getInstance());
 	}
 

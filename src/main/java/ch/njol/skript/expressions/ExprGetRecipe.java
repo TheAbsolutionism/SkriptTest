@@ -47,7 +47,7 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 	protected Recipe @Nullable [] get(Event event) {
 		List<Recipe> recipeList = new ArrayList<>();
 		for (String name : recipeNames.getArray(event)) {
-			NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
+			NamespacedKey key = NamespacedUtils.getNamespacedKey(name, false);
 			Recipe check = Bukkit.getRecipe(key);
 			if (check != null)
 				recipeList.add(check);

@@ -204,7 +204,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							);
 						}
 					} else {
-						customError("You can only get the base, template, and addition items of a Smithing, Ssmithing Transform and Smithing Trim Recipe.");
+						customError("You can only get the base, template, and addition items of a Smithing, Smithing Transform and Smithing Trim Recipe.");
 					}
 				}
 				case INPUT -> {

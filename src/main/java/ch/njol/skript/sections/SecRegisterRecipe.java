@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type",
 	"Groups only apply to Shaped, Shapeless and Cooking Recipes",
 	"Category only applies to Shaped, Shapeless and Cooking Recipes",
-	"You can not create a Cooking and Crafting Recipe type."
+	"You can not create a Cooking, Crafting and Complex Recipe type."
 })
 @Examples({
 	"register a new shaped recipe with the name \"my_recipe\":",
@@ -56,7 +56,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe crafting category to crafting category misc",
 		"\tset the recipe result item to diamond helmet named \"Heavenly Helm\"",
 	"",
-	"#Furnace, Campfire and Smoking follow same format as Cooking",
+	"#Furnace, Campfire and Smoking follow same format as Blasting example",
 	"create new blasting recipe with the namespacekey \"my_recipe\":",
 		"\tset the recipe experience to 5",
 		"\tset the recipe cooking time to 10 seconds",
@@ -78,14 +78,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 })
 @Since("INSERT VERSION")
 public class SecRegisterRecipe extends Section {
-	/*
-	TODO:
-		Comparing key of recipe to a string
-		Recipe event values
-		Maybe Complex Recipe?
-		ExprRecipeIngredients Test
-	 */
-
+	
 	private static final boolean RUNNING_1_20 = Skript.isRunningMinecraft(1, 20, 0);
 
 	static {
@@ -103,7 +96,7 @@ public class SecRegisterRecipe extends Section {
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
 		providedType = ((Literal<RecipeType>) exprs[0]).getSingle();
-		if (providedType == RecipeType.COOKING || providedType == RecipeType.CRAFTING) {
+		if (providedType == RecipeType.COOKING || providedType == RecipeType.CRAFTING || providedType == RecipeType.COMPLEX) {
 			Skript.error("You can not register a '" + providedType + "' recipe type.");
 			return false;
 		} else if (providedType == RecipeType.SMITHING && RUNNING_1_20) {
@@ -126,7 +119,7 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
-		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
+		NamespacedKey key = NamespacedUtils.getNamespacedKey(name, false);
 		RecipeType recipeType = providedType;
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);

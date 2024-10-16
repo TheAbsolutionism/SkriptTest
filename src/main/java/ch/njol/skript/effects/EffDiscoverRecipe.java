@@ -52,7 +52,7 @@ public class EffDiscoverRecipe extends Effect {
 	protected void execute(Event event) {
 		for (Player player : players.getArray(event)) {
 			for (String recipe : recipes.getArray(event)) {
-				NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe);
+				NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe, false);
 				if (Bukkit.getRecipe(key) != null) {
 					if (isDiscover)
 						player.discoverRecipe(key);
