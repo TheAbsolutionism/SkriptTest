@@ -78,7 +78,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 })
 @Since("INSERT VERSION")
 public class SecRegisterRecipe extends Section {
-	
+
 	private static final boolean RUNNING_1_20 = Skript.isRunningMinecraft(1, 20, 0);
 
 	static {

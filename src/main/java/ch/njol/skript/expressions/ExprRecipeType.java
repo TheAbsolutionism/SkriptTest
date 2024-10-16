@@ -15,8 +15,6 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 @Name("Recipe Type")
 @Description("Get the recipe type of a recipe")
 @Examples({
