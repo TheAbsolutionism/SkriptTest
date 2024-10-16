@@ -208,7 +208,6 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 					}
 					yield super.getItem();
 				}
-				default -> null;
 			};
 		}
 
