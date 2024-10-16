@@ -8,6 +8,7 @@ import ch.njol.skript.bukkitutil.EnchantmentUtils;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.classes.EnumClassInfo;
 import ch.njol.skript.classes.EnumSerializer;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.classes.Serializer;
@@ -25,6 +26,7 @@ import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.EnchantmentType;
 import ch.njol.skript.util.Experience;
 import ch.njol.skript.util.GameruleValue;
+import ch.njol.skript.util.RecipeUtils;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.skript.util.StructureType;
 import ch.njol.skript.util.Time;
@@ -667,6 +669,13 @@ public class SkriptClasses {
 				.examples("")
 				.since("2.5")
 				.serializer(new YggdrasilSerializer<GameruleValue>())
+		);
+
+		Classes.registerClass(new EnumClassInfo<>(RecipeUtils.RecipeType.class, "recipetype", "recipe types")
+			.user("recipe type")
+			.name("Recipe Type")
+			.description("Represents recipe types")
+			.since("INSERT VERSION")
 		);
 	}
 	

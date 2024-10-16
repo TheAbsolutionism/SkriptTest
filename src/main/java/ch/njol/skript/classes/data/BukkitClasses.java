@@ -99,7 +99,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.CachedServerIcon;
 import org.bukkit.util.Vector;
-import ch.njol.skript.util.RecipeUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.StreamCorruptedException;
@@ -1562,13 +1561,6 @@ public class BukkitClasses {
 			.examples("")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(Recipe.class)));
-
-		Classes.registerClass(new EnumClassInfo<>(RecipeUtils.RecipeType.class, "recipetype", "recipe types")
-			.user("recipe type")
-			.name("Recipe Type")
-			.description("Represents recipe types")
-			.since("INSERT VERSION")
-		);
 
 		Classes.registerClass(new EnumClassInfo<>(CraftingBookCategory.class, "craftingbookcategory", "crafting book categories")
 			.user("crafting book category")
