@@ -125,14 +125,16 @@ public class EffSecShoot extends EffectSection {
 				Vector vector;
 				if (shooter instanceof LivingEntity livingShooter) {
 					vector = finalDirection.getDirection(livingShooter.getLocation()).multiply(finalVelocity.doubleValue());
+					//noinspection rawtypes
+					Consumer afterSpawn = afterSpawn(event, vector, entityData, livingShooter);
 					Class<? extends Entity> type = entityData.getType();
 					if (Fireball.class.isAssignableFrom(type)) {
 						if (trigger != null) {
-							//noinspection unchecked,rawtypes
+							//noinspection unchecked
 							livingShooter.getWorld().spawn(
 								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
 								type,
-								(Consumer) afterSpawn(event, vector, entityData, livingShooter)
+								afterSpawn
 							);
 						} else {
 							Fireball fireball = (Fireball) livingShooter.getWorld().spawn(
@@ -144,11 +146,11 @@ public class EffSecShoot extends EffectSection {
 						}
 					} else if (Projectile.class.isAssignableFrom(type)) {
 						if (trigger != null) {
-							//noinspection unchecked,rawtypes
+							//noinspection unchecked
 							livingShooter.launchProjectile(
 								(Class<? extends Projectile>) type,
 								vector,
-								(Consumer) afterSpawn(event, vector, entityData, livingShooter)
+								afterSpawn
 							);
 						} else {
 							//noinspection unchecked
@@ -159,8 +161,8 @@ public class EffSecShoot extends EffectSection {
 						Location location = livingShooter.getLocation();
 						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
 						if (trigger != null) {
-							//noinspection unchecked,rawtypes
-							entityData.spawn(location, (Consumer) afterSpawn(event, vector, entityData, livingShooter));
+							//noinspection unchecked
+							entityData.spawn(location, afterSpawn);
 						} else {
 							finalProjectile = entityData.spawn(location);
 						}
