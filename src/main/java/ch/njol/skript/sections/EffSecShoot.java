@@ -21,7 +21,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import java.lang.reflect.Method;
 
 @Name("Shoot")
 @Description("Shoots a projectile (or any other entity) from a given entity or location.")
@@ -39,6 +40,8 @@ import java.util.function.Consumer;
 })
 @Since("INSERT VERSION")
 public class EffSecShoot extends EffectSection {
+
+	//TODO: Remove reflect method once 1.19 is no longer supported
 
 	public static class ShootEvent extends Event {
 
@@ -64,6 +67,9 @@ public class EffSecShoot extends EffectSection {
 		}
 	}
 
+	private static final boolean RUNNING_1_20_4 = Skript.isRunningMinecraft(1, 20, 4);
+	private static Method LAUNCH_BUKKIT_CONSUMER_METHOD;
+
 	static {
 		Skript.registerSection(EffSecShoot.class,
 			"shoot %entitydatas% [from %livingentities/locations%] [(at|with) (speed|velocity) %-number%] [%-direction%]",
@@ -81,7 +87,15 @@ public class EffSecShoot extends EffectSection {
 				return shootEvent.getProjectile() instanceof Projectile projectile ? projectile : null;
 			}
 		}, EventValues.TIME_NOW);
-	}
+
+		if (!RUNNING_1_20_4) {
+			try {
+				LAUNCH_BUKKIT_CONSUMER_METHOD = LivingEntity.class.getMethod("launchProjectile", Class.class, Vector.class, org.bukkit.util.Consumer.class);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			}
+		}
+    }
 
 	private final static Double DEFAULT_SPEED = 5.;
 	private Expression<EntityData<?>> types;
@@ -126,7 +140,7 @@ public class EffSecShoot extends EffectSection {
 				if (shooter instanceof LivingEntity livingShooter) {
 					vector = finalDirection.getDirection(livingShooter.getLocation()).multiply(finalVelocity.doubleValue());
 					//noinspection rawtypes
-					Consumer afterSpawn = afterSpawn(event, vector, entityData, livingShooter);
+					Consumer afterSpawn = afterSpawn(event, entityData, livingShooter);
 					Class<? extends Entity> type = entityData.getType();
 					if (Fireball.class.isAssignableFrom(type)) {
 						if (trigger != null) {
@@ -146,12 +160,23 @@ public class EffSecShoot extends EffectSection {
 						}
 					} else if (Projectile.class.isAssignableFrom(type)) {
 						if (trigger != null) {
-							//noinspection unchecked
-							livingShooter.launchProjectile(
-								(Class<? extends Projectile>) type,
-								vector,
-								afterSpawn
-							);
+							if (!RUNNING_1_20_4 && LAUNCH_BUKKIT_CONSUMER_METHOD != null) {
+								// 1.19 uses Bukkit Consumer instead of Java Consumer
+								try {
+									LAUNCH_BUKKIT_CONSUMER_METHOD.invoke(livingShooter,
+										type,
+										vector,
+										afterSpawnBukkit(event, entityData, livingShooter)
+									);
+								} catch (Exception ignored) {};
+							} else {
+								//noinspection unchecked
+								livingShooter.launchProjectile(
+									(Class<? extends Projectile>) type,
+									vector,
+									afterSpawn
+								);
+							}
 						} else {
 							//noinspection unchecked
 							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
@@ -171,7 +196,7 @@ public class EffSecShoot extends EffectSection {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
 					if (trigger != null) {
 						//noinspection unchecked,rawtypes
-						entityData.spawn((Location) shooter, (Consumer) afterSpawn(event, vector, entityData, null));
+						entityData.spawn((Location) shooter, (Consumer) afterSpawn(event, entityData, null));
 					} else {
 						finalProjectile = entityData.spawn((Location) shooter);
 					}
@@ -191,7 +216,7 @@ public class EffSecShoot extends EffectSection {
 		entityData.set((E) entity);
 	}
 
-	private Consumer<? extends Entity> afterSpawn(Event event, Vector vector, EntityData<?> entityData, @Nullable LivingEntity shooter) {
+	private Consumer<? extends Entity> afterSpawn(Event event, EntityData<?> entityData, @Nullable LivingEntity shooter) {
 		return entity -> {
 			if (entity instanceof Fireball fireball)
 				fireball.setShooter(shooter);
@@ -199,7 +224,6 @@ public class EffSecShoot extends EffectSection {
 				projectile.setShooter(shooter);
 				set(projectile, entityData);
 			}
-			entity.setVelocity(vector);
 			ShootEvent shootEvent = new ShootEvent(entity, shooter);
 			lastSpawned = entity;
 			Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
@@ -207,6 +231,27 @@ public class EffSecShoot extends EffectSection {
 			Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
 			Variables.removeLocals(shootEvent);
 		};
+	}
+
+	/**
+	 * MC 1.19 uses Bukkit Consumer for LivingEntity$launchProjectile instead of Java Consumer
+	 */
+	@SuppressWarnings("deprecation")
+	private org.bukkit.util.Consumer<? extends Entity> afterSpawnBukkit(Event event, EntityData<?> entityData, @Nullable LivingEntity shooter) {
+		return entity -> {
+            if (entity instanceof Fireball fireball)
+                fireball.setShooter(shooter);
+            else if (entity instanceof Projectile projectile && shooter != null) {
+                projectile.setShooter(shooter);
+                set(projectile, entityData);
+            }
+            ShootEvent shootEvent = new ShootEvent(entity, shooter);
+            lastSpawned = entity;
+            Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
+            TriggerItem.walk(trigger, shootEvent);
+            Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
+            Variables.removeLocals(shootEvent);
+        };
 	}
 
 	@Override
