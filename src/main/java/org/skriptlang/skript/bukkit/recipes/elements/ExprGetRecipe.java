@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -31,7 +31,7 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprGetRecipe.class, Recipe.class, ExpressionType.SIMPLE,
-			"[the] recipe[s] with [the] (key|id)[s] %strings%");
+			"[the] recipe[s] [with [the] (key|id)[s]] %strings%");
 	}
 
 	private Expression<String> recipeNames;
@@ -69,4 +69,5 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "recipes with the keys " + recipeNames.toString(event, debug);
 	}
+
 }

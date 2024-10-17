@@ -26,12 +26,11 @@ import java.util.List;
 
 @Name("All Recipes")
 @Description({
-	"Retrieve all recipes registered in the server",
+	"Retrieve all recipes registered in the server. Including the options to:",
 	"<ul>",
-	"<li>You can retrieve all recipes of a recipe type.</li>",
-	"<li>You can retrieve all recipes of an item, including custom items.</li>",
-	"<li>You can retrieve all minecraft recipes.</li>",
-	"<li>You can retrieve all custom recipes made by any and all plugins.</li>",
+	"<li>Get only recipes provided by Minecraft or custom recipes</li>",
+	"<li>Specific recipe types</li>",
+	"<li>For specific items</li>",
 	"</ul>"
 })
 @Examples({
@@ -44,12 +43,12 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprAllRecipes.class, Recipe.class, ExpressionType.SIMPLE,
-			"all [of the] recipes [items:for %-itemstacks/itemtypes%]",
-			"all [of the] (mc|minecraft|vanilla) recipes [items:for %-itemstacks/itemtypes%]",
-			"all [of the] custom recipes [items:for %-itemstacks/itemtypes%]",
-			"all [of the] %recipetype% [items:for %-itemstacks/itemtypes%]",
-			"all [of the] (mc|minecraft|vanilla) %recipetype% [items:for %-itemstacks/itemtypes%]",
-			"all [of the] custom %recipetype% [items:for %-itemstacks/itemtypes%]");
+			"all [of the] recipes [for %-itemstacks/itemtypes%]",
+			"all [of the] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
+			"all [of the] custom recipes [for %-itemstacks/itemtypes%]",
+			"all [of the] %recipetype% [for %-itemstacks/itemtypes%]",
+			"all [of the] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
+			"all [of the] custom %recipetype% [for %-itemstacks/itemtypes%]");
 	}
 
 	private Expression<RecipeUtils.RecipeType> recipeTypeExpr;
@@ -58,9 +57,13 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		//noinspection unchecked
-		recipeTypeExpr = matchedPattern >= 3 ? (Expression<RecipeUtils.RecipeType>) exprs[0] : null;
-		itemExpr = parseResult.hasTag("items") ? exprs[1] : null;
+		if (matchedPattern <= 2 && exprs[0] != null) {
+			itemExpr = exprs[0];
+		} else if (matchedPattern >= 3) {
+			//noinspection unchecked
+			recipeTypeExpr = (Expression<RecipeUtils.RecipeType>) exprs[0];
+			itemExpr = exprs[1] != null ? exprs[1] : null;
+		}
 		getMinecraft = matchedPattern == 1 || matchedPattern == 4;
 		getCustom = matchedPattern == 2 || matchedPattern == 5;
 		return true;
@@ -128,4 +131,5 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			(recipeTypeExpr != null ? " of type " + recipeTypeExpr.toString(event, debug) : "") +
 			(itemExpr != null ? " for " + itemExpr.toString(event, debug) : "");
 	}
+
 }

@@ -8,16 +8,18 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
+import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Has Discovered Recipe")
-@Description("Checks whether a player or players have discovered a recipe.")
+@Description("Checks whether players have discovered a recipe.")
 @Examples({
 	"if player has discovered recipe \"custom_recipe\":",
 		"\tgive player 1 diamond",
@@ -30,20 +32,21 @@ public class CondDiscoveredRecipes extends Condition {
 
 	static {
 		Skript.registerCondition(CondDiscoveredRecipes.class,
-			"%players% (has|have) (discovered|unlocked) recipe[s] %strings%",
-			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) recipe[s] %strings%");
+			"%players% (has|have) (discovered|unlocked) [the] recipe[s] [with [the] (key|id)[s]] %recipes%",
+			"%players% (has|have) (discovered|unlocked) [the] recipe[s] %recipes%",
+			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] [with [the] (key|id)[s]] %strings%",
+			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] %recipes%");
 	}
 
 	private Expression<Player> players;
-	private Expression<String> recipes;
+	private Expression<?> recipes;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		players = (Expression<Player>) exprs[0];
-		//noinspection unchecked
-		recipes = (Expression<String>) exprs[1];
-		setNegated(matchedPattern == 1);
+		recipes = exprs[1];
+		setNegated(matchedPattern >= 2);
 		return true;
 	}
 
@@ -52,10 +55,15 @@ public class CondDiscoveredRecipes extends Condition {
 		return players.check(event,
 			player -> recipes.check(event,
 				recipe -> {
-					NamespacedKey key = NamespacedUtils.getNamespacedKey(recipe, false);
-					if (Bukkit.getRecipe(key) != null)
-						return player.hasDiscoveredRecipe(key);
-					return false;
+					if (recipe instanceof String recipeName) {
+						NamespacedKey key = NamespacedUtils.getNamespacedKey(recipeName, false);
+						if (Bukkit.getRecipe(key) != null)
+							return player.hasDiscoveredRecipe(key);
+						return isNegated();
+					} else if (recipe instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
+						return player.hasDiscoveredRecipe(recipeKey.getKey());
+					}
+					return isNegated();
 				}
 			)
 		);
@@ -63,6 +71,6 @@ public class CondDiscoveredRecipes extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return players.toString(event, debug) + (isNegated() ? "have not" : "have") + " found recipes " + recipes.toString(event, debug);
+		return players.toString(event, debug) + (isNegated() ? " have not" : " have") + " found recipes " + recipes.toString(event, debug);
 	}
 }

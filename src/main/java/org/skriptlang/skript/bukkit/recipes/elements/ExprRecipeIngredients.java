@@ -27,10 +27,10 @@ import java.util.*;
 
 @Name("Recipe Ingredients")
 @Description({
-	"The ingredients of a Shaped or Shapeless recipe",
-	"The ingredients of a row for a Shaped recipe",
-	"The input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting recipe",
-	"The base, template, addition items of a Smithing Transform and Smithing Trim recipe"
+	"The ingredients of a shaped or shapeless recipe.",
+	"The ingredients of a row for a shaped recipe.",
+	"The input item of a blasting, furnace, campfire, smoking and stonecutting recipe.",
+	"The base, template, addition items of a smithing transform and smithing trim recipe."
 })
 @Examples({
 	"register a new shaped recipe with the key \"my_recipe\":",

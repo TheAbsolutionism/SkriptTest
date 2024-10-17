@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Name("Recipe Name")
-@Description("Get the namespacekey of a recipe")
+@Description("Get the namespaced key of a recipe.")
 @Examples({
 	"loop all recipes:",
 		"\tbroadcast the recipe key of loop-recipe",

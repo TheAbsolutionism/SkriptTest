@@ -160,7 +160,6 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -1395,13 +1394,6 @@ public final class BukkitEventValues {
 			}
 		}, 0);
 
-		EventValues.registerEventValue(PrepareItemCraftEvent.class, Recipe.class, new Getter<Recipe, PrepareItemCraftEvent>() {
-			@Override
-			public @Nullable Recipe get(PrepareItemCraftEvent event) {
-				return event.getRecipe();
-			}
-		}, EventValues.TIME_NOW);
-
 		// CraftEvents - recipe namespaced key strings
 		EventValues.registerEventValue(CraftItemEvent.class, String.class, new Getter<String, CraftItemEvent>() {
 			@Nullable
@@ -1431,13 +1423,6 @@ public final class BukkitEventValues {
 				return e.getRecipe().getResult();
 			}
 		}, 0);
-
-		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, new Getter<Recipe, CraftItemEvent>() {
-			@Override
-			public @Nullable Recipe get(CraftItemEvent event) {
-				return event.getRecipe();
-			}
-		}, EventValues.TIME_NOW);
 
 		//InventoryOpenEvent
 		EventValues.registerEventValue(InventoryOpenEvent.class, Player.class, new Getter<Player, InventoryOpenEvent>() {
@@ -2006,14 +1991,6 @@ public final class BukkitEventValues {
 			@Override
 			public Entity[] get(BlockDropItemEvent event) {
 				return event.getItems().toArray(Entity[]::new);
-			}
-		}, EventValues.TIME_NOW);
-
-		// PlayerRecipeDiscoverEvent
-		EventValues.registerEventValue(PlayerRecipeDiscoverEvent.class, Recipe.class, new Getter<Recipe, PlayerRecipeDiscoverEvent>() {
-			@Override
-			public @Nullable Recipe get(PlayerRecipeDiscoverEvent event) {
-				return Bukkit.getRecipe(event.getRecipe());
 			}
 		}, EventValues.TIME_NOW);
 	}

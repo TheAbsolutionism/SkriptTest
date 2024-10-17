@@ -16,7 +16,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Type")
-@Description("Get the recipe type of a recipe")
+@Description("Get the recipe type of a recipe.")
 @Examples({
 	"loop all recipes:",
 		"\tbroadcast the recipe type of loop-recipe"
@@ -31,8 +31,8 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		setExpr((Expression<Recipe>) exprs[0]);
 		return true;
 	}
@@ -51,4 +51,5 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the recipe type of " + getExpr().toString(event, debug);
 	}
+
 }

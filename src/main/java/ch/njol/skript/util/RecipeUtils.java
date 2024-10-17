@@ -11,18 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class RecipeUtils {
 
-	private static Class<? extends Recipe> CRAFTING_CLASS = null;
-
-	// Due to 1.19 not having 'CraftingRecipe.class'
-	static {
-		if (Skript.classExists("org.bukkit.inventory.CraftingRecipe"))
-			CRAFTING_CLASS = CraftingRecipe.class;
-	}
-
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
-		CRAFTING(CRAFTING_CLASS, RegisterRecipeEvent.CraftingRecipeEvent.class),
+		CRAFTING(getCraftingRecipeClass(), RegisterRecipeEvent.CraftingRecipeEvent.class),
 		BLASTING(BlastingRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent.class),
 		FURNACE(FurnaceRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent.class),
 		CAMPFIRE(CampfireRecipe.class, RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent.class),
@@ -48,6 +40,13 @@ public class RecipeUtils {
 
 		public @Nullable Class<? extends Event> getEventClass() {
 			return eventClass;
+		}
+
+		// Due to 1.19 not having 'CraftingRecipe.class'
+		private static @Nullable Class<? extends Recipe> getCraftingRecipeClass() {
+			if (Skript.classExists("org.bukkit.inventory.CraftingRecipe"))
+				return CraftingRecipe.class;
+			return null;
 		}
 	}
 

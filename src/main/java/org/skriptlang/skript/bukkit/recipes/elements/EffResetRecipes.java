@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Reset Recipes")
-@Description("Resets the recipes to the Minecraft-provided defaults.")
+@Description("Resets the recipes of the server; not including Minecraft defaults and datapacks.")
 @Examples("reset server recipes")
 @Since("INSERT VERSION")
 public class EffResetRecipes extends Effect {
@@ -38,4 +38,5 @@ public class EffResetRecipes extends Effect {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "reset server recipes";
 	}
+
 }

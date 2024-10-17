@@ -9,7 +9,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.skript.util.RecipeUtils.RecipeType;
 import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
@@ -30,15 +30,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Name("Register Recipe")
 @Description({
 	"Create a custom recipe for any of the following types:",
-	"Shaped, Shapeless, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting",
+	"Shaped, Shapeless, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting.",
 	"NOTES:",
-	"All recipes except Smithing Trim require a 'result item'",
-	"Shaped and Shapeless Ingredients allows custom items only on Paper",
-	"Shaped and Shapeless have a maximum of 9 and minimum requirement of 2 ingredients",
-	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type",
-	"Groups only apply to Shaped, Shapeless and Cooking Recipes",
-	"Category only applies to Shaped, Shapeless and Cooking Recipes",
-	"You can not create a Cooking, Crafting and Complex Recipe type."
+	"All recipes except Smithing Trim require a 'result item'.",
+	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type.",
+	"Groups only apply to Shaped, Shapeless and Cooking Recipes.",
+	"Category only applies to Shaped, Shapeless and Cooking Recipes.",
+	"You can not create a Cooking, Crafting and Complex Recipe type.",
+	"Custom recipes are not persistent across server restart."
 })
 @Examples({
 	"register a new shaped recipe with the name \"my_recipe\":",
@@ -79,7 +78,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Since("INSERT VERSION")
 public class SecRegisterRecipe extends Section {
 
-	private static final boolean RUNNING_1_20 = Skript.isRunningMinecraft(1, 20, 0);
+	private static final boolean SUPPORT_SMITHING = !Skript.isRunningMinecraft(1, 20, 0);
+	public static Recipe lastRegistered;
 
 	static {
 		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
@@ -90,16 +90,15 @@ public class SecRegisterRecipe extends Section {
 	private Trigger trigger;
 	private Node thisNode;
 	private String thisScript;
-	public static Recipe lastRegistered;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
+		//noinspection unchecked
 		providedType = ((Literal<RecipeType>) exprs[0]).getSingle();
 		if (providedType == RecipeType.COOKING || providedType == RecipeType.CRAFTING || providedType == RecipeType.COMPLEX) {
 			Skript.error("You can not register a '" + providedType + "' recipe type.");
 			return false;
-		} else if (providedType == RecipeType.SMITHING && RUNNING_1_20) {
+		} else if (providedType == RecipeType.SMITHING && SUPPORT_SMITHING) {
 			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+");
 			return false;
 		}
@@ -144,8 +143,8 @@ public class SecRegisterRecipe extends Section {
 			case SHAPED, SHAPELESS -> {
 				if (recipeEvent instanceof CraftingRecipeEvent craftingEvent) {
 					RecipeChoice[] ingredients = craftingEvent.getIngredients();
-					if (ingredients.length < 2 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
-						customError("You must have at least 2 ingredients when registering a '" + recipeType + "' recipe.");
+					if (ingredients.length == 0 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
+						customError("You must have at least 1 ingredient when registering a '" + recipeType + "' recipe.");
 						return super.walk(event, false);
 					}
 					String group = craftingEvent.getGroup();

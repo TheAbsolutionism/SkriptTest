@@ -8,7 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -46,6 +46,6 @@ public class CondRecipeExists extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "recipes " + recipes.toString(event, debug) + (isNegated() ? "does not" : "") + "exists";
+		return "recipes " + recipes.toString(event, debug) + (isNegated() ? " do not" : "") + "exist";
 	}
 }

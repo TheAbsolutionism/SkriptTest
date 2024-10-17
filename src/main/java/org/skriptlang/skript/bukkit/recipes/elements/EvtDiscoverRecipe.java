@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.jetbrains.annotations.Nullable;
@@ -54,4 +54,5 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "player discovered recipes" + (recipes == null ? "" : " of " + recipes.toString(event, debug));
 	}
+
 }

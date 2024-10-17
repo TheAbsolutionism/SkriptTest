@@ -21,7 +21,7 @@ import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Recipe Category")
-@Description("The recipe category of a Shaped, Shapeless, Cooking, Blasting, Furnace, Campfire and Smoking Recipe.")
+@Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
 @Examples({
 	"register a new shaped recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to diamond, air, diamond, air, emerald, air, diamond, air and diamond",
@@ -53,10 +53,10 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 	private boolean isEvent = false;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		isCrafting = matchedPattern == 0;
 		if (exprs[0] != null) {
+			//noinspection unchecked
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {

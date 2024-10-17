@@ -1,4 +1,4 @@
-package ch.njol.skript.util;
+package ch.njol.skript.bukkitutil;
 
 import ch.njol.skript.Skript;
 import ch.njol.util.Pair;
@@ -15,18 +15,21 @@ public class NamespacedUtils {
 	/**
 	 * Gets a namespaced key. This method will try to get existing keys first, but if that fails
 	 * it will create the key in Skript's namespace.
+	 *
 	 * @param key the unparsed key
 	 * @param usingMinecraft whether to have it as Skript or Minecraft namespace
 	 * @return the resulting NamespacedKey
 	 */
-	public static NamespacedKey getNamespacedKey(String key, Boolean usingMinecraft) {
+	public static NamespacedKey getNamespacedKey(String key, boolean usingMinecraft) {
 		NamespacedKey namespacedKey;
-		if (usingMinecraft)
+		if (usingMinecraft) {
 			namespacedKey = NamespacedKey.fromString(key);
-		else
+		} else {
 			namespacedKey = NamespacedKey.fromString(key, Skript.getInstance());
+		}
 		if (namespacedKey != null)
 			return namespacedKey;
+
 		NamespacedKey convertedKey = createNamespacedKey(key, usingMinecraft);
 		if (!Skript.testing())
 			Skript.info("The key provided '" + key + "' has been converted to '" + convertedKey.toString() + "' due to invalid characters." +
@@ -42,12 +45,10 @@ public class NamespacedUtils {
 	 * @param usingMinecraft whether to have it as Skript or Minecraft's namespace
 	 * @return a NamespacedKey with the encoded key in corresponding Namespace
 	 */
-	public static NamespacedKey createNamespacedKey(String key, Boolean usingMinecraft) {
-		// TODO: add tests for this
+	public static NamespacedKey createNamespacedKey(String key, boolean usingMinecraft) {
 		StringBuilder encodedKeyBuilder = new StringBuilder();
 		// keys must be all lowercase
-		key = key.toLowerCase();
-		key = key.replace(' ', '_');
+		key = key.toLowerCase().replace(' ', '_');
 		int keyLength = key.length();
 		for (int i = 0; i < keyLength; i++) {
 			char currentChar = key.charAt(i);

@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.NamespacedUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 @Name("Recipe Key Converter")
 @Description({
 	"Converts a string to a valid key to be used with recipes.",
-	"'using minecraft namespace' will convert the string to a minecraft namespace key"
+	"'using minecraft namespace' will convert the string to a minecraft namespaced key."
 })
 @Examples({
 	"send the converted recipe key from \"my_recipe\"",

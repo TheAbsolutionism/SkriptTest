@@ -53,4 +53,5 @@ public class ExprLastRecipe extends SimpleExpression<Recipe> {
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the last registered recipe";
 	}
+
 }
