@@ -56,7 +56,7 @@ public class CondDiscoveredRecipes extends Condition {
 			player -> recipes.check(event,
 				recipe -> {
 					if (recipe instanceof String recipeName) {
-						NamespacedKey key = NamespacedUtils.getNamespacedKey(recipeName, false);
+						NamespacedKey key = NamespacedUtils.getNamespacedKey(recipeName);
 						if (Bukkit.getRecipe(key) != null)
 							return player.hasDiscoveredRecipe(key);
 						return isNegated();

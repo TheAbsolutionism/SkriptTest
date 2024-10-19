@@ -102,6 +102,7 @@ public class SecRegisterRecipe extends Section {
 			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+");
 			return false;
 		}
+		//noinspection unchecked
 		providedName = (Expression<String>) exprs[1];
 		AtomicBoolean delayed = new AtomicBoolean(false);
 		Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
@@ -118,7 +119,7 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
-		NamespacedKey key = NamespacedUtils.getNamespacedKey(name, false);
+		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
 		RecipeType recipeType = providedType;
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
 			case SHAPED -> new ShapedRecipeEvent(recipeType);

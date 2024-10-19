@@ -47,7 +47,7 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 		if (recipes == null)
 			return true;
 
-		return recipes.check(event, recipe -> discoverEvent.getRecipe().equals(NamespacedUtils.getNamespacedKey(recipe, false)));
+		return recipes.check(event, recipe -> discoverEvent.getRecipe().equals(NamespacedUtils.getNamespacedKey(recipe)));
 	}
 
 	@Override

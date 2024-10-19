@@ -46,7 +46,7 @@ public class EffRemoveRecipe extends Effect {
 		for (Object object : recipes.getArray(event)) {
 			NamespacedKey key = null;
 			if (object instanceof String recipeName) {
-				key = NamespacedUtils.getNamespacedKey(recipeName, false);
+				key = NamespacedUtils.getNamespacedKey(recipeName);
 			} else if (object instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
 				key = recipeKey.getKey();
 			}
