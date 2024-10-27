@@ -67,7 +67,7 @@ public class EffSecShoot extends EffectSection {
 		}
 	}
 
-	private static final boolean RUNNING_1_20_4 = Skript.isRunningMinecraft(1, 20, 4);
+	private static boolean RUNNING_PAPER;
 	private static Method LAUNCH_BUKKIT_CONSUMER_METHOD;
 
 	static {
@@ -88,14 +88,16 @@ public class EffSecShoot extends EffectSection {
 			}
 		}, EventValues.TIME_NOW);
 
-		if (!RUNNING_1_20_4) {
+		if (!Skript.isRunningMinecraft(1, 20, 3)) {
 			try {
 				LAUNCH_BUKKIT_CONSUMER_METHOD = LivingEntity.class.getMethod("launchProjectile", Class.class, Vector.class, org.bukkit.util.Consumer.class);
 			} catch (NoSuchMethodException e) {
 				throw new RuntimeException(e);
 			}
 		}
-    }
+		boolean LAUNCH_JAVA_CONSUMER = Skript.methodExists(LivingEntity.class, "launchProjectile", Class.class, Vector.class, Consumer.class);
+		RUNNING_PAPER = LAUNCH_BUKKIT_CONSUMER_METHOD != null || LAUNCH_JAVA_CONSUMER;
+	}
 
 	private final static Double DEFAULT_SPEED = 5.;
 	private Expression<EntityData<?>> types;
@@ -142,54 +144,67 @@ public class EffSecShoot extends EffectSection {
 					//noinspection rawtypes
 					Consumer afterSpawn = afterSpawn(event, entityData, livingShooter);
 					Class<? extends Entity> type = entityData.getType();
+					Location shooterLoc = livingShooter.getLocation();
+					shooterLoc.setY(shooterLoc.getY() + livingShooter.getEyeHeight() / 2);
+					boolean isProjectile = false, useWorldSpawn = false;
 					if (Fireball.class.isAssignableFrom(type)) {
-						if (trigger != null) {
-							//noinspection unchecked
-							livingShooter.getWorld().spawn(
-								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
-								type,
-								afterSpawn
-							);
-						} else {
-							Fireball fireball = (Fireball) livingShooter.getWorld().spawn(
-								livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5)),
-								type
-							);
-							fireball.setShooter(livingShooter);
-							finalProjectile = fireball;
-						}
+						shooterLoc = livingShooter.getEyeLocation().add(vector.clone().normalize().multiply(0.5));
+						isProjectile = true;
+						useWorldSpawn = true;
 					} else if (Projectile.class.isAssignableFrom(type)) {
-						if (trigger != null) {
-							if (!RUNNING_1_20_4 && LAUNCH_BUKKIT_CONSUMER_METHOD != null) {
-								// 1.19 uses Bukkit Consumer instead of Java Consumer
-								try {
-									LAUNCH_BUKKIT_CONSUMER_METHOD.invoke(livingShooter,
-										type,
-										vector,
-										afterSpawnBukkit(event, entityData, livingShooter)
-									);
-								} catch (Exception ignored) {};
-							} else {
+						isProjectile = true;
+						if (trigger != null && !RUNNING_PAPER) {
+							useWorldSpawn = true;
+						}
+					}
+
+					if (isProjectile) {
+						if (useWorldSpawn) {
+							if (trigger != null) {
 								//noinspection unchecked
-								livingShooter.launchProjectile(
-									(Class<? extends Projectile>) type,
-									vector,
+                                livingShooter.getWorld().spawn(
+									shooterLoc,
+									type,
 									afterSpawn
 								);
+							} else {
+								Projectile projectile = (Projectile) livingShooter.getWorld().spawn(
+									shooterLoc,
+									type
+								);
+								projectile.setShooter(livingShooter);
+								finalProjectile = projectile;
 							}
 						} else {
-							//noinspection unchecked
-							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
-							set(finalProjectile, entityData);
+							if (trigger != null) {
+								if (LAUNCH_BUKKIT_CONSUMER_METHOD != null) {
+									try {
+										LAUNCH_BUKKIT_CONSUMER_METHOD.invoke(livingShooter,
+											type,
+											vector,
+											afterSpawnBukkit(event, entityData, livingShooter)
+										);
+									} catch (Exception ignored) {};
+								} else {
+									//noinspection unchecked
+									livingShooter.launchProjectile(
+										(Class<? extends Projectile>) type,
+										vector,
+										afterSpawn
+									);
+								}
+							} else {
+								//noinspection unchecked
+								finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
+								set(finalProjectile, entityData);
+							}
 						}
 					} else {
-						Location location = livingShooter.getLocation();
-						location.setY(location.getY() + livingShooter.getEyeHeight() / 2);
 						if (trigger != null) {
 							//noinspection unchecked
-							entityData.spawn(location, afterSpawn);
+							entityData.spawn(shooterLoc, afterSpawn);
 						} else {
-							finalProjectile = entityData.spawn(location);
+							finalProjectile = entityData.spawn(shooterLoc);
 						}
 					}
 				} else {
@@ -239,19 +254,19 @@ public class EffSecShoot extends EffectSection {
 	@SuppressWarnings("deprecation")
 	private org.bukkit.util.Consumer<? extends Entity> afterSpawnBukkit(Event event, EntityData<?> entityData, @Nullable LivingEntity shooter) {
 		return entity -> {
-            if (entity instanceof Fireball fireball)
-                fireball.setShooter(shooter);
-            else if (entity instanceof Projectile projectile && shooter != null) {
-                projectile.setShooter(shooter);
-                set(projectile, entityData);
-            }
-            ShootEvent shootEvent = new ShootEvent(entity, shooter);
-            lastSpawned = entity;
-            Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
-            TriggerItem.walk(trigger, shootEvent);
-            Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
-            Variables.removeLocals(shootEvent);
-        };
+			if (entity instanceof Fireball fireball)
+				fireball.setShooter(shooter);
+			else if (entity instanceof Projectile projectile && shooter != null) {
+				projectile.setShooter(shooter);
+				set(projectile, entityData);
+			}
+			ShootEvent shootEvent = new ShootEvent(entity, shooter);
+			lastSpawned = entity;
+			Variables.setLocalVariables(shootEvent, Variables.copyLocalVariables(event));
+			TriggerItem.walk(trigger, shootEvent);
+			Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
+			Variables.removeLocals(shootEvent);
+		};
 	}
 
 	@Override
