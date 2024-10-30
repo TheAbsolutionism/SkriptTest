@@ -30,9 +30,9 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 		Skript.registerExpression(ExprShooter.class, LivingEntity.class, ExpressionType.SIMPLE, "[the] shooter [of %projectile%]");
 	}
 
-	@SuppressWarnings({"unchecked", "null"})
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		setExpr((Expression<? extends Projectile>) exprs[0]);
 		return true;
 	}

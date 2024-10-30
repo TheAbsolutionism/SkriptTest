@@ -67,8 +67,8 @@ public class EffSecShoot extends EffectSection {
 		}
 	}
 
-	private static boolean RUNNING_PAPER;
-	private static Method LAUNCH_BUKKIT_CONSUMER_METHOD;
+	private static final boolean RUNNING_PAPER;
+	private static Method launchWithBukkitConsumer;
 
 	static {
 		Skript.registerSection(EffSecShoot.class,
@@ -90,13 +90,13 @@ public class EffSecShoot extends EffectSection {
 
 		if (!Skript.isRunningMinecraft(1, 20, 3)) {
 			try {
-				LAUNCH_BUKKIT_CONSUMER_METHOD = LivingEntity.class.getMethod("launchProjectile", Class.class, Vector.class, org.bukkit.util.Consumer.class);
+				launchWithBukkitConsumer = LivingEntity.class.getMethod("launchProjectile", Class.class, Vector.class, org.bukkit.util.Consumer.class);
 			} catch (NoSuchMethodException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		boolean LAUNCH_JAVA_CONSUMER = Skript.methodExists(LivingEntity.class, "launchProjectile", Class.class, Vector.class, Consumer.class);
-		RUNNING_PAPER = LAUNCH_BUKKIT_CONSUMER_METHOD != null || LAUNCH_JAVA_CONSUMER;
+		boolean launchHasJavaConsumer = Skript.methodExists(LivingEntity.class, "launchProjectile", Class.class, Vector.class, Consumer.class);
+		RUNNING_PAPER = launchWithBukkitConsumer != null || launchHasJavaConsumer;
 	}
 
 	private final static Double DEFAULT_SPEED = 5.;
@@ -108,11 +108,13 @@ public class EffSecShoot extends EffectSection {
 	private @Nullable Trigger trigger;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, @Nullable SectionNode sectionNode, @Nullable List<TriggerItem> triggerItems) {
+		//noinspection unchecked
 		types = (Expression<EntityData<?>>) exprs[matchedPattern];
 		shooters = exprs[1 - matchedPattern];
+		//noinspection unchecked
 		velocity = (Expression<Number>) exprs[2];
+		//noinspection unchecked
 		direction = (Expression<Direction>) exprs[3];
 
 		if (sectionNode != null) {
@@ -177,9 +179,9 @@ public class EffSecShoot extends EffectSection {
 							}
 						} else {
 							if (trigger != null) {
-								if (LAUNCH_BUKKIT_CONSUMER_METHOD != null) {
+								if (launchWithBukkitConsumer != null) {
 									try {
-										LAUNCH_BUKKIT_CONSUMER_METHOD.invoke(livingShooter,
+										launchWithBukkitConsumer.invoke(livingShooter,
 											type,
 											vector,
 											afterSpawnBukkit(event, entityData, livingShooter)
@@ -226,8 +228,8 @@ public class EffSecShoot extends EffectSection {
 		return super.walk(event, false);
 	}
 
-	@SuppressWarnings("unchecked")
 	private static <E extends Entity> void set(Entity entity, EntityData<E> entityData) {
+		//noinspection unchecked
 		entityData.set((E) entity);
 	}
 
@@ -249,7 +251,7 @@ public class EffSecShoot extends EffectSection {
 	}
 
 	/**
-	 * MC 1.19 uses Bukkit Consumer for LivingEntity$launchProjectile instead of Java Consumer
+	 * MC 1.19 uses Bukkit Consumer for LivingEntity#launchProjectile instead of Java Consumer
 	 */
 	@SuppressWarnings("deprecation")
 	private org.bukkit.util.Consumer<? extends Entity> afterSpawnBukkit(Event event, EntityData<?> entityData, @Nullable LivingEntity shooter) {
