@@ -80,10 +80,10 @@ public class ExprFurnaceSlot extends SimpleExpression<Slot> {
 	private boolean isEvent;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedSlot = furnaceSlots[(int) Math2.floor(matchedPattern / 2)];
 		if (exprs[0] != null) {
+			//noinspection unchecked
 			blocks = (Expression<Block>) exprs[0];
 		} else {
 			if (!getParser().isCurrentEvent(FurnaceBurnEvent.class, FurnaceStartSmeltEvent.class, FurnaceExtractEvent.class, FurnaceSmeltEvent.class)) {

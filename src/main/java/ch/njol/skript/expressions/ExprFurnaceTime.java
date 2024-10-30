@@ -79,11 +79,11 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	private boolean explicitlyBlock = false;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = furnaceExprs[(int) Math2.floor(matchedPattern / 2)];
+		type = furnaceExprs[(int) Math2.floor( matchedPattern / 2)];
 		if (exprs[0] != null) {
 			explicitlyBlock = true;
+			//noinspection unchecked
 			setExpr((Expression<Block>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(FurnaceBurnEvent.class, FurnaceStartSmeltEvent.class, FurnaceExtractEvent.class, FurnaceSmeltEvent.class)) {

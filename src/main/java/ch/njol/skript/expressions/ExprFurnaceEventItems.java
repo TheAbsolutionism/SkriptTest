@@ -78,7 +78,6 @@ public class ExprFurnaceEventItems extends PropertyExpression<Block, ItemStack> 
 	private FurnaceValues type;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		type = FURNACE_VALUES[matchedPattern];
 		if (!getParser().isCurrentEvent(type.clazz)) {
