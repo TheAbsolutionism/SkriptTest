@@ -10,10 +10,12 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.bukkitutil.NamespacedUtils;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
-import ch.njol.skript.util.RecipeUtils.RecipeType;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
+import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.util.Getter;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
@@ -23,6 +25,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,13 +49,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset recipe ingredients of second row to air, emerald and air",
 		"\tset recipe ingredients of 3rd row to diamond, air and diamond",
 		"\tset recipe group to \"my group\"",
-		"\tset recipe crafting category to crafting misc",
+		"\tset recipe category to crafting misc",
 		"\tset recipe result to diamond sword named \"Heavenly Sword\"",
 	"",
 	"register a shapeless recipe with namespace \"my_recipe\":",
 		"\tset recipe ingredients to 3 diamonds, 3 emeralds and 3 iron ingots",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe crafting category to crafting category misc",
+		"\tset the recipe category to crafting category misc",
 		"\tset the recipe result item to diamond helmet named \"Heavenly Helm\"",
 	"",
 	"#Furnace, Campfire and Smoking follow same format as Blasting example",
@@ -60,7 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe experience to 5",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe cooking category to cooking misc",
+		"\tset the recipe category to cooking misc",
 		"\tset the recipe input item to coal named \"Ash\"",
 		"\tset the recipe resulting item to gunpowder named \"Dust\"",
 	"",
@@ -83,13 +86,17 @@ public class SecRegisterRecipe extends Section {
 
 	static {
 		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
+		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
+			@Override
+			public @Nullable Recipe get(RegisterRecipeEvent event) {
+				return event.getRecipeWrapper();
+			}
+		}, EventValues.TIME_NOW);
 	}
 
 	private Expression<String> providedName;
 	private RecipeType providedType;
 	private Trigger trigger;
-	private Node thisNode;
-	private String thisScript;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
@@ -98,7 +105,7 @@ public class SecRegisterRecipe extends Section {
 		if (providedType == RecipeType.COOKING || providedType == RecipeType.CRAFTING || providedType == RecipeType.COMPLEX) {
 			Skript.error("You can not register a '" + providedType + "' recipe type.");
 			return false;
-		} else if (providedType == RecipeType.SMITHING && SUPPORT_SMITHING) {
+		} else if (providedType == RecipeType.SMITHING && !SUPPORT_SMITHING) {
 			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+");
 			return false;
 		}
@@ -111,8 +118,6 @@ public class SecRegisterRecipe extends Section {
 			Skript.error("Delays cannot be used within a 'register recipe' section.");
 			return false;
 		}
-		thisNode = getParser().getNode();
-		thisScript = getParser().getCurrentScript().getConfig().getFileName();
 		return true;
 	}
 
@@ -122,12 +127,12 @@ public class SecRegisterRecipe extends Section {
 		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
 		RecipeType recipeType = providedType;
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
-			case SHAPED -> new ShapedRecipeEvent(recipeType);
-			case SHAPELESS -> new ShapelessRecipeEvent(recipeType);
-			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(recipeType);
-			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(recipeType);
-			case STONECUTTING -> new StonecuttingRecipeEvent(recipeType);
-			default -> throw new IllegalStateException("Unexpected vale: " + recipeType);
+			case SHAPED -> new ShapedRecipeEvent(key, recipeType);
+			case SHAPELESS -> new ShapelessRecipeEvent(key, recipeType);
+			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(key, recipeType);
+			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(key, recipeType);
+			case STONECUTTING -> new StonecuttingRecipeEvent(key, recipeType);
+			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
 		};
 		Variables.setLocalVariables(recipeEvent, Variables.copyLocalVariables(event));
 		TriggerItem.walk(trigger, recipeEvent);
@@ -135,133 +140,18 @@ public class SecRegisterRecipe extends Section {
 		Variables.removeLocals(recipeEvent);
 		if (recipeEvent.getErrorInEffect())
 			return super.walk(event, false);
-		ItemStack result = recipeEvent.getResultItem();
-		if (result == null && (recipeType != RecipeType.SMITHING_TRIM)) {
-			customError("You must provide a result item when registering a recipe.");
-			return super.walk(event, false);
-		}
-		switch (recipeType) {
-			case SHAPED, SHAPELESS -> {
-				if (recipeEvent instanceof CraftingRecipeEvent craftingEvent) {
-					RecipeChoice[] ingredients = craftingEvent.getIngredients();
-					if (ingredients.length == 0 || Arrays.stream(ingredients).filter(Objects::nonNull).toArray().length < 2) {
-						customError("You must have at least 1 ingredient when registering a '" + recipeType + "' recipe.");
-						return super.walk(event, false);
-					}
-					String group = craftingEvent.getGroup();
-					CraftingBookCategory category = craftingEvent.getCategory();
-					switch (recipeType) {
-						case SHAPED -> createShapedRecipe(key, result, ingredients, group, category);
-						case SHAPELESS -> createShapelessRecipe(key, result, ingredients, group, category);
-					}
-				}
-			}
-			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> {
-				if (recipeEvent instanceof CookingRecipeEvent cookingEvent) {
-					RecipeChoice input = cookingEvent.getInput();
-					String group = cookingEvent.getGroup();
-					CookingBookCategory category = cookingEvent.getCategory();
-					int cookingTime = cookingEvent.getCookingTime();
-					float experience = cookingEvent.getExperience();
-					createCookingRecipe(recipeType, key, result, input, group, category, cookingTime, experience);
-				}
-			}
-			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> {
-				if (recipeEvent instanceof SmithingRecipeEvent smithingEvent) {
-					RecipeChoice base = smithingEvent.getBase();
-					RecipeChoice template = smithingEvent.getTemplate();
-					RecipeChoice addition = smithingEvent.getAddition();
-					createSmithingRecipe(recipeType, key, result, base, template, addition);
-				}
-			}
-			case STONECUTTING -> {
-				if (recipeEvent instanceof StonecuttingRecipeEvent stonecuttingEvent) {
-					RecipeChoice input = stonecuttingEvent.getInput();
-					createStonecuttingRecipe(key, result, input);
-				}
-			}
-		}
 
+		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		Recipe recipe = recipeWrapper.create();
+		if (recipe == null) {
+			Skript.error(recipeWrapper.getErrors().toString());
+		} else {
+			if (Bukkit.getRecipe(key) != null)
+				Bukkit.removeRecipe(key);
+			Bukkit.addRecipe(recipe);
+			lastRegistered = recipe;
+		}
 		return super.walk(event, false);
-	}
-
-	private void completeRecipe(NamespacedKey key, Recipe recipe) {
-		if (Bukkit.getRecipe(key) != null)
-			Bukkit.removeRecipe(key);
-		Bukkit.addRecipe(recipe);
-		lastRegistered = recipe;
-	}
-
-	private void createShapedRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
-		ShapedRecipe shapedRecipe = new ShapedRecipe(key, result);
-		if (category != null)
-			shapedRecipe.setCategory(category);
-		if (group != null && !group.isEmpty())
-			shapedRecipe.setGroup(group);
-		Character[] characters = new Character[]{'a','b','c','d','e','f','g','h','i'};
-		shapedRecipe.shape("abc","def","ghi");
-		for (int i = 0; i < ingredients.length; i++) {
-			RecipeChoice thisChoice = ingredients[i];
-			if (thisChoice != null)
-				shapedRecipe.setIngredient(characters[i], thisChoice);
-		}
-		completeRecipe(key, shapedRecipe);
-	}
-
-	private void createShapelessRecipe(NamespacedKey key, ItemStack result, RecipeChoice[] ingredients, String group, CraftingBookCategory category) {
-		ShapelessRecipe shapelessRecipe = new ShapelessRecipe(key, result);
-		if (category != null)
-			shapelessRecipe.setCategory(category);
-		if (group != null && !group.isEmpty())
-			shapelessRecipe.setGroup(group);
-		for (int i = 0; i < ingredients.length; i++) {
-			RecipeChoice thisChoice = ingredients[i];
-			if (thisChoice != null)
-				shapelessRecipe.addIngredient(thisChoice);
-		}
-		completeRecipe(key, shapelessRecipe);
-	}
-
-	private void createCookingRecipe(RecipeType recipeType, NamespacedKey key, ItemStack result, RecipeChoice input, String group, CookingBookCategory category, int cookingTime, float experience) {
-		var recipe = switch (recipeType) {
-			case BLASTING -> new BlastingRecipe(key, result, input, experience, cookingTime);
-			case CAMPFIRE -> new CampfireRecipe(key, result, input, experience, cookingTime);
-			case FURNACE -> new FurnaceRecipe(key, result, input, experience, cookingTime);
-			case SMOKING -> new SmokingRecipe(key, result, input, experience, cookingTime);
-			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
-		};
-		if (category != null)
-			recipe.setCategory(category);
-		if (group != null && !group.isEmpty())
-			recipe.setGroup(group);
-		completeRecipe(key, recipe);
-	}
-
-	private void createSmithingRecipe(RecipeType recipeType, NamespacedKey key, ItemStack result, RecipeChoice base, RecipeChoice template, RecipeChoice addition) {
-		if (base == null || (template == null && recipeType != RecipeType.SMITHING) || addition == null) {
-			customError("Unable to create '" + recipeType + "' recipe, missing data.");
-			return;
-		}
-		var recipe = switch (recipeType) {
-			case SMITHING_TRANSFORM -> new SmithingTransformRecipe(key, result, template, base, addition);
-			case SMITHING_TRIM -> new SmithingTrimRecipe(key, template, base, addition);
-			case SMITHING -> new SmithingRecipe(key, result, base, addition);
-			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
-		};
-		completeRecipe(key, recipe);
-	}
-
-	private void createStonecuttingRecipe(NamespacedKey key, ItemStack result, RecipeChoice input) {
-		if (input == null) {
-			customError("Unable to create a 'stonecutting' recipe, missing data.");
-			return;
-		}
-		StonecuttingRecipe recipe = new StonecuttingRecipe(key, result, input);
-		completeRecipe(key, recipe);
-	}
-
-	private void customError(String message) {
-		Skript.info("Line " + thisNode.getLine() + ": (" + thisScript + ")\n\t" + message + "\n\t" + thisNode.getKey());
 	}
 
 	@Override

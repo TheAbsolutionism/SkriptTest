@@ -5,7 +5,6 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.EnumClassInfo;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.util.RecipeUtils;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;

@@ -16,12 +16,14 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.*;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
 
 import java.util.*;
 
@@ -80,14 +82,14 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 		private Class<? extends Event>[] eventClasses;
 
 		RecipePattern(String pattern, String toString, Class<? extends Event> eventClass, String error) {
-			this.pattern = "[the] " + pattern + " [of %-recipes%]";
+			this.pattern = "[the] " + pattern + " [of %recipes%]";
 			this.toString = toString;
 			this.eventClass = eventClass;
 			this.error = error;
 		}
 
 		RecipePattern(String pattern, String toString, Class<? extends Event>[] eventClasses, String error) {
-			this.pattern = "[the] " + pattern + " [of %-recipes%]";
+			this.pattern = "[the] " + pattern + " [of %recipes%]";
 			this.toString = toString;
 			this.eventClasses = eventClasses;
 			this.error = error;
@@ -113,32 +115,35 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedChoice = recipePatterns[matchedPattern];
-		if (exprs[0] != null) {
+		if (!exprs[0].isDefault()) {
+			//noinspection unchecked
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
-			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
-				Skript.error("There is no 'recipe' in a " + getParser().getCurrentEventName() + " event.");
+			if (exprs[0] == null) {
+				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
-			if (selectedChoice.eventClass != null) {
-				if (!getParser().isCurrentEvent(selectedChoice.eventClass)) {
-					Skript.error(selectedChoice.error);
-					return false;
-				}
-			} else if (selectedChoice.eventClasses != null) {
-				boolean classFound = false;
-				for (Class<? extends Event> eventClass : selectedChoice.eventClasses) {
-					if (getParser().isCurrentEvent(eventClass)) {
-						classFound = true;
-						break;
+			if (getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
+				if (selectedChoice.eventClass != null) {
+					if (!getParser().isCurrentEvent(selectedChoice.eventClass)) {
+						Skript.error(selectedChoice.error);
+						return false;
+					}
+				} else if (selectedChoice.eventClasses != null) {
+					boolean classFound = false;
+					for (Class<? extends Event> eventClass : selectedChoice.eventClasses) {
+						if (getParser().isCurrentEvent(eventClass)) {
+							classFound = true;
+							break;
+						}
+					}
+					if (!classFound) {
+						Skript.error(selectedChoice.error);
+						return false;
 					}
 				}
-				if (!classFound) {
-					Skript.error(selectedChoice.error);
-					return false;
-				}
+				isEvent = true;
 			}
-			isEvent = true;
 			setExpr(new EventValueExpression<>(Recipe.class));
 		}
 		thisNode = getParser().getNode();
@@ -155,7 +160,17 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 		for (Recipe recipe : source) {
 			switch (selectedChoice) {
 				case INGREDIENTS -> {
-					if (recipe instanceof ShapedRecipe shapedRecipe) {
+					if (recipe instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+						Arrays.stream(craftingRecipeWrapper.getIngredients()).forEach(recipeChoice -> {
+							if (recipeChoice instanceof RecipeChoice.ExactChoice exactChoice) {
+								ingredients.addAll(exactChoice.getChoices());
+							} else if (recipeChoice instanceof RecipeChoice.MaterialChoice materialChoice) {
+								materialChoice.getChoices().stream().forEach(material -> {
+									ingredients.add(new ItemStack(material));
+								});
+							}
+						});
+					} else if (recipe instanceof ShapedRecipe shapedRecipe) {
 						Map<Character, ItemStack> ingredientMap = shapedRecipe.getIngredientMap();
 						ingredients.addAll(ingredientMap.values().stream()
 							.map(itemStack -> {
@@ -169,7 +184,14 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					}
 				}
 				case FIRSTROW, SECONDROW, THIRDROW -> {
-					if (recipe instanceof ShapedRecipe shapedRecipe) {
+					if (recipe instanceof CraftingRecipeWrapper.ShapedRecipeWrapper shapedRecipeWrapper) {
+						RecipeChoice[] choices = shapedRecipeWrapper.getIngredients();
+						int row = selectedChoice.ordinal() - 1;
+						for (int i = 0; i < 3; i++) {
+							RecipeChoice.ExactChoice exactChoice = (RecipeChoice.ExactChoice) choices[i * row + i];
+							ingredients.addAll(exactChoice.getChoices());
+						}
+					} else if (recipe instanceof ShapedRecipe shapedRecipe) {
 						String[] shape = shapedRecipe.getShape();
 						Map<Character, ItemStack> ingredientMap = shapedRecipe.getIngredientMap();
 						String row = shape[selectedChoice.ordinal() - 1];
@@ -183,7 +205,21 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					}
 				}
 				case BASE, TEMPLATE, ADDITION -> {
-					if (recipe instanceof SmithingRecipe smithingRecipe) {
+					if (recipe instanceof SmithingRecipeWrapper smithingRecipeWrapper) {
+						RecipeChoice.ExactChoice exactChoice = (RecipeChoice.ExactChoice) switch (selectedChoice) {
+							case BASE -> smithingRecipeWrapper.getBase();
+							case ADDITION -> smithingRecipeWrapper.getAddition();
+							case TEMPLATE -> {
+								if (recipe instanceof SmithingRecipeWrapper.SmithingTransformRecipeWrapper || recipe instanceof SmithingRecipeWrapper.SmithingTrimRecipeWrapper) {
+									yield smithingRecipeWrapper.getTemplate();
+								}
+								yield null;
+							}
+							default -> null;
+						};
+						if (exactChoice != null)
+							ingredients.addAll(exactChoice.getChoices());
+					} else if (recipe instanceof SmithingRecipe smithingRecipe) {
 						RecipeChoice choice = switch (selectedChoice) {
 							case BASE -> smithingRecipe.getBase();
 							case TEMPLATE -> {
@@ -208,18 +244,26 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					}
 				}
 				case INPUT -> {
-					RecipeChoice choice = null;
-					if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-						choice = cookingRecipe.getInputChoice();
-					} else if  (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
-						choice = stonecuttingRecipe.getInputChoice();
+					if (recipe instanceof RecipeWrapper) {
+						if (recipe instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+							ingredients.addAll(((RecipeChoice.ExactChoice) cookingRecipeWrapper.getInput()).getChoices());
+						} else if (recipe instanceof StonecuttingRecipeWrapper stonecuttingRecipeWrapper) {
+							ingredients.addAll(((RecipeChoice.ExactChoice) stonecuttingRecipeWrapper.getInput()).getChoices());
+						}
 					} else {
-						customError("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
-					}
-					if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
-						ingredients.addAll(exactChoice.getChoices());
-					} else if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
-						ingredients.addAll(materialChoice.getChoices().stream().map(ItemStack::new).toList());
+						RecipeChoice choice = null;
+						if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+							choice = cookingRecipe.getInputChoice();
+						} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
+							choice = stonecuttingRecipe.getInputChoice();
+						} else {
+							customError("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
+						}
+						if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
+							ingredients.addAll(exactChoice.getChoices());
+						} else if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
+							ingredients.addAll(materialChoice.getChoices().stream().map(ItemStack::new).toList());
+						}
 					}
 				}
 			}
@@ -254,9 +298,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 			}
 		}
 
+		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+
 		switch (selectedChoice) {
 			case INGREDIENTS -> {
-				if (!(event instanceof CraftingRecipeEvent craftingEvent))
+				if (!(recipeWrapper instanceof CraftingRecipeWrapper craftingRecipeWrapper))
 					return;
 
 				if (items.size() > 9) {
@@ -276,11 +322,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						}
 					}
 					RecipeChoice choice = new RecipeChoice.ExactChoice(ingredients);
-					craftingEvent.setIngredients(entry.getKey(), choice);
+					craftingRecipeWrapper.setIngredients(entry.getKey(), choice);
 				}
 			}
 			case FIRSTROW, SECONDROW, THIRDROW -> {
-				if (!(event instanceof ShapedRecipeEvent shapedEvent))
+				if (!(recipeWrapper instanceof CraftingRecipeWrapper.ShapedRecipeWrapper shapedRecipeWrapper))
 					return;
 				if (items.size() > 3) {
 					customError("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
@@ -299,11 +345,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						}
 					}
 					RecipeChoice choice = new RecipeChoice.ExactChoice(ingredients);
-					shapedEvent.setIngredients(((3 * (selectedChoice.ordinal() - 1)) + entry.getKey()), choice);
+					shapedRecipeWrapper.setIngredients(((3 * (selectedChoice.ordinal() - 1)) + entry.getKey()), choice);
 				}
 			}
 			case BASE, TEMPLATE, ADDITION -> {
-				if (!(event instanceof SmithingRecipeEvent smithingEvent))
+				if (!(recipeWrapper instanceof SmithingRecipeWrapper smithingRecipeWrapper))
 					return;
 				List<ItemStack> stackList = new ArrayList<>();
 				items.entrySet().stream().forEach(entry -> stackList.addAll(Arrays.asList(entry.getValue())));
@@ -314,9 +360,9 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				}
 				RecipeChoice choice = new RecipeChoice.ExactChoice(stackList);
 				switch (selectedChoice) {
-					case BASE -> smithingEvent.setBase(choice);
-					case TEMPLATE -> smithingEvent.setTemplate(choice);
-					case ADDITION -> smithingEvent.setAddition(choice);
+					case BASE -> smithingRecipeWrapper.setBase(choice);
+					case TEMPLATE -> smithingRecipeWrapper.setTemplate(choice);
+					case ADDITION -> smithingRecipeWrapper.setAddition(choice);
 				}
 			}
 			case INPUT -> {
@@ -328,10 +374,10 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					return;
 				}
 				RecipeChoice choice = new RecipeChoice.ExactChoice(stackList);
-				if (recipeEvent instanceof CookingRecipeEvent cookingEvent) {
-					cookingEvent.setInput(choice);
-				} else if (recipeEvent instanceof StonecuttingRecipeEvent stonecuttingEvent) {
-					stonecuttingEvent.setInput(choice);
+				if (recipeWrapper instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+					cookingRecipeWrapper.setInput(choice);
+				} else if (recipeWrapper instanceof StonecuttingRecipeWrapper stonecuttingRecipeWrapper) {
+					stonecuttingRecipeWrapper.setInput(choice);
 				}
 			}
 		}

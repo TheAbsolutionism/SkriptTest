@@ -17,7 +17,6 @@ public class NamespacedUtils {
 	 * it will create the key in Skript's namespace.
 	 *
 	 * @param key the unparsed key
-	 * @param usingMinecraft whether to have it as Skript or Minecraft namespace
 	 * @return the resulting NamespacedKey
 	 */
 	public static NamespacedKey getNamespacedKey(String key) {
@@ -37,7 +36,6 @@ public class NamespacedUtils {
 	 * This key will be created in Skript's namespace.
 	 *
 	 * @param key The key to use
-	 * @param usingMinecraft whether to have it as Skript or Minecraft's namespace
 	 * @return a NamespacedKey with the encoded key in corresponding Namespace
 	 */
 	public static NamespacedKey createNamespacedKey(String key) {

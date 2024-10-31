@@ -10,7 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.RecipeUtils;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;

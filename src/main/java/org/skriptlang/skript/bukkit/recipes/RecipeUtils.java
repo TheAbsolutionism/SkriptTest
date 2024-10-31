@@ -1,11 +1,14 @@
-package ch.njol.skript.util;
+package org.skriptlang.skript.bukkit.recipes;
 
 import ch.njol.skript.Skript;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.*;
-import org.bukkit.inventory.recipe.CookingBookCategory;
-import org.bukkit.inventory.recipe.CraftingBookCategory;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CraftingRecipeWrapper.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CookingRecipeWrapper.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.SmithingRecipeWrapper.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,25 +68,31 @@ public class RecipeUtils {
 
 	// Custom Events used for SecRegisterRecipe
 	public static class RegisterRecipeEvent extends Event {
-		private ItemStack resultItem;
 		private boolean errorInEffect = false;
 		private RecipeType recipeType;
+		private RecipeWrapper recipeWrapper;
 
-		public RegisterRecipeEvent(RecipeType recipeType) {
+		public RegisterRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			this.recipeType = recipeType;
-		}
-
-		public void setResultItem(ItemStack resultItem) {
-			this.resultItem = resultItem;
+			this.recipeWrapper = switch (recipeType) {
+				case SHAPED -> new ShapedRecipeWrapper(key, recipeType);
+				case SHAPELESS -> new ShapelessRecipeWrapper(key, recipeType);
+				case BLASTING -> new BlastingRecipeWrapper(key, recipeType);
+				case FURNACE -> new FurnaceRecipeWrapper(key, recipeType);
+				case SMOKING -> new SmokingRecipeWrapper(key, recipeType);
+				case CAMPFIRE -> new CampfireRecipeWrapper(key, recipeType);
+				case SMITHING -> new SmithingRecipeWrapper(key, recipeType);
+				case SMITHING_TRANSFORM -> new SmithingTransformRecipeWrapper(key, recipeType);
+				case SMITHING_TRIM -> new SmithingTrimRecipeWrapper(key, recipeType);
+				case STONECUTTING -> new StonecuttingRecipeWrapper(key, recipeType);
+				default -> null;
+			};
 		}
 
 		public void setErrorInEffect() {
 			this.errorInEffect = true;
 		}
 
-		public ItemStack getResultItem() {
-			return resultItem;
-		}
 
 		public boolean getErrorInEffect() {
 			return errorInEffect;
@@ -93,189 +102,83 @@ public class RecipeUtils {
 			return recipeType;
 		}
 
-		public static class CraftingRecipeEvent extends RegisterRecipeEvent {
-			private RecipeChoice[] ingredients = new RecipeChoice[9];
-			private CraftingBookCategory category = CraftingBookCategory.MISC;
-			private String group;
+		public RecipeWrapper getRecipeWrapper() {
+			return recipeWrapper;
+		}
 
-			public CraftingRecipeEvent(RecipeType recipeType) {
-				super(recipeType);
+		public static class CraftingRecipeEvent extends RegisterRecipeEvent {
+
+			public CraftingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+				super(key, recipeType);
 			};
 
-			public void setIngredients(int placement, RecipeChoice item) {
-				ingredients[placement] = item;
-			}
-
-			public void setCategory(CraftingBookCategory category) {
-				this.category = category;
-			}
-
-			public void setGroup(String group) {
-				this.group = group;
-			}
-
-			public RecipeChoice[] getIngredients() {
-				return ingredients;
-			}
-
-			public CraftingBookCategory getCategory() {
-				return category;
-			}
-
-			public String getGroup() {
-				return group;
-			}
-
 			public static class ShapedRecipeEvent extends CraftingRecipeEvent {
-				public ShapedRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public ShapedRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				};
 			}
 
 			public static class ShapelessRecipeEvent extends CraftingRecipeEvent {
-				public ShapelessRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public ShapelessRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				};
 			}
 		}
 
 		public static class CookingRecipeEvent extends RegisterRecipeEvent {
-			private RecipeChoice input;
-			private CookingBookCategory category = CookingBookCategory.MISC;
-			private String group;
-			private int cookingTime = 10;
-			private float experience = 0;
 
-			public CookingRecipeEvent(RecipeType recipeType) {
-				super(recipeType);
+			public CookingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+				super(key, recipeType);
 			};
 
-			public void setInput(RecipeChoice input) {
-				this.input = input;
-			}
-
-			public void setCategory(CookingBookCategory category) {
-				this.category = category;
-			}
-
-			public void setGroup(String group) {
-				this.group = group;
-			}
-
-			public void setCookingTime(int cookingTime) {
-				this.cookingTime = cookingTime;
-			}
-
-			public void setExperience(float experience) {
-				this.experience = experience;
-			}
-
-			public CookingBookCategory getCategory() {
-				return category;
-			}
-
-			public String getGroup() {
-				return group;
-			}
-
-			public RecipeChoice getInput() {
-				return input;
-			}
-
-			public int getCookingTime() {
-				return cookingTime;
-			}
-
-			public float getExperience() {
-				return experience;
-			}
-
 			public static class BlastingRecipeEvent extends CookingRecipeEvent {
-				public BlastingRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public BlastingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 
 			public static class CampfireRecipeEvent extends CookingRecipeEvent {
-				public CampfireRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public CampfireRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 
 			public static class FurnaceRecipeEvent extends CookingRecipeEvent {
-				public FurnaceRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public FurnaceRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 
 			public static class SmokingRecipeEvent extends CookingRecipeEvent {
-				public SmokingRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public SmokingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 		}
 
 		public static class SmithingRecipeEvent extends RegisterRecipeEvent {
 
-			private RecipeChoice base;
-			private RecipeChoice template;
-			private RecipeChoice addition;
-
-			public SmithingRecipeEvent(RecipeType recipeType) {
-				super(recipeType);
-			}
-
-			public void setBase(RecipeChoice base) {
-				this.base = base;
-			}
-
-			public void setAddition(RecipeChoice addition) {
-				this.addition = addition;
-			}
-
-			public void setTemplate(RecipeChoice template) {
-				this.template = template;
-			}
-
-			public RecipeChoice getBase() {
-				return base;
-			}
-
-			public RecipeChoice getAddition() {
-				return addition;
-			}
-
-			public RecipeChoice getTemplate() {
-				return template;
+			public SmithingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+				super(key, recipeType);
 			}
 
 			public static class SmithingTransformRecipeEvent extends SmithingRecipeEvent {
-				public SmithingTransformRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public SmithingTransformRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 
 			public static class SmithingTrimRecipeEvent extends SmithingRecipeEvent {
-				public SmithingTrimRecipeEvent(RecipeType recipeType) {
-					super(recipeType);
+				public SmithingTrimRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+					super(key, recipeType);
 				}
 			}
 		}
 
 		public static class StonecuttingRecipeEvent extends RegisterRecipeEvent {
 
-			private RecipeChoice input;
-
-			public StonecuttingRecipeEvent(RecipeType recipeType) {
-				super(recipeType);
-			}
-
-			public void setInput(RecipeChoice input) {
-				this.input = input;
-			}
-
-			public RecipeChoice getInput() {
-				return input;
+			public StonecuttingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+				super(key, recipeType);
 			}
 		}
 

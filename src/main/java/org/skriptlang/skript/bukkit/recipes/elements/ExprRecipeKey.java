@@ -14,6 +14,7 @@ import org.bukkit.Keyed;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +46,11 @@ public class ExprRecipeKey extends PropertyExpression<Recipe, String> {
 	protected String @Nullable [] get(Event event, Recipe[] source) {
 		List<String> names = new ArrayList<>();
 		for (Recipe recipe : getExpr().getArray(event)) {
-			if (recipe instanceof Keyed key)
+			if (recipe instanceof RecipeWrapper recipeWrapper) {
+				names.add(recipeWrapper.getKey().toString());
+			} else if (recipe instanceof Keyed key) {
 				names.add(key.getKey().toString());
+			}
 		}
 		return names.toArray(new String[0]);
 	}

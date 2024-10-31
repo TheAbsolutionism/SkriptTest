@@ -9,11 +9,12 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.RecipeUtils;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 @Name("Recipe Type")
 @Description("Get the recipe type of a recipe.")
@@ -39,7 +40,11 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 
 	@Override
 	protected RecipeUtils.RecipeType @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> RecipeUtils.getRecipeTypeFromRecipe(recipe));
+		return get(source, recipe -> {
+			if (recipe instanceof RecipeWrapper recipeWrapper)
+				return recipeWrapper.getRecipeType();
+			return RecipeUtils.getRecipeTypeFromRecipe(recipe);
+		});
 	}
 
 	@Override

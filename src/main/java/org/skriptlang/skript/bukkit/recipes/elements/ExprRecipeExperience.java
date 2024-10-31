@@ -11,14 +11,16 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent;
-import ch.njol.skript.util.RecipeUtils.RegisterRecipeEvent.CookingRecipeEvent;
+import ch.njol.skript.util.Timespan;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CookingRecipeEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 @Name("Recipe Experience")
 @Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
@@ -33,7 +35,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	static {
 		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY,
-			"[the] recipe [e]xp[erience] [of %-recipes%]");
+			"[the] recipe [e]xp[erience] [of %recipes%]");
 	}
 
 	private boolean isEvent = false;
@@ -41,18 +43,16 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0] != null) {
+		if (!exprs[0].isDefault()) {
+			//noinspection unchecked
 			setExpr((Expression<? extends Recipe>) exprs[0]);
 		} else {
-			if (!getParser().isCurrentEvent(RegisterRecipeEvent.class)) {
-				Skript.error("There is no 'recipe' in a " + getParser().getCurrentEventName() + " event.");
+			if (exprs[0] == null) {
+				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
-			if (!getParser().isCurrentEvent(CookingRecipeEvent.class)) {
-				Skript.error("This can only be used when registering a blasting, furnace, campfire or smoking recipe.");
-				return false;
-			}
-			isEvent = true;
+			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
+				isEvent = true;
 			setExpr(new EventValueExpression<>(Recipe.class));
 		}
 		return true;
@@ -60,11 +60,10 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	@Override
 	protected Float @Nullable [] get(Event event, Recipe[] source) {
-		if (isEvent)
-			return null;
-
 		return get(source, recipe -> {
-			if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+			if (recipe instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
+				return cookingRecipeWrapper.getExperience();
+			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getExperience();
 			}
 			return null;
@@ -80,11 +79,15 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof CookingRecipeEvent cookingEvent))
+		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+			return;
+
+		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		if (!(recipeWrapper instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper))
 			return;
 
 		float experience = (float) delta[0];
-		cookingEvent.setExperience(experience);
+		cookingRecipeWrapper.setExperience(experience);
 	}
 
 	@Override
