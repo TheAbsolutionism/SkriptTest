@@ -24,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 @Examples({
 	"set {_owner} to the skull owner of event-block",
 	"set skull owner of {_block} to \"Njol\" parsed as offlineplayer",
-	"set skull owner of player's tool to \"Njol\" parsed as offlineplayer"
+	"set head owner of player's tool to {_player}"
 })
-@Since("2.9.0, INSERT VERSION (items)")
+@Since("2.9.0, INSERT VERSION (of items)")
 public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlayer> {
 
 	static {
@@ -46,8 +46,7 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 	}
 
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
 			return CollectionUtils.array(OfflinePlayer.class);
 		return null;
