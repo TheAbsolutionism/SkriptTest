@@ -180,7 +180,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
 						ingredients.addAll(shapelessRecipe.getIngredientList());
 					} else {
-						customError("You can only get the ingredients of a Shaped or Shapeless Recipe.");
+						Skript.error("You can only get the ingredients of a Shaped or Shapeless Recipe.");
 					}
 				}
 				case FIRSTROW, SECONDROW, THIRDROW -> {
@@ -201,7 +201,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							ingredients.add(stack);
 						}
 					} else {
-						customError("You can only get the ingredients of a row for a Shaped Recipe.");
+						Skript.error("You can only get the ingredients of a row for a Shaped Recipe.");
 					}
 				}
 				case BASE, TEMPLATE, ADDITION -> {
@@ -240,7 +240,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							);
 						}
 					} else {
-						customError("You can only get the base, template, and addition items of a Smithing, Smithing Transform and Smithing Trim Recipe.");
+						Skript.error("You can only get the base, template, and addition items of a Smithing, Smithing Transform and Smithing Trim Recipe.");
 					}
 				}
 				case INPUT -> {
@@ -257,7 +257,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
 							choice = stonecuttingRecipe.getInputChoice();
 						} else {
-							customError("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
+							Skript.error("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
 						}
 						if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
 							ingredients.addAll(exactChoice.getChoices());
@@ -306,7 +306,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					return;
 
 				if (items.size() > 9) {
-					customError("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeType()  + "' recipe.");
+					Skript.error("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeType()  + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -314,7 +314,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					ItemStack[] ingredients = entry.getValue();
 					if (Arrays.stream(ingredients).anyMatch(itemStack -> itemStack.getType().isAir())) {
 						if (ingredients.length > 1) {
-							customError("You can not provide air with a list of other items.");
+							Skript.error("You can not provide air with a list of other items.");
 							recipeEvent.setErrorInEffect();
 							return;
 						} else {
@@ -329,7 +329,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				if (!(recipeWrapper instanceof CraftingRecipeWrapper.ShapedRecipeWrapper shapedRecipeWrapper))
 					return;
 				if (items.size() > 3) {
-					customError("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
+					Skript.error("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -337,7 +337,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					ItemStack[] ingredients = entry.getValue();
 					if (Arrays.stream(ingredients).anyMatch(itemStack -> itemStack.getType().isAir())) {
 						if (ingredients.length > 1) {
-							customError("You can not provide 'air' with a list of other items.");
+							Skript.error("You can not provide 'air' with a list of other items.");
 							recipeEvent.setErrorInEffect();
 							return;
 						} else {
@@ -354,7 +354,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				List<ItemStack> stackList = new ArrayList<>();
 				items.entrySet().stream().forEach(entry -> stackList.addAll(Arrays.asList(entry.getValue())));
 				if (stackList.stream().anyMatch(itemStack -> itemStack.getType().isAir())) {
-					customError("You can not provide 'air' with this expression.");
+					Skript.error("You can not provide 'air' with this expression.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -369,7 +369,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				List<ItemStack> stackList = new ArrayList<>();
 				items.entrySet().stream().forEach(entry -> stackList.addAll(Arrays.asList(entry.getValue())));
 				if (stackList.stream().anyMatch(itemStack -> itemStack.getType().isAir())) {
-					customError("You can not provide 'air' with this expression.");
+					Skript.error("You can not provide 'air' with this expression.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -381,10 +381,6 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				}
 			}
 		}
-	}
-
-	private void customError(String message) {
-		Skript.info("Line " + thisNode.getLine() + ": (" + thisScript + ")\n\t" + message + "\n\t" + thisNode.getKey());
 	}
 
 	@Override

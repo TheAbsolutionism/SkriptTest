@@ -1,24 +1,24 @@
 package org.skriptlang.skript.bukkit.recipes;
 
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class RecipeWrapper implements Recipe {
+public abstract class RecipeWrapper implements Recipe {
 
-	private final RecipeUtils.RecipeType recipeType;
+	private final RecipeType recipeType;
 	private final NamespacedKey key;
 	private ItemStack result = null;
 	private List<String> errors = new ArrayList<>();
 
-	public RecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+	public RecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 		this.key = key;
 		this.recipeType = recipeType;
 	}
@@ -35,7 +35,7 @@ public class RecipeWrapper implements Recipe {
 		return this.key;
 	}
 
-	public RecipeUtils.RecipeType getRecipeType() {
+	public RecipeType getRecipeType() {
 		return recipeType;
 	}
 
@@ -47,17 +47,20 @@ public class RecipeWrapper implements Recipe {
 		return errors;
 	}
 
-	public Recipe create() {
-		return null;
-	}
+	public abstract Recipe create();
 
     public static class CraftingRecipeWrapper extends RecipeWrapper {
 		private RecipeChoice[] ingredients = new RecipeChoice[9];
 		private String group;
 		private CraftingBookCategory category;
 
-		public CraftingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+		public CraftingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
+		}
+
+		@Override
+		public Recipe create() {
+			return null;
 		}
 
 		public void setIngredients(int placement, RecipeChoice item) {
@@ -86,10 +89,11 @@ public class RecipeWrapper implements Recipe {
 
 		public static class ShapedRecipeWrapper extends CraftingRecipeWrapper {
 
-			public ShapedRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public ShapedRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public ShapedRecipe create() {
 				if (getResult() == null) {
 					addError("You must provide a result item when registering a recipe");
@@ -119,10 +123,11 @@ public class RecipeWrapper implements Recipe {
 
 		public static class ShapelessRecipeWrapper extends CraftingRecipeWrapper {
 
-			public ShapelessRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public ShapelessRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public ShapelessRecipe create() {
 				if (getResult() == null) {
 					addError("You must provide a result item when registering a recipe");
@@ -154,7 +159,7 @@ public class RecipeWrapper implements Recipe {
 		private int cookingTime = 10;
 		private float experience = 0;
 
-		public CookingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+		public CookingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		}
 
@@ -198,6 +203,7 @@ public class RecipeWrapper implements Recipe {
 			return experience;
 		}
 
+		@Override
 		public CookingRecipe<?> create() {
 			if (getResult() == null) {
 				addError("You must provide a result item when registering a recipe");
@@ -218,40 +224,44 @@ public class RecipeWrapper implements Recipe {
 		}
 
 		public static class BlastingRecipeWrapper extends CookingRecipeWrapper {
-			public BlastingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public BlastingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public BlastingRecipe create() {
 				return (BlastingRecipe) super.create();
 			}
 		}
 
 		public static class FurnaceRecipeWrapper extends CookingRecipeWrapper {
-			public FurnaceRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public FurnaceRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public FurnaceRecipe create() {
 				return (FurnaceRecipe) super.create();
 			}
 		}
 
 		public static class SmokingRecipeWrapper extends CookingRecipeWrapper {
-			public SmokingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public SmokingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public SmokingRecipe create() {
 				return (SmokingRecipe) super.create();
 			}
 		}
 
 		public static class CampfireRecipeWrapper extends CookingRecipeWrapper {
-			public CampfireRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public CampfireRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public CampfireRecipe create() {
 				return (CampfireRecipe) super.create();
 			}
@@ -264,7 +274,7 @@ public class RecipeWrapper implements Recipe {
 		private RecipeChoice template;
 		private RecipeChoice addition;
 
-		public SmithingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+		public SmithingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		}
 
@@ -292,6 +302,7 @@ public class RecipeWrapper implements Recipe {
 			return addition;
 		}
 
+		@Override
 		public SmithingRecipe create() {
 			if (getResult() == null) {
 				addError("You must provide a result item when registering a recipe");
@@ -306,10 +317,11 @@ public class RecipeWrapper implements Recipe {
 		}
 
 		public static class SmithingTransformRecipeWrapper extends SmithingRecipeWrapper {
-			public SmithingTransformRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public SmithingTransformRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public SmithingTransformRecipe create() {
 				if (getResult() == null) {
 					addError("You must provide a result item when registering a recipe");
@@ -325,10 +337,11 @@ public class RecipeWrapper implements Recipe {
 		}
 
 		public static class SmithingTrimRecipeWrapper extends SmithingRecipeWrapper {
-			public SmithingTrimRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+			public SmithingTrimRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			}
 
+			@Override
 			public SmithingTrimRecipe create() {
 				RecipeChoice base = getBase(), template = getTemplate(), addition = getAddition();
 				if (base == null || template == null || addition == null) {
@@ -343,7 +356,7 @@ public class RecipeWrapper implements Recipe {
 	public static class StonecuttingRecipeWrapper extends RecipeWrapper {
 		private RecipeChoice input;
 
-		public StonecuttingRecipeWrapper(NamespacedKey key, RecipeUtils.RecipeType recipeType) {
+		public StonecuttingRecipeWrapper(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		}
 
@@ -355,6 +368,7 @@ public class RecipeWrapper implements Recipe {
 			return input;
 		}
 
+		@Override
 		public StonecuttingRecipe create() {
 			if (getResult() == null) {
 				addError("You must provide a result item when registering a recipe");

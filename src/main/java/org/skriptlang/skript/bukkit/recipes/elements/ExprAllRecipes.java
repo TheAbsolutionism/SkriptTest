@@ -10,7 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
@@ -51,7 +51,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			"all [of the] custom %recipetype% [for %-itemstacks/itemtypes%]");
 	}
 
-	private Expression<RecipeUtils.RecipeType> recipeTypeExpr;
+	private Expression<RecipeType> recipeTypeExpr;
 	private Expression<?> itemExpr;
 	private boolean getMinecraft, getCustom;
 
@@ -61,7 +61,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			itemExpr = exprs[0];
 		} else if (matchedPattern >= 3) {
 			//noinspection unchecked
-			recipeTypeExpr = (Expression<RecipeUtils.RecipeType>) exprs[0];
+			recipeTypeExpr = (Expression<RecipeType>) exprs[0];
 			itemExpr = exprs[1] != null ? exprs[1] : null;
 		}
 		getMinecraft = matchedPattern == 1 || matchedPattern == 4;
@@ -103,7 +103,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 					return;
 
 				if (recipeTypeExpr != null) {
-					RecipeUtils.RecipeType type = recipeTypeExpr.getSingle(event);
+					RecipeType type = recipeTypeExpr.getSingle(event);
 					if (recipe.getClass().equals(type.getRecipeClass()) || type.getRecipeClass().isInstance(recipe))
 						recipeList.add(recipe);
 				} else {

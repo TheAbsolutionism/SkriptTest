@@ -10,8 +10,8 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -20,6 +20,7 @@ import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
 
 @Name("Recipe Category")
 @Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
@@ -37,10 +38,10 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 	"loop all recipes:",
 		"\tbroadcast recipe category of loop-recipe"
 })
-public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
+public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategory> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCategory.class, Object.class, ExpressionType.PROPERTY,
+		Skript.registerExpression(ExprRecipeCategory.class, RecipeCategory.class, ExpressionType.PROPERTY,
 			"[the] recipe category [of %recipes%]");
 	}
 
@@ -64,23 +65,26 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 	}
 
 	@Override
-	protected Object @Nullable [] get(Event event, Recipe[] source) {
+	protected RecipeCategory @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
+			Enum<?> category = null;
 			if (recipe instanceof RecipeWrapper) {
-				if (recipe instanceof RecipeWrapper.CraftingRecipeWrapper craftingRecipeWrapper) {
-					return craftingRecipeWrapper.getCategory();
-				} else if (recipe instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
-					return cookingRecipeWrapper.getCategory();
+				if (recipe instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+					category = craftingRecipeWrapper.getCategory();
+				} else if (recipe instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+					category = cookingRecipeWrapper.getCategory();
 				}
 			} else {
 				if (recipe instanceof ShapedRecipe shapedRecipe) {
-					return shapedRecipe.getCategory();
+					category = shapedRecipe.getCategory();
 				} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-					return shapelessRecipe.getCategory();
+					category = shapelessRecipe.getCategory();
 				} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-					return cookingRecipe.getCategory();
+					category = cookingRecipe.getCategory();
 				}
 			}
+			if (category != null)
+				return RecipeCategory.convertBukkitToSkript(category);
 			return null;
 		});
 	}
@@ -88,7 +92,7 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET && isEvent) {
-			return CollectionUtils.array(CraftingBookCategory.class, CookingBookCategory.class);
+			return CollectionUtils.array(RecipeCategory.class);
 		}
 		return null;
 	}
@@ -97,21 +101,23 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, Object> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
+		if (!(delta[0] instanceof RecipeCategory recipeCategory))
+			return;
 		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
-		if (recipeWrapper instanceof RecipeWrapper.CraftingRecipeWrapper craftingRecipeWrapper) {
-			if (!(delta[0] instanceof CraftingBookCategory category))
+		if (recipeWrapper instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+			if (!(recipeCategory.getCategory() instanceof CraftingBookCategory category))
 				return;
 			craftingRecipeWrapper.setCategory(category);
-		} else if (recipeWrapper instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
-			if (!(delta[0] instanceof CookingBookCategory category))
+		} else if (recipeWrapper instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+			if (!(recipeCategory.getCategory() instanceof CookingBookCategory category))
 				return;
 			cookingRecipeWrapper.setCategory(category);
 		}
 	}
 
 	@Override
-	public Class<Object> getReturnType() {
-		return Object.class;
+	public Class<RecipeCategory> getReturnType() {
+		return RecipeCategory.class;
 	}
 
 	@Override

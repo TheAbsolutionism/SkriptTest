@@ -12,7 +12,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;

@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
@@ -23,10 +24,10 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 		"\tbroadcast the recipe type of loop-recipe"
 })
 @Since("INSERT VERSION")
-public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.RecipeType> {
+public class ExprRecipeType extends PropertyExpression<Recipe, RecipeType> {
 
 	static {
-		Skript.registerExpression(ExprRecipeType.class, RecipeUtils.RecipeType.class, ExpressionType.PROPERTY,
+		Skript.registerExpression(ExprRecipeType.class, RecipeType.class, ExpressionType.PROPERTY,
 			"[the] recipe type of %recipes%",
 			"[the] %recipes%'[s] recipe type");
 	}
@@ -39,7 +40,7 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 	}
 
 	@Override
-	protected RecipeUtils.RecipeType @Nullable [] get(Event event, Recipe[] source) {
+	protected RecipeType @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
 			if (recipe instanceof RecipeWrapper recipeWrapper)
 				return recipeWrapper.getRecipeType();
@@ -48,8 +49,8 @@ public class ExprRecipeType extends PropertyExpression<Recipe, RecipeUtils.Recip
 	}
 
 	@Override
-	public Class<RecipeUtils.RecipeType> getReturnType() {
-		return RecipeUtils.RecipeType.class;
+	public Class<RecipeType> getReturnType() {
+		return RecipeType.class;
 	}
 
 	@Override
