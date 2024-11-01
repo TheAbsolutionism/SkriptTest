@@ -56,6 +56,8 @@ import ch.njol.util.coll.iterator.ArrayIterator;
 @Since("1.0, 2.5.1 (within/cuboid/chunk)")
 public class ExprBlocks extends SimpleExpression<Block> {
 
+	private static final boolean SUPPORTS_WORLD_LOADED = Skript.methodExists(Location.class, "isWorldLoaded");
+
 	static {
 		Skript.registerExpression(ExprBlocks.class, Block.class, ExpressionType.COMBINED,
 				"[(all [[of] the]|the)] blocks %direction% [%locations%]",
@@ -116,7 +118,11 @@ public class ExprBlocks extends SimpleExpression<Block> {
 			return from.stream(event)
 					.filter(Location.class::isInstance)
 					.map(Location.class::cast)
-				    .filter(Location::isWorldLoaded)
+				    .filter(location -> {
+						if (SUPPORTS_WORLD_LOADED)
+							return location.isWorldLoaded();
+						return location.getChunk().isLoaded();
+					})
 					.map(direction::getRelative)
 					.map(Location::getBlock)
 					.toArray(Block[]::new);
