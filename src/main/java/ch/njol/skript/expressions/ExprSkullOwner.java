@@ -17,6 +17,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -85,7 +86,9 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 			return skull -> skull.setOwningPlayer(offlinePlayer);
 		} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
 			//noinspection deprecation
-			return skull -> skull.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
+			PlayerProfile profile = Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), "");
+			//noinspection deprecation
+			return skull -> skull.setOwnerProfile(profile);
 		}
 		//noinspection deprecation
 		return skull -> skull.setOwner("");
@@ -96,7 +99,9 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 			return skullMeta -> skullMeta.setOwningPlayer(offlinePlayer);
 		} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
 			//noinspection deprecation
-			return skullMeta -> skullMeta.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
+			PlayerProfile profile = Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), "");
+			//noinspection deprecation
+			return skullMeta -> skullMeta.setOwnerProfile(profile);
 		}
 		//noinspection deprecation
 		return skullMeta -> skullMeta.setOwner("");
