@@ -19,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 @Name("Skull Owner")
 @Description("The skull owner of a player skull.")
 @Examples({
@@ -55,31 +57,17 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		OfflinePlayer offlinePlayer = (OfflinePlayer) delta[0];
+		Consumer<Skull> blockChanger = getBlockChanger(offlinePlayer);
+		Consumer<SkullMeta> metaChanger = getMetaChanger(offlinePlayer);
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof Block block && block.getState() instanceof Skull skull) {
-				if (offlinePlayer.getName() != null) {
-					skull.setOwningPlayer(offlinePlayer);
-				} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
-					//noinspection deprecation
-					skull.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
-				} else {
-					//noinspection deprecation
-					skull.setOwner("");
-				}
+				blockChanger.accept(skull);
 				skull.update(true, false);
 			} else {
 				ItemStack skullItem = ItemUtils.asItemStack(object);
 				if (skullItem == null || !(skullItem.getItemMeta() instanceof SkullMeta skullMeta))
 					continue;
-				if (offlinePlayer.getName() != null) {
-					skullMeta.setOwningPlayer(offlinePlayer);
-				} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
-					//noinspection deprecation
-					skullMeta.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
-				} else {
-					//noinspection deprecation
-					skullMeta.setOwner("");
-				}
+				metaChanger.accept(skullMeta);
 				skullItem.setItemMeta(skullMeta);
 				if (object instanceof Slot slot) {
 					slot.setItem(skullItem);
@@ -90,6 +78,28 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 				}
 			}
 		}
+	}
+
+	private Consumer<Skull> getBlockChanger(OfflinePlayer offlinePlayer) {
+		if (offlinePlayer.getName() != null) {
+			return skull -> skull.setOwningPlayer(offlinePlayer);
+		} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
+			//noinspection deprecation
+			return skull -> skull.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
+		}
+		//noinspection deprecation
+		return skull -> skull.setOwner("");
+	}
+
+	private Consumer<SkullMeta> getMetaChanger(OfflinePlayer offlinePlayer) {
+		if (offlinePlayer.getName() != null) {
+			return skullMeta -> skullMeta.setOwningPlayer(offlinePlayer);
+		} else if (ItemUtils.CAN_CREATE_PLAYER_PROFILE) {
+			//noinspection deprecation
+			return skullMeta -> skullMeta.setOwnerProfile(Bukkit.createPlayerProfile(offlinePlayer.getUniqueId(), ""));
+		}
+		//noinspection deprecation
+		return skullMeta -> skullMeta.setOwner("");
 	}
 
 	@Override
