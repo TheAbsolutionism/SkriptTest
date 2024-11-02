@@ -1,6 +1,5 @@
-
 test "skull owner - block":
-	set {_loc} to spawn of world "world" ~ vector(3,3,3)
+	set {_loc} to test-location
 	set {_old} to block at {_loc}
 	set block at {_loc} to player head
 	assert skull owner of (block at {_loc}) is not set with "Block Skull Owner should not be set"
