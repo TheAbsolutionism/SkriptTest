@@ -1,0 +1,4 @@
+test "equippable component - equip sound" when running minecraft "1.21.2":
+	set {_item} to player head
+	set the equip sound of {_item} to "entity.experience_orb.pickup"
+	assert the equip sound of {_item} is "entity.experience_orb.pickup" with "Item equip sound was not set to ""entity.experience_orb.pickup"""

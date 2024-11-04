@@ -2,63 +2,74 @@ package org.skriptlang.skript.bukkit.equippablecomponents.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.ItemUtils;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
+import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.components.EquippableComponent;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Equippable Component Can Take Damage")
-@Description("Checks if the items can take damage when the entity wearing them gets hurt.")
+@Name("Equippable Component - Is Damageable")
+@Description("Checks if the item can be damaged when the wearer gets injured.")
 @Examples({
-	"if the equippable component of diamond chestplate can take damage:",
-		"\t"
+	"if {_item} is damageable:",
+		"\tadd \"Damageable\" to lore of {_item}",
+	"",
+	"set {_component} to the equippable component of {_item}",
+	"if {_component} is not damageable:",
+		"\tmake {_component} damageable"
 })
-public class CondEquipCompDamage extends Condition {
+@RequiredPlugins("Minecraft 1.21.2+")
+@Since("INSERT VERSION")
+public class CondEquipCompDamage extends PropertyCondition<Object> {
 
 	static {
 		Skript.registerCondition(CondEquipCompDamage.class, ConditionType.PROPERTY,
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (can take|allow) damage",
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (can't take|can not take|disallow) damage");
+			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (is|are) [:un]damageable",
+			"[the] %equippablecomponents% (is|are) [:un]damageable",
+			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (isn't|is not|aren't|are not) [:un]damageable",
+			"[the] %equippablecomponents% (isn't|is not|aren't|are not) [:un]damageable");
 	}
 
 	private Expression<?> objects;
-	private boolean damage;
+	private boolean damageable;
+	private boolean isComponents;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		objects = exprs[0];
-		damage = matchedPattern == 0;
-		setNegated(!damage);
+		damageable = !parseResult.hasTag("un");
+		isComponents = matchedPattern == 1 || matchedPattern == 3;
+		setNegated(matchedPattern >= 2);
 		return true;
 	}
 
 	@Override
-	public boolean check(Event event) {
-		boolean finalProvocation = false;
-		for (Object object : objects.getArray(event)) {
+	public boolean check(Object object) {
+		if (object instanceof EquippableComponent component) {
+			return component.isDamageOnHurt() == damageable;
+		} else {
 			ItemStack itemStack = ItemUtils.asItemStack(object);
-			if (itemStack == null)
-				continue;
-			if (itemStack.getItemMeta().getEquippable().isDamageOnHurt() == damage) {
-				finalProvocation = true;
-			} else {
-				finalProvocation = false;
-				break;
-			}
+			if (itemStack != null)
+				return itemStack.getItemMeta().getEquippable().isDamageOnHurt() == damageable;
 		}
-		return finalProvocation;
+		return isNegated();
 	}
 
 	@Override
+	protected String getPropertyName() {
+		return null;
+	}
+
+
+	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the equippable components of " + objects.toString(event, debug)
-			+ (isNegated() ? "can not" : "can") + " take damage";
+		return "the " + (isComponents ? "" : "equippable components of ") + objects.toString(event, debug) + " " +
+			(isNegated() ? "are not" : "are") + " " + (damageable ? "damageable" : "undamageable");
 	}
 
 }

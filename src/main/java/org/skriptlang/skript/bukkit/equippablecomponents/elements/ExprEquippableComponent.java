@@ -3,6 +3,7 @@ package org.skriptlang.skript.bukkit.equippablecomponents.elements;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -15,10 +16,26 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.EquippableComponent;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Equippable Component")
+@Description({
+	"The equippable component of an item.",
+	"NOTE: When setting a variable to a component of an item, it will be a copy.",
+	"Meaning any changes made to the component will not be present on the item.",
+	"Set the components of the item directly or change the component of an item to the stored component."
+})
+@Examples({
+	"set {_component} to the equippable component of {_item}",
+	"set the equipment slot {_component} to helmet slot",
+	"set the equippable component of {_item} to {_component}",
+	"",
+	"set the equipment slot of {_item} to helmet slot"
+})
+@RequiredPlugins("Minecraft 1.21.2+")
+@Since("INSERT VERSION")
 public class ExprEquippableComponent extends PropertyExpression<Object, EquippableComponent> {
 
 	static {
-		register(ExprEquippableComponent.class,  EquippableComponent.class, "equip[pable] component", "itemstacks/itemtypes/slots");
+		register(ExprEquippableComponent.class,  EquippableComponent.class, "equip[pable] component[s]", "itemstacks/itemtypes/slots");
 	}
 
 	@Override
@@ -80,7 +97,7 @@ public class ExprEquippableComponent extends PropertyExpression<Object, Equippab
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the equippable component of " + getExpr().toString(event, debug);
+		return "the equippable components of " + getExpr().toString(event, debug);
 	}
 
 }

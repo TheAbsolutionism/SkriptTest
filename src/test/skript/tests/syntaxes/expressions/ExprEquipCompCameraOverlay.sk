@@ -1,0 +1,6 @@
+test "equippable component - camera overlay" when running minecraft "1.21.2":
+	set {_item} to diamond chestplate
+	set the camera overlay of {_item} to "test_equippable_component_camera_overlay"
+	assert the camera overlay of {_item} is "skript:test_equippable_component_camera_overlay" with "Item camera overlay was not set"
+	clear the camera overlay of {_item}
+	assert the camera overlay of {_item} is not set with "Item camera overlay was not cleared"

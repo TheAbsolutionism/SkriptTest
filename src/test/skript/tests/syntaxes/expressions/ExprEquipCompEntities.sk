@@ -1,0 +1,6 @@
+test "equippable component - allowed entities" when running minecraft "1.21.2":
+	set {_item} to a diamond chestplate
+	set the allowed entities of {_item} to a zombie and a skeleton
+	assert the allowed entities of {_item} is a zombie and a skeleton with "Allowed entities are not a zombie and skeleton"
+	clear the allowed entities of {_item}
+	assert the allowed entities of {_item} is not set with "Allowed entities were not cleared"

@@ -1,0 +1,7 @@
+test "equippable component - dispensable" when running minecraft "1.21.2":
+	set {_item} to a diamond chestplate
+	make {_item} to be dispensable
+	#CondEquipCompDispensable
+	assert {_item} is dispensable with "Item did not become dispensable"
+	make {_item} to be undispensable
+	assert {_item} is undispensable with "Item did not become undispensable"

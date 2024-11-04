@@ -2412,8 +2412,8 @@ experience cooldown change reasons:
 	pickup_orb: orb pickup, pickup orb
 
 # -- Equipment Slots --
-equipment slots:
-	head: helmet slot, head slot
+equipment slot:
+	helmet: helmet slot, head slot
 	chestplate: chestplate slot, chest slot
 	leggings: leggings slot, legs slot
 	boots: feet slot, boots slot

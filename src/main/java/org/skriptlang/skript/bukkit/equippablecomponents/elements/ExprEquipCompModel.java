@@ -3,40 +3,41 @@ package org.skriptlang.skript.bukkit.equippablecomponents.elements;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.ItemUtils;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.EquippableComponent;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Equippaable Component - Equipment Slot")
-@Description("The equipment slot an item can be equipped to.")
+@Name("Equippable Component - Model")
+@Description("The model of the item when equipped.")
 @Examples({
-	"set the equipment slot of {_item} to chest slot",
+	"set the model key of {_item} to \"custom_model\"",
 	"",
 	"set {_component} to the equippable component of {_item}",
-	"set the equipment slot of {_component} to boots slot",
+	"set the model id of {_component} to \"custom_model\"",
 	"set the equippable component of {_item} to {_component}"
 })
 @RequiredPlugins("Minecraft 1.21.2+")
 @Since("INSERT VERSION")
-public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
+public class ExprEquipCompModel extends PropertyExpression<Object, String> {
 
 	static {
-		Skript.registerExpression(ExprEquipCompSlot.class,  EquipSlot.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] equipment slot of %itemstacks/itemtypes/slots%",
-			"[the] equipment slot of %equippablecomponents%");
+		Skript.registerExpression(ExprEquipCompModel.class, String.class, ExpressionType.PROPERTY,
+			"[the] [equip[pable] component] model (key|id) of %itemstacks/itemtypes/slots%",
+			"[the] model (key|id) of %equippablecomponents%");
 	}
 
 	@Override
@@ -46,49 +47,47 @@ public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
 	}
 
 	@Override
-	protected EquipSlot[] get(Event event, Object[] source) {
+	protected String @Nullable [] get(Event event, Object[] source) {
 		return get(source, object -> {
-			if (object instanceof EquippableComponent component)
-				return EquipmentSlot.convertToSkriptEquipSlot(component.getSlot());
-
-			ItemStack itemStack = ItemUtils.asItemStack(object);
-			if (itemStack == null)
-				return null;
-			org.bukkit.inventory.EquipmentSlot bukkitSlot = itemStack.getItemMeta().getEquippable().getSlot();
-			return EquipmentSlot.convertToSkriptEquipSlot(bukkitSlot);
+			if (object instanceof EquippableComponent component)  {
+				return component.getModel().toString();
+			} else {
+				ItemStack itemStack = ItemUtils.asItemStack(object);
+				if (itemStack == null)
+					return null;
+				return itemStack.getItemMeta().getEquippable().getModel().toString();
+			}
 		});
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(EquipSlot.class);
+		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
+			return CollectionUtils.array(String.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (delta == null)
-			return;
-		EquipSlot providedSlot = (EquipSlot) delta[0];
-		if (providedSlot == null)
-			return;
-		org.bukkit.inventory.EquipmentSlot bukkitSlot = providedSlot.getBukkitEquipSlot();
+		NamespacedKey key = null;
+		if (delta[0] != null && delta[0] instanceof String string)
+			key = NamespacedUtils.getNamespacedKey(string);
+
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof EquippableComponent component) {
-				component.setSlot(bukkitSlot);
+				component.setModel(key);
 			} else {
 				ItemStack itemStack = ItemUtils.asItemStack(object);
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setSlot(bukkitSlot);
+				meta.getEquippable().setModel(key);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);
 				} else if (object instanceof ItemType itemType) {
 					itemType.setItemMeta(meta);
-				} else if (object instanceof ItemStack itemStack1) {
+				} else if (object instanceof  ItemStack itemStack1) {
 					itemStack1.setItemMeta(meta);
 				}
 			}
@@ -101,13 +100,13 @@ public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
 	}
 
 	@Override
-	public Class<EquipSlot> getReturnType() {
-		return EquipSlot.class;
+	public Class<String> getReturnType() {
+		return String.class;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the equipment slot of " + getExpr().toString(event, debug);
+		return "the model key of " + getExpr().toString(event, debug);
 	}
 
 }

@@ -1,0 +1,6 @@
+test "equippable component - model" when running minecraft "1.21.2":
+	set {_item} to diamond chestplate
+	set the model key of {_item} to "test_equippable_component_model"
+	assert the model key of {_item} is "skript:test_equippable_component_model" with "Item model key was not set"
+	clear the model key of {_item}
+	assert the model key of {_item} is not set with "Item model key was not cleared"
