@@ -24,11 +24,7 @@ public class NamespacedUtils {
 		if (namespacedKey != null)
 			return namespacedKey;
 
-		NamespacedKey convertedKey = createNamespacedKey(key);
-		if (!Skript.testing())
-			Skript.info("The key provided '" + key + "' has been converted to '" + convertedKey.toString() + "' due to invalid characters." +
-					"\n\tValid characters are a-z, 0-9, -, _ and .");
-		return convertedKey;
+        return createNamespacedKey(key);
 	}
 
 	/**
@@ -82,7 +78,6 @@ public class NamespacedUtils {
 	 * @return a Pair with the first element as the namespace and the second as the decoded key
 	 */
 	public static Pair<String, String> decodeNamespacedKey(NamespacedKey namespacedKey) {
-		// TODO: add tests for this
 		String encodedKey = namespacedKey.getKey();
 		StringBuilder decodedKeyBuilder = new StringBuilder();
 		int encodedKeyLength = encodedKey.length();
