@@ -1,7 +1,0 @@
-test "equippable component - damageable" when running minecraft "1.21.2":
-	set {_item} to a diamond chestplate
-	make {_item} to be damageable
-	#CondEquipCompDamageable
-	assert {_item} is damageable with "Item did not become damageable"
-	make {_item} to be undamageable
-	assert {_item} is undamageable with "Item did not become undamageable"

@@ -34,8 +34,8 @@ public class ExprEquipCompSound extends PropertyExpression<Object, String> {
 
 	static {
 		Skript.registerExpression(ExprEquipCompSound.class, String.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] equip sound of %itemstacks/itemtypes/slots%",
-			"[the] equip sound of %equippablecomponents%");
+			"[the] equip sound of %itemstacks/itemtypes/slots/equippablecomponents%"
+		);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class ExprEquipCompSound extends PropertyExpression<Object, String> {
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override

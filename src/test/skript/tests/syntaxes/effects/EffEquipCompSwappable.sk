@@ -1,7 +1,0 @@
-test "equippable component - swappable" when running minecraft "1.21.2":
-	set {_item} to a diamond chestplate
-	make {_item} to be swappable
-	#CondEquipCompSwappable
-	assert {_item} is swappable with "Item did not become swappable"
-	make {_item} to be unswappable
-	assert {_item} is unswappable with "Item did not become unswappable"

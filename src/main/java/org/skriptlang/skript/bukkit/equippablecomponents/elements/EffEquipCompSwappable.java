@@ -30,10 +30,9 @@ public class EffEquipCompSwappable extends Effect {
 
 	static {
 		Skript.registerEffect(EffEquipCompSwappable.class,
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] swappable",
-			"(set|make) %equippablecomponents% [to [be]] swappable",
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] unswappable",
-			"(set|make) %equippablecomponents% [to [be]] unswappable");
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] swappable",
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] unswappable"
+		);
 	}
 
 	private Expression<?> objects;
@@ -42,7 +41,7 @@ public class EffEquipCompSwappable extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		objects = exprs[0];
-		swappable = matchedPattern <= 1;
+		swappable = matchedPattern == 0;
 		return true;
 	}
 
@@ -71,7 +70,6 @@ public class EffEquipCompSwappable extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "set the equippable components of " + objects.toString(event, debug) + " to be "
-			+ (swappable ? "swappable" : "unswappable");
+		return "set the " + objects.toString(event, debug) + " to be " + (swappable ? "swappable" : "unswappable");
 	}
 }

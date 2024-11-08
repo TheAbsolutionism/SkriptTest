@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -29,22 +28,19 @@ public class CondEquipCompSwappable extends PropertyCondition<Object> {
 
 	static {
 		Skript.registerCondition(CondEquipCompSwappable.class, ConditionType.PROPERTY,
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (is|are) [:un]swappable",
-			"[the] %equippablecomponents% (is|are) [:un]swappable",
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (isn't|is not|aren't|are not) [:un]swappable",
-			"[the] %equippablecomponents% (isn't|is not|aren't|are not) [:un]swappable");
+			"[the] %itemstacks/itemtypes/slots/equippablecomponents% (is|are) [:un]swappable",
+			"[the] %itemstacks/itemtypes/slots/equippablecomponents% (isn't|is not|aren't|are not) [:un]swappable"
+		);
 	}
 
 	private Expression<?> objects;
 	private boolean swappable;
-	private boolean isComponents;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		objects = exprs[0];
 		swappable = !parseResult.hasTag("un");
-		isComponents = matchedPattern == 1 || matchedPattern == 3;
-		setNegated(matchedPattern >= 2);
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -67,8 +63,8 @@ public class CondEquipCompSwappable extends PropertyCondition<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + (isComponents ? "" : "equippable components of ") + objects.toString(event, debug) + " " +
-			(isNegated() ? "are not" : "are") + " " + (swappable ? "swappable" : "unswappable");
+		return "the " + objects.toString(event, debug) + (isNegated() ? " are not " : " are ")
+			+ (swappable ? "swappable" : "unswappable");
 	}
 
 }

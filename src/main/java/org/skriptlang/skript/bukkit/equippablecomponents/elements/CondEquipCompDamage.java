@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
@@ -29,22 +28,19 @@ public class CondEquipCompDamage extends PropertyCondition<Object> {
 
 	static {
 		Skript.registerCondition(CondEquipCompDamage.class, ConditionType.PROPERTY,
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (is|are) [:un]damageable",
-			"[the] %equippablecomponents% (is|are) [:un]damageable",
-			"[the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% (isn't|is not|aren't|are not) [:un]damageable",
-			"[the] %equippablecomponents% (isn't|is not|aren't|are not) [:un]damageable");
+			"[the] %itemstacks/itemtypes/slots/equippablecomponents% (is|are) [:un]damageable",
+			"[the] %itemstacks/itemtypes/slots/equippablecomponents% (isn't|is not|aren't|are not) [:un]damageable"
+		);
 	}
 
 	private Expression<?> objects;
 	private boolean damageable;
-	private boolean isComponents;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
 		objects = exprs[0];
 		damageable = !parseResult.hasTag("un");
-		isComponents = matchedPattern == 1 || matchedPattern == 3;
-		setNegated(matchedPattern >= 2);
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -68,8 +64,8 @@ public class CondEquipCompDamage extends PropertyCondition<Object> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + (isComponents ? "" : "equippable components of ") + objects.toString(event, debug) + " " +
-			(isNegated() ? "are not" : "are") + " " + (damageable ? "damageable" : "undamageable");
+		return "the " + objects.toString(event, debug) + (isNegated() ? " are not " : " are ")
+			+ (damageable ? "damageable" : "undamageable");
 	}
 
 }

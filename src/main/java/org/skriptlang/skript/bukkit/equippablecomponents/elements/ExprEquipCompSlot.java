@@ -35,8 +35,8 @@ public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
 
 	static {
 		Skript.registerExpression(ExprEquipCompSlot.class,  EquipSlot.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] equipment slot of %itemstacks/itemtypes/slots%",
-			"[the] equipment slot of %equippablecomponents%");
+			"[the] equipment slot of %itemstacks/itemtypes/slots/equippablecomponents%"
+		);
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override

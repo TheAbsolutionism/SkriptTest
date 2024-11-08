@@ -30,10 +30,9 @@ public class EffEquipCompDispensable extends Effect {
 
 	static {
 		Skript.registerEffect(EffEquipCompDispensable.class,
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] dispensable",
-			"(set|make) %equippablecomponents% [to [be]] dispensable",
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] (un|in|non)dispensable",
-			"(set|make) %equippablecomponents% [to [be]] (un|in|non)dispensable");
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] dispensable",
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] (un|in|non)dispensable"
+		);
 	}
 
 	private Expression<?> objects;
@@ -42,7 +41,7 @@ public class EffEquipCompDispensable extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		objects = exprs[0];
-		dispensable = matchedPattern <= 1;
+		dispensable = matchedPattern == 0;
 		return true;
 	}
 
@@ -71,8 +70,7 @@ public class EffEquipCompDispensable extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "set the equippable components of " + objects.toString(event, debug) + " to be "
-			+  (dispensable ? "dispensable" : "undispensable");
+		return "set the " + objects.toString(event, debug) + " to be " + (dispensable ? "dispensable" : "undispensable");
 	}
 
 }

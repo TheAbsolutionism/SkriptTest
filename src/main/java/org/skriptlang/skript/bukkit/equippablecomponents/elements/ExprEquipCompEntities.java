@@ -43,8 +43,8 @@ public class ExprEquipCompEntities extends PropertyExpression<Object, EntityData
 
 	static {
 		Skript.registerExpression(ExprEquipCompEntities.class, EntityData.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] allowed entities of %itemstacks/itemtypes/slots%",
-			"[the] allowed entities of %equippablecomponents%");
+			"[the] allowed entities of %itemstacks/itemtypes/slots/equippablecomponents%"
+		);
 	}
 
 	@Override
@@ -94,61 +94,35 @@ public class ExprEquipCompEntities extends PropertyExpression<Object, EntityData
 			});
 		}
 
-		Consumer<EquippableComponent> changeEquippableComponent = null;
-		Consumer<ItemMeta> changeItemMeta = null;
-
-		switch (mode) {
-			case SET -> {
-				changeEquippableComponent = component -> {
-					component.setAllowedEntities(converted);
-				};
-				changeItemMeta =  itemMeta -> {
-					itemMeta.getEquippable().setAllowedEntities(converted);
-				};
-			}
-			case ADD -> {
-				changeEquippableComponent = component -> {
-					List<EntityType> current = component.getAllowedEntities().stream().toList();
-					current.addAll(converted);
-					component.setAllowedEntities(current);
-				};
-				changeItemMeta = itemMeta -> {
-					List<EntityType> current = itemMeta.getEquippable().getAllowedEntities().stream().toList();
-					current.addAll(converted);
-					itemMeta.getEquippable().setAllowedEntities(current);
-				};
-			}
-			case REMOVE -> {
-				changeEquippableComponent = component -> {
-					List<EntityType> current = component.getAllowedEntities().stream().toList();
-					current.removeAll(converted);
-					component.setAllowedEntities(current);
-				};
-				changeItemMeta = itemMeta -> {
-					List<EntityType> current = itemMeta.getEquippable().getAllowedEntities().stream().toList();
-					current.removeAll(converted);
-					itemMeta.getEquippable().setAllowedEntities(current);
-				};
-			}
-			case DELETE -> {
-				changeEquippableComponent = component -> {
-					component.setAllowedEntities(new ArrayList<>());
-				};
-				changeItemMeta = itemMeta -> {
-					itemMeta.getEquippable().setAllowedEntities(new ArrayList<>());
-				};
-			}
-		}
+		Consumer<EquippableComponent> changer = switch (mode) {
+			case SET -> component -> {
+				component.setAllowedEntities(converted);
+			};
+			case ADD -> component -> {
+				List<EntityType> current = component.getAllowedEntities().stream().toList();
+				current.addAll(converted);
+				component.setAllowedEntities(current);
+			};
+			case REMOVE -> component -> {
+				List<EntityType> current = component.getAllowedEntities().stream().toList();
+				current.removeAll(converted);
+				component.setAllowedEntities(current);
+			};
+			case DELETE -> component -> {
+				component.setAllowedEntities(new ArrayList<>());
+			};
+			default -> throw new IllegalStateException("Unexpected value: " + mode);
+		};
 
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof EquippableComponent component) {
-				changeEquippableComponent.accept(component);
+				changer.accept(component);
 			} else {
 				ItemStack itemStack = ItemUtils.asItemStack(object);
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				changeItemMeta.accept(meta);
+				changer.accept(meta.getEquippable());
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

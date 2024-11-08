@@ -28,14 +28,16 @@ import org.jetbrains.annotations.Nullable;
 	"set the equipment slot {_component} to helmet slot",
 	"set the equippable component of {_item} to {_component}",
 	"",
-	"set the equipment slot of {_item} to helmet slot"
+	"set the equipment slot of {_item} to helmet slot",
+	"",
+	"clear the equippable component of {_item}"
 })
 @RequiredPlugins("Minecraft 1.21.2+")
 @Since("INSERT VERSION")
 public class ExprEquippableComponent extends PropertyExpression<Object, EquippableComponent> {
 
 	static {
-		register(ExprEquippableComponent.class,  EquippableComponent.class, "equip[pable] component[s]", "itemstacks/itemtypes/slots");
+		register(ExprEquippableComponent.class,  EquippableComponent.class, "equippable component[s]", "itemstacks/itemtypes/slots");
 	}
 
 	@Override
@@ -56,18 +58,18 @@ public class ExprEquippableComponent extends PropertyExpression<Object, Equippab
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
+		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
 			return CollectionUtils.array(EquippableComponent.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (delta == null)
-			return;
-		EquippableComponent equipComp = (EquippableComponent) delta[0];
-		if (equipComp == null)
-			return;
+
+		EquippableComponent equipComp = null;
+		if (delta != null && delta[0] != null)
+			equipComp = (EquippableComponent) delta[0];
+
 		for (Object object : getExpr().getArray(event)) {
 			ItemStack itemStack = ItemUtils.asItemStack(object);
 			if (itemStack == null)
@@ -87,7 +89,7 @@ public class ExprEquippableComponent extends PropertyExpression<Object, Equippab
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override

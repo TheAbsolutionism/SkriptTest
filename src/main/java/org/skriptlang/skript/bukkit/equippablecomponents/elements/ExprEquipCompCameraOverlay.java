@@ -38,8 +38,8 @@ public class ExprEquipCompCameraOverlay extends PropertyExpression<Object, Strin
 
 	static {
 		Skript.registerExpression(ExprEquipCompCameraOverlay.class, String.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] camera overlay of %itemstacks/itemtypes/slots%",
-			"[the] camera overlay of %equippablecomponents%");
+			"[the] camera overlay of %itemstacks/itemtypes/slots/equippablecomponents%"
+		);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class ExprEquipCompCameraOverlay extends PropertyExpression<Object, Strin
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override

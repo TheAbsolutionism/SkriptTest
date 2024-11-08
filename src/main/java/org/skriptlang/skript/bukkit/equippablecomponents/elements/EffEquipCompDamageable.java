@@ -30,10 +30,9 @@ public class EffEquipCompDamageable extends Effect {
 
 	static {
 		Skript.registerEffect(EffEquipCompDamageable.class,
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] damageable",
-			"(set|make) %equippablecomponents% [to [be]] damageable",
-			"(set|make) [the] [equip[pable] component[s] of] %itemstacks/itemtypes/slots% [to [be]] undamageable",
-			"(set|make) %equippablecomponents% [to [be]] undamageable");
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] damageable",
+			"(set|make) [the] %itemstacks/itemtypes/slots/equippablecomponents% [to [be]] undamageable"
+		);
 	}
 
 	private Expression<?> objects;
@@ -42,7 +41,7 @@ public class EffEquipCompDamageable extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		objects = exprs[0];
-		damageable = matchedPattern <= 1;
+		damageable = matchedPattern == 0;
 		return true;
 	}
 
@@ -71,8 +70,7 @@ public class EffEquipCompDamageable extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "set the equippable components of " + objects.toString(event, debug) + " to be "
-			+  (damageable ? "damageable" : "undamageable");
+		return "set the " + objects.toString(event, debug) + " to be " + (damageable ? "damageable" : "undamageable");
 	}
 
 }

@@ -10,7 +10,6 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.slot.EquipmentSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -36,8 +35,8 @@ public class ExprEquipCompModel extends PropertyExpression<Object, String> {
 
 	static {
 		Skript.registerExpression(ExprEquipCompModel.class, String.class, ExpressionType.PROPERTY,
-			"[the] [equip[pable] component] model (key|id) of %itemstacks/itemtypes/slots%",
-			"[the] model (key|id) of %equippablecomponents%");
+			"[the] model (key|id) of %itemstacks/itemtypes/slots/equippablecomponents%"
+		);
 	}
 
 	@Override
@@ -96,7 +95,7 @@ public class ExprEquipCompModel extends PropertyExpression<Object, String> {
 
 	@Override
 	public boolean isSingle() {
-		return true;
+		return getExpr().isSingle();
 	}
 
 	@Override
