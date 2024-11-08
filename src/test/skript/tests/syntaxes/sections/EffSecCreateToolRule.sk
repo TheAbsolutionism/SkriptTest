@@ -1,0 +1,19 @@
+test "create tool rule" when running minecraft "1.20.6":
+	###
+		Combines:
+			EffSecCreateToolRule
+			EffToolRuleDrops
+			CondToolRuleDrops
+			ExprToolRuleSpeed
+			ExprToolRuleBlocks
+	###
+
+	create a new tool rule and store it in {_rule}:
+		set tool rule speed to 10
+		set tool rule blocks to oak log, stone and obsidian
+		enable tool rule drops
+	assert {_rule} is set with "New tool rule was not created"
+	assert {_rule} is a tool rule with "New tool rule is not a tool rule"
+	assert the tool rule blocks of {_rule} is oak log, stone and obsidian with "New tool rule blocks were not set"
+	assert the tool rule speed of {_rule} is 10 with "New tool rule speed was not set"
+	assert the tool rule drops of {_rule} is enabled with "New tool rule drops are not enabled"

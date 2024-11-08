@@ -2497,6 +2497,8 @@ types:
 	textalignment: text alignment¦s @a
 	itemdisplaytransform: item display transform¦s @an
 	experiencecooldownchangereason: experience cooldown change reason¦s @a
+	toolcomponent: tool component¦s @a
+	toolrule: tool rule¦s @a
 
 	# Skript
 	weathertype: weather type¦s @a
