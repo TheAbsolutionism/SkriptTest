@@ -188,7 +188,7 @@ public final class Arithmetics {
 		differences.put(type, new DifferenceInfo<>(type, returnType, operation));
 	}
 
-	private static boolean exactDifferenceExists(Class<?> type) {
+	public static boolean exactDifferenceExists(Class<?> type) {
 		return differences.containsKey(type);
 	}
 
