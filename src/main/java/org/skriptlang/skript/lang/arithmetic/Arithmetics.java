@@ -72,7 +72,7 @@ public final class Arithmetics {
 		getOperations_i(operator).add(new OperationInfo<>(leftClass, rightClass, returnType, operation));
 	}
 
-	private static boolean exactOperationExists(Operator operator, Class<?> leftClass, Class<?> rightClass) {
+	public static boolean exactOperationExists(Operator operator, Class<?> leftClass, Class<?> rightClass) {
 		for (OperationInfo<?, ?, ?> info : getOperations_i(operator)) {
 			if (info.getLeft() == leftClass && info.getRight() == rightClass)
 				return true;
