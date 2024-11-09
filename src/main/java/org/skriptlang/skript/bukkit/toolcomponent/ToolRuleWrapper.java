@@ -14,13 +14,14 @@ import java.util.Map;
 public class ToolRuleWrapper implements ToolRule {
 
 	private Collection<Material> blocks = new ArrayList<>();
-	private boolean correct = false;
-	private Float speed = 5.0F;
+	private Boolean correctForDrops;
+	private Float speed;
 
 	public ToolRuleWrapper() {}
-	public ToolRuleWrapper(Collection<Material> blocks, Float speed, boolean correct) {
+
+	public ToolRuleWrapper(Collection<Material> blocks, Float speed, boolean correctForDrops) {
 		this.blocks = blocks;
-		this.correct = correct;
+		this.correctForDrops = correctForDrops;
 		this.speed = speed;
 	}
 
@@ -56,12 +57,12 @@ public class ToolRuleWrapper implements ToolRule {
 
 	@Override
 	public @Nullable Boolean isCorrectForDrops() {
-		return correct;
+		return correctForDrops;
 	}
 
 	@Override
-	public void setCorrectForDrops(@Nullable Boolean correct) {
-		this.correct = correct;
+	public void setCorrectForDrops(@Nullable Boolean correctForDrops) {
+		this.correctForDrops = correctForDrops;
 	}
 
 	@Override

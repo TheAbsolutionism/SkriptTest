@@ -58,7 +58,7 @@ public class EffSecCreateToolRule extends Section {
 		Skript.registerSection(EffSecCreateToolRule.class, "create [a] [new] tool rule and store (it|the result) in %object%");
 		EventValues.registerEventValue(ToolRuleEvent.class, ToolRule.class, new Getter<ToolRule, ToolRuleEvent>() {
 			@Override
-			public @Nullable ToolRule get(ToolRuleEvent event) {
+			public @NotNull ToolRule get(ToolRuleEvent event) {
 				return event.getToolRuleWrapper();
 			}
 		}, EventValues.TIME_NOW);
@@ -98,6 +98,8 @@ public class EffSecCreateToolRule extends Section {
 
 		if (!wrapper.getBlocks().isEmpty()) {
 			variable.change(event, new ToolRule[]{wrapper}, ChangeMode.SET);
+		} else {
+			// TODO: Skript.error when API is merged
 		}
 
 		return super.walk(event, false);

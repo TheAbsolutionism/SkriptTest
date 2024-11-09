@@ -36,7 +36,7 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 
 	static {
 		Skript.registerExpression(ExprToolCompMiningSpeed.class, Number.class, ExpressionType.PROPERTY,
-			"[the] [default] mining speed of %itemstacks/itemtypes/slots/toolcomponents%");
+			"[the] (default|base) mining speed of %itemstacks/itemtypes/slots/toolcomponents%");
 	}
 
 	@Override
@@ -61,14 +61,14 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, REMOVE, ADD -> CollectionUtils.array(Number.class);
+			case SET, REMOVE, ADD, DELETE -> CollectionUtils.array(Number.class);
 			default -> null;
 		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		Number providedNumber = 0;
+		Number providedNumber = 1;
 		if (delta[0] != null && delta[0] instanceof Number number)
 			providedNumber = number;
 		Number finalNumber = providedNumber;

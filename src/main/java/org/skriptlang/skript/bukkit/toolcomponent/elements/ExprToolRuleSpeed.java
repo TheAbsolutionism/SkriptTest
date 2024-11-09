@@ -3,7 +3,6 @@ package org.skriptlang.skript.bukkit.toolcomponent.elements;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -13,7 +12,6 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.toolcomponent.ToolRuleWrapper;
 import org.skriptlang.skript.bukkit.toolcomponent.elements.EffSecCreateToolRule.ToolRuleEvent;
 
 @Name("Tool Rule - Speed")
@@ -38,18 +36,18 @@ public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Number> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (getParser().isCurrentEvent(ToolRuleEvent.class) && exprs[0].isDefault()) {
+		if (getParser().isCurrentEvent(ToolRuleEvent.class) && exprs[0].isDefault())
 			isEvent = true;
-			setExpr(new EventValueExpression<>(ToolRule.class));
-		} else {
-			//noinspection unchecked
-			setExpr((Expression<? extends ToolRule>) exprs[0]);
-		}
+		//noinspection unchecked
+		setExpr((Expression<? extends ToolRule>) exprs[0]);
 		return true;
 	}
 
 	@Override
 	protected Number @Nullable [] get(Event event, ToolRule[] source) {
+		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent)
+			return new Float[]{toolRuleEvent.getToolRuleWrapper().getSpeed()};
+
 		return get(source, toolRule -> {
 			return toolRule.getSpeed();
 		});
@@ -57,19 +55,21 @@ public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Number> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent)
+		if (mode == ChangeMode.SET)
 			return CollectionUtils.array(Number.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof ToolRuleEvent toolRuleEvent))
-			return;
-
-		ToolRuleWrapper wrapper = toolRuleEvent.getToolRuleWrapper();
 		Number providedNumber = (Number) delta[0];
-		wrapper.setSpeed(providedNumber.floatValue());
+		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent) {
+			toolRuleEvent.getToolRuleWrapper().setSpeed(providedNumber.floatValue());
+		} else {
+			for (ToolRule rule : getExpr().getArray(event)) {
+				rule.setSpeed(providedNumber.floatValue());
+			}
+		}
 	}
 
 	@Override

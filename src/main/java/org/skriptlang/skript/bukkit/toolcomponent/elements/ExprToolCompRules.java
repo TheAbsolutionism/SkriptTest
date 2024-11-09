@@ -18,7 +18,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.toolcomponent.ToolRuleWrapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +66,7 @@ public class ExprToolCompRules extends PropertyExpression<Object, ToolRule> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, ADD, REMOVE -> CollectionUtils.array(ToolRuleWrapper.class);
+			case SET, DELETE, ADD, REMOVE -> CollectionUtils.array(ToolRule[].class);
 			default -> null;
 		};
 	}
@@ -75,26 +74,26 @@ public class ExprToolCompRules extends PropertyExpression<Object, ToolRule> {
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		ToolRule[] rules = null;
-		if (delta != null)
+		if (delta != null && delta[0] != null)
 			rules = (ToolRule[]) delta;
-		ToolRule[] finalRules = rules;
+		List<ToolRule> ruleList = rules != null ? Arrays.stream(rules).toList() : new ArrayList<>();
 
 		Consumer<ToolComponent> changer = switch (mode) {
 			case SET -> component -> {
-				component.setRules(Arrays.stream(finalRules).toList());
+				component.setRules(ruleList);
 			};
 			case DELETE -> component -> {
-				component.setRules(new ArrayList<>());
+				component.getRules().clear();
 			};
 			case ADD -> component -> {
 				List<ToolRule> current = component.getRules();
-				current.addAll(Arrays.stream(finalRules).toList());
+				current.addAll(ruleList);
 				component.setRules(current);
 			};
 			case REMOVE -> component -> {
-				List<ToolRule> current = component.getRules();
-				current.removeAll(Arrays.stream(finalRules).toList());
-				component.setRules(current);
+				ruleList.forEach(toolRule -> {
+					component.removeRule(toolRule);
+				});
 			};
 			default -> throw new IllegalStateException("Unexpected value: "  + mode);
 		};
