@@ -7,8 +7,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.lang.EffectSection;
+import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.*;
+import ch.njol.skript.lang.Trigger;
+import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Direction;
 import ch.njol.skript.util.Getter;
@@ -25,11 +28,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import java.lang.reflect.Method;
 
 @Name("Shoot")
 @Description("Shoots a projectile (or any other entity) from a given entity or location.")
@@ -42,6 +44,16 @@ import java.lang.reflect.Method;
 public class EffSecShoot extends EffectSection {
 
 	//TODO: Remove reflect method once 1.19 is no longer supported
+
+	private enum CaseUsage {
+		NOT_PROJECTILE_NO_TRIGGER,
+		NOT_PROJECTILE_TRIGGER,
+		PROJECTILE_NO_WORLD_NO_TRIGGER,
+		PROJECTILE_NO_WORLD_TRIGGER_BUKKIT,
+		PROJECTILE_NO_WORLD_TRIGGER,
+		PROJECTILE_WORLD_NO_TRIGGER,
+		PROJECTILE_WORLD_TRIGGER;
+	}
 
 	public static class ShootEvent extends Event {
 
@@ -136,9 +148,10 @@ public class EffSecShoot extends EffectSection {
 		Direction finalDirection = direction != null ? direction.getSingle(event) : Direction.IDENTITY;
 		if (finalVelocity == null || finalDirection == null)
 			return null;
+		EntityData<?>[] data = types.getArray(event);
 
 		for (Object shooter : shooters.getArray(event)) {
-			for (EntityData<?> entityData : types.getArray(event)) {
+			for (EntityData<?> entityData : data) {
 				Entity finalProjectile = null;
 				Vector vector;
 				if (shooter instanceof LivingEntity livingShooter) {
@@ -160,54 +173,40 @@ public class EffSecShoot extends EffectSection {
 						}
 					}
 
-					if (isProjectile) {
-						if (useWorldSpawn) {
-							if (trigger != null) {
-								//noinspection unchecked
-                                livingShooter.getWorld().spawn(
-									shooterLoc,
-									type,
-									afterSpawn
-								);
-							} else {
-								Projectile projectile = (Projectile) livingShooter.getWorld().spawn(
-									shooterLoc,
-									type
-								);
-								projectile.setShooter(livingShooter);
-								finalProjectile = projectile;
-							}
-						} else {
-							if (trigger != null) {
-								if (launchWithBukkitConsumer != null) {
-									try {
-										launchWithBukkitConsumer.invoke(livingShooter,
-											type,
-											vector,
-											afterSpawnBukkit(event, entityData, livingShooter)
-										);
-									} catch (Exception ignored) {};
-								} else {
-									//noinspection unchecked
-									livingShooter.launchProjectile(
-										(Class<? extends Projectile>) type,
-										vector,
-										afterSpawn
-									);
-								}
-							} else {
-								//noinspection unchecked
-								finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
-								set(finalProjectile, entityData);
-							}
-						}
-					} else {
-						if (trigger != null) {
-							//noinspection unchecked
-							entityData.spawn(shooterLoc, afterSpawn);
-						} else {
+					CaseUsage caseUsage = getCaseUsage(isProjectile, useWorldSpawn, trigger != null);
+
+					switch (caseUsage) {
+						case NOT_PROJECTILE_NO_TRIGGER -> {
 							finalProjectile = entityData.spawn(shooterLoc);
 						}
+						case NOT_PROJECTILE_TRIGGER -> {
+							//noinspection unchecked
+							entityData.spawn(shooterLoc, afterSpawn);
+						}
+						case PROJECTILE_NO_WORLD_NO_TRIGGER -> {
+							//noinspection unchecked
+							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
+							set(finalProjectile, entityData);
+						}
+						case PROJECTILE_NO_WORLD_TRIGGER_BUKKIT -> {
+							try {
+								launchWithBukkitConsumer.invoke(livingShooter, type, vector, afterSpawnBukkit(event, entityData, livingShooter));
+							} catch (Exception ignored) {};
+						}
+						case PROJECTILE_NO_WORLD_TRIGGER -> {
+							//noinspection unchecked
+							livingShooter.launchProjectile((Class<? extends Projectile>) type, vector, afterSpawn);
+						}
+						case PROJECTILE_WORLD_NO_TRIGGER -> {
+							Projectile projectile = (Projectile) livingShooter.getWorld().spawn(shooterLoc, type);
+							projectile.setShooter(livingShooter);
+							finalProjectile = projectile;
+						}
+						case PROJECTILE_WORLD_TRIGGER -> {
+							//noinspection unchecked
+							livingShooter.getWorld().spawn(shooterLoc, type, afterSpawn);
+						}
+						default -> throw new IllegalStateException("Unexpected value: " + caseUsage);
 					}
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
@@ -231,6 +230,24 @@ public class EffSecShoot extends EffectSection {
 	private static <E extends Entity> void set(Entity entity, EntityData<E> entityData) {
 		//noinspection unchecked
 		entityData.set((E) entity);
+	}
+
+	private CaseUsage getCaseUsage(Boolean isProjectile, Boolean useWorldSpawn, Boolean hasTrigger) {
+		if (!isProjectile) {
+			if (!hasTrigger)
+				return CaseUsage.NOT_PROJECTILE_NO_TRIGGER;
+			return CaseUsage.NOT_PROJECTILE_TRIGGER;
+		}
+		if (!useWorldSpawn) {
+			if (!hasTrigger)
+				return CaseUsage.PROJECTILE_NO_WORLD_NO_TRIGGER;
+			if (launchWithBukkitConsumer != null)
+				return CaseUsage.PROJECTILE_NO_WORLD_TRIGGER_BUKKIT;
+			return CaseUsage.PROJECTILE_NO_WORLD_TRIGGER;
+		}
+		if (!hasTrigger)
+			return CaseUsage.PROJECTILE_WORLD_NO_TRIGGER;
+		return CaseUsage.PROJECTILE_WORLD_TRIGGER;
 	}
 
 	private Consumer<? extends Entity> afterSpawn(Event event, EntityData<?> entityData, @Nullable LivingEntity shooter) {
