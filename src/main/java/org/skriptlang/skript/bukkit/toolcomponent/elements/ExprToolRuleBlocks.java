@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.toolcomponent.elements.EffSecCreateToolRule.ToolRuleEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,11 +22,10 @@ import java.util.List;
 @Name("Tool Rule - Blocks")
 @Description("The blocks of a tool rule.")
 @Examples({
-	"create a new tool rule and store it in {_toolrule}:",
-		"\tset the tool rule blocks to oak log, stone and obsidian",
-		"\tset the tool rule speed to 5",
-		"\tenable tool rule drops",
-		"add {_toolrule} to the tool rules of {_item}"
+	"set {_rule} to a new tool rule with block types oak log, stone and obsidian",
+	"set the tool rule speed of {_rule} to 10",
+	"enable the tool rule drops of {_rule}",
+	"add {_rule} to the tool rules of {_item}"
 })
 @RequiredPlugins("Minecraft 1.20.6+")
 @Since("INSERT VERSION")
@@ -35,15 +33,12 @@ public class ExprToolRuleBlocks extends PropertyExpression<ToolRule, ItemType> {
 
 	static {
 		Skript.registerExpression(ExprToolRuleBlocks.class, ItemType.class, ExpressionType.PROPERTY,
-			"[the] tool rule[s] block types [of %toolrules%]");
+			"[the] tool rule[s] block types of %toolrules%");
 	}
 
-	private boolean isEvent = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (getParser().isCurrentEvent(ToolRuleEvent.class) && exprs[0].isDefault())
-			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends ToolRule>) exprs[0]);
 		return true;
@@ -52,12 +47,8 @@ public class ExprToolRuleBlocks extends PropertyExpression<ToolRule, ItemType> {
 	@Override
 	protected ItemType @Nullable [] get(Event event, ToolRule[] source) {
 		List<ItemType> types = new ArrayList<>();
-		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent) {
-			types.addAll(toolRuleEvent.getToolRuleWrapper().getBlocks().stream().map(ItemType::new).toList());
-		} else {
-			for (ToolRule rule : getExpr().getArray(event)) {
-				types.addAll(rule.getBlocks().stream().map(ItemType::new).toList());
-			}
+		for (ToolRule rule : getExpr().getArray(event)) {
+			types.addAll(rule.getBlocks().stream().map(ItemType::new).toList());
 		}
 		return types.toArray(new ItemType[0]);
 	}
@@ -73,12 +64,8 @@ public class ExprToolRuleBlocks extends PropertyExpression<ToolRule, ItemType> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		ItemType[] types = (ItemType[]) delta;
 		List<Material> materials = Arrays.stream(types).map(ItemType::getMaterial).toList();
-		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent) {
-			toolRuleEvent.getToolRuleWrapper().setBlocks(materials);
-		} else {
-			for (ToolRule rule : getExpr().getArray(event)) {
-				rule.setBlocks(materials);
-			}
+		for (ToolRule rule : getExpr().getArray(event)) {
+			rule.setBlocks(materials);
 		}
 	}
 

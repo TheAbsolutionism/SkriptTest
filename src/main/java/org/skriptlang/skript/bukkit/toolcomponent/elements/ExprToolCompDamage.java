@@ -32,10 +32,10 @@ import java.util.function.Consumer;
 })
 @RequiredPlugins("Minecraft 1.20.6+")
 @Since("INSERT VERSION")
-public class ExprToolCompDamage extends PropertyExpression<Object, Number> {
+public class ExprToolCompDamage extends PropertyExpression<Object, Integer> {
 
 	static {
-		Skript.registerExpression(ExprToolCompMiningSpeed.class, Number.class, ExpressionType.PROPERTY,
+		Skript.registerExpression(ExprToolCompDamage.class, Integer.class, ExpressionType.PROPERTY,
 			"[the] damage per block of %itemstacks/itemtypes/slots/toolcomponents%");
 	}
 
@@ -46,7 +46,7 @@ public class ExprToolCompDamage extends PropertyExpression<Object, Number> {
 	}
 
 	@Override
-	protected Number @Nullable [] get(Event event, Object[] source) {
+	protected Integer @Nullable [] get(Event event, Object[] source) {
 		return get(source, object -> {
 			if (object instanceof ToolComponent component)
 				return component.getDamagePerBlock();
@@ -95,7 +95,9 @@ public class ExprToolCompDamage extends PropertyExpression<Object, Number> {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				changer.accept(meta.getTool());
+				ToolComponent toolComponent = meta.getTool();
+				changer.accept(toolComponent);
+				meta.setTool(toolComponent);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);
@@ -115,8 +117,8 @@ public class ExprToolCompDamage extends PropertyExpression<Object, Number> {
 	}
 
 	@Override
-	public Class<Number> getReturnType() {
-		return Number.class;
+	public Class<Integer> getReturnType() {
+		return Integer.class;
 	}
 
 	@Override

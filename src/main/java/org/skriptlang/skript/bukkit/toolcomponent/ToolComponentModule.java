@@ -2,7 +2,6 @@ package org.skriptlang.skript.bukkit.toolcomponent;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.registrations.Classes;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule;
@@ -15,8 +14,6 @@ public class ToolComponentModule {
 		if (!Skript.classExists("org.bukkit.inventory.meta.components.ToolComponent"))
 			return;
 
-		// TODO: Rewrite EffSecCreateToolRule as secpression when merged
-
 		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.toolcomponent", "elements");
 
 		Classes.registerClass(new ClassInfo<>(ToolComponent.class, "toolcomponent")
@@ -25,7 +22,6 @@ public class ToolComponentModule {
 			.description("The tool component of an item")
 			.requiredPlugins("Minecraft 1.20.6+")
 			.since("INSERT VERSION")
-			.defaultExpression(new EventValueExpression<>(ToolComponent.class))
 		);
 
 		Classes.registerClass(new ClassInfo<>(ToolRule.class, "toolrule")
@@ -34,7 +30,6 @@ public class ToolComponentModule {
 			.description("The tool rule of a tool component")
 			.requiredPlugins("Minecraft 1.20.6+")
 			.since("INSERT VERSION")
-			.defaultExpression(new EventValueExpression<>(ToolRule.class))
 		);
 
 	}

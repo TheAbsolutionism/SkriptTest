@@ -35,7 +35,7 @@ public class ExprNewToolComp extends SimpleExpression<ToolComponent> {
 
 	@Override
 	protected ToolComponent @Nullable [] get(Event event) {
-		return new ToolComponent[]{(new ItemStack(Material.AIR)).getItemMeta().getTool()};
+		return new ToolComponent[]{(new ItemStack(Material.APPLE)).getItemMeta().getTool()};
 	}
 
 	@Override

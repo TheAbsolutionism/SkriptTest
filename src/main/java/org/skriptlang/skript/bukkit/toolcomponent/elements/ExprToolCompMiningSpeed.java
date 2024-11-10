@@ -32,10 +32,10 @@ import java.util.function.Consumer;
 })
 @RequiredPlugins("Minecraft 1.20.6+")
 @Since("INSERT VERSION")
-public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> {
+public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Float> {
 
 	static {
-		Skript.registerExpression(ExprToolCompMiningSpeed.class, Number.class, ExpressionType.PROPERTY,
+		Skript.registerExpression(ExprToolCompMiningSpeed.class, Float.class, ExpressionType.PROPERTY,
 			"[the] (default|base) mining speed of %itemstacks/itemtypes/slots/toolcomponents%");
 	}
 
@@ -46,7 +46,7 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 	}
 
 	@Override
-	protected Number @Nullable [] get(Event event, Object[] source) {
+	protected Float @Nullable [] get(Event event, Object[] source) {
 		return get(source, object -> {
 			if (object instanceof ToolComponent component)
 				return component.getDefaultMiningSpeed();
@@ -71,19 +71,19 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 		Number providedNumber = 1;
 		if (delta[0] != null && delta[0] instanceof Number number)
 			providedNumber = number;
-		Number finalNumber = providedNumber;
+		Float finalFloat = providedNumber.floatValue();
 
         Consumer<ToolComponent> changer = switch (mode) {
 			case SET -> component -> {
-				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalNumber.floatValue(), Float.MAX_VALUE));
+				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalFloat, Float.MAX_VALUE));
 			};
 			case ADD -> component -> {
 				Float current = component.getDefaultMiningSpeed();
-				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalNumber.floatValue() + current, Float.MAX_VALUE));
+				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalFloat + current, Float.MAX_VALUE));
 			};
 			case REMOVE -> component -> {
 				Float current = component.getDefaultMiningSpeed();
-				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalNumber.floatValue() - current, Float.MAX_VALUE));
+				component.setDefaultMiningSpeed(Math2.fit(Float.MIN_VALUE, finalFloat - current, Float.MAX_VALUE));
 			};
 			default -> throw new IllegalStateException("Unexpected value: " + mode);
 		};
@@ -96,7 +96,9 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				changer.accept(meta.getTool());
+				ToolComponent toolComponent = meta.getTool();
+				changer.accept(toolComponent);
+				meta.setTool(toolComponent);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);
@@ -116,8 +118,8 @@ public class ExprToolCompMiningSpeed extends PropertyExpression<Object, Number> 
 	}
 
 	@Override
-	public Class<Number> getReturnType() {
-		return Number.class;
+	public Class<Float> getReturnType() {
+		return Float.class;
 	}
 
 	@Override

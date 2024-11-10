@@ -91,9 +91,7 @@ public class ExprToolCompRules extends PropertyExpression<Object, ToolRule> {
 				component.setRules(current);
 			};
 			case REMOVE -> component -> {
-				ruleList.forEach(toolRule -> {
-					component.removeRule(toolRule);
-				});
+				ruleList.forEach(component::removeRule);
 			};
 			default -> throw new IllegalStateException("Unexpected value: "  + mode);
 		};
@@ -106,7 +104,9 @@ public class ExprToolCompRules extends PropertyExpression<Object, ToolRule> {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				changer.accept(meta.getTool());
+				ToolComponent toolComponent = meta.getTool();
+				changer.accept(toolComponent);
+				meta.setTool(toolComponent);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

@@ -12,42 +12,36 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.components.ToolComponent.ToolRule;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.toolcomponent.elements.EffSecCreateToolRule.ToolRuleEvent;
 
 @Name("Tool Rule - Speed")
-@Description("The speed of a tool rule determining the mining speed of the blocks of the tool rule for an item.")
+@Description({
+	"The speed of a tool rule determining the mining speed of the blocks of the tool rule for an item.",
+	"NOTE: 1.0 is equivalent to the default mining speed of the mined block."
+})
 @Examples({
-	"create a new tool rule and store it in {_toolrule}:",
-		"\tset the tool rule blocks to oak log, stone and obsidian",
-		"\tset the tool rule speed to 5",
-		"\tenable tool rule drops",
-	"add {_toolrule} to the tool rules of {_item}"
+	"set {_rule} to a new tool rule with block types oak log, stone and obsidian",
+	"set the tool rule speed of {_rule} to 10",
+	"enable the tool rule drops of {_rule}",
+	"add {_rule} to the tool rules of {_item}"
 })
 @RequiredPlugins("Minecraft 1.20.6+")
 @Since("INSERT VERSION")
-public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Number> {
+public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Float> {
 
 	static {
-		Skript.registerExpression(ExprToolRuleSpeed.class, Number.class, ExpressionType.PROPERTY,
-			"[the] tool rule speed [of %toolrules%]");
+		Skript.registerExpression(ExprToolRuleSpeed.class, Float.class, ExpressionType.PROPERTY,
+			"[the] tool rule speed of %toolrules%");
 	}
-
-	private boolean isEvent = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (getParser().isCurrentEvent(ToolRuleEvent.class) && exprs[0].isDefault())
-			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends ToolRule>) exprs[0]);
 		return true;
 	}
 
 	@Override
-	protected Number @Nullable [] get(Event event, ToolRule[] source) {
-		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent)
-			return new Float[]{toolRuleEvent.getToolRuleWrapper().getSpeed()};
-
+	protected Float @Nullable [] get(Event event, ToolRule[] source) {
 		return get(source, toolRule -> {
 			return toolRule.getSpeed();
 		});
@@ -63,12 +57,8 @@ public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Number> {
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		Number providedNumber = (Number) delta[0];
-		if (isEvent && event instanceof ToolRuleEvent toolRuleEvent) {
-			toolRuleEvent.getToolRuleWrapper().setSpeed(providedNumber.floatValue());
-		} else {
-			for (ToolRule rule : getExpr().getArray(event)) {
-				rule.setSpeed(providedNumber.floatValue());
-			}
+		for (ToolRule rule : getExpr().getArray(event)) {
+			rule.setSpeed(providedNumber.floatValue());
 		}
 	}
 
@@ -78,8 +68,8 @@ public class ExprToolRuleSpeed extends PropertyExpression<ToolRule, Number> {
 	}
 
 	@Override
-	public Class<Number> getReturnType() {
-		return Number.class;
+	public Class<Float> getReturnType() {
+		return Float.class;
 	}
 
 	@Override

@@ -37,6 +37,7 @@ public class CondToolRuleDrops extends PropertyCondition<ToolRule> {
 		enable = matchedPattern == 0;
 		//noinspection unchecked
 		toolRules = (Expression<ToolRule>) exprs[0];
+		setExpr(toolRules);
 		return true;
 	}
 
@@ -47,12 +48,12 @@ public class CondToolRuleDrops extends PropertyCondition<ToolRule> {
 
 	@Override
 	protected String getPropertyName() {
-		return null;
+		return "tool rule drops";
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the drops of " + toolRules.toString(event, debug) + " are " + (enable ? "enabled" : "disabled");
+		return "the tool rule drops of " + toolRules.toString(event, debug) + " are " + (enable ? "enabled" : "disabled");
 	}
 
 }
