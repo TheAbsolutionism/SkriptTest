@@ -41,6 +41,7 @@ public class CondEquipCompDamage extends PropertyCondition<Object> {
 		objects = exprs[0];
 		damageable = !parseResult.hasTag("un");
 		setNegated(matchedPattern == 1);
+		setExpr(objects);
 		return true;
 	}
 

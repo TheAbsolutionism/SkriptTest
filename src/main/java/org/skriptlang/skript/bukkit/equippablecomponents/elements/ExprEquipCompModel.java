@@ -80,7 +80,9 @@ public class ExprEquipCompModel extends PropertyExpression<Object, String> {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setModel(key);
+				EquippableComponent component = meta.getEquippable();
+				component.setModel(key);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

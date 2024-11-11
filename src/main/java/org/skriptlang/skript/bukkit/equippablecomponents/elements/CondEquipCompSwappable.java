@@ -41,6 +41,7 @@ public class CondEquipCompSwappable extends PropertyCondition<Object> {
 		objects = exprs[0];
 		swappable = !parseResult.hasTag("un");
 		setNegated(matchedPattern == 1);
+		setExpr(objects);
 		return true;
 	}
 

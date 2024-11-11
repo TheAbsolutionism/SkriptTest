@@ -35,7 +35,7 @@ public class ExprNewEquipComp extends SimpleExpression<EquippableComponent> {
 
 	@Override
 	protected EquippableComponent @Nullable [] get(Event event) {
-		return new EquippableComponent[]{(new ItemStack(Material.AIR)).getItemMeta().getEquippable()};
+		return new EquippableComponent[]{(new ItemStack(Material.APPLE)).getItemMeta().getEquippable()};
 	}
 
 	@Override

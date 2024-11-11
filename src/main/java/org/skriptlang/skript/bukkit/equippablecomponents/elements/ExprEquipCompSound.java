@@ -3,6 +3,7 @@ package org.skriptlang.skript.bukkit.equippablecomponents.elements;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.ItemUtils;
+import ch.njol.skript.bukkitutil.SoundUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
@@ -45,33 +46,34 @@ public class ExprEquipCompSound extends PropertyExpression<Object, String> {
 	}
 
 	@Override
-	protected String[] get(Event event, Object[] source) {
+	protected String @Nullable [] get(Event event, Object[] source) {
 		return get(source, object -> {
-			if (object instanceof EquippableComponent component)
-				return component.getEquipSound().toString();
+			if (object instanceof EquippableComponent component) {
+				return SoundUtils.getKey(component.getEquipSound()).getKey();
+			}
 
 			ItemStack itemStack = ItemUtils.asItemStack(object);
 			if (itemStack == null)
 				return null;
-			return itemStack.getItemMeta().getEquippable().getEquipSound().toString();
+			return SoundUtils.getKey(itemStack.getItemMeta().getEquippable().getEquipSound()).getKey();
 		});
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
+		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
 			return CollectionUtils.array(String.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (delta == null)
-			return;
-		String string = (String) delta[0];
-		Sound enumSound = Sound.valueOf(string);
-		if (enumSound == null)
-			return;
+		Sound enumSound = null;
+		if (delta[0] != null) {
+			String soundString = (String) delta[0];
+			enumSound = SoundUtils.getSound(soundString);
+		}
+
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof EquippableComponent component) {
 				component.setEquipSound(enumSound);
@@ -80,7 +82,9 @@ public class ExprEquipCompSound extends PropertyExpression<Object, String> {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setEquipSound(enumSound);
+				EquippableComponent component = meta.getEquippable();
+				component.setEquipSound(enumSound);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

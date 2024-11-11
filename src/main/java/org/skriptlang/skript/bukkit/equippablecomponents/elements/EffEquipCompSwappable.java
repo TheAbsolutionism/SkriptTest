@@ -55,7 +55,9 @@ public class EffEquipCompSwappable extends Effect {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setSwappable(swappable);
+				EquippableComponent component = meta.getEquippable();
+				component.setSwappable(swappable);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

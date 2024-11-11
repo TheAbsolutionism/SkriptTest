@@ -83,7 +83,9 @@ public class ExprEquipCompCameraOverlay extends PropertyExpression<Object, Strin
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setCameraOverlay(key);
+				EquippableComponent component = meta.getEquippable();
+				component.setCameraOverlay(key);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

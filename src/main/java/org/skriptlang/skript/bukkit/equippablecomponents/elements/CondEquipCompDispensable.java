@@ -41,6 +41,7 @@ public class CondEquipCompDispensable extends PropertyCondition<Object> {
 		objects = exprs[0];
 		dispensable = !parseResult.hasTag("un");
 		setNegated(matchedPattern == 1);
+		setExpr(objects);
 		return true;
 	}
 

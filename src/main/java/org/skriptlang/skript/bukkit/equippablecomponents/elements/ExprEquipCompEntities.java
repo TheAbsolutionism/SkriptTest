@@ -122,7 +122,9 @@ public class ExprEquipCompEntities extends PropertyExpression<Object, EntityData
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				changer.accept(meta.getEquippable());
+				EquippableComponent component = meta.getEquippable();
+				changer.accept(component);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

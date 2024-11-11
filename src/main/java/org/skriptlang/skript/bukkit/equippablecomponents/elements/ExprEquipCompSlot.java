@@ -82,7 +82,9 @@ public class ExprEquipCompSlot extends PropertyExpression<Object, EquipSlot> {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setSlot(bukkitSlot);
+				EquippableComponent component = meta.getEquippable();
+				component.setSlot(bukkitSlot);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

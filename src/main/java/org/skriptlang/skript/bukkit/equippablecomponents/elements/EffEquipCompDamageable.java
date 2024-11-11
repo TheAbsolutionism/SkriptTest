@@ -55,7 +55,9 @@ public class EffEquipCompDamageable extends Effect {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setDamageOnHurt(damageable);
+				EquippableComponent component = meta.getEquippable();
+				component.setDamageOnHurt(damageable);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);

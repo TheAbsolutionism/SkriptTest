@@ -55,7 +55,9 @@ public class EffEquipCompDispensable extends Effect {
 				if (itemStack == null)
 					continue;
 				ItemMeta meta = itemStack.getItemMeta();
-				meta.getEquippable().setDispensable(dispensable);
+				EquippableComponent component = meta.getEquippable();
+				component.setDispensable(dispensable);
+				meta.setEquippable(component);
 				itemStack.setItemMeta(meta);
 				if (object instanceof Slot slot) {
 					slot.setItem(itemStack);
