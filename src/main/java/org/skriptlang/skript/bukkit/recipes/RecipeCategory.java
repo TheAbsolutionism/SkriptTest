@@ -4,7 +4,7 @@ import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 
 /**
- * Enum of converting Bukkit recipe categories into a singular Skript category.
+ * Enum for converting Bukkit recipe categories into one usable by Skript.
  */
 public enum RecipeCategory {
 

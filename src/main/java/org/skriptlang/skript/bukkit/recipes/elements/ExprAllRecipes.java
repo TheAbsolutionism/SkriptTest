@@ -2,6 +2,7 @@ package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -11,6 +12,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.util.coll.CollectionUtils;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
@@ -37,19 +39,24 @@ import java.util.List;
 @Examples({
 	"set {_list::*} to all of the recipe of type shaped recipe for netherite ingot",
 	"set {_list::*} to all mc recipes of type cooking recipe for raw beef",
-	"set {_list::*} to all of the custom recipes of type blasting for raw iron named \"Impure Iron\""
+	"set {_list::*} to all of the custom recipes of type blasting for raw iron named \"Impure Iron\"",
+	"",
+	"reset all of the server's recipes",
+	"reset all recipes for netherite ingot",
+	"reset all of the minecraft recipes",
+	"reset all of the custom shaped recipes"
 })
 @Since("INSERT VERSION")
 public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprAllRecipes.class, Recipe.class, ExpressionType.SIMPLE,
-			"all [of the] recipes [for %-itemstacks/itemtypes%]",
-			"all [of the] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
-			"all [of the] custom recipes [for %-itemstacks/itemtypes%]",
-			"all [of the] %recipetype% [for %-itemstacks/itemtypes%]",
-			"all [of the] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
-			"all [of the] custom %recipetype% [for %-itemstacks/itemtypes%]");
+			"all [of] [the] [server['s]] recipes [for %-itemstacks/itemtypes%]",
+			"all [of] [the] [server['s]] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
+			"all [of] [the] [server['s]] custom recipes [for %-itemstacks/itemtypes%]",
+			"all [of] [the] [server['s]] %recipetype% [for %-itemstacks/itemtypes%]",
+			"all [of] [the] [server['s]] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
+			"all [of] [the] [server['s]] custom %recipetype% [for %-itemstacks/itemtypes%]");
 	}
 
 	private Expression<RecipeType> recipeTypeExpr;
@@ -72,6 +79,29 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	protected Recipe @Nullable [] get(Event event) {
+		return getSelectedRecipes(event).toArray(new Recipe[0]);
+	}
+
+	@Override
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
+		if (mode == ChangeMode.RESET)
+			return CollectionUtils.array(Recipe.class);
+		return null;
+	}
+
+	@Override
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
+		if (itemExpr == null && recipeTypeExpr == null && !getMinecraft && !getCustom) {
+			Bukkit.resetRecipes();
+		} else {
+			getSelectedRecipes(event).forEach(recipe -> {
+				if (recipe instanceof Keyed key)
+					Bukkit.removeRecipe(key.getKey());
+			});
+		}
+	}
+
+	private List<Recipe> getSelectedRecipes(Event event) {
 		List<Recipe> recipeList = new ArrayList<>();
 		Iterator<Recipe> iterator = null;
 		if (itemExpr != null) {
@@ -112,8 +142,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 				}
 			}
 		});
-
-		return recipeList.toArray(new Recipe[0]);
+		return recipeList;
 	}
 
 	@Override
@@ -130,10 +159,11 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 		builder.append("all of the");
-		builder.append(getMinecraft ? "minecraft" : getCustom ? "custom" : "");
+		if (getMinecraft) builder.append("minecraft");
+		else if (getCustom) builder.append("custom");
 		builder.append("recipes");
-		builder.append(recipeTypeExpr != null ? " of type " + recipeTypeExpr.toString(event,  debug) : "");
-		builder.append(itemExpr != null ? " for " + itemExpr.toString(event, debug) : "");
+		if (recipeTypeExpr != null) builder.append("of type", recipeTypeExpr);
+		if (itemExpr != null) builder.append("for", itemExpr);
 		return builder.toString();
 	}
 

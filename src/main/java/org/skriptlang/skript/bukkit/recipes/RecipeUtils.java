@@ -17,6 +17,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RecipeUtils {
 
+	/**
+	 * Enum for storing all types of Recipes (until Bukkit makes an enum or registry)
+	 */
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent.class),
@@ -40,10 +43,18 @@ public class RecipeUtils {
 			this.eventClass = eventClass;
 		}
 
+		/**
+		 * Gets the Bukkit recipe type class.
+		 * @return Bukkit recipe class
+		 */
 		public @Nullable Class<? extends Recipe> getRecipeClass() {
 			return recipeClass;
 		}
 
+		/**
+		 * Gets the custom event used when creating a new recipe.
+		 * @return Custom event class
+		 */
 		public @Nullable Class<? extends Event> getEventClass() {
 			return eventClass;
 		}
@@ -56,6 +67,11 @@ public class RecipeUtils {
 		}
 	}
 
+	/**
+	 * Gets {@link RecipeType} from provided recipe class.
+	 * @param providedClass Bukkit recipe class
+	 * @return Recipe Type
+	 */
 	public static RecipeType getRecipeTypeFromRecipeClass(Class<? extends Recipe> providedClass) {
 		for (RecipeType type : RecipeType.values()) {
 			if (type.recipeClass != null && type.recipeClass.isAssignableFrom(providedClass)) {
@@ -65,6 +81,11 @@ public class RecipeUtils {
 		return null;
 	}
 
+	/**
+	 * Gets {@link RecipeType} from provided recipe.
+	 * @param providedRecipe Recipe
+	 * @return Recipe Type
+	 */
 	public static RecipeType getRecipeTypeFromRecipe(Recipe providedRecipe) {
 		return getRecipeTypeFromRecipeClass(providedRecipe.getClass());
 	}
