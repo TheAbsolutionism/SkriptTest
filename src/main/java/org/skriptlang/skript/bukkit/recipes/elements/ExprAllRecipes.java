@@ -51,12 +51,12 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprAllRecipes.class, Recipe.class, ExpressionType.SIMPLE,
-			"all [of] [the] [server['s]] recipes [for %-itemstacks/itemtypes%]",
-			"all [of] [the] [server['s]] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
-			"all [of] [the] [server['s]] custom recipes [for %-itemstacks/itemtypes%]",
-			"all [of] [the] [server['s]] %recipetype% [for %-itemstacks/itemtypes%]",
-			"all [of] [the] [server['s]] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
-			"all [of] [the] [server['s]] custom %recipetype% [for %-itemstacks/itemtypes%]");
+			"[all [of]] [the] server['s] recipes [for %-itemstacks/itemtypes%]",
+			"[all [of]] [the] server['s] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
+			"[all [of]] [the] server['s] custom recipes [for %-itemstacks/itemtypes%]",
+			"[all [of]] [the] server['s] %recipetype% [for %-itemstacks/itemtypes%]",
+			"[all [of]] [the] server['s] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
+			"[all [of]] [the] server['s] custom %recipetype% [for %-itemstacks/itemtypes%]");
 	}
 
 	private Expression<RecipeType> recipeTypeExpr;
