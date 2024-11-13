@@ -15,7 +15,7 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 @Name("Recipe Type")
 @Description("Get the recipe type of a recipe.")
 @Examples({
-	"loop all recipes:",
+	"loop all of the server's recipes:",
 		"\tbroadcast the recipe type of loop-recipe"
 })
 @Since("INSERT VERSION")

@@ -36,7 +36,7 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
 		"\tset the recipe category to cooking misc",
 		"\tset the recipe result item to gunpowder",
 	"",
-	"loop all recipes:",
+	"loop the server's recipes:",
 		"\tbroadcast recipe category of loop-recipe"
 })
 @Since("INSERT VERSION")

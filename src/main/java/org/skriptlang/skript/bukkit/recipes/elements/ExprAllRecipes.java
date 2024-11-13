@@ -37,9 +37,9 @@ import java.util.List;
 	"</ul>"
 })
 @Examples({
-	"set {_list::*} to all of the recipe of type shaped recipe for netherite ingot",
-	"set {_list::*} to all mc recipes of type cooking recipe for raw beef",
-	"set {_list::*} to all of the custom recipes of type blasting for raw iron named \"Impure Iron\"",
+	"set {_list::*} to all of the server's recipe of type shaped recipe for netherite ingot",
+	"set {_list::*} to all server's mc recipes of type cooking recipe for raw beef",
+	"set {_list::*} to all of the server's custom recipes of type blasting for raw iron named \"Impure Iron\"",
 	"",
 	"reset all of the server's recipes",
 	"reset all recipes for netherite ingot",

@@ -14,7 +14,7 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 @Name("Recipe Name")
 @Description("Get the namespaced key of a recipe.")
 @Examples({
-	"loop all recipes:",
+	"loop all of the server's recipes:",
 		"\tbroadcast the recipe key of loop-recipe",
 		"\tadd loop-recipe's id to {_list::*}"
 })
