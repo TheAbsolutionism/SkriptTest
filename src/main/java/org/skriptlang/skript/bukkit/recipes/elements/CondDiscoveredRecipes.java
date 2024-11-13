@@ -19,7 +19,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Has Discovered Recipe")
-@Description("Checks whether players have discovered a recipe.")
+@Description("Checks whether the players have discovered a recipe.")
 @Examples({
 	"if player has discovered recipe \"custom_recipe\":",
 		"\tgive player 1 diamond",

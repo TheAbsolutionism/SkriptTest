@@ -1,20 +1,15 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import ch.njol.util.Kleenean;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 @Name("Recipe Type")
@@ -24,28 +19,22 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 		"\tbroadcast the recipe type of loop-recipe"
 })
 @Since("INSERT VERSION")
-public class ExprRecipeType extends PropertyExpression<Recipe, RecipeType> {
+public class ExprRecipeType extends SimplePropertyExpression<Recipe, RecipeType> {
 
 	static {
-		Skript.registerExpression(ExprRecipeType.class, RecipeType.class, ExpressionType.PROPERTY,
-			"[the] recipe type of %recipes%",
-			"[the] %recipes%'[s] recipe type");
+		register(ExprRecipeType.class, RecipeType.class, "recipe type", "recipes");
 	}
 
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		//noinspection unchecked
-		setExpr((Expression<Recipe>) exprs[0]);
-		return true;
+	public @Nullable RecipeType convert(Recipe recipe) {
+		if (recipe instanceof RecipeWrapper recipeWrapper)
+			return recipeWrapper.getRecipeType();
+		return RecipeUtils.getRecipeTypeFromRecipe(recipe);
 	}
 
 	@Override
-	protected RecipeType @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			if (recipe instanceof RecipeWrapper recipeWrapper)
-				return recipeWrapper.getRecipeType();
-			return RecipeUtils.getRecipeTypeFromRecipe(recipe);
-		});
+	protected String getPropertyName() {
+		return "recipe type";
 	}
 
 	@Override

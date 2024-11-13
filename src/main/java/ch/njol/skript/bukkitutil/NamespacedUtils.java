@@ -1,11 +1,13 @@
 package ch.njol.skript.bukkitutil;
 
 import ch.njol.skript.Skript;
-import ch.njol.util.Pair;
+import ch.njol.util.NonNullPair;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.Set;
 
 public class NamespacedUtils {
@@ -19,7 +21,7 @@ public class NamespacedUtils {
 	 * @param key the unparsed key
 	 * @return the resulting NamespacedKey
 	 */
-	public static NamespacedKey getNamespacedKey(String key) {
+	public static NamespacedKey getNamespacedKey(@NotNull String key) {
 		NamespacedKey namespacedKey = NamespacedKey.fromString(key, Skript.getInstance());
 		if (namespacedKey != null)
 			return namespacedKey;
@@ -34,10 +36,10 @@ public class NamespacedUtils {
 	 * @param key The key to use
 	 * @return a NamespacedKey with the encoded key in corresponding Namespace
 	 */
-	public static NamespacedKey createNamespacedKey(String key) {
+	public static NamespacedKey createNamespacedKey(@NotNull String key) {
 		StringBuilder encodedKeyBuilder = new StringBuilder();
 		// keys must be all lowercase
-		key = key.toLowerCase().replace(' ', '_');
+		key = key.toLowerCase(Locale.ENGLISH).replace(' ', '_');
 		int keyLength = key.length();
 		for (int i = 0; i < keyLength; i++) {
 			char currentChar = key.charAt(i);
@@ -77,7 +79,7 @@ public class NamespacedUtils {
 	 * @param namespacedKey the namespaced key to decode
 	 * @return a Pair with the first element as the namespace and the second as the decoded key
 	 */
-	public static Pair<String, String> decodeNamespacedKey(NamespacedKey namespacedKey) {
+	public static NonNullPair<String, String> decodeNamespacedKey(NamespacedKey namespacedKey) {
 		String encodedKey = namespacedKey.getKey();
 		StringBuilder decodedKeyBuilder = new StringBuilder();
 		int encodedKeyLength = encodedKey.length();
@@ -105,7 +107,7 @@ public class NamespacedUtils {
 				decodedKeyBuilder.append(currentChar);
 			}
 		}
-		return new Pair<>(namespacedKey.getNamespace(), decodedKeyBuilder.toString());
+		return new NonNullPair<>(namespacedKey.getNamespace(), decodedKeyBuilder.toString());
 	}
 
 }

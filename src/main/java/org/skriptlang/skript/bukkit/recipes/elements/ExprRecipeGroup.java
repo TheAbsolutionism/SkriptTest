@@ -20,7 +20,10 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 
 @Name("Recipe Group")
-@Description("The recipe group of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
+@Description({
+	"The recipe group of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.",
+	"Groups recipes together under the provided string."
+})
 @Examples({
 	"register a new shapeless recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to 3 diamonds, 3 emeralds and 3 netherite ingots",
@@ -31,7 +34,8 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 
 	static {
-		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY, "[the] recipe group [of %recipes%]");
+		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY,
+			"[the] recipe group [of %recipes%]");
 	}
 
 	private boolean isEvent = false;

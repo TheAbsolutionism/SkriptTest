@@ -5,7 +5,14 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.EnumClassInfo;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.util.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.Recipe;
+import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.comparator.Comparator;
 import org.skriptlang.skript.lang.comparator.Comparators;
 import org.skriptlang.skript.lang.comparator.Relation;
@@ -17,6 +24,8 @@ public class RecipeModule {
 
 	public static void load() throws IOException {
 		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.recipes", "elements");
+
+		// --- CLASSES --- //
 
 		Classes.registerClass(new ClassInfo<>(Recipe.class, "recipe")
 			.user("recipes?")
@@ -37,9 +46,11 @@ public class RecipeModule {
 		Classes.registerClass(new EnumClassInfo<>(RecipeType.class, "recipetype", "recipe types")
 			.user("recipe ?types?")
 			.name("Recipe Type")
-			.description("Represents recipe types.")
+			.description("Represents the type of a recipe.")
 			.since("INSERT VERSION")
 		);
+
+		// --- COMPARATORS --- //
 
 		Comparators.registerComparator(RecipeType.class, RecipeType.class, new Comparator<RecipeType, RecipeType>() {
 			@Override
@@ -49,6 +60,33 @@ public class RecipeModule {
 				return Relation.NOT_EQUAL;
 			}
 		});
+
+		// --- EVENT VALUES --- //
+
+		//PrepareItemCraftEvent
+		EventValues.registerEventValue(PrepareItemCraftEvent.class, Recipe.class, new Getter<Recipe, PrepareItemCraftEvent>() {
+			@Override
+			public @Nullable Recipe get(PrepareItemCraftEvent event) {
+				return event.getRecipe();
+			}
+		}, EventValues.TIME_NOW);
+
+		//CraftItemEvent
+		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, new Getter<Recipe, CraftItemEvent>() {
+			@Override
+			public @Nullable Recipe get(CraftItemEvent event) {
+				return event.getRecipe();
+			}
+		}, EventValues.TIME_NOW);
+
+		// PlayerRecipeDiscoverEvent
+		EventValues.registerEventValue(PlayerRecipeDiscoverEvent.class, Recipe.class, new Getter<Recipe, PlayerRecipeDiscoverEvent>() {
+			@Override
+			public @Nullable Recipe get(PlayerRecipeDiscoverEvent event) {
+				return Bukkit.getRecipe(event.getRecipe());
+			}
+		}, EventValues.TIME_NOW);
+
 	}
 
 }

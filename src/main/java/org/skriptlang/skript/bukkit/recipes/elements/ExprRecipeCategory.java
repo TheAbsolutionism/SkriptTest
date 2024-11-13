@@ -5,6 +5,7 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -38,6 +39,7 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
 	"loop all recipes:",
 		"\tbroadcast recipe category of loop-recipe"
 })
+@Since("INSERT VERSION")
 public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategory> {
 
 	static {

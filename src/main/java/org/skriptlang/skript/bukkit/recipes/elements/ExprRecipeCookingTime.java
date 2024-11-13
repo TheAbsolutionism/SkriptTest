@@ -33,7 +33,8 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
 public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY, "[the] recipe cook[ing] time [of %recipes%]");
+		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
+			"[the] recipe cook[ing] time [of %recipes%]");
 	}
 
 	private boolean isEvent = false;

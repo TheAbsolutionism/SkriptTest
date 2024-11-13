@@ -3,6 +3,9 @@ package org.skriptlang.skript.bukkit.recipes;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 
+/**
+ * Enum of converting Bukkit recipe categories into a singular Skript category.
+ */
 public enum RecipeCategory {
 
 	CRAFTING_BUILDING(CraftingBookCategory.BUILDING),

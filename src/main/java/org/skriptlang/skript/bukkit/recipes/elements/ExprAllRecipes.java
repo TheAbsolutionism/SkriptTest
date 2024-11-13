@@ -9,6 +9,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.lang.util.SimpleExpression;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import ch.njol.util.Kleenean;
@@ -26,7 +27,7 @@ import java.util.List;
 
 @Name("All Recipes")
 @Description({
-	"Retrieve all recipes registered in the server. Including the options to:",
+	"Retrieve all recipes registered in the server. Includes the options to:",
 	"<ul>",
 	"<li>Get only recipes provided by Minecraft or custom recipes</li>",
 	"<li>Specific recipe types</li>",
@@ -127,9 +128,13 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "all of the " + (getMinecraft ? "minecraft " : getCustom ? "custom " : "") + "recipes" +
-			(recipeTypeExpr != null ? " of type " + recipeTypeExpr.toString(event, debug) : "") +
-			(itemExpr != null ? " for " + itemExpr.toString(event, debug) : "");
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("all of the");
+		builder.append(getMinecraft ? "minecraft" : getCustom ? "custom" : "");
+		builder.append("recipes");
+		builder.append(recipeTypeExpr != null ? " of type " + recipeTypeExpr.toString(event,  debug) : "");
+		builder.append(itemExpr != null ? " for " + itemExpr.toString(event, debug) : "");
+		return builder.toString();
 	}
 
 }

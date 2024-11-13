@@ -141,7 +141,7 @@ public class SecRegisterRecipe extends Section {
 		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
 		Recipe recipe = recipeWrapper.create();
 		if (recipe == null) {
-			Skript.error(recipeWrapper.getErrors().toString());
+			//Skript.error(recipeWrapper.getErrors().toString());
 		} else {
 			if (Bukkit.getRecipe(key) != null)
 				Bukkit.removeRecipe(key);

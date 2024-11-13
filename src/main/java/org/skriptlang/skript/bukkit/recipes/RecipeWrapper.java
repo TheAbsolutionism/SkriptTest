@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Wrapper class allowing the creation of a Recipe without being on initialization.
+ */
 public abstract class RecipeWrapper implements Recipe {
 
 	private final RecipeType recipeType;
@@ -27,6 +30,7 @@ public abstract class RecipeWrapper implements Recipe {
 		this.result = result;
 	}
 
+	@Override
 	public ItemStack getResult() {
 		return result;
 	}

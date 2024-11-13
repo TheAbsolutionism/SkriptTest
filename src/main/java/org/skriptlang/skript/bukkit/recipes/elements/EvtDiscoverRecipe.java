@@ -28,7 +28,9 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Player Discover Recipe", EvtDiscoverRecipe.class, PlayerRecipeDiscoverEvent.class,
-			"[player] discover[ed|ing] recipe[s] [of %-strings%]");
+			"[player] discover[ed|ing] recipe[s] [of %-strings%]",
+			"[player] recipe discover[ed|ing] [of %-strings%]"
+		);
 	}
 
 	private @Nullable Expression<String> recipes;

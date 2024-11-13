@@ -3,7 +3,6 @@ package org.skriptlang.skript.bukkit.recipes.elements;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.config.Node;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -16,14 +15,21 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CookingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.StonecuttingRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CookingRecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CraftingRecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.SmithingRecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.StonecuttingRecipeWrapper;
 
 import java.util.*;
 
@@ -108,8 +114,6 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 
 	private boolean isEvent = false;
 	private RecipePattern selectedChoice;
-	private Node thisNode;
-	private String thisScript;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -146,8 +150,6 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 			}
 			setExpr(new EventValueExpression<>(Recipe.class));
 		}
-		thisNode = getParser().getNode();
-		thisScript = getParser().getCurrentScript().getConfig().getFileName();
 		return true;
 	}
 
@@ -180,7 +182,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
 						ingredients.addAll(shapelessRecipe.getIngredientList());
 					} else {
-						Skript.error("You can only get the ingredients of a Shaped or Shapeless Recipe.");
+						//Skript.error("You can only get the ingredients of a Shaped or Shapeless Recipe.");
 					}
 				}
 				case FIRSTROW, SECONDROW, THIRDROW -> {

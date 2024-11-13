@@ -12,6 +12,9 @@ import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.SmithingRecipeWrapper.
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Utils used for getting data from {@link RecipeType}
+ */
 public class RecipeUtils {
 
 	public enum RecipeType {
