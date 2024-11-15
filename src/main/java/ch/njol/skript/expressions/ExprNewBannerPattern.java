@@ -41,18 +41,18 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 	static {
 		if (BukkitUtils.registryExists("BANNER_PATTERN")) {
-            try {
-                Class<?> registryClass = Class.forName("org.bukkit.Registry");
+			try {
+				Class<?> registryClass = Class.forName("org.bukkit.Registry");
 				Object bannerRegistry = registryClass.getField("BANNER_PATTERN").get(null);
 				List<?> registryPatterns = ((Stream<?>) registryClass.getMethod("stream").invoke(bannerRegistry)).toList();
 				patternTypes = registryPatterns.toArray();
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException |
-                     InvocationTargetException | NoSuchMethodException e)
+			} catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException |
+					 InvocationTargetException | NoSuchMethodException e)
 			{
-                throw new RuntimeException(e);
-            }
+				throw new RuntimeException(e);
+			}
 
-        } else {
+		} else {
 			try {
 				//noinspection UnstableApiUsage,removal
 				patternTypes = PatternType.values();
@@ -61,15 +61,15 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 		List<String> patterns = new ArrayList<>();
 		for (int i = 0; i < patternTypes.length; i++) {
 			Object type = patternTypes[i];
-            try {
-                patterns.add("[a] [new] "
-                    + getKey(type)
-                    + " [banner] pattern colo[u]red %*color%"
-                );
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            patternCorrelation.put(patterns.size(), type);
+			try {
+				patterns.add("[a] [new] "
+					+ getKey(type)
+					+ " [banner] pattern colo[u]red %*color%"
+				);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			patternCorrelation.put(patterns.size(), type);
 		}
 		Skript.registerExpression(ExprNewBannerPattern.class, Pattern.class, ExpressionType.SIMPLE,
 			patterns.toArray(String[]::new));
