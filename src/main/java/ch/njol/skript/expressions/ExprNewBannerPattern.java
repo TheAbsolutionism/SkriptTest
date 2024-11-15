@@ -54,10 +54,16 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 		} else {
 			try {
-				//noinspection UnstableApiUsage,removal
-				patternTypes = PatternType.values();
-			} catch (Exception ignored) {}
-		}
+				Class<?> enumClass = Class.forName("org.bukkit.block.banner.PatternType");
+				if (enumClass.isEnum()) {
+					patternTypes = enumClass.getEnumConstants();
+				} else {
+					throw new IllegalStateException("PatternType is neither an enum nor a valid registry.");
+				}
+			} catch (ClassNotFoundException | IllegalStateException e) {
+                throw new RuntimeException(e);
+            }
+        }
 		List<String> patterns = new ArrayList<>();
 		for (int i = 0; i < patternTypes.length; i++) {
 			Object type = patternTypes[i];

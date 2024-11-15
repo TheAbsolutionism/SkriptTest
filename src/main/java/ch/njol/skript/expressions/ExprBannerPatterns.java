@@ -16,9 +16,11 @@ import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.DyeColor;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -30,7 +32,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Name("Banner Patterns")
-@Description("Banner patterns of a banner.")
+@Description({
+	"Banner patterns of a banner.",
+	"NOTE: When setting a direct placement of a banner pattern, filler banner patterns will be added up to the provided placement."
+})
 @Examples({
 	"broadcast banner patterns of {_banneritem}",
 	"broadcast 1st banner pattern of block at location(0,0,0)",
@@ -68,7 +73,8 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 		for (Object object : objects.getArray(event)) {
 			if (object instanceof Block block && block.getState() instanceof Banner banner) {
 				if (placement != null) {
-					patterns.add(banner.getPattern(placement));
+					if (banner.numberOfPatterns() >= placement)
+						patterns.add(banner.getPattern(placement - 1));
 				} else {
 					patterns.addAll(banner.getPatterns());
 				}
@@ -77,7 +83,8 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 				if (itemStack == null || !(itemStack.getItemMeta() instanceof BannerMeta bannerMeta))
 					continue;
 				if (placement != null) {
-					patterns.add(bannerMeta.getPattern(placement));
+					if (bannerMeta.numberOfPatterns() >= placement)
+						patterns.add(bannerMeta.getPattern(placement - 1));
 				} else {
 					patterns.addAll(bannerMeta.getPatterns());
 				}
@@ -104,8 +111,9 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 		Integer placement = null;
 		if (patternNumber != null) {
 			placement = patternNumber.getSingle(event);
-			if (delta != null && delta[0] != null)
+			if (delta != null && delta[0] != null) {
 				pattern = (Pattern) delta[0];
+			}
 		} else if (delta != null) {
 			patterns = (Pattern[]) delta;
 		}
@@ -119,10 +127,22 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 			case SET -> {
 				if (placement != null) {
 					metaChanger = bannerMeta -> {
-						bannerMeta.setPattern(finalPlacement, finalPattern);
+						if (bannerMeta.numberOfPatterns() < finalPlacement) {
+							int toAdd = finalPlacement - bannerMeta.numberOfPatterns();
+							for (int i = 0; i < toAdd; i++) {
+								bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.BASE));
+							}
+						}
+						bannerMeta.setPattern(finalPlacement - 1, finalPattern);
 					};
 					blockChanger = banner -> {
-						banner.setPattern(finalPlacement, finalPattern);
+						if (banner.numberOfPatterns() < finalPlacement) {
+							int toAdd = finalPlacement - banner.numberOfPatterns();
+							for (int i = 0; i < toAdd; i++) {
+								banner.addPattern(new Pattern(DyeColor.GRAY, PatternType.BASE));
+							}
+						}
+						banner.setPattern(finalPlacement - 1, finalPattern);
 					};
 				} else {
 					metaChanger = bannerMeta -> {
@@ -136,10 +156,12 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 			case DELETE -> {
 				if (placement != null) {
 					metaChanger = bannerMeta -> {
-						bannerMeta.removePattern(finalPlacement);
+						if (bannerMeta.numberOfPatterns() >= finalPlacement)
+							bannerMeta.removePattern(finalPlacement - 1);
 					};
 					blockChanger = banner -> {
-						banner.removePattern(finalPlacement);
+						if (banner.numberOfPatterns() >= finalPlacement)
+							banner.removePattern(finalPlacement - 1);
 					};
 				} else {
 					metaChanger = bannerMeta -> {

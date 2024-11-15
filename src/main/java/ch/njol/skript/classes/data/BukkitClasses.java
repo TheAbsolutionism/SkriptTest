@@ -1560,10 +1560,10 @@ public class BukkitClasses {
 			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
 			.since("INSERT VERSION"));
 
-		Classes.registerClass(new ClassInfo<>(org.bukkit.block.banner.Pattern.class, "bannerpattern")
-			.user("banner ?patterns?")
-			.name("Banner Pattern")
-			.description("Represents a banner pattern.")
+		Classes.registerClass(new ClassInfo<>(org.bukkit.block.banner.Pattern.class, "bannerpatterntype")
+			.user("banner ?patterns? ?types?")
+			.name("Banner Pattern Type")
+			.description("Represents a banner pattern type.")
 			.since("INSERT VERSION")
 		);
 	}
