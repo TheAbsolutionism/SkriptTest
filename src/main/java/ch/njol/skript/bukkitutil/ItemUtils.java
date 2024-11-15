@@ -21,11 +21,7 @@ package ch.njol.skript.bukkitutil;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.util.slot.Slot;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Tag;
-import org.bukkit.TreeType;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Fence;
@@ -39,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Miscellaneous static utility methods related to items.
@@ -214,12 +211,12 @@ public class ItemUtils {
 	 */
 	@Nullable
 	public static ItemStack asItemStack(Object object) {
-		if (object instanceof ItemType)
-			return ((ItemType) object).getRandom();
-		else if (object instanceof Slot)
-			return ((Slot) object).getItem();
-		else if (object instanceof ItemStack)
-			return ((ItemStack) object);
+		if (object instanceof ItemType itemType)
+			return itemType.getRandom();
+		else if (object instanceof Slot slot)
+			return slot.getItem();
+		else if (object instanceof ItemStack itemStack)
+			return itemStack;
 		return null;
 	}
 	
@@ -361,4 +358,36 @@ public class ItemUtils {
 				return false;
 		}
 	}
+
+	/**
+	 * Changes the ItemMeta of the provided ItemStack with the provided Consumer
+	 * @param itemStack ItemStack's ItemMeta to be changed
+	 * @param metaChanger Consumer to change the ItemMeta
+	 * @return ItemStack with the updated ItemMeta
+	 * @param <T>
+	 */
+	public static <T extends ItemMeta> ItemStack changeItemMeta(ItemStack itemStack, Consumer<T> metaChanger) {
+		//noinspection unchecked
+		T itemMeta = (T) itemStack.getItemMeta();
+		metaChanger.accept(itemMeta);
+		itemStack.setItemMeta(itemMeta);
+		return itemStack;
+	}
+
+	/**
+	 * Set's the item back from its original location, see {@link ItemUtils#asItemStack(Object)}
+	 * @param object The original object used to determine it's origin
+	 * @param itemStack The ItemStack to update the original location
+	 */
+	public static void setItem(Object object, ItemStack itemStack) {
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (object instanceof Slot slot) {
+			slot.setItem(itemStack);
+		} else if (object instanceof ItemType itemType) {
+			itemType.setItemMeta(itemMeta);
+		} else if (object instanceof ItemStack itemStack1) {
+			itemStack1.setItemMeta(itemMeta);
+		}
+	}
+
 }
