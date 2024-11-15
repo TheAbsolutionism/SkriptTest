@@ -69,8 +69,8 @@ public class ExprSkullOwner extends SimplePropertyExpression<Object, OfflinePlay
 				if (skullItem == null || !(skullItem.getItemMeta() instanceof SkullMeta skullMeta))
 					continue;
 				metaChanger.accept(skullMeta);
-				skullItem.setItemMeta(skullMeta);
 				if (object instanceof Slot slot) {
+					skullItem.setItemMeta(skullMeta);
 					slot.setItem(skullItem);
 				} else if (object instanceof ItemType itemType) {
 					itemType.setItemMeta(skullMeta);
