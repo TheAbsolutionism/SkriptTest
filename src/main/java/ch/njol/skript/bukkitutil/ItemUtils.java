@@ -209,8 +209,7 @@ public class ItemUtils {
 	 * @param object Object to convert
 	 * @return ItemStack from slot/itemtype
 	 */
-	@Nullable
-	public static ItemStack asItemStack(Object object) {
+	public static @Nullable ItemStack asItemStack(Object object) {
 		if (object instanceof ItemType itemType)
 			return itemType.getRandom();
 		else if (object instanceof Slot slot)
@@ -360,7 +359,7 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Changes the ItemMeta of the provided ItemStack with the provided Consumer
+	 * Applies {@code metaChanger} to the meta of {@code itemStack} and returns the itemStack with the updated ItemMeta.
 	 * @param itemStack ItemStack's ItemMeta to be changed
 	 * @param metaChanger Consumer to change the ItemMeta
 	 * @return ItemStack with the updated ItemMeta
@@ -375,7 +374,8 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Set's the item back from its original location, see {@link ItemUtils#asItemStack(Object)}
+	 * Updates the provided, slot, itemtype or item stack in {@code object} by applying {@code itemStack} to it.
+	 * See {@see asItemStack}
 	 * @param object The original object used to determine it's origin
 	 * @param itemStack The ItemStack to update the original location
 	 */
@@ -388,6 +388,7 @@ public class ItemUtils {
 		} else if (object instanceof ItemStack itemStack1) {
 			itemStack1.setItemMeta(itemMeta);
 		}
+		throw new IllegalArgumentException("Object did not originate from a Slot, ItemType or ItemStack");
 	}
 
 }
