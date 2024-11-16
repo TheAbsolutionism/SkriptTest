@@ -32,10 +32,8 @@ public class CondDiscoveredRecipes extends Condition {
 
 	static {
 		Skript.registerCondition(CondDiscoveredRecipes.class,
-			"%players% (has|have) (discovered|unlocked) [the] recipe[s] [with [the] (key|id)[s]] %recipes%",
-			"%players% (has|have) (discovered|unlocked) [the] recipe[s] %recipes%",
-			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] [with [the] (key|id)[s]] %strings%",
-			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] %recipes%");
+			"%players% (has|have) (discovered|unlocked) [the] recipe[s] %recipes/strings%",
+			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] %recipes/strings%");
 	}
 
 	private Expression<Player> players;
@@ -46,7 +44,7 @@ public class CondDiscoveredRecipes extends Condition {
 		//noinspection unchecked
 		players = (Expression<Player>) exprs[0];
 		recipes = exprs[1];
-		setNegated(matchedPattern >= 2);
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -55,15 +53,16 @@ public class CondDiscoveredRecipes extends Condition {
 		return players.check(event,
 			player -> recipes.check(event,
 				recipe -> {
+					boolean result = false;
 					if (recipe instanceof String recipeName) {
 						NamespacedKey key = NamespacedUtils.getNamespacedKey(recipeName);
 						if (Bukkit.getRecipe(key) != null)
-							return player.hasDiscoveredRecipe(key);
+							result = player.hasDiscoveredRecipe(key);
 						return isNegated();
 					} else if (recipe instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
-						return player.hasDiscoveredRecipe(recipeKey.getKey());
+						result = player.hasDiscoveredRecipe(recipeKey.getKey());
 					}
-					return isNegated();
+					return isNegated() ? !result : result;
 				}
 			)
 		);

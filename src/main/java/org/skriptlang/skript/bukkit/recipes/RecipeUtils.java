@@ -77,7 +77,7 @@ public class RecipeUtils {
 	 * @param providedClass Bukkit recipe class
 	 * @return Recipe Type
 	 */
-	public static RecipeType getRecipeTypeFromRecipeClass(Class<? extends Recipe> providedClass) {
+	public static RecipeType getRecipeType(Class<? extends Recipe> providedClass) {
 		for (RecipeType type : RecipeType.values()) {
 			if (type.recipeClass != null && type.recipeClass.isAssignableFrom(providedClass)) {
 				return type;
@@ -91,8 +91,8 @@ public class RecipeUtils {
 	 * @param providedRecipe Recipe
 	 * @return Recipe Type
 	 */
-	public static RecipeType getRecipeTypeFromRecipe(Recipe providedRecipe) {
-		return getRecipeTypeFromRecipeClass(providedRecipe.getClass());
+	public static RecipeType getRecipeType(Recipe providedRecipe) {
+		return getRecipeType(providedRecipe.getClass());
 	}
 
 }

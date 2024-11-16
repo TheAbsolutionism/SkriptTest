@@ -29,7 +29,7 @@ public class ExprRecipeType extends SimplePropertyExpression<Recipe, RecipeType>
 	public @Nullable RecipeType convert(Recipe recipe) {
 		if (recipe instanceof MutableRecipe recipeWrapper)
 			return recipeWrapper.getRecipeType();
-		return RecipeUtils.getRecipeTypeFromRecipe(recipe);
+		return RecipeUtils.getRecipeType(recipe);
 	}
 
 	@Override
