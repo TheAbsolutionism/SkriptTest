@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 	"if player has discovered recipe \"custom_recipe\":",
 		"\tgive player 1 diamond",
 	"",
-	"if all players have not found recipe \"custom_recipe\":",
+	"if all players have not discovered recipe \"custom_recipe\":",
 		"\tkill all players",
 })
 @Since("INSERT VERSION")

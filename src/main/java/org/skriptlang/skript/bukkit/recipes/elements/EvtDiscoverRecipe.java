@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 		"\tbroadcast event-recipe",
 	"",
 	"on discovered recipe of \"my_recipe\":",
-		"broadcast event-recipe"
+		"\tbroadcast event-recipe"
 })
 @Since("INSERT VERSION")
 public class EvtDiscoverRecipe extends SkriptEvent {
