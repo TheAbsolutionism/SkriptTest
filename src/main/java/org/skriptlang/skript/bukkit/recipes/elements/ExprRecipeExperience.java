@@ -11,14 +11,15 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Experience")
 @Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
@@ -59,7 +60,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	@Override
 	protected Float @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
+			if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
 				return cookingRecipeWrapper.getExperience();
 			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getExperience();
@@ -80,8 +81,8 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
-		if (!(recipeWrapper instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper))
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
 			return;
 
 		float experience = (float) delta[0];

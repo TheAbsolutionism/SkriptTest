@@ -16,20 +16,25 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.RecipeChoice.ExactChoice;
+import org.bukkit.inventory.RecipeChoice.MaterialChoice;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CookingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.StonecuttingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CookingRecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.CraftingRecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.SmithingRecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.StonecuttingRecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapedRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTransformRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTrimRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.StonecuttingRecipeEvent;
 
 import java.util.*;
 
@@ -162,11 +167,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 		for (Recipe recipe : source) {
 			switch (selectedChoice) {
 				case INGREDIENTS -> {
-					if (recipe instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+					if (recipe instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 						Arrays.stream(craftingRecipeWrapper.getIngredients()).forEach(recipeChoice -> {
-							if (recipeChoice instanceof RecipeChoice.ExactChoice exactChoice) {
+							if (recipeChoice instanceof ExactChoice exactChoice) {
 								ingredients.addAll(exactChoice.getChoices());
-							} else if (recipeChoice instanceof RecipeChoice.MaterialChoice materialChoice) {
+							} else if (recipeChoice instanceof MaterialChoice materialChoice) {
 								materialChoice.getChoices().stream().forEach(material -> {
 									ingredients.add(new ItemStack(material));
 								});
@@ -186,11 +191,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					}
 				}
 				case FIRSTROW, SECONDROW, THIRDROW -> {
-					if (recipe instanceof CraftingRecipeWrapper.ShapedRecipeWrapper shapedRecipeWrapper) {
+					if (recipe instanceof MutableShapedRecipe shapedRecipeWrapper) {
 						RecipeChoice[] choices = shapedRecipeWrapper.getIngredients();
 						int row = selectedChoice.ordinal() - 1;
 						for (int i = 0; i < 3; i++) {
-							RecipeChoice.ExactChoice exactChoice = (RecipeChoice.ExactChoice) choices[i * row + i];
+							ExactChoice exactChoice = (ExactChoice) choices[i * row + i];
 							ingredients.addAll(exactChoice.getChoices());
 						}
 					} else if (recipe instanceof ShapedRecipe shapedRecipe) {
@@ -203,16 +208,16 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							ingredients.add(stack);
 						}
 					} else {
-						Skript.error("You can only get the ingredients of a row for a Shaped Recipe.");
+						//Skript.error("You can only get the ingredients of a row for a Shaped Recipe.");
 					}
 				}
 				case BASE, TEMPLATE, ADDITION -> {
-					if (recipe instanceof SmithingRecipeWrapper smithingRecipeWrapper) {
-						RecipeChoice.ExactChoice exactChoice = (RecipeChoice.ExactChoice) switch (selectedChoice) {
+					if (recipe instanceof MutableSmithingRecipe smithingRecipeWrapper) {
+						ExactChoice exactChoice = (ExactChoice) switch (selectedChoice) {
 							case BASE -> smithingRecipeWrapper.getBase();
 							case ADDITION -> smithingRecipeWrapper.getAddition();
 							case TEMPLATE -> {
-								if (recipe instanceof SmithingRecipeWrapper.SmithingTransformRecipeWrapper || recipe instanceof SmithingRecipeWrapper.SmithingTrimRecipeWrapper) {
+								if (recipe instanceof MutableSmithingTransformRecipe || recipe instanceof MutableSmithingTrimRecipe) {
 									yield smithingRecipeWrapper.getTemplate();
 								}
 								yield null;
@@ -234,23 +239,23 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 							case ADDITION -> smithingRecipe.getAddition();
                             default -> null;
                         };
-						if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
+						if (choice instanceof ExactChoice exactChoice) {
 							ingredients.addAll(exactChoice.getChoices());
-						} else if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
+						} else if (choice instanceof MaterialChoice materialChoice) {
 							ingredients.addAll(
 								materialChoice.getChoices().stream().map(ItemStack::new).toList()
 							);
 						}
 					} else {
-						Skript.error("You can only get the base, template, and addition items of a Smithing, Smithing Transform and Smithing Trim Recipe.");
+						//Skript.error("You can only get the base, template, and addition items of a Smithing, Smithing Transform and Smithing Trim Recipe.");
 					}
 				}
 				case INPUT -> {
-					if (recipe instanceof RecipeWrapper) {
-						if (recipe instanceof CookingRecipeWrapper cookingRecipeWrapper) {
-							ingredients.addAll(((RecipeChoice.ExactChoice) cookingRecipeWrapper.getInput()).getChoices());
-						} else if (recipe instanceof StonecuttingRecipeWrapper stonecuttingRecipeWrapper) {
-							ingredients.addAll(((RecipeChoice.ExactChoice) stonecuttingRecipeWrapper.getInput()).getChoices());
+					if (recipe instanceof MutableRecipe) {
+						if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
+							ingredients.addAll(((ExactChoice) cookingRecipeWrapper.getInput()).getChoices());
+						} else if (recipe instanceof MutableStonecuttingRecipe stonecuttingRecipeWrapper) {
+							ingredients.addAll(((ExactChoice) stonecuttingRecipeWrapper.getInput()).getChoices());
 						}
 					} else {
 						RecipeChoice choice = null;
@@ -259,11 +264,11 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 						} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
 							choice = stonecuttingRecipe.getInputChoice();
 						} else {
-							Skript.error("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
+							//Skript.error("You can only get the input item of a Cooking, Blasting, Furnace, Campfire, Smoking and Stonecutting Recipe.");
 						}
-						if (choice instanceof RecipeChoice.ExactChoice exactChoice) {
+						if (choice instanceof ExactChoice exactChoice) {
 							ingredients.addAll(exactChoice.getChoices());
-						} else if (choice instanceof RecipeChoice.MaterialChoice materialChoice) {
+						} else if (choice instanceof MaterialChoice materialChoice) {
 							ingredients.addAll(materialChoice.getChoices().stream().map(ItemStack::new).toList());
 						}
 					}
@@ -300,15 +305,15 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 			}
 		}
 
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
 
 		switch (selectedChoice) {
 			case INGREDIENTS -> {
-				if (!(recipeWrapper instanceof CraftingRecipeWrapper craftingRecipeWrapper))
+				if (!(recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper))
 					return;
 
 				if (items.size() > 9) {
-					Skript.error("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeType()  + "' recipe.");
+					//Skript.error("You can only provide up to 9 items when setting the ingredients for a '" + recipeEvent.getRecipeType()  + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -316,22 +321,22 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					ItemStack[] ingredients = entry.getValue();
 					if (Arrays.stream(ingredients).anyMatch(itemStack -> itemStack.getType().isAir())) {
 						if (ingredients.length > 1) {
-							Skript.error("You can not provide air with a list of other items.");
+							//Skript.error("You can not provide air with a list of other items.");
 							recipeEvent.setErrorInEffect();
 							return;
 						} else {
 							continue;
 						}
 					}
-					RecipeChoice choice = new RecipeChoice.ExactChoice(ingredients);
+					RecipeChoice choice = new ExactChoice(ingredients);
 					craftingRecipeWrapper.setIngredients(entry.getKey(), choice);
 				}
 			}
 			case FIRSTROW, SECONDROW, THIRDROW -> {
-				if (!(recipeWrapper instanceof CraftingRecipeWrapper.ShapedRecipeWrapper shapedRecipeWrapper))
+				if (!(recipeWrapper instanceof MutableShapedRecipe shapedRecipeWrapper))
 					return;
 				if (items.size() > 3) {
-					Skript.error("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
+					//Skript.error("You can only provide up to 3 items when setting the ingredients of a row for a '" + recipeEvent.getRecipeType() + "' recipe.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
@@ -339,28 +344,28 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					ItemStack[] ingredients = entry.getValue();
 					if (Arrays.stream(ingredients).anyMatch(itemStack -> itemStack.getType().isAir())) {
 						if (ingredients.length > 1) {
-							Skript.error("You can not provide 'air' with a list of other items.");
+							//Skript.error("You can not provide 'air' with a list of other items.");
 							recipeEvent.setErrorInEffect();
 							return;
 						} else {
 							continue;
 						}
 					}
-					RecipeChoice choice = new RecipeChoice.ExactChoice(ingredients);
+					RecipeChoice choice = new ExactChoice(ingredients);
 					shapedRecipeWrapper.setIngredients(((3 * (selectedChoice.ordinal() - 1)) + entry.getKey()), choice);
 				}
 			}
 			case BASE, TEMPLATE, ADDITION -> {
-				if (!(recipeWrapper instanceof SmithingRecipeWrapper smithingRecipeWrapper))
+				if (!(recipeWrapper instanceof MutableSmithingRecipe smithingRecipeWrapper))
 					return;
 				List<ItemStack> stackList = new ArrayList<>();
 				items.entrySet().stream().forEach(entry -> stackList.addAll(Arrays.asList(entry.getValue())));
 				if (stackList.stream().anyMatch(itemStack -> itemStack.getType().isAir())) {
-					Skript.error("You can not provide 'air' with this expression.");
+					//Skript.error("You can not provide 'air' with this expression.");
 					recipeEvent.setErrorInEffect();
 					return;
 				}
-				RecipeChoice choice = new RecipeChoice.ExactChoice(stackList);
+				RecipeChoice choice = new ExactChoice(stackList);
 				switch (selectedChoice) {
 					case BASE -> smithingRecipeWrapper.setBase(choice);
 					case TEMPLATE -> smithingRecipeWrapper.setTemplate(choice);
@@ -375,10 +380,10 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 					recipeEvent.setErrorInEffect();
 					return;
 				}
-				RecipeChoice choice = new RecipeChoice.ExactChoice(stackList);
-				if (recipeWrapper instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+				RecipeChoice choice = new ExactChoice(stackList);
+				if (recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper) {
 					cookingRecipeWrapper.setInput(choice);
-				} else if (recipeWrapper instanceof StonecuttingRecipeWrapper stonecuttingRecipeWrapper) {
+				} else if (recipeWrapper instanceof MutableStonecuttingRecipe stonecuttingRecipeWrapper) {
 					stonecuttingRecipeWrapper.setInput(choice);
 				}
 			}

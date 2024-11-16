@@ -11,7 +11,6 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -19,7 +18,9 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a blasting, furnace, campfire or smoking recipe.")
@@ -59,7 +60,7 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	@Override
 	protected Timespan @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
+			if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
 				return new Timespan(Timespan.TimePeriod.TICK, cookingRecipeWrapper.getCookingTime());
 			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return new Timespan(Timespan.TimePeriod.TICK, cookingRecipe.getCookingTime());
@@ -81,8 +82,8 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 			return;
 
 		Timespan timespan = (Timespan) delta[0];
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
-		if (!(recipeWrapper instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper))
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
 			return;
 		cookingRecipeWrapper.setCookingTime((int) timespan.getAs(Timespan.TimePeriod.TICK));
 	}

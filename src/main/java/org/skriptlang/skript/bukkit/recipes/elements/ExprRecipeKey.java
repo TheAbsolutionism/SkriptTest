@@ -9,7 +9,7 @@ import org.bukkit.Keyed;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 
 @Name("Recipe Name")
 @Description("Get the namespaced key of a recipe.")
@@ -27,7 +27,7 @@ public class ExprRecipeKey extends SimplePropertyExpression<Recipe, String> {
 
 	@Override
 	public @Nullable String convert(Recipe recipe) {
-		if (recipe instanceof RecipeWrapper recipeWrapper) {
+		if (recipe instanceof MutableRecipe recipeWrapper) {
 			return recipeWrapper.getKey().toString();
 		} else if (recipe instanceof Keyed key) {
 			return key.getKey().toString();

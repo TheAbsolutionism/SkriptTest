@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -8,23 +9,25 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.*;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent.CraftingRecipeEvent.*;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.StonecuttingRecipeEvent;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Name("Register Recipe")
@@ -138,7 +141,7 @@ public class SecRegisterRecipe extends Section {
 		if (recipeEvent.getErrorInEffect())
 			return super.walk(event, false);
 
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
 		Recipe recipe = recipeWrapper.create();
 		if (recipe == null) {
 			//Skript.error(recipeWrapper.getErrors().toString());

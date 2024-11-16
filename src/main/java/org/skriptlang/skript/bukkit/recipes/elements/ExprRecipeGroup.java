@@ -11,13 +11,18 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.CookingRecipe;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Group")
 @Description({
@@ -60,10 +65,10 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	@Override
 	protected String[] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof RecipeWrapper)  {
-				if (recipe instanceof RecipeWrapper.CraftingRecipeWrapper craftingRecipeWrapper) {
+			if (recipe instanceof MutableRecipe)  {
+				if (recipe instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 					return craftingRecipeWrapper.getGroup();
-				} else if (recipe instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
+				} else if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
 					return cookingRecipeWrapper.getGroup();
 				}
 			} else {
@@ -90,15 +95,15 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
 
 		String group = (String) delta[0];
 		if (group.isEmpty())
 			return;
 
-		if (recipeWrapper instanceof RecipeWrapper.CraftingRecipeWrapper craftingRecipeWrapper) {
+		if (recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 			craftingRecipeWrapper.setGroup(group);
-		} else if (recipeWrapper instanceof RecipeWrapper.CookingRecipeWrapper cookingRecipeWrapper) {
+		} else if (recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper) {
 			cookingRecipeWrapper.setGroup(group);
 		}
 	}

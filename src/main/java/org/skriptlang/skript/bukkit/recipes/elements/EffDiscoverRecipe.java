@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -8,7 +9,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
@@ -17,8 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 @Name("Discover Recipe")
 @Description("Makes the specified players discover or forget the recipes.")
@@ -33,17 +31,11 @@ public class EffDiscoverRecipe extends Effect {
 
 	static {
 		Skript.registerEffect(EffDiscoverRecipe.class,
-			"make %players% (discover|unlock) recipe[s] [with [the] (key|id)[s]] %strings%",
-			"make %players% (discover|unlock) recipe[s] %recipes%",
-			"make %players% (undiscover|lock|forget) recipe[s] [with [the] (key|id)[s]] %strings%",
-			"make %players% (undiscover|lock|forget) recipe[s] %recipes%",
-			"(discover|unlock) recipe[s] [with [the] (key|id)[s]] %strings% for %players%",
-			"(discover|unlock) recipe[s] %recipes% for %players%",
-			"(undiscover|lock|forget) recipe[s] [with [the] (key|id)[s]] %strings% for %players%",
-			"(undiscover|lock|forget) recipe[s] %recipes% for %players%");
+			"make %players% (discover|unlock) recipe[s] %recipes/strings%",
+			"make %players% (undiscover|lock|forget) recipe[s] %recipes/strings%",
+			"(discover|unlock) recipe[s] %recipes/strings% for %players%",
+			"(undiscover|lock|forget) recipe[s] %recipes/strings% for %players%");
 	}
-
-	private static final Set<Integer> discoverPatterns = Set.of(0, 1, 4, 5);
 
 	private Expression<Player> players;
 	private Expression<?> recipes;
@@ -51,15 +43,16 @@ public class EffDiscoverRecipe extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		isDiscover = discoverPatterns.contains(matchedPattern);
+		isDiscover = matchedPattern == 0 || matchedPattern == 2;
 		//noinspection unchecked
-		players = (Expression<Player>) (matchedPattern <= 3 ? exprs[0] : exprs[1]);
-		recipes = matchedPattern <= 3 ? exprs[1] : exprs[0];
+		players = (Expression<Player>) (matchedPattern <= 1 ? exprs[0] : exprs[1]);
+		recipes = matchedPattern <= 1 ? exprs[1] : exprs[0];
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
+		Player[] playerArray = players.getArray(event);
 		for (Object object : recipes.getArray(event)) {
 			NamespacedKey key = null;
 			if (object instanceof String recipeName) {
@@ -71,7 +64,7 @@ public class EffDiscoverRecipe extends Effect {
 				key = recipeKey.getKey();
 			}
 			if (key != null) {
-				for (Player player : players.getArray(event)) {
+				for (Player player : playerArray) {
 					if (isDiscover) {
 						player.discoverRecipe(key);
 					} else {

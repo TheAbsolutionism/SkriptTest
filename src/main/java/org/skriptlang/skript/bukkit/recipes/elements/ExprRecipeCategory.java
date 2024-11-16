@@ -11,17 +11,21 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.CookingRecipe;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper.*;
+import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Category")
 @Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
@@ -70,10 +74,10 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	protected RecipeCategory @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
 			Enum<?> category = null;
-			if (recipe instanceof RecipeWrapper) {
-				if (recipe instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+			if (recipe instanceof MutableRecipe) {
+				if (recipe instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 					category = craftingRecipeWrapper.getCategory();
-				} else if (recipe instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+				} else if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
 					category = cookingRecipeWrapper.getCategory();
 				}
 			} else {
@@ -105,12 +109,12 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 			return;
 		if (!(delta[0] instanceof RecipeCategory recipeCategory))
 			return;
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
-		if (recipeWrapper instanceof CraftingRecipeWrapper craftingRecipeWrapper) {
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		if (recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 			if (!(recipeCategory.getCategory() instanceof CraftingBookCategory category))
 				return;
 			craftingRecipeWrapper.setCategory(category);
-		} else if (recipeWrapper instanceof CookingRecipeWrapper cookingRecipeWrapper) {
+		} else if (recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper) {
 			if (!(recipeCategory.getCategory() instanceof CookingBookCategory category))
 				return;
 			cookingRecipeWrapper.setCategory(category);

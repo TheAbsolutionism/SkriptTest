@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -8,17 +9,16 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RegisterRecipeEvent;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeWrapper;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Result")
 @Description("The result item for a recipe.")
@@ -57,7 +57,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof RecipeWrapper recipeWrapper)
+			if (recipe instanceof MutableRecipe recipeWrapper)
 				return recipeWrapper.getResult();
 			return recipe.getResult();
 		});
@@ -75,7 +75,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 
-		RecipeWrapper recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
 
 		ItemStack result = (ItemStack) delta[0];
 		recipeWrapper.setResult(result);
