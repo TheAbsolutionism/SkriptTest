@@ -12,9 +12,9 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.util.coll.CollectionUtils;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
+import ch.njol.util.coll.iterator.CheckedIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
@@ -22,6 +22,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +35,12 @@ import java.util.List;
 	"<li>Get only recipes provided by Minecraft or custom recipes</li>",
 	"<li>Specific recipe types</li>",
 	"<li>For specific items</li>",
-	"</ul>"
+	"</ul>",
+	"",
+	"NOTES:",
+	"- When resetting the server recipes, all custom recipes from any plugin will be removed, regardless of specifying additional data. "
+		+ "Only vanilla recipes will be present.",
+	"- When deleting the server recipes, you are allowed to delete recipes using the options listed above.",
 })
 @Examples({
 	"set {_list::*} to all of the server's recipe of type shaped recipe for netherite ingot",
@@ -42,9 +48,10 @@ import java.util.List;
 	"set {_list::*} to all of the server's custom recipes of type blasting for raw iron named \"Impure Iron\"",
 	"",
 	"reset all of the server's recipes",
-	"reset all recipes for netherite ingot",
-	"reset all of the minecraft recipes",
-	"reset all of the custom shaped recipes"
+	"",
+	"delete all recipes for netherite ingot",
+	"clear all of the minecraft recipes",
+	"delete all of the custom shaped recipes"
 })
 @Since("INSERT VERSION")
 public class ExprAllRecipes extends SimpleExpression<Recipe> {
@@ -84,21 +91,46 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.RESET)
+		if (mode == ChangeMode.RESET || mode == ChangeMode.DELETE)
 			return CollectionUtils.array(Recipe.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (itemExpr == null && recipeTypeExpr == null && !getMinecraft && !getCustom) {
-			Bukkit.resetRecipes();
-		} else {
-			getSelectedRecipes(event).forEach(recipe -> {
-				if (recipe instanceof Keyed key)
-					Bukkit.removeRecipe(key.getKey());
-			});
+		switch (mode) {
+			case RESET -> {
+				Bukkit.resetRecipes();
+			}
+			case REMOVE -> {
+				getSelectedRecipes(event).forEach(recipe -> {
+					if (recipe instanceof Keyed key)
+						Bukkit.removeRecipe(key.getKey());
+				});
+			}
 		}
+	}
+
+	@Override
+	public boolean isSingle() {
+		return false;
+	}
+
+	@Override
+	public Class<Recipe> getReturnType() {
+		return Recipe.class;
+	}
+
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("all of the");
+		if (getMinecraft) builder.append("minecraft");
+		else if (getCustom) builder.append("custom");
+		builder.append("recipes");
+		if (recipeTypeExpr != null) builder.append("of type", recipeTypeExpr);
+		if (itemExpr != null) builder.append("for", itemExpr);
+		return builder.toString();
 	}
 
 	private List<Recipe> getSelectedRecipes(Event event) {
@@ -124,6 +156,24 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			iterator = Bukkit.recipeIterator();
 		}
 
+		RecipeType recipeType = recipeTypeExpr != null ? recipeTypeExpr.getSingle(event) : null;
+
+		CheckedIterator<Recipe> checkedIterator = new CheckedIterator<Recipe>(iterator, recipe -> {
+			if (recipe instanceof Keyed keyed) {
+				NamespacedKey key = keyed.getKey();
+				if (getMinecraft && !key.getNamespace().equalsIgnoreCase("minecraft"))
+					return false;
+				else if (getCustom && key.getNamespace().equalsIgnoreCase("minecraft"))
+					return false;
+
+				if (recipeType != null) {
+					if (!(recipe.getClass().equals(recipeType.getRecipeClass()) || recipeType.getRecipeClass().isInstance(recipe)))
+						return false;
+				}
+				return true;
+			}
+			return false;
+		});
 
 		iterator.forEachRemaining(recipe -> {
 			if (recipe instanceof Keyed keyed) {
@@ -143,28 +193,6 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			}
 		});
 		return recipeList;
-	}
-
-	@Override
-	public boolean isSingle() {
-		return false;
-	}
-
-	@Override
-	public Class<Recipe> getReturnType() {
-		return Recipe.class;
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("all of the");
-		if (getMinecraft) builder.append("minecraft");
-		else if (getCustom) builder.append("custom");
-		builder.append("recipes");
-		if (recipeTypeExpr != null) builder.append("of type", recipeTypeExpr);
-		if (itemExpr != null) builder.append("for", itemExpr);
-		return builder.toString();
 	}
 
 }

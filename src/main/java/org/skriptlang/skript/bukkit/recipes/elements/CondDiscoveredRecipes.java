@@ -8,11 +8,8 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
-import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
@@ -32,18 +29,19 @@ public class CondDiscoveredRecipes extends Condition {
 
 	static {
 		Skript.registerCondition(CondDiscoveredRecipes.class,
-			"%players% (has|have) (discovered|unlocked) [the] recipe[s] %recipes/strings%",
-			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] recipe[s] %recipes/strings%");
+			"%players% (has|have) (discovered|unlocked) [the] [recipe[s]] %recipes%",
+			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] [recipe[s]] %recipes%");
 	}
 
 	private Expression<Player> players;
-	private Expression<?> recipes;
+	private Expression<? extends Recipe> recipes;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		players = (Expression<Player>) exprs[0];
-		recipes = exprs[1];
+		//noinspection unchecked
+		recipes = (Expression<? extends Recipe>) exprs[1];
 		setNegated(matchedPattern == 1);
 		return true;
 	}
@@ -54,12 +52,7 @@ public class CondDiscoveredRecipes extends Condition {
 			player -> recipes.check(event,
 				recipe -> {
 					boolean result = false;
-					if (recipe instanceof String recipeName) {
-						NamespacedKey key = NamespacedUtils.getNamespacedKey(recipeName);
-						if (Bukkit.getRecipe(key) != null)
-							result = player.hasDiscoveredRecipe(key);
-						return isNegated();
-					} else if (recipe instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
+					if (recipe instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
 						result = player.hasDiscoveredRecipe(recipeKey.getKey());
 					}
 					return isNegated() ? !result : result;

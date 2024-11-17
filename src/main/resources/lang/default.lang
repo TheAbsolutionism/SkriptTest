@@ -2420,13 +2420,13 @@ experience cooldown change reasons:
 
 # -- Recipe Categories --
 recipe categories:
-	crafting_building: crafting building, craftingcategory building, crafting category building
-	crafting_equipment: crafting equipment, craftingcategory equipment, crafting category equipment
-	crafting_misc: crafting misc, craftingcategory misc, crafting category misc
-	crafting_redstone: crafting redstone, craftingcategory redstone, crafting category redstone
-	cooking_blocks: cooking blocks, cookingcategory blocks, cooking category blocks
-	cooking_food: cooking food, cookingcategory food, cooking category food
-	cooking_misc: cooking misc, cookingcategory misc, cooking category misc
+	crafting_building: building crafting category
+	crafting_equipment: equipment crafting category
+	crafting_misc: misc crafting category, miscellaneous crafting category
+	crafting_redstone: redstone crafting category
+	cooking_blocks: blocks cooking category
+	cooking_food: food cooking category
+	cooking_misc: misc cooking category, miscellaneous cooking category
 
 # -- Recipe Types --
 recipe types:

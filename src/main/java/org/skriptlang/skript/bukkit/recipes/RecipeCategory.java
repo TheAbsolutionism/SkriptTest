@@ -17,7 +17,7 @@ public enum RecipeCategory {
 	COOKING_FOOD(CookingBookCategory.FOOD),
 	COOKING_MISC(CookingBookCategory.MISC);
 
-	private Enum<?> category;
+	private final Enum<?> category;
 
 	RecipeCategory(Enum<?> category) {
 		this.category = category;

@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -21,10 +20,10 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
+import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
 import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Category")
@@ -48,25 +47,24 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 
 	static {
 		Skript.registerExpression(ExprRecipeCategory.class, RecipeCategory.class, ExpressionType.PROPERTY,
-			"[the] recipe category [of %recipes%]");
+			"[the] recipe category [of %recipes%]",
+			"%recipes%'[s] recipe category");
 	}
 
 	private boolean isEvent = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
-			//noinspection unchecked
-			setExpr((Expression<? extends Recipe>) exprs[0]);
-		} else {
+		if (exprs[0].isDefault()) {
 			if (exprs[0] == null) {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
 			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
 				isEvent = true;
-			setExpr(new EventValueExpression<>(Recipe.class));
 		}
+		//noinspection unchecked
+		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
 	}
 
@@ -97,8 +95,12 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent) {
-			return CollectionUtils.array(RecipeCategory.class);
+		if (!isEvent) {
+			Skript.error("You can not set the recipe category of existing recipes.");
+		} else {
+			if (mode == ChangeMode.SET) {
+				return CollectionUtils.array(RecipeCategory.class);
+			}
 		}
 		return null;
 	}
@@ -107,9 +109,8 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
-		if (!(delta[0] instanceof RecipeCategory recipeCategory))
-			return;
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		RecipeCategory recipeCategory = (RecipeCategory) (delta != null ? delta[0] : null);
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 		if (recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper) {
 			if (!(recipeCategory.getCategory() instanceof CraftingBookCategory category))
 				return;

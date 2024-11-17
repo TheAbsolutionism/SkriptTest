@@ -1,10 +1,11 @@
 package org.skriptlang.skript.bukkit.recipes;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 import java.util.ArrayList;
@@ -12,12 +13,13 @@ import java.util.List;
 
 /**
  * Mutable Recipe class allowing data to be set before creation of a recipe.
+ * Wraps all types of recipe.
  */
 public abstract class MutableRecipe implements Recipe {
 
 	private final RecipeType recipeType;
 	private final NamespacedKey key;
-	private ItemStack result = null;
+	private ItemStack result = new ItemStack(Material.AIR);
 	private final List<String> errors = new ArrayList<>();
 
 	public MutableRecipe(NamespacedKey key, RecipeType recipeType) {
@@ -30,7 +32,7 @@ public abstract class MutableRecipe implements Recipe {
 	}
 
 	@Override
-	public @Nullable ItemStack getResult() {
+	public @NotNull ItemStack getResult() {
 		return result;
 	}
 
@@ -98,7 +100,7 @@ public abstract class MutableRecipe implements Recipe {
 
 			@Override
 			public ShapedRecipe create() {
-				if (getResult() == null) {
+				if (getResult().getType() == Material.AIR) {
 					addError("You must provide a result item when creating a recipe");
 					return null;
 				}
@@ -131,7 +133,7 @@ public abstract class MutableRecipe implements Recipe {
 
 			@Override
 			public ShapelessRecipe create() {
-				if (getResult() == null) {
+				if (getResult().getType() == Material.AIR) {
 					addError("You must provide a result item when creating a recipe");
 					return null;
 				}
@@ -207,7 +209,7 @@ public abstract class MutableRecipe implements Recipe {
 
 		@Override
 		public CookingRecipe<?> create() {
-			if (getResult() == null) {
+			if (getResult().getType() == Material.AIR) {
 				addError("You must provide a result item when creating a recipe");
 				return null;
 			}
@@ -310,7 +312,7 @@ public abstract class MutableRecipe implements Recipe {
 
 		@Override
 		public SmithingRecipe create() {
-			if (getResult() == null) {
+			if (getResult().getType() == Material.AIR) {
 				addError("You must provide a result item when creating a recipe");
 				return null;
 			}
@@ -333,7 +335,7 @@ public abstract class MutableRecipe implements Recipe {
 
 			@Override
 			public SmithingTransformRecipe create() {
-				if (getResult() == null) {
+				if (getResult().getType() == Material.AIR) {
 					addError("You must provide a result item when creating a recipe");
 					return null;
 				}
@@ -396,7 +398,7 @@ public abstract class MutableRecipe implements Recipe {
 
 		@Override
 		public StonecuttingRecipe create() {
-			if (getResult() == null) {
+			if (getResult().getType() == Material.AIR) {
 				addError("You must provide a result item when creating a recipe");
 				return null;
 			}

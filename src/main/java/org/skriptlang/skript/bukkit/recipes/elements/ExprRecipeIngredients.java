@@ -6,7 +6,6 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -124,10 +123,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedChoice = recipePatterns[matchedPattern];
-		if (!exprs[0].isDefault()) {
-			//noinspection unchecked
-			setExpr((Expression<? extends Recipe>) exprs[0]);
-		} else {
+		if (exprs[0].isDefault()) {
 			if (exprs[0] == null) {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
@@ -153,8 +149,9 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 				}
 				isEvent = true;
 			}
-			setExpr(new EventValueExpression<>(Recipe.class));
 		}
+		//noinspection unchecked
+		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
 	}
 
@@ -285,8 +282,13 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent)
-			return CollectionUtils.array(ItemType[].class);
+		if (!isEvent) {
+			Skript.error("You can not set the " + selectedChoice.toString + " of existing recipes.");
+		} else {
+			if (mode == ChangeMode.SET) {
+				return CollectionUtils.array(ItemType[].class);
+			}
+		}
 		return null;
 	}
 
@@ -305,7 +307,7 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 			}
 		}
 
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 
 		switch (selectedChoice) {
 			case INGREDIENTS -> {

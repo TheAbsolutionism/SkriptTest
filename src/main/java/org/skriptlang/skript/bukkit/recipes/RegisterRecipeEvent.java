@@ -16,14 +16,17 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTrimRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
 
+/**
+ * Event class used with SecRegisterRecipe to allow the creation of MutableRecipe
+ */
 public class RegisterRecipeEvent extends Event {
 	private boolean errorInEffect = false;
 	private RecipeType recipeType;
-	private MutableRecipe recipeWrapper;
+	private MutableRecipe mutableRecipe;
 
 	public RegisterRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 		this.recipeType = recipeType;
-		this.recipeWrapper = switch (recipeType) {
+		this.mutableRecipe = switch (recipeType) {
 			case SHAPED -> new MutableShapedRecipe(key, recipeType);
 			case SHAPELESS -> new MutableShapelessRecipe(key, recipeType);
 			case BLASTING -> new MutableBlastingRecipe(key, recipeType);
@@ -51,22 +54,31 @@ public class RegisterRecipeEvent extends Event {
 		return recipeType;
 	}
 
-	public MutableRecipe getRecipeWrapper() {
-		return recipeWrapper;
+	public MutableRecipe getMutableRecipe() {
+		return mutableRecipe;
 	}
 
+	/**
+	 * Specific event to determine if the mutableRecipe is of MutableCraftingRecipe
+	 */
 	public static class CraftingRecipeEvent extends RegisterRecipeEvent {
 
 		public CraftingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		};
 
+		/**
+		 * Specific event to determine if the mutableRecipe is of MutableShapedRecipe
+		 */
 		public static class ShapedRecipeEvent extends CraftingRecipeEvent {
 			public ShapedRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
 			};
 		}
 
+		/**
+		 * Specific event to determine if the mutableRecipe is of MutableShapelessRecipe
+		 */
 		public static class ShapelessRecipeEvent extends CraftingRecipeEvent {
 			public ShapelessRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 				super(key, recipeType);
@@ -74,6 +86,9 @@ public class RegisterRecipeEvent extends Event {
 		}
 	}
 
+	/**
+	 * Specific event to determine if the mutableRecipe is of MutableCookingRecipe
+	 */
 	public static class CookingRecipeEvent extends RegisterRecipeEvent {
 
 		public CookingRecipeEvent(NamespacedKey key, RecipeType recipeType) {

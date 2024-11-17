@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -35,25 +34,24 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 
 	static {
 		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
-			"[the] recipe cook[ing] time [of %recipes%]");
+			"[the] recipe cook[ing] time [of %recipes%]",
+			"%recipes%'[s] recipe cook[ing] time");
 	}
 
 	private boolean isEvent = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
-			//noinspection unchecked
-			setExpr((Expression<? extends Recipe>) exprs[0]);
-		} else {
+		if (exprs[0].isDefault()) {
 			if (exprs[0] == null) {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
 			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
 				isEvent = true;
-			setExpr(new EventValueExpression<>(Recipe.class));
 		}
+		//noinspection unchecked
+		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
 	}
 
@@ -71,8 +69,13 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent)
-			return CollectionUtils.array(Timespan.class);
+		if (!isEvent) {
+			Skript.error("You can not set the recipe cooking time of existing recipes.");
+		} else {
+			if (mode == ChangeMode.SET) {
+				return CollectionUtils.array(Timespan.class);
+			}
+		}
 		return null;
 	}
 
@@ -82,7 +85,7 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 			return;
 
 		Timespan timespan = (Timespan) delta[0];
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
 			return;
 		cookingRecipeWrapper.setCookingTime((int) timespan.getAs(Timespan.TimePeriod.TICK));

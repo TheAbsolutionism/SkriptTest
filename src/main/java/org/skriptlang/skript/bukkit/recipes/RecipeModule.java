@@ -74,7 +74,7 @@ public class RecipeModule {
 		//CraftItemEvent
 		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, new Getter<Recipe, CraftItemEvent>() {
 			@Override
-			public @Nullable Recipe get(CraftItemEvent event) {
+			public Recipe get(CraftItemEvent event) {
 				return event.getRecipe();
 			}
 		}, EventValues.TIME_NOW);

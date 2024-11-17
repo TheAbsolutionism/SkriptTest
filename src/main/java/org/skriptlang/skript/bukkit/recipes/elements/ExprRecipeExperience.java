@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -34,26 +33,24 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	static {
 		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY,
-			"[the] recipe [e]xp[erience] [of %recipes%]");
+			"[the] recipe [e]xp[erience] [of %recipes%]",
+			"%recipes%'[s] recipe [e]xp[erience]");
 	}
 
 	private boolean isEvent = false;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
-			//noinspection unchecked
-			setExpr((Expression<? extends Recipe>) exprs[0]);
-		} else {
+		if (exprs[0].isDefault()) {
 			if (exprs[0] == null) {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
 			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
 				isEvent = true;
-			setExpr(new EventValueExpression<>(Recipe.class));
 		}
+		//noinspection unchecked
+		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
 	}
 
@@ -71,8 +68,13 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent)
-			return CollectionUtils.array(Float.class);
+		if (!isEvent) {
+			Skript.error("You can not set the recipe experience of existing recipes.");
+		} else {
+			if (mode == ChangeMode.SET) {
+				return CollectionUtils.array(Float.class);
+			}
+		}
 		return null;
 	}
 
@@ -81,7 +83,7 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
 			return;
 

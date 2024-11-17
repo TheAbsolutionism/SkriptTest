@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
@@ -29,28 +28,26 @@ public class EffRemoveRecipe extends Effect {
 
 	static {
 		Skript.registerEffect(EffRemoveRecipe.class,
-			"(remove|delete|clear) [the] recipe[s] %recipes/strings% [from [the] server]");
+			"(remove|delete|clear) [the] [recipe[s]] %recipes% [from [the] server]");
 	}
 
-	private Expression<?> recipes;
+	private Expression<? extends Recipe> recipes;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		recipes = exprs[0];
+		//noinspection unchecked
+		recipes = (Expression<? extends Recipe>) exprs[0];
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
 		for (Object object : recipes.getArray(event)) {
-			NamespacedKey key = null;
-			if (object instanceof String recipeName) {
-				key = NamespacedUtils.getNamespacedKey(recipeName);
-			} else if (object instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
-				key = recipeKey.getKey();
+			if (object instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
+				NamespacedKey key = recipeKey.getKey();
+				if (key != null && Bukkit.getRecipe(key) != null)
+					Bukkit.removeRecipe(key);
 			}
-			if (key != null && Bukkit.getRecipe(key) != null)
-				Bukkit.removeRecipe(key);
 		}
 	}
 

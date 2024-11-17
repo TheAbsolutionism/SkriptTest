@@ -88,8 +88,8 @@ public class SecRegisterRecipe extends Section {
 		Skript.registerSection(SecRegisterRecipe.class, "(register|create) [a] [new] %*recipetype% with [the] (key|id) %string%");
 		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
 			@Override
-			public @Nullable Recipe get(RegisterRecipeEvent event) {
-				return event.getRecipeWrapper();
+			public Recipe get(RegisterRecipeEvent event) {
+				return event.getMutableRecipe();
 			}
 		}, EventValues.TIME_NOW);
 	}
@@ -124,6 +124,8 @@ public class SecRegisterRecipe extends Section {
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
 		String name = providedName.getSingle(event);
+		if (name == null)
+			return super.walk(event, false);
 		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
 		RecipeType recipeType = providedType;
 		RegisterRecipeEvent recipeEvent = switch (recipeType) {
@@ -141,7 +143,7 @@ public class SecRegisterRecipe extends Section {
 		if (recipeEvent.getErrorInEffect())
 			return super.walk(event, false);
 
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 		Recipe recipe = recipeWrapper.create();
 		if (recipe == null) {
 			//Skript.error(recipeWrapper.getErrors().toString());
@@ -156,7 +158,7 @@ public class SecRegisterRecipe extends Section {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "register a new " + providedType + " recipe with the namespacekey " + providedName.toString(event, debug);
+		return "register a new " + providedType + " recipe with key " + providedName.toString(event, debug);
 	}
 
 }

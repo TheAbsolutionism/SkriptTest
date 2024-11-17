@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -40,25 +39,24 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 
 	static {
 		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY,
-			"[the] recipe group [of %recipes%]");
+			"[the] recipe group [of %recipes%]",
+			"%recipes%'[s] recipe group");
 	}
 
 	private boolean isEvent = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!exprs[0].isDefault()) {
-			//noinspection unchecked
-			setExpr((Expression<? extends Recipe>) exprs[0]);
-		} else {
+		if (exprs[0].isDefault()) {
 			if (exprs[0] == null) {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
 			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
 				isEvent = true;
-			setExpr(new EventValueExpression<>(Recipe.class));
 		}
+		//noinspection unchecked
+		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
 	}
 
@@ -86,8 +84,13 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET && isEvent)
-			return CollectionUtils.array(String.class);
+		if (!isEvent) {
+			Skript.error("You can not set the recipe group of existing recipes.");
+		} else {
+			if (mode == ChangeMode.SET) {
+				return CollectionUtils.array(String.class);
+			}
+		}
 		return null;
 	}
 
@@ -95,7 +98,7 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
-		MutableRecipe recipeWrapper = recipeEvent.getRecipeWrapper();
+		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 
 		String group = (String) delta[0];
 		if (group.isEmpty())
