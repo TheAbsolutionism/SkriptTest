@@ -359,11 +359,11 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Applies {@code metaChanger} to the meta of {@code itemStack} and returns the itemStack with the updated ItemMeta.
-	 * @param itemStack ItemStack's ItemMeta to be changed
-	 * @param metaChanger Consumer to change the ItemMeta
-	 * @return ItemStack with the updated ItemMeta
+	 * Applies a provided {@code Consumer} to the meta of the provided {@code ItemStack} and returns the updated {@code ItemStack} (with updated {@code ItemMeta}).
+	 * @param itemStack the item whose meta is to be changed using the provided Consumer
+	 * @param metaChanger a consumer to update the meta of the provided ItemStack
 	 * @param <T>
+	 * @return the updated item
 	 */
 	public static <T extends ItemMeta> ItemStack changeItemMeta(ItemStack itemStack, Consumer<T> metaChanger) {
 		//noinspection unchecked
@@ -374,10 +374,11 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Updates the provided, slot, itemtype or item stack in {@code object} by applying {@code itemStack} to it.
-	 * See {@see asItemStack}
-	 * @param object The original object used to determine it's origin
-	 * @param itemStack The ItemStack to update the original location
+	 * Updates the provided object ({@code Slot}, {@code ItemType}, {@code ItemStack}) by setting it to the provided {@code ItemStack}.
+	 * 
+	 * @param object the object to update
+	 * @param itemStack the item to set the object to
+	 * @see #asItemStack(Object)    
 	 */
 	public static void setItem(Object object, ItemStack itemStack) {
 		ItemMeta itemMeta = itemStack.getItemMeta();
@@ -388,7 +389,7 @@ public class ItemUtils {
 		} else if (object instanceof ItemStack itemStack1) {
 			itemStack1.setItemMeta(itemMeta);
 		}
-		throw new IllegalArgumentException("Object did not originate from a Slot, ItemType or ItemStack");
+		throw new IllegalArgumentException("Object was not a Slot, ItemType or ItemStack.");
 	}
 
 }
