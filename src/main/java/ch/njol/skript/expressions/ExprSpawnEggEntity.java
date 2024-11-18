@@ -24,9 +24,11 @@ import org.jetbrains.annotations.Nullable;
 	"set {_item} to a zombie spawn egg",
 	"broadcast the spawn egg entity of {_item}",
 	"",
-	"create a new entity snapshot from a zombie and store it in {_snapshot}:",
-		"\tset the max health of entity to 30",
-		"\tset the health of entity to 30",
+	"spawn a pig at location(0,0,0):",
+		"\tset the max health of entity to 20",
+		"\tset the health of entity to 20",
+		"\tset {_snapshot} to the entity snapshot of entity",
+		"\tclear entity",
 	"set the spawn egg entity of {_item} to {_snapshot}"
 })
 @RequiredPlugins("Minecraft 1.20.2+")

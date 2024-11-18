@@ -667,11 +667,17 @@ public class DefaultComparators {
 		Comparators.registerComparator(Color.class, org.bukkit.Color.class, (one, two) -> Relation.get(one.asBukkitColor().equals(two)));
 		Comparators.registerComparator(org.bukkit.Color.class, org.bukkit.Color.class, (one, two) -> Relation.get(one.equals(two)));
 
-		if (Skript.classExists("org.bukkit.entity.EntitySnapshot") && Skript.methodExists(EntitySnapshot.class, "getAsString")) {
+		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
+			boolean SNAPSHOT_AS_STRING_EXISTS = Skript.methodExists(EntitySnapshot.class, "getAsString");
 			Comparators.registerComparator(EntitySnapshot.class, EntitySnapshot.class, new Comparator<EntitySnapshot, EntitySnapshot>() {
 				@Override
 				public Relation compare(EntitySnapshot snap1, EntitySnapshot snap2) {
-					return Relation.get(snap1.equals(snap2) || snap1.getAsString().equalsIgnoreCase(snap1.getAsString()));
+					if (!snap1.getEntityType().equals(snap1.getEntityType()))
+						return Relation.NOT_EQUAL;
+					boolean isEqual = snap1.equals(snap2);
+					if (SNAPSHOT_AS_STRING_EXISTS)
+						isEqual = isEqual || snap1.getAsString().equalsIgnoreCase(snap2.getAsString());
+					return Relation.get(isEqual);
 				}
 			});
 		}
