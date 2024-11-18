@@ -29,9 +29,10 @@ import org.jetbrains.annotations.Nullable;
 		"\tset the health of entity to 20",
 		"\tset {_snapshot} to the entity snapshot of entity",
 		"\tclear entity",
-	"set the spawn egg entity of {_item} to {_snapshot}"
+	"set the spawn egg entity of {_item} to {_snapshot}",
+	"if the spawn egg entity of {_item} is {_snapshot}: # Minecraft 1.20.5+",
 })
-@RequiredPlugins("Minecraft 1.20.2+")
+@RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparison)")
 @Since("INSERT VERSION")
 public class ExprSpawnEggEntity extends PropertyExpression<Object, EntitySnapshot> {
 
