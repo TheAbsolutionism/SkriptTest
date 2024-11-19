@@ -2,10 +2,10 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @RequiredPlugins("Minecraft 1.20.2+")
 @Since("INSERT VERSION")
-public class ExprEntitySnapshot extends SimpleExpression<EntitySnapshot> {
+public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntitySnapshot> {
 
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
@@ -37,23 +37,26 @@ public class ExprEntitySnapshot extends SimpleExpression<EntitySnapshot> {
 		}
 	}
 
-	private Expression<Entity> entities;
-
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		entities = (Expression<Entity>) exprs[0];
+		setExpr((Expression<? extends Entity>) exprs[0]);
 		return true;
 	}
 
 	@Override
-	protected EntitySnapshot @Nullable [] get(Event event) {
-		return entities.stream(event).map(Entity::createSnapshot).toArray(EntitySnapshot[]::new);
+	public @Nullable EntitySnapshot convert(Entity entity) {
+		return entity.createSnapshot();
+	}
+
+	@Override
+	protected String getPropertyName() {
+		return "entity snapshot";
 	}
 
 	@Override
 	public boolean isSingle() {
-		return entities.isSingle();
+		return getExpr().isSingle();
 	}
 
 	@Override
@@ -63,7 +66,7 @@ public class ExprEntitySnapshot extends SimpleExpression<EntitySnapshot> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the entity snapshot of " + entities.toString(event, debug);
+		return "the entity snapshot of " + getExpr().toString(event, debug);
 	}
 
 }
