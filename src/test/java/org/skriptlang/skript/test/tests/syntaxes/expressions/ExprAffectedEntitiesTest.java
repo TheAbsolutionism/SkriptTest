@@ -12,14 +12,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class ExprAffectedEntitiesTest extends SkriptJUnitTest {
 
-	AreaEffectCloud cloud;
-	Pig piggy;
-	List<LivingEntity> entityList = new ArrayList<>();
+	private AreaEffectCloud cloud;
+	private Pig piggy;
+	private final List<LivingEntity> entityList = new ArrayList<>();
 
 	@Before
 	public void setUp() {
