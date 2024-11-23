@@ -49,7 +49,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 
 	static {
 		Skript.registerExpression(ExprBannerPatterns.class, Pattern.class, ExpressionType.PROPERTY,
-			"[the] banner pattern[s] of %itemstacks/itemtypes/slots/blocks%",
+			"[all [[of] the]|the] banner pattern[s] of %itemstacks/itemtypes/slots/blocks%",
 			"%itemstacks/itemtypes/slots/blocks%'[s] banner pattern[s]",
 			"[the] %integer%[st|nd|rd|th] [banner] pattern of %itemstacks/itemtypes/slots/blocks%",
 			"%itemstacks/itemtypes/slots/blocks%'[s] %integer%[st|nd|rd|th] [banner] pattern"
@@ -82,22 +82,20 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 		Integer placement = patternNumber != null ? patternNumber.getSingle(event) : null;
 		for (Object object : objects.getArray(event)) {
 			if (object instanceof Block block) {
-				if (block.getState() instanceof Banner banner) {
-					if (placement != null) {
-						if (banner.numberOfPatterns() >= placement)
-							patterns.add(banner.getPattern(placement - 1));
-					} else {
-						patterns.addAll(banner.getPatterns());
-					}
+				if (!(block.getState() instanceof Banner banner))
+					continue;
+				if (placement != null && banner.numberOfPatterns() >= placement) {
+					patterns.add(banner.getPattern(placement - 1));
+				} else if (placement == null) {
+					patterns.addAll(banner.getPatterns());
 				}
 			} else {
 				ItemStack itemStack = ItemUtils.asItemStack(object);
 				if (itemStack == null || !(itemStack.getItemMeta() instanceof BannerMeta bannerMeta))
 					continue;
-				if (placement != null) {
-					if (bannerMeta.numberOfPatterns() >= placement)
-						patterns.add(bannerMeta.getPattern(placement - 1));
-				} else {
+				if (placement != null && bannerMeta.numberOfPatterns() >= placement) {
+					patterns.add(bannerMeta.getPattern(placement - 1));
+				} else if (placement == null) {
 					patterns.addAll(bannerMeta.getPatterns());
 				}
 			}
@@ -113,34 +111,30 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 					yield CollectionUtils.array(Pattern.class);
 				yield CollectionUtils.array(Pattern[].class);
 			}
-			case REMOVE, ADD -> CollectionUtils.array(Pattern[].class);
+			case REMOVE, ADD -> {
+				if (patternNumber != null)
+					yield null;
+				yield CollectionUtils.array(Pattern[].class);
+			}
 			default -> null;
 		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		Pattern[] patterns = null;
-		Pattern pattern = null;
+		Pattern[] patterns = (Pattern[]) delta;
 		Integer placement = null;
-		if (patternNumber != null) {
+		if (patternNumber != null)
 			placement = patternNumber.getSingle(event);
-			if (delta != null && delta[0] != null) {
-				pattern = (Pattern) delta[0];
-			}
-		} else if (delta != null) {
-			patterns = (Pattern[]) delta;
-		}
 		Integer finalPlacement = placement;
-		Pattern finalPattern = pattern;
 		List<Pattern> patternList = patterns != null ? Arrays.stream(patterns).toList() : new ArrayList<>();
 
 		Consumer<BannerMeta> metaChanger = null;
 		Consumer<Banner> blockChanger = null;
 
 		if (placement != null) {
-			metaChanger = getPlacementMetaChanger(mode, finalPlacement, finalPattern);
-			blockChanger = getPlacementBlockChanger(mode, finalPlacement, finalPattern);
+			metaChanger = getPlacementMetaChanger(mode, finalPlacement, patternList.size() == 1 ? patternList.get(0) : null);
+			blockChanger = getPlacementBlockChanger(mode, finalPlacement, patternList.size() == 1 ? patternList.get(0) : null);
 		} else {
 			metaChanger = getAllMetaChanger(mode, patternList);
 			blockChanger = getAllBlockChanger(mode, patternList);
@@ -170,8 +164,8 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 
 	@Override
 	public boolean isSingle() {
-        return patternNumber != null && getExpr().isSingle();
-    }
+		return patternNumber != null && getExpr().isSingle();
+	}
 
 	@Override
 	public Class<Pattern> getReturnType() {
@@ -190,13 +184,13 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 		return builder.toString();
 	}
 
-	private Consumer<BannerMeta> getPlacementMetaChanger(ChangeMode mode, int placement, Pattern pattern) {
+	private Consumer<BannerMeta> getPlacementMetaChanger(ChangeMode mode, int placement, @Nullable Pattern pattern) {
 		return switch (mode) {
 			case SET -> bannerMeta -> {
 				if (bannerMeta.numberOfPatterns() < placement) {
 					int toAdd = placement - bannerMeta.numberOfPatterns();
 					for (int i = 0; i < toAdd; i++) {
-						bannerMeta.addPattern(new Pattern(DyeColor.GRAY, PatternType.BASE));
+						bannerMeta.addPattern(new Pattern(DyeColor.WHITE, PatternType.BASE));
 					}
 				}
 				bannerMeta.setPattern(placement - 1, pattern);
@@ -209,7 +203,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 		};
 	}
 
-	private Consumer<Banner> getPlacementBlockChanger(ChangeMode mode, int placement, Pattern pattern) {
+	private Consumer<Banner> getPlacementBlockChanger(ChangeMode mode, int placement, @Nullable Pattern pattern) {
 		return switch (mode) {
 			case SET -> banner -> {
 				if (banner.numberOfPatterns() < placement) {

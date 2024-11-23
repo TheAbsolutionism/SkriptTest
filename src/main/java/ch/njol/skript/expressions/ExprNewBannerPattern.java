@@ -32,9 +32,9 @@ import org.jetbrains.annotations.Nullable;
 public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 	static {
-		Skript.registerExpression(ExprNewBannerPattern.class, Pattern.class, ExpressionType.SIMPLE,
-			"[a] [new] %bannerpattern% colo[u]red %*color%",
-			"[a] [new] %*color% %bannerpattern%");
+		Skript.registerExpression(ExprNewBannerPattern.class, Pattern.class, ExpressionType.PATTERN_MATCHES_EVERYTHING,
+			"[a] %bannerpatterntype% colo[u]red %*color%",
+			"[a] %*color% %bannerpatterntype%");
 	}
 
 	private Expression<PatternType> selectedPattern;

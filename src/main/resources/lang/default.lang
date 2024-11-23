@@ -2418,7 +2418,8 @@ experience cooldown change reasons:
 	plugin: plugin
 	pickup_orb: orb pickup, pickup orb
 
-banner patterns:
+# -- Banner Pattern Types --
+banner pattern types:
 	base: base banner pattern
 	border: border banner pattern, bordure banner pattern, bordure indented banner pattern
 	bricks: bricks banner pattern, field masoned banner pattern
@@ -2426,42 +2427,42 @@ banner patterns:
 	creeper: creeper banner pattern, creeper charged banner pattern
 	cross: cross banner pattern
 	curly_border: curly border banner pattern
-	diagonal_left: diagonal left banner pattern, left diagonal banner pattern
-	diagonal_right: diagonal right banner pattern, right diagonal banner pattern
-	diagonal_up_left: diagonal up left banner pattern, left up diagonal banner pattern, up left banner pattern
-	diagonal_up_right: diagonal up right banner pattern, right up diagonal banner pattern, up right diagonal banner pattern
+	diagonal_left: left diagonal banner pattern
+	diagonal_right: right diagonal banner pattern
+	diagonal_up_left: diagonal up left banner pattern
+	diagonal_up_right: diagonal up right banner pattern
 	flow: flow banner pattern
 	flower: flower banner pattern
 	globe: globe banner pattern
 	gradient: gradient banner pattern
 	gradient_up: gradient up banner pattern
 	guster: guster banner pattern
-	half_horizontal: half horizontal banner pattern, horizontal half banner pattern
-	half_horizontal_bottom: half horizontal bottom banner pattern, half bottom horizontal banner pattern, bottom half horizontal banner pattern, bottom horizontal half banner pattern, horizontal half bottom banner pattern, horizontal bottom half banner pattern
-	half_vertical: half vertical banner pattern, vertical half banner pattern
-	half_vertical_right: half vertical right banner pattern, half right vertical banner pattern, right half vertical banner pattern, right vertical half banner pattern, vertical half right banner pattern, vertical right half banner pattern
+	half_horizontal: horizontal half banner pattern
+	half_horizontal_bottom: horizontal bottom half banner pattern
+	half_vertical: vertical half banner pattern
+	half_vertical_right: right vertical half banner pattern
 	mojang: mojang banner pattern, thing banner pattern
 	piglin: piglin banner pattern, snout banner pattern
 	rhombus: rhombus banner pattern
 	skull: skull banner pattern
-	small_stripes: small stripes banner pattern, stripes small banner pattern
-	square_bottom_left: square bottom left banner pattern, square left bottom banner pattern, left bottom square banner pattern, left square bottom banner pattern, bottom left square banner pattern, bottom square left banner pattern
-	square_bottom_right: square bottom right banner pattern, square right bottom banner pattern, right bottom square banner pattern, right square bottom banner pattern, bottom right square banner pattern, bottom square right banner pattern
-	square_top_left: square top left banner pattern, square left top banner pattern, left top square banner pattern, left square top banner pattern, top left square banner pattern, top square left banner pattern
-	square_top_right: square top right banner pattern, square right top banner pattern, right top square banner pattern, right square top banner pattern, top right square banner pattern, top square right banner pattern
-	straight_cross: straight cross banner pattern, cross straight banner pattern
-	stripe_bottom: stripe bottom banner pattern, bottom stripe banner pattern
-	stripe_center: stripe center banner pattern, center stripe banner pattern
-	stripe_downleft: stripe down left banner pattern, stripe left down banner pattern, down left stripe banner pattern, down stripe left banner pattern, left down stripe banner pattern, left stripe down banner pattern
-	stripe_downright: stripe down right banner pattern, stripe right down banner pattern, down right stripe banner pattern, down stripe right banner pattern, right down stripe banner pattern, right stripe down banner pattern
-	stripe_left: stripe left banner pattern, left stripe banner pattern
-	stripe_middle: stripe middle banner pattern, middle stripe banner pattern
-	stripe_right: stripe right banner pattern, right stripe banner pattern
-	stripe_top: stripe top banner pattern, top stripe banner pattern
-	triangle_bottom: triangle bottom banner pattern, bottom triangle banner pattern
-	triangle_top: triangle top banner pattern, top triangle banner pattern
-	triangles_bottom: triangles bottom banner pattern, bottom triangles banner pattern
-	triangles_top: triangles top banner pattern, top triangles banner pattern
+	small_stripes: small stripes banner pattern
+	square_bottom_left: bottom left square banner pattern
+	square_bottom_right: bottom right square banner pattern
+	square_top_left: top left square banner pattern
+	square_top_right: top right square banner pattern
+	straight_cross: straight cross banner pattern
+	stripe_bottom: bottom stripe banner pattern
+	stripe_center: center stripe banner pattern
+	stripe_downleft: down left stripe banner pattern
+	stripe_downright: down right stripe banner pattern
+	stripe_left: left stripe banner pattern
+	stripe_middle: middle stripe banner pattern
+	stripe_right: right stripe banner pattern
+	stripe_top: top stripe banner pattern
+	triangle_bottom: bottom triangle banner pattern
+	triangle_top: top triangle banner pattern
+	triangles_bottom: tbottom triangles banner pattern
+	triangles_top: top triangles banner pattern
 
 # -- Boolean --
 boolean:
@@ -2549,7 +2550,7 @@ types:
 	textalignment: text alignment¦s @a
 	itemdisplaytransform: item display transform¦s @an
 	experiencecooldownchangereason: experience cooldown change reason¦s @a
-	bannerpatterntype: banner pattern¦s type¦s @a
+	bannerpatterntype: banner pattern type¦s @a
 	bannerpattern: banner pattern¦s @a
 
 	# Skript

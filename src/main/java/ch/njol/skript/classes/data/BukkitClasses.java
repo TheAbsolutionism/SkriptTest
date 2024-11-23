@@ -1561,9 +1561,9 @@ public class BukkitClasses {
 			.description("Represents a change reason of an <a href='events.html#experience cooldown change event'>experience cooldown change event</a>.")
 			.since("INSERT VERSION"));
 
-		Classes.registerClass(new ClassInfo<>(org.bukkit.block.banner.Pattern.class, "bannerpatterntype")
-			.user("banner ?patterns? ?types?")
-			.name("Banner Pattern Type")
+		Classes.registerClass(new ClassInfo<>(org.bukkit.block.banner.Pattern.class, "bannerpattern")
+			.user("banner ?patterns?")
+			.name("Banner Pattern")
 			.description("Represents a banner pattern.")
 			.since("INSERT VERSION")
 		);
@@ -1571,7 +1571,7 @@ public class BukkitClasses {
 		ClassInfo<?> patternTypeInfo;
 		Registry<PatternType> patternRegistry = Bukkit.getRegistry(PatternType.class);
 		if (patternRegistry != null) {
-			patternTypeInfo = new RegistryClassInfo<>(PatternType.class, patternRegistry, "bannerpattern", "banner patterns");
+			patternTypeInfo = new RegistryClassInfo<>(PatternType.class, patternRegistry, "bannerpatterntype", "banner pattern types");
 		} else {
 			try {
 				Class<?> patternClass = Class.forName("org.bukkit.block.banner.PatternType");
@@ -1588,8 +1588,8 @@ public class BukkitClasses {
 			}
 		}
 		Classes.registerClass(patternTypeInfo
-			.user("banner ?patterns?")
-			.name("Banner Pattern")
+			.user("banner ?pattern ?types?")
+			.name("Banner Pattern Type")
 			.description("Represents the various banner patterns that can be applied to a banner.")
 			.since("INSERT VERSION")
 		);
