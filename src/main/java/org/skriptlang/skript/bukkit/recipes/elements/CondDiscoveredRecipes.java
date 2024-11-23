@@ -52,7 +52,7 @@ public class CondDiscoveredRecipes extends Condition {
 			player -> recipes.check(event,
 				recipe -> {
 					boolean result = false;
-					if (recipe instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
+					if (recipe instanceof Keyed recipeKey) {
 						result = player.hasDiscoveredRecipe(recipeKey.getKey());
 					}
 					return isNegated() ? !result : result;

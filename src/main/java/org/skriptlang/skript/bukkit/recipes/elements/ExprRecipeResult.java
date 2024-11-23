@@ -22,7 +22,7 @@ import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 @Name("Recipe Result")
 @Description("The result item for a recipe.")
 @Examples({
-	"register a new shaped recipe with the key \"my_recipe\":",
+	"set {_recipe} to a new shaped recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients of 1st row to diamond, air and diamond",
 		"\tset the recipe result to diamond sword named \"Chosen One\""
 })
@@ -55,8 +55,8 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof MutableRecipe recipeWrapper)
-				return recipeWrapper.getResult();
+			if (recipe instanceof MutableRecipe mutableRecipe)
+				return mutableRecipe.getResult();
 			return recipe.getResult();
 		});
 	}
@@ -78,10 +78,10 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 
-		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
+		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
 
 		ItemStack result = (ItemStack) delta[0];
-		recipeWrapper.setResult(result);
+		mutableRecipe.setResult(result);
 	}
 
 	@Override

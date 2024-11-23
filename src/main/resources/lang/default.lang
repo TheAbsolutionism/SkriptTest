@@ -2542,8 +2542,6 @@ types:
 	experiencecooldownchangereason: experience cooldown change reason¦s @a
 	inputkey: input key¦s @an
 	recipe: recipe¦s @a
-	craftingbookcategory: crafting book categor¦y¦ies @a
-	cookingbookcategory: cooking book categor¦y¦ies @a
 
 	# Skript
 	weathertype: weather type¦s @a

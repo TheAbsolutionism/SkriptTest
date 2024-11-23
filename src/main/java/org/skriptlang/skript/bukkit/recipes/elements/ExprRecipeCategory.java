@@ -29,14 +29,14 @@ import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 @Name("Recipe Category")
 @Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
 @Examples({
-	"register a new shaped recipe with the key \"my_recipe\":",
+	"set {_recipe} to a new shaped recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to diamond, air, diamond, air, emerald, air, diamond, air and diamond",
-		"\tset the recipe category to crafting misc",
+		"\tset the recipe category to misc crafting category",
 		"\tset the recipe result item to nether star",
 	"",
-	"register a new blasting recipe with the id \"my_recipe\":",
+	"set {_recipe} to a new blasting recipe with the id \"my_recipe\":",
 		"\tset the recipe input item to coal",
-		"\tset the recipe category to cooking misc",
+		"\tset the recipe category to misc cooking category",
 		"\tset the recipe result item to gunpowder",
 	"",
 	"loop the server's recipes:",
@@ -72,11 +72,11 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	protected RecipeCategory @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
 			Enum<?> category = null;
-			if (recipe instanceof MutableRecipe) {
-				if (recipe instanceof MutableCraftingRecipe craftingRecipeWrapper) {
-					category = craftingRecipeWrapper.getCategory();
-				} else if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
-					category = cookingRecipeWrapper.getCategory();
+			if (recipe instanceof MutableRecipe mutableRecipe) {
+				if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
+					category = mutableCraftingRecipe.getCategory();
+				} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+					category = mutableCookingRecipe.getCategory();
 				}
 			} else {
 				if (recipe instanceof ShapedRecipe shapedRecipe) {
@@ -110,15 +110,15 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 		RecipeCategory recipeCategory = (RecipeCategory) (delta != null ? delta[0] : null);
-		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
-		if (recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper) {
+		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
+		if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
 			if (!(recipeCategory.getCategory() instanceof CraftingBookCategory category))
 				return;
-			craftingRecipeWrapper.setCategory(category);
-		} else if (recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper) {
+			mutableCraftingRecipe.setCategory(category);
+		} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
 			if (!(recipeCategory.getCategory() instanceof CookingBookCategory category))
 				return;
-			cookingRecipeWrapper.setCategory(category);
+			mutableCookingRecipe.setCategory(category);
 		}
 	}
 

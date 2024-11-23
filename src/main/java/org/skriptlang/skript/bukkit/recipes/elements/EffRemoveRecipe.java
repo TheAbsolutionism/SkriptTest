@@ -28,7 +28,7 @@ public class EffRemoveRecipe extends Effect {
 
 	static {
 		Skript.registerEffect(EffRemoveRecipe.class,
-			"(remove|delete|clear) [the] [recipe[s]] %recipes% [from [the] server]");
+			"(remove|delete) [the] [recipe[s]] %recipes% [from [the] server]");
 	}
 
 	private Expression<? extends Recipe> recipes;
@@ -42,8 +42,8 @@ public class EffRemoveRecipe extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		for (Object object : recipes.getArray(event)) {
-			if (object instanceof Recipe actualRecipe && actualRecipe instanceof Keyed recipeKey) {
+		for (Recipe recipe : recipes.getArray(event)) {
+			if (recipe instanceof Keyed recipeKey) {
 				NamespacedKey key = recipeKey.getKey();
 				if (key != null && Bukkit.getRecipe(key) != null)
 					Bukkit.removeRecipe(key);

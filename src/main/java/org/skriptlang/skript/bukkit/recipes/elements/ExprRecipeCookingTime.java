@@ -24,7 +24,7 @@ import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a blasting, furnace, campfire or smoking recipe.")
 @Examples({
-	"register a new blasting recipe with the key \"my_recipe\":",
+	"set {_recipe} to a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to raw gold named \"Impure Gold\"",
 		"\tset the recipe cooking time to 10 seconds",
 		"\tset the recipe result to gold ingot named \"Pure Gold\""
@@ -58,8 +58,8 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	@Override
 	protected Timespan @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
-				return new Timespan(Timespan.TimePeriod.TICK, cookingRecipeWrapper.getCookingTime());
+			if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+				return new Timespan(Timespan.TimePeriod.TICK, mutableCookingRecipe.getCookingTime());
 			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return new Timespan(Timespan.TimePeriod.TICK, cookingRecipe.getCookingTime());
 			}
@@ -85,10 +85,10 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 			return;
 
 		Timespan timespan = (Timespan) delta[0];
-		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
-		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
+		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
+		if (!(mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe))
 			return;
-		cookingRecipeWrapper.setCookingTime((int) timespan.getAs(Timespan.TimePeriod.TICK));
+		mutableCookingRecipe.setCookingTime((int) timespan.getAs(Timespan.TimePeriod.TICK));
 	}
 
 	@Override

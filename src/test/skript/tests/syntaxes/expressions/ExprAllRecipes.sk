@@ -6,9 +6,10 @@ test "all recipes":
 	set {_custom} to size of all of the server's custom recipes
 	set {_custom_shaped} to size of all of the server's custom shaped recipes
 
-	register a new shaped recipe with the key "test_all_recipes":
+	set {_recipe} to a new shaped recipe with the key "test_all_recipes":
 		set the recipe ingredients to raw iron, raw gold and raw copper
 		set the recipe result to lightning rod
+	add {_recipe} to the server's recipes
 
 	assert (size of all of the server's recipes) = ({_all} + 1) with "Mismatching size of all comparison"
 	assert (size of all of the server's shaped recipes) = ({_all_shaped} + 1) with "Mismatching size of all shaped comparison"

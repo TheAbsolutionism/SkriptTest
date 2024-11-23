@@ -3,6 +3,7 @@ package org.skriptlang.skript.bukkit.recipes;
 import ch.njol.skript.Skript;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
@@ -74,10 +75,12 @@ public class RecipeUtils {
 
 	/**
 	 * Gets {@link RecipeType} from provided recipe class.
+	 *
+	 * Note: MC versions below 1.20 converts Smithing Transform and Smithing Trim Recipes to a Smithing Recipe, causing the returned RecipeType to be Smithing.
 	 * @param providedClass Bukkit recipe class
 	 * @return Recipe Type
 	 */
-	public static RecipeType getRecipeType(Class<? extends Recipe> providedClass) {
+	public static @Nullable RecipeType getRecipeType(@NotNull Class<? extends Recipe> providedClass) {
 		for (RecipeType type : RecipeType.values()) {
 			if (type.recipeClass != null && type.recipeClass.isAssignableFrom(providedClass)) {
 				return type;
@@ -91,7 +94,7 @@ public class RecipeUtils {
 	 * @param providedRecipe Recipe
 	 * @return Recipe Type
 	 */
-	public static RecipeType getRecipeType(Recipe providedRecipe) {
+	public static @Nullable RecipeType getRecipeType(@NotNull Recipe providedRecipe) {
 		return getRecipeType(providedRecipe.getClass());
 	}
 

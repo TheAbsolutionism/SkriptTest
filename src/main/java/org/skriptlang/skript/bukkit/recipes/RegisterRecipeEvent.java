@@ -17,10 +17,10 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
 
 /**
- * Event class used with SecRegisterRecipe to allow the creation of MutableRecipe
+ * Event class used with ExprSecCreateRecipe to allow the creation of MutableRecipe
  */
 public class RegisterRecipeEvent extends Event {
-	private boolean errorInEffect = false;
+	private boolean errorInSection = false;
 	private RecipeType recipeType;
 	private MutableRecipe mutableRecipe;
 
@@ -41,13 +41,13 @@ public class RegisterRecipeEvent extends Event {
 		};
 	}
 
-	public void setErrorInEffect() {
-		this.errorInEffect = true;
+	public void setErrorInSection() {
+		this.errorInSection = true;
 	}
 
 
-	public boolean getErrorInEffect() {
-		return errorInEffect;
+	public boolean getErrorInSection() {
+		return errorInSection;
 	}
 
 	public RecipeType getRecipeType() {

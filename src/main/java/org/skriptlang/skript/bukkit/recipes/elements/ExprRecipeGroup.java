@@ -13,23 +13,21 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.CookingRecipe;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
 import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 
 @Name("Recipe Group")
 @Description({
-	"The recipe group of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.",
+	"The recipe group of a shaped, shapeless, blasting, furnace, campfire, smoking, or stonecutting recipe.",
 	"Groups recipes together under the provided string."
 })
 @Examples({
-	"register a new shapeless recipe with the key \"my_recipe\":",
+	"set {_recipe} to a new shapeless recipe with the key \"my_recipe\":",
 		"\tset the recipe ingredients to 3 diamonds, 3 emeralds and 3 netherite ingots",
 		"\tset the recipe group to \"my group\"",
 		"\tset the recipe result to nether star"
@@ -64,10 +62,12 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	protected String[] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
 			if (recipe instanceof MutableRecipe)  {
-				if (recipe instanceof MutableCraftingRecipe craftingRecipeWrapper) {
-					return craftingRecipeWrapper.getGroup();
-				} else if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
-					return cookingRecipeWrapper.getGroup();
+				if (recipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
+					return mutableCraftingRecipe.getGroup();
+				} else if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+					return mutableCookingRecipe.getGroup();
+				} else if (recipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
+					return mutableStonecuttingRecipe.getGroup();
 				}
 			} else {
 				if (recipe instanceof ShapedRecipe shapedRecipe) {
@@ -76,6 +76,8 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 					return shapelessRecipe.getGroup();
 				} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 					return cookingRecipe.getGroup();
+				} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
+					return stonecuttingRecipe.getGroup();
 				}
 			}
 			return null;
@@ -98,16 +100,18 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
-		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
+		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
 
 		String group = (String) delta[0];
 		if (group.isEmpty())
 			return;
 
-		if (recipeWrapper instanceof MutableCraftingRecipe craftingRecipeWrapper) {
-			craftingRecipeWrapper.setGroup(group);
-		} else if (recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper) {
-			cookingRecipeWrapper.setGroup(group);
+		if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
+			mutableCraftingRecipe.setGroup(group);
+		} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+			mutableCookingRecipe.setGroup(group);
+		} else if (mutableRecipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
+			mutableStonecuttingRecipe.setGroup(group);
 		}
 	}
 

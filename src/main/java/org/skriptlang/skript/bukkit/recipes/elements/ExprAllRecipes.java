@@ -44,8 +44,8 @@ import java.util.List;
 })
 @Examples({
 	"set {_list::*} to all of the server's recipe of type shaped recipe for netherite ingot",
-	"set {_list::*} to all server's mc recipes of type cooking recipe for raw beef",
-	"set {_list::*} to all of the server's custom recipes of type blasting for raw iron named \"Impure Iron\"",
+	"set {_list::*} to the server's mc recipes of type cooking recipe for raw beef",
+	"set {_list::*} to server's custom recipes of type blasting for raw iron named \"Impure Iron\"",
 	"",
 	"reset all of the server's recipes",
 	"",
@@ -86,13 +86,17 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	@Override
 	protected Recipe @Nullable [] get(Event event) {
-		return getSelectedRecipes(event).toArray(new Recipe[0]);
+		List<Recipe> recipes = new ArrayList<>();
+		getSelectedRecipes(event).forEachRemaining(recipes::add);
+		return recipes.toArray(new Recipe[0]);
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.RESET || mode == ChangeMode.DELETE)
 			return CollectionUtils.array(Recipe.class);
+		else if (mode == ChangeMode.ADD)
+			return CollectionUtils.array(Recipe[].class);
 		return null;
 	}
 
@@ -103,10 +107,24 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 				Bukkit.resetRecipes();
 			}
 			case REMOVE -> {
-				getSelectedRecipes(event).forEach(recipe -> {
+				getSelectedRecipes(event).forEachRemaining(recipe -> {
 					if (recipe instanceof Keyed key)
 						Bukkit.removeRecipe(key.getKey());
 				});
+			}
+			case ADD -> {
+				Recipe[] recipes = delta != null ? (Recipe[]) delta : null;
+				if (recipes == null || recipes.length == 0)
+					return;
+				for (Recipe recipe : recipes) {
+					if (!(recipe instanceof Keyed keyed))
+						continue;
+					NamespacedKey key = keyed.getKey();
+					if (Bukkit.getRecipe(key) != null)
+						Bukkit.removeRecipe(key);
+					Bukkit.addRecipe(recipe);
+				}
+
 			}
 		}
 	}
@@ -133,7 +151,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 		return builder.toString();
 	}
 
-	private List<Recipe> getSelectedRecipes(Event event) {
+	private CheckedIterator<Recipe> getSelectedRecipes(Event event) {
 		List<Recipe> recipeList = new ArrayList<>();
 		Iterator<Recipe> iterator = null;
 		if (itemExpr != null) {
@@ -158,7 +176,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 		RecipeType recipeType = recipeTypeExpr != null ? recipeTypeExpr.getSingle(event) : null;
 
-		CheckedIterator<Recipe> checkedIterator = new CheckedIterator<Recipe>(iterator, recipe -> {
+        return new CheckedIterator<Recipe>(iterator, recipe -> {
 			if (recipe instanceof Keyed keyed) {
 				NamespacedKey key = keyed.getKey();
 				if (getMinecraft && !key.getNamespace().equalsIgnoreCase("minecraft"))
@@ -174,25 +192,6 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			}
 			return false;
 		});
-
-		iterator.forEachRemaining(recipe -> {
-			if (recipe instanceof Keyed keyed) {
-				NamespacedKey key = keyed.getKey();
-				if (getMinecraft && !key.getNamespace().equalsIgnoreCase("minecraft"))
-					return;
-				else if (getCustom && key.getNamespace().equalsIgnoreCase("minecraft"))
-					return;
-
-				if (recipeTypeExpr != null) {
-					RecipeType type = recipeTypeExpr.getSingle(event);
-					if (recipe.getClass().equals(type.getRecipeClass()) || type.getRecipeClass().isInstance(recipe))
-						recipeList.add(recipe);
-				} else {
-					recipeList.add(recipe);
-				}
-			}
-		});
-		return recipeList;
 	}
 
 }

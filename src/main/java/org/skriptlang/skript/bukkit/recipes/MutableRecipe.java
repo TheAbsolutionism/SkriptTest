@@ -383,6 +383,7 @@ public abstract class MutableRecipe implements Recipe {
 
 	public static class MutableStonecuttingRecipe extends MutableRecipe {
 		private RecipeChoice input;
+		private String group;
 
 		public MutableStonecuttingRecipe(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
@@ -396,6 +397,14 @@ public abstract class MutableRecipe implements Recipe {
 			return input;
 		}
 
+		public void setGroup(String group) {
+			this.group =  group;
+		}
+
+		public String getGroup() {
+			return group;
+		}
+
 		@Override
 		public StonecuttingRecipe create() {
 			if (getResult().getType() == Material.AIR) {
@@ -406,7 +415,10 @@ public abstract class MutableRecipe implements Recipe {
 				addError("You must provide an input item when creating a stonecutting recipe.");
 				return null;
 			}
-			return new StonecuttingRecipe(getKey(), getResult(), input);
+			StonecuttingRecipe recipe = new StonecuttingRecipe(getKey(), getResult(), input);
+			if (group != null && !group.isEmpty())
+				recipe.setGroup(group);
+			return recipe;
 		}
 	}
 

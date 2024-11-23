@@ -23,7 +23,7 @@ import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
 @Name("Recipe Experience")
 @Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
 @Examples({
-	"register a new blasting recipe with the key \"my_recipe\":",
+	"set {_recipe} to a new blasting recipe with the key \"my_recipe\":",
 		"\tset the recipe input item to a raw copper named \"Impure Copper\"",
 		"\tset the recipe experience to 20",
 		"\tset the recipe result to copper ingot named \"Pure Copper\""
@@ -57,8 +57,8 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	@Override
 	protected Float @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof MutableCookingRecipe cookingRecipeWrapper) {
-				return cookingRecipeWrapper.getExperience();
+			if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+				return mutableCookingRecipe.getExperience();
 			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
 				return cookingRecipe.getExperience();
 			}
@@ -83,12 +83,12 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 		if (!(event instanceof RegisterRecipeEvent recipeEvent))
 			return;
 
-		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
-		if (!(recipeWrapper instanceof MutableCookingRecipe cookingRecipeWrapper))
+		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
+		if (!(mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe))
 			return;
 
 		float experience = (float) delta[0];
-		cookingRecipeWrapper.setExperience(experience);
+		mutableCookingRecipe.setExperience(experience);
 	}
 
 	@Override
