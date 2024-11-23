@@ -1,8 +1,6 @@
 package ch.njol.skript.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.classes.data.DefaultComparators;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
@@ -11,7 +9,6 @@ import com.destroystokyo.paper.event.block.BeaconEffectEvent;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.lang.comparator.Relation;
 
 @Name("Beacon Effect")
 @Description("Called when a player gets an effect from a beacon.")
@@ -58,9 +55,8 @@ public class EvtBeaconEffect extends SkriptEvent {
 			return false;
 		if (primaryCheck != null && effectEvent.isPrimary() != primaryCheck)
 			return false;
-		if (potionTypes != null) {
+		if (potionTypes != null)
 			return potionTypes.check(event, type -> effectEvent.getEffect().getType() == type);
-		}
 		return true;
 	}
 
