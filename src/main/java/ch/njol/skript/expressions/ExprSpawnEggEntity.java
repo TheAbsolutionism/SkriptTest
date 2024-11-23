@@ -5,12 +5,8 @@ import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.slot.Slot;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
@@ -19,7 +15,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Spawn Egg Entity")
-@Description("The entity to spawn from a spawn egg.")
+@Description("Returns the entity snapshot that the provided spawn eggs will spawn when used.")
 @Examples({
 	"set {_item} to a zombie spawn egg",
 	"broadcast the spawn egg entity of {_item}",
@@ -32,31 +28,22 @@ import org.jetbrains.annotations.Nullable;
 	"set the spawn egg entity of {_item} to {_snapshot}",
 	"if the spawn egg entity of {_item} is {_snapshot}: # Minecraft 1.20.5+",
 })
-@RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparison)")
+@RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparisons)")
 @Since("INSERT VERSION")
-public class ExprSpawnEggEntity extends PropertyExpression<Object, EntitySnapshot> {
+public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
 
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot") && Skript.methodExists(SpawnEggMeta.class, "setSpawnedEntity", EntitySnapshot.class)) {
-			Skript.registerExpression(ExprSpawnEggEntity.class, EntitySnapshot.class, ExpressionType.PROPERTY,
-				"[the] spawn egg entity of %itemstacks/itemtypes/slots%");
+			register(ExprSpawnEggEntity.class, EntitySnapshot.class, "spawn egg entity", "itemstacks/itemtypes/slots");
 		}
 	}
 
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setExpr(exprs[0]);
-		return true;
-	}
-
-	@Override
-	protected EntitySnapshot[] get(Event event, Object[] source) {
-		return get(source, object -> {
-			ItemStack itemStack = ItemUtils.asItemStack(object);
-			if (itemStack == null || !(itemStack.getItemMeta() instanceof SpawnEggMeta eggMeta))
-				return null;
-			return eggMeta.getSpawnedEntity();
-		});
+	public @Nullable EntitySnapshot convert(Object object) {
+		ItemStack itemStack = ItemUtils.asItemStack(object);
+		if (itemStack == null || !(itemStack.getItemMeta() instanceof SpawnEggMeta eggMeta))
+			return null;
+		return eggMeta.getSpawnedEntity();
 	}
 
 	@Override
@@ -93,7 +80,8 @@ public class ExprSpawnEggEntity extends PropertyExpression<Object, EntitySnapsho
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the spawn egg entity of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "spawn egg entity";
 	}
+
 }

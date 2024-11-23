@@ -1558,7 +1558,9 @@ public class BukkitClasses {
 			Classes.registerClass(new ClassInfo<>(EntitySnapshot.class, "entitysnapshot")
 				.user("entity ?snapshots?")
 				.name("Entity Snapshot")
-				.description("Represents an entity snapshot.")
+				.description("Represents a snapshot of all the data of the provided entities. "
+					+ "This data includes the values of all the entities' attributes at the time of this expression being called. "
+					+ "This can only be used to copy the full attributes of an entity. Individual attributes cannot be modified or retrieved.")
 				.requiredPlugins("Minecraft 1.20.2+")
 				.since("INSERT VERSION")
 			);
