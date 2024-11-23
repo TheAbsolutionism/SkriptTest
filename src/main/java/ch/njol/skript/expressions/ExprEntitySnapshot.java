@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Snapshot")
 @Description({
-	"Returns an entity snapshot of the provided entities, which is a snapshot of all the data of the provided entities. "
-	+ "This data includes the values of all the entities' attributes at the time of this expression being called.",
+	"Returns an entity snapshot of the provided entities, which is a snapshot of all the data of the provided entities.",
+	"This data includes the values of all the entities' attributes at the time of this expression being called.",
 	"This expression can only be used to copy the full attributes of an entity. Individual attributes cannot be modified or retrieved."
 })
 @Examples({

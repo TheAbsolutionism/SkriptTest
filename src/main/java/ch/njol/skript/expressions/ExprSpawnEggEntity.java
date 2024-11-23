@@ -56,20 +56,20 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntityS
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		EntitySnapshot snapshot = (EntitySnapshot) (delta != null ? delta[0] : null);
-		if (snapshot != null) {
-			for (Object object : getExpr().getArray(event)) {
-				ItemStack item = ItemUtils.asItemStack(object);
-				if (item == null || !(item.getItemMeta() instanceof SpawnEggMeta eggMeta))
-					continue;
-				eggMeta.setSpawnedEntity(snapshot);
-				if (object instanceof Slot slot) {
-					item.setItemMeta(eggMeta);
-					slot.setItem(item);
-				} else if (object instanceof ItemType itemType) {
-					itemType.setItemMeta(eggMeta);
-				} else if (object instanceof ItemStack itemStack) {
-					itemStack.setItemMeta(eggMeta);
-				}
+		if (snapshot == null)
+			return;
+		for (Object object : getExpr().getArray(event)) {
+			ItemStack item = ItemUtils.asItemStack(object);
+			if (item == null || !(item.getItemMeta() instanceof SpawnEggMeta eggMeta))
+				continue;
+			eggMeta.setSpawnedEntity(snapshot);
+			if (object instanceof Slot slot) {
+				item.setItemMeta(eggMeta);
+				slot.setItem(item);
+			} else if (object instanceof ItemType itemType) {
+				itemType.setItemMeta(eggMeta);
+			} else if (object instanceof ItemStack itemStack) {
+				itemStack.setItemMeta(eggMeta);
 			}
 		}
 	}
