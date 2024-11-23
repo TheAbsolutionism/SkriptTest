@@ -1579,7 +1579,7 @@ public class BukkitClasses {
 					//noinspection unchecked,rawtypes
 					Class<? extends Enum> enumClass = (Class<? extends Enum>) patternClass;
 					//noinspection rawtypes,unchecked
-					patternTypeInfo = new EnumClassInfo<>(enumClass, "bannerpattern", "banner patterns");
+					patternTypeInfo = new EnumClassInfo<>(enumClass, "bannerpatterntype", "banner pattern types");
 				} else {
 					throw new IllegalStateException("PatternType is neither an enum nor a valid registry.");
 				}
