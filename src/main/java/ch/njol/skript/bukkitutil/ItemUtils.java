@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -209,7 +210,7 @@ public class ItemUtils {
 	 * @param object Object to convert
 	 * @return ItemStack from slot/itemtype
 	 */
-	public static @Nullable ItemStack asItemStack(Object object) {
+	public static @Nullable ItemStack asItemStack(@Nullable Object object) {
 		if (object instanceof ItemType itemType)
 			return itemType.getRandom();
 		else if (object instanceof Slot slot)
@@ -360,12 +361,13 @@ public class ItemUtils {
 
 	/**
 	 * Applies a provided {@code Consumer} to the meta of the provided {@code ItemStack} and returns the updated {@code ItemStack} (with updated {@code ItemMeta}).
+	 *
 	 * @param itemStack the item whose meta is to be changed using the provided Consumer
 	 * @param metaChanger a consumer to update the meta of the provided ItemStack
 	 * @param <T>
 	 * @return the updated item
 	 */
-	public static <T extends ItemMeta> ItemStack changeItemMeta(ItemStack itemStack, Consumer<T> metaChanger) {
+	public static <T extends ItemMeta> ItemStack changeItemMeta(@NotNull ItemStack itemStack, @NotNull Consumer<T> metaChanger) {
 		//noinspection unchecked
 		T itemMeta = (T) itemStack.getItemMeta();
 		metaChanger.accept(itemMeta);
@@ -380,7 +382,7 @@ public class ItemUtils {
 	 * @param itemStack the item to set the object to
 	 * @see #asItemStack(Object)    
 	 */
-	public static void setItem(Object object, ItemStack itemStack) {
+	public static void setItem(@Nullable Object object, @NotNull ItemStack itemStack) {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (object instanceof Slot slot) {
 			slot.setItem(itemStack);
