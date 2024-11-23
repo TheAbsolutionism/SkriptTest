@@ -2463,6 +2463,14 @@ banner pattern types:
 	triangle_top: top triangle banner pattern
 	triangles_bottom: tbottom triangles banner pattern
 	triangles_top: top triangles banner pattern
+	stripe_small: small stripe banner pattern
+	diagonal_left_mirror: left diagonal mirror banner pattern
+	diagonal_right_mirror: right diagonal mirror banner pattern
+	circle_middle: middle circle banner pattern
+	rhombus_middle: middle rhombus banner pattern
+	half_vertical_mirror: vertical half mirror banner pattern
+	half_horizontal_mirror: horizontal half mirror banner pattern
+
 
 # -- Input Keys --
 input keys:

@@ -111,7 +111,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 			return null;
 		NamespacedKey namespacedKey = null;
 		try {
-			namespacedKey = (NamespacedKey) PatternType.class.getMethod("key").invoke(patternType);
+			namespacedKey = (NamespacedKey) PatternType.class.getMethod("getKey").invoke(patternType);
 		} catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
