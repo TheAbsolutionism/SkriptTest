@@ -37,12 +37,14 @@ import java.util.*;
 public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	private static Map<Object, Material> bannerMaterials = new HashMap<>();
+	private static boolean PATTERN_TYPE_IS_REGISTRY = false;
 
 	static {
 		Registry<PatternType> patternRegistry = Bukkit.getRegistry(PatternType.class);
 		Object[] bannerPatterns;
 		if (patternRegistry != null) {
-			bannerPatterns  = patternRegistry.stream().toArray();
+			bannerPatterns = patternRegistry.stream().toArray();
+			PATTERN_TYPE_IS_REGISTRY = true;
 		} else {
 			try {
 				Class<?> patternClass = Class.forName("org.bukkit.block.banner.PatternType");
@@ -109,15 +111,20 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 	private static @Nullable Material getMaterial(Object object) {
 		if (!(object instanceof PatternType patternType))
 			return null;
-		NamespacedKey namespacedKey = null;
+		String key = null;
 		try {
-			namespacedKey = (NamespacedKey) PatternType.class.getMethod("getKey").invoke(patternType);
+			if (PATTERN_TYPE_IS_REGISTRY) {
+				NamespacedKey namespacedKey = (NamespacedKey) PatternType.class.getMethod("getKey").invoke(patternType);
+				if (namespacedKey != null)
+					key = namespacedKey.getKey().toUpperCase(Locale.ENGLISH);
+			} else {
+				key = (String) PatternType.class.getMethod("toString").invoke(patternType);
+			}
 		} catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-		if (namespacedKey == null)
+		if (key == null)
 			return null;
-        String key = namespacedKey.getKey().toUpperCase(Locale.ENGLISH);
 		Material material = Material.getMaterial(key +  "_BANNER_PATTERN");
 		return material != null ? material : checkAlias(patternType);
 	}
