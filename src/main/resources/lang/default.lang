@@ -2428,6 +2428,21 @@ input keys:
 	sneak: sneak key, sneaking key
 	sprint: sprint key, sprinting key
 
+# -- Raid Stop Reasons --
+raid stop reasons:
+	finished: finished, completed
+	not_in_village: no longer village, not village
+	peace: difficulty changed, peace, peaceful
+	timeout: timeout, timed out
+	unspawnable: unspawnable, could not spawn
+
+# -- Raid Statuses --
+raid statuses:
+	loss: raid loss
+	ongoing: raid ongoing
+	stopped: raid stopped
+	victory: raid victory
+
 # -- Boolean --
 boolean:
 	true:
@@ -2515,6 +2530,9 @@ types:
 	itemdisplaytransform: item display transform¦s @an
 	experiencecooldownchangereason: experience cooldown change reason¦s @a
 	inputkey: input key¦s @an
+	raidstopreason: raid stop reason¦s @a
+	raidstatus: raid status¦es @a
+	raid: raid¦s @a
 
 	# Skript
 	weathertype: weather type¦s @a
