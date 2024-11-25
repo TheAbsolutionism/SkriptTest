@@ -83,6 +83,7 @@ public class SecLoop extends LoopSection {
 
 	private @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
+	private Object nextValue = null;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -125,21 +126,22 @@ public class SecLoop extends LoopSection {
 			iter = expr instanceof Variable<?> variable ? variable.variablesIterator(event) : expr.iterator(event);
 			if (iter != null && iter.hasNext()) {
 				currentIter.put(event, iter);
-				next.put(event, iter.next());
+			} else {
+				iter = null;
 			}
 		}
 
-		if (iter == null || next.get(event) == null) {
+		if (iter == null || (!iter.hasNext() && nextValue == null)) {
 			exit(event);
 			debug(event, false);
 			return actualNext;
 		} else {
 			previous.put(event, current.get(event));
-			current.put(event, next.get(event));
-			if (iter.hasNext()) {
-				next.put(event, iter.next());
-			} else {
-				next.put(event, null);
+			if (nextValue != null) {
+				current.put(event, nextValue);
+				nextValue = null;
+			} else if (iter.hasNext()) {
+				current.put(event, iter.next());
 			}
 			currentLoopCounter.put(event, (currentLoopCounter.getOrDefault(event, 0L)) + 1);
 			return walk(event, true);
@@ -161,7 +163,11 @@ public class SecLoop extends LoopSection {
 	}
 
 	public @Nullable Object getNext(Event event) {
-		return next.get(event);
+		Iterator<?> iter = currentIter.get(event);
+		if (iter == null || !iter.hasNext())
+			return null;
+		nextValue = iter.next();
+		return nextValue;
 	}
 
 	public @Nullable Object getPrevious(Event event) {
@@ -189,7 +195,6 @@ public class SecLoop extends LoopSection {
 		current.remove(event);
 		currentIter.remove(event);
 		previous.remove(event);
-		next.remove(event);
 		super.exit(event);
 	}
 
