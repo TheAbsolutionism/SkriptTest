@@ -227,7 +227,7 @@ public class EffSecShoot extends EffectSection {
 							launchWithBukkitConsumer.invoke(livingShooter, type, vector, afterSpawnBukkit(event, entityData, livingShooter));
 						} catch (Exception ignored) {}
 					} else {
-						caseUsage.shootHandler(entityData, livingShooter, shooterLoc, type, vector, afterSpawn);
+						finalProjectile = caseUsage.shootHandler(entityData, livingShooter, shooterLoc, type, vector, afterSpawn);
 					}
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
