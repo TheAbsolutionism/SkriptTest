@@ -46,13 +46,61 @@ public class EffSecShoot extends EffectSection {
 	//TODO: Remove reflect method once 1.19 is no longer supported
 
 	private enum CaseUsage {
-		NOT_PROJECTILE_NO_TRIGGER,
-		NOT_PROJECTILE_TRIGGER,
-		PROJECTILE_NO_WORLD_NO_TRIGGER,
-		PROJECTILE_NO_WORLD_TRIGGER_BUKKIT,
-		PROJECTILE_NO_WORLD_TRIGGER,
-		PROJECTILE_WORLD_NO_TRIGGER,
-		PROJECTILE_WORLD_TRIGGER;
+		NOT_PROJECTILE_NO_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				return entityData.spawn(location);
+			}
+		},
+		NOT_PROJECTILE_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				//noinspection unchecked,rawtypes
+				entityData.spawn(location, (Consumer) consumer);
+				return null;
+			}
+		},
+		PROJECTILE_NO_WORLD_NO_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				//noinspection unchecked
+				Projectile projectile = shooter.launchProjectile((Class<? extends Projectile>) type);
+				set(projectile, entityData);
+				return projectile;
+			}
+		},
+		PROJECTILE_NO_WORLD_TRIGGER_BUKKIT {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				return null;
+			}
+		},
+		PROJECTILE_NO_WORLD_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				//noinspection unchecked,rawtypes
+				shooter.launchProjectile((Class<? extends Projectile>) type, vector, (Consumer) consumer);
+				return null;
+			}
+		},
+		PROJECTILE_WORLD_NO_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				Projectile projectile = (Projectile) shooter.getWorld().spawn(location, type);
+				projectile.setShooter(shooter);
+				return projectile;
+			}
+		},
+		PROJECTILE_WORLD_TRIGGER {
+			@Override
+			public @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer) {
+				//noinspection unchecked,rawtypes
+				shooter.getWorld().spawn(location, type, (Consumer) consumer);
+				return null;
+			}
+		};
+
+		public abstract @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer);
 	}
 
 	public static class ShootEvent extends Event {
@@ -174,39 +222,12 @@ public class EffSecShoot extends EffectSection {
 					}
 
 					CaseUsage caseUsage = getCaseUsage(isProjectile, useWorldSpawn, trigger != null);
-
-					switch (caseUsage) {
-						case NOT_PROJECTILE_NO_TRIGGER -> {
-							finalProjectile = entityData.spawn(shooterLoc);
-						}
-						case NOT_PROJECTILE_TRIGGER -> {
-							//noinspection unchecked
-							entityData.spawn(shooterLoc, afterSpawn);
-						}
-						case PROJECTILE_NO_WORLD_NO_TRIGGER -> {
-							//noinspection unchecked
-							finalProjectile = livingShooter.launchProjectile((Class<? extends Projectile>) type);
-							set(finalProjectile, entityData);
-						}
-						case PROJECTILE_NO_WORLD_TRIGGER_BUKKIT -> {
-							try {
-								launchWithBukkitConsumer.invoke(livingShooter, type, vector, afterSpawnBukkit(event, entityData, livingShooter));
-							} catch (Exception ignored) {};
-						}
-						case PROJECTILE_NO_WORLD_TRIGGER -> {
-							//noinspection unchecked
-							livingShooter.launchProjectile((Class<? extends Projectile>) type, vector, afterSpawn);
-						}
-						case PROJECTILE_WORLD_NO_TRIGGER -> {
-							Projectile projectile = (Projectile) livingShooter.getWorld().spawn(shooterLoc, type);
-							projectile.setShooter(livingShooter);
-							finalProjectile = projectile;
-						}
-						case PROJECTILE_WORLD_TRIGGER -> {
-							//noinspection unchecked
-							livingShooter.getWorld().spawn(shooterLoc, type, afterSpawn);
-						}
-						default -> throw new IllegalStateException("Unexpected value: " + caseUsage);
+					if (caseUsage == CaseUsage.PROJECTILE_NO_WORLD_TRIGGER_BUKKIT) {
+						try {
+							launchWithBukkitConsumer.invoke(livingShooter, type, vector, afterSpawnBukkit(event, entityData, livingShooter));
+						} catch (Exception ignored) {}
+					} else {
+						caseUsage.shootHandler(entityData, livingShooter, shooterLoc, type, vector, afterSpawn);
 					}
 				} else {
 					vector = finalDirection.getDirection((Location) shooter).multiply(finalVelocity.doubleValue());
@@ -225,6 +246,13 @@ public class EffSecShoot extends EffectSection {
 		}
 
 		return super.walk(event, false);
+	}
+
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return "shoot " + types.toString(event, debug) + " from " + shooters.toString(event, debug)
+			+ (velocity != null ? " at speed " + velocity.toString(event, debug) : "")
+			+ (direction != null ? " " + direction.toString(event, debug) : "");
 	}
 
 	private static <E extends Entity> void set(Entity entity, EntityData<E> entityData) {
@@ -286,13 +314,6 @@ public class EffSecShoot extends EffectSection {
 			Variables.setLocalVariables(event, Variables.copyLocalVariables(shootEvent));
 			Variables.removeLocals(shootEvent);
 		};
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "shoot " + types.toString(event, debug) + " from " + shooters.toString(event, debug) +
-			(velocity != null ? " at speed " + velocity.toString(event, debug) : "") +
-			(direction != null ? " " + direction.toString(event, debug) : "");
 	}
 
 }

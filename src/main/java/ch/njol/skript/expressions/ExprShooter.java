@@ -62,9 +62,10 @@ public class ExprShooter extends PropertyExpression<Projectile, LivingEntity> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (mode == ChangeMode.SET) {
 			assert delta != null;
+			ProjectileSource source = (ProjectileSource) delta[0];
 			for (Projectile projectile : getExpr().getArray(event)) {
 				assert projectile != null : getExpr();
-				projectile.setShooter((ProjectileSource) delta[0]);
+				projectile.setShooter(source);
 			}
 		} else {
 			super.change(event, delta, mode);
