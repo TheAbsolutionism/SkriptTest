@@ -674,9 +674,11 @@ public class DefaultComparators {
 				public Relation compare(EntitySnapshot snap1, EntitySnapshot snap2) {
 					if (!snap1.getEntityType().equals(snap1.getEntityType()))
 						return Relation.NOT_EQUAL;
-					boolean isEqual = snap1.equals(snap2) || snap1.hashCode() == snap2.hashCode();
-					if (SNAPSHOT_AS_STRING_EXISTS)
-						isEqual = snap1.getAsString().equalsIgnoreCase(snap2.getAsString());
+					boolean isEqual;
+					if (!SNAPSHOT_AS_STRING_EXISTS)
+						isEqual = snap1.equals(snap2) || snap1.hashCode() == snap2.hashCode();
+					else
+						isEqual = snap1.getAsString().equalsIgnoreCase(snap2.getAsString();
 					return Relation.get(isEqual);
 				}
 			});

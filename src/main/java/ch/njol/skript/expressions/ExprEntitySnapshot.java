@@ -26,9 +26,8 @@ import org.jetbrains.annotations.Nullable;
 public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntitySnapshot> {
 
 	static {
-		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
+		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
 			register(ExprEntitySnapshot.class, EntitySnapshot.class, "entity snapshot", "entities");
-		}
 	}
 
 	@Override

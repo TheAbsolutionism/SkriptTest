@@ -8,6 +8,7 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +16,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Spawn Egg Entity")
-@Description("Returns the entity snapshot that the provided spawn eggs will spawn when used.")
+@Description("Gets or sets the entity snapshot that the provided spawn eggs will spawn when used.")
 @Examples({
 	"set {_item} to a zombie spawn egg",
 	"broadcast the spawn egg entity of {_item}",
@@ -27,15 +28,16 @@ import org.jetbrains.annotations.Nullable;
 		"\tclear entity",
 	"set the spawn egg entity of {_item} to {_snapshot}",
 	"if the spawn egg entity of {_item} is {_snapshot}: # Minecraft 1.20.5+",
+	"",
+	"set the spawn egg entity of {_item} to (random element out of all entities)"
 })
 @RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparisons)")
 @Since("INSERT VERSION")
-public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
+public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object> {
 
 	static {
-		if (Skript.classExists("org.bukkit.entity.EntitySnapshot") && Skript.methodExists(SpawnEggMeta.class, "setSpawnedEntity", EntitySnapshot.class)) {
-			register(ExprSpawnEggEntity.class, EntitySnapshot.class, "spawn egg entity", "itemstacks/itemtypes/slots");
-		}
+		if (Skript.classExists("org.bukkit.entity.EntitySnapshot") && Skript.methodExists(SpawnEggMeta.class, "setSpawnedEntity", EntitySnapshot.class))
+			register(ExprSpawnEggEntity.class, Object.class, "spawn egg entity", "itemstacks/itemtypes/slots");
 	}
 
 	@Override
@@ -55,9 +57,17 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntityS
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		EntitySnapshot snapshot = (EntitySnapshot) (delta != null ? delta[0] : null);
+		if (delta == null || delta[0] == null)
+			return;
+		EntitySnapshot snapshot = null;
+		if (delta[0] instanceof EntitySnapshot entitySnapshot) {
+			snapshot = entitySnapshot;
+		} else if (delta[0] instanceof Entity entity) {
+			snapshot = entity.createSnapshot();
+		}
 		if (snapshot == null)
 			return;
+
 		for (Object object : getExpr().getArray(event)) {
 			ItemStack item = ItemUtils.asItemStack(object);
 			if (item == null || !(item.getItemMeta() instanceof SpawnEggMeta eggMeta))
@@ -75,8 +85,8 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntityS
 	}
 
 	@Override
-	public Class<EntitySnapshot> getReturnType() {
-		return EntitySnapshot.class;
+	public Class<Object> getReturnType() {
+		return Object.class;
 	}
 
 	@Override
