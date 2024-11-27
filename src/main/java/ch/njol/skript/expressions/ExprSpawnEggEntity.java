@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object> {
 
 	static {
-		if (Skript.classExists("org.bukkit.entity.EntitySnapshot") && Skript.methodExists(SpawnEggMeta.class, "setSpawnedEntity", EntitySnapshot.class))
+		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
 			register(ExprSpawnEggEntity.class, Object.class, "spawn egg entity", "itemstacks/itemtypes/slots");
 	}
 
@@ -51,7 +51,7 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(EntitySnapshot.class);
+			return CollectionUtils.array(EntitySnapshot.class, Entity.class);
 		return null;
 	}
 
