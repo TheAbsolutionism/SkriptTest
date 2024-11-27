@@ -55,3 +55,14 @@ test "previous and next loop value":
 		assert previous loop-value is not set with "Looping one object should not have a previous loop-value"
 		assert next loop-value is not set with "Looping one object should not have a next loop-value"
 		assert loop-value is a diamond with "Current loop-value should be a diamond"
+
+test "loop peeking":
+	parse:
+		loop test loop peeking disabled:
+			set {_next} to next loop-value
+	assert last parse logs contains "This loop does not allow the usage of 'next loop-value'" with "Disabled loop peeking did not error."
+
+	parse:
+		loop test loop peeking enabled:
+			set {_next} to next loop-value
+	assert last parse logs does not contain "This loop does not allow the usage of 'next loop-value'" with "Enabled loop peeking should not error."

@@ -57,23 +57,23 @@ import java.util.regex.Pattern;
 @Since("1.0, 2.8.0 (loop-counter), INSERT VERSION (previous, next)")
 public class ExprLoopValue extends SimpleExpression<Object> {
 
-	enum LoopStates {
+	enum LoopState {
 		CURRENT("[current]"),
 		NEXT("next"),
 		PREVIOUS("previous");
 
 		private String pattern;
 
-		LoopStates(String pattern) {
+		LoopState(String pattern) {
 			this.pattern = pattern;
 		}
 	}
 
-	private static final LoopStates[] loopStates = LoopStates.values();
+	private static final LoopState[] loopStates = LoopState.values();
 
 	static {
 		String[] patterns = new String[loopStates.length];
-		for (LoopStates state : loopStates) {
+		for (LoopState state : loopStates) {
 			patterns[state.ordinal()] = "[the] " + state.pattern + " loop-<.+>";
 		}
 		Skript.registerExpression(ExprLoopValue.class, Object.class, ExpressionType.SIMPLE, patterns);
@@ -90,12 +90,13 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 	// if this loops a variable and isIndex is true, return the index of the variable instead of the value
 	boolean isIndex = false;
 
-	private LoopStates selectedState;
+	private LoopState selectedState;
 
 	private static final Pattern LOOP_PATTERN = Pattern.compile("^(.+)-(\\d+)$");
 
 	@Override
 	public boolean init(Expression<?>[] vars, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+		selectedState = loopStates[matchedPattern];
 		name = parser.expr;
 		String s = "" + parser.regexes.get(0).group();
 		int i = -1;
@@ -131,13 +132,16 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 			Skript.error("There's no loop that matches 'loop-" + s + "'");
 			return false;
 		}
+		if (selectedState == LoopState.NEXT && !loop.supportsPeeking()) {
+			Skript.error("This loop does not allow the usage of 'next loop-" + s + "'");
+			return false;
+		}
 		if (loop.getLoopedExpression() instanceof Variable) {
 			isVariableLoop = true;
 			if (((Variable<?>) loop.getLoopedExpression()).isIndexLoop(s))
 				isIndex = true;
 		}
 		this.loop = loop;
-		selectedState = loopStates[matchedPattern];
 		return true;
 	}
 	

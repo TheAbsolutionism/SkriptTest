@@ -381,4 +381,8 @@ public interface Expression<T> extends SyntaxElement, Debuggable {
 		return newDelta == null ? delta : newDelta;
 	}
 
+	default boolean isLoopPeeking() {
+		return true;
+	};
+
 }

@@ -84,6 +84,7 @@ public class SecLoop extends LoopSection {
 	private @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
 	private Object nextValue = null;
+	private boolean loopPeeking = true;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -110,6 +111,9 @@ public class SecLoop extends LoopSection {
 			Skript.error("Can't loop '" + expr + "' because it's only a single value");
 			return false;
 		}
+
+
+		loopPeeking = exprs[0].isLoopPeeking();
 
 		guaranteedToLoop = guaranteedToLoop(expr);
 		loadOptionalCode(sectionNode);
@@ -163,6 +167,8 @@ public class SecLoop extends LoopSection {
 	}
 
 	public @Nullable Object getNext(Event event) {
+		if (!loopPeeking)
+			return null;
 		Iterator<?> iter = currentIter.get(event);
 		if (iter == null || !iter.hasNext())
 			return null;
@@ -224,6 +230,10 @@ public class SecLoop extends LoopSection {
 
 		// Otherwise, we can't guarantee that it will loop
 		return false;
+	}
+
+	public boolean supportsPeeking() {
+		return loopPeeking;
 	}
 
 }

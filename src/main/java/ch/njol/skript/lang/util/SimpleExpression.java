@@ -51,6 +51,7 @@ import java.util.List;
 public abstract class SimpleExpression<T> implements Expression<T> {
 
 	private int time = 0;
+	private boolean loopPeeking = true;
 
 	protected SimpleExpression() {}
 
@@ -376,4 +377,14 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 	public boolean getAnd() {
 		return true;
 	}
+
+	protected final void setLoopPeeking(boolean loopPeeking) {
+		this.loopPeeking = loopPeeking;
+	}
+
+	@Override
+	public boolean isLoopPeeking() {
+		return loopPeeking;
+	}
+
 }
