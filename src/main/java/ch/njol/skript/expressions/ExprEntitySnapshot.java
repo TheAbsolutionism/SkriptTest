@@ -3,8 +3,12 @@ package ch.njol.skript.expressions;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.util.Kleenean;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Snapshot")
@@ -28,6 +32,15 @@ public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntityS
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
 			register(ExprEntitySnapshot.class, EntitySnapshot.class, "entity snapshot", "entities");
+	}
+
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		if (exprs[0].getReturnType().isAssignableFrom(Player.class)) {
+			Skript.error("You can't get a snapshot of a player.");
+			return false;
+		}
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override

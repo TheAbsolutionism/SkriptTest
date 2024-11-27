@@ -6,10 +6,14 @@ import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.slot.Slot;
+import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
@@ -38,6 +42,15 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
 			register(ExprSpawnEggEntity.class, Object.class, "spawn egg entity", "itemstacks/itemtypes/slots");
+	}
+
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		if (exprs[0].getReturnType().isAssignableFrom(Player.class)) {
+			Skript.error("You can't set the spawn egg entity to a player.");
+			return false;
+		}
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
