@@ -46,7 +46,7 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0].getReturnType().isAssignableFrom(Player.class)) {
+		if (Player.class.equals(exprs[0].getReturnType())) {
 			Skript.error("You can't set the spawn egg entity to a player.");
 			return false;
 		}
