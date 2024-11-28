@@ -14,6 +14,7 @@ import ch.njol.skript.util.Container;
 import ch.njol.skript.util.Container.ContainerType;
 import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
+import com.google.common.collect.PeekingIterator;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,13 +79,12 @@ public class SecLoop extends LoopSection {
 
 	private final transient Map<Event, Object> current = new WeakHashMap<>();
 	private final transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
-	private final transient Map<Event, Object> next = new WeakHashMap<>();
 	private final transient Map<Event, Object> previous = new WeakHashMap<>();
 
 	private @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
 	private Object nextValue = null;
-	private boolean loopPeeking = true;
+	private boolean loopPeeking;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -111,9 +111,7 @@ public class SecLoop extends LoopSection {
 			Skript.error("Can't loop '" + expr + "' because it's only a single value");
 			return false;
 		}
-
-
-		loopPeeking = exprs[0].isLoopPeeking();
+		loopPeeking = exprs[0].supportsLoopPeeking();
 
 		guaranteedToLoop = guaranteedToLoop(expr);
 		loadOptionalCode(sectionNode);
@@ -172,6 +170,8 @@ public class SecLoop extends LoopSection {
 		Iterator<?> iter = currentIter.get(event);
 		if (iter == null || !iter.hasNext())
 			return null;
+		if (iter instanceof PeekingIterator<?> peekingIterator)
+			return peekingIterator.peek();
 		nextValue = iter.next();
 		return nextValue;
 	}
@@ -234,6 +234,10 @@ public class SecLoop extends LoopSection {
 
 	public boolean supportsPeeking() {
 		return loopPeeking;
+	}
+
+	public Expression<?> getExpression() {
+		return expr;
 	}
 
 }

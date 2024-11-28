@@ -25,12 +25,14 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
+import ch.njol.skript.lang.Loopable;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.util.coll.iterator.ArrayIterator;
+import com.google.common.collect.PeekingIterator;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +53,6 @@ import java.util.List;
 public abstract class SimpleExpression<T> implements Expression<T> {
 
 	private int time = 0;
-	private boolean loopPeeking = true;
 
 	protected SimpleExpression() {}
 
@@ -353,6 +354,14 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * Overriding this method, returning an {@link Iterator}, ensure to override {@link Loopable#supportsLoopPeeking()}
+	 * Or returning an {@link PeekingIterator}, ensure to set up {@link PeekingIterator#peek()}
+	 *
+	 * @param event The event to be used for evaluation
+	 * @return {@link ArrayIterator}
+	 */
 	@Override
 	public @Nullable Iterator<? extends T> iterator(Event event) {
 		return new ArrayIterator<>(getArray(event));
@@ -378,13 +387,8 @@ public abstract class SimpleExpression<T> implements Expression<T> {
 		return true;
 	}
 
-	protected final void setLoopPeeking(boolean loopPeeking) {
-		this.loopPeeking = loopPeeking;
-	}
-
 	@Override
-	public boolean isLoopPeeking() {
-		return loopPeeking;
+	public boolean supportsLoopPeeking() {
+		return true;
 	}
-
 }

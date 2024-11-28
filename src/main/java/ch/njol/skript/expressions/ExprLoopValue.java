@@ -133,7 +133,7 @@ public class ExprLoopValue extends SimpleExpression<Object> {
 			return false;
 		}
 		if (selectedState == LoopState.NEXT && !loop.supportsPeeking()) {
-			Skript.error("This loop does not allow the usage of 'next loop-" + s + "'");
+			Skript.error("The expression '" + loop.getExpression().toString() + "' does not allow the usage of 'next loop-" + s + "'.");
 			return false;
 		}
 		if (loop.getLoopedExpression() instanceof Variable) {

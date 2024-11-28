@@ -694,4 +694,9 @@ public class Variable<T> implements Expression<T> {
 		return this;
 	}
 
+	@Override
+	public boolean supportsLoopPeeking() {
+		return true;
+	}
+
 }

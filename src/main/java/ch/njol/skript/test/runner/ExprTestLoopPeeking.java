@@ -17,10 +17,11 @@ public class ExprTestLoopPeeking extends SimpleExpression<Object> {
 			"test loop peeking enabled");
 	}
 
+	private boolean toPeek;
+
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (matchedPattern == 0)
-			setLoopPeeking(false);
+		toPeek = matchedPattern == 1;
 		return true;
 	}
 
@@ -37,6 +38,12 @@ public class ExprTestLoopPeeking extends SimpleExpression<Object> {
 	@Override
 	public Class<Object> getReturnType() {
 		return Object.class;
+	}
+
+	@Override
+	public boolean supportsLoopPeeking() {
+		Skript.adminBroadcast("Test Loop Peeking");
+		return toPeek;
 	}
 
 	@Override
