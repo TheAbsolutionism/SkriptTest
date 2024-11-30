@@ -14,3 +14,5 @@ test "blocks vector direction":
 	assert blocks at {_blocks::*} is stone with "1 or more blocks were not set to stone"
 	set blocks at {_blocks::*} to air
 	assert blocks at {_blocks::*} is air with "1 or more blocks were not set to air"
+	loop {_blocks::*}:
+		set block at loop-value to loop-value
