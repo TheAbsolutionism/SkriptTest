@@ -42,7 +42,6 @@ public class ExprTestLoopPeeking extends SimpleExpression<Object> {
 
 	@Override
 	public boolean supportsLoopPeeking() {
-		Skript.adminBroadcast("Test Loop Peeking");
 		return toPeek;
 	}
 

@@ -60,7 +60,6 @@ test "loop peeking":
 	parse:
 		loop test loop peeking disabled:
 			set {_next} to next loop-value
-	broadcast last parse logs
 	assert last parse logs contains "The expression 'test loop peeking' does not allow the usage of 'next loop-value'." with "Disabled loop peeking did not error."
 
 	parse:
