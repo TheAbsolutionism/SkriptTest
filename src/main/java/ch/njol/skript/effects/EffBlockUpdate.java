@@ -10,7 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
@@ -18,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Update Block")
 @Description({
-	"Updates the blocks to a selected block",
-	"`force`: Will force the update of the block",
-	"`without physics`: Does not send updates to surrounding blocks"
+	"Updates the blocks by setting them to a selected block",
+	"Using 'without physics' will not send updates to the surrounding blocks of the blocks being set.",
+	"Example: Updating a block next to a sand block in the air 'without physics' will not cause the sand block to fall."
 })
 @Examples({
 	"update {_blocks::*} as gravel",
@@ -61,8 +60,8 @@ public class EffBlockUpdate extends Effect {
 
 	@Override
 	public @NotNull String toString(@Nullable Event event, boolean debug) {
-		return "update " + this.blocks.toString(event, debug) + " as " +
-			this.blockData.toString(event, debug) + (this.physics ? "without neighbour updates" : "");
+		return "update " + this.blocks.toString(event, debug) + " as "
+			+ this.blockData.toString(event, debug) + (this.physics ? "without neighbour updates" : "");
 	}
 
 }
