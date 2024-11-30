@@ -106,6 +106,8 @@ public class EvtFurnace extends SkriptEvent {
 			result = "extract";
 		} else if (event instanceof FurnaceStartSmeltEvent) {
 			result = "start smelt";
+		} else {
+			throw new IllegalStateException("Unexpected event: " + event);
 		}
 		return result + " of " + Classes.toString(types);
 	}

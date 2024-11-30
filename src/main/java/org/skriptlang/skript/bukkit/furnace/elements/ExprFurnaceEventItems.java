@@ -2,11 +2,7 @@ package org.skriptlang.skript.bukkit.furnace.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Events;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -90,23 +86,15 @@ public class ExprFurnaceEventItems extends PropertyExpression<Block, ItemStack> 
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Block[] source) {
-		ItemStack stack = null;
-		switch (type) {
-			case SMELTING -> {
-				stack = ((FurnaceStartSmeltEvent) event).getSource();
-			}
-			case BURNED -> {
-				stack =  ((FurnaceBurnEvent) event).getFuel();
-			}
-			case SMELTED -> {
-				stack = ((FurnaceSmeltEvent) event).getResult();
-			}
+		return new ItemStack[]{switch (type) {
+			case SMELTING -> ((FurnaceStartSmeltEvent) event).getSource();
+			case BURNED -> ((FurnaceBurnEvent) event).getFuel();
+			case SMELTED -> ((FurnaceSmeltEvent) event).getResult();
 			case EXTRACTED -> {
 				FurnaceExtractEvent extractEvent = (FurnaceExtractEvent) event;
-				stack = new ItemStack(extractEvent.getItemType(), extractEvent.getItemAmount());
+				yield new ItemStack(extractEvent.getItemType(), extractEvent.getItemAmount());
 			}
-		};
-		return new ItemStack[]{stack};
+		}};
 	}
 
 	@Override
