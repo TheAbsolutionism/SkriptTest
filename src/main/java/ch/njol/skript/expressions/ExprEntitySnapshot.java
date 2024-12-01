@@ -36,7 +36,7 @@ public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntityS
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (Player.class.equals(exprs[0].getReturnType())) {
+		if (Player.class.isAssignableFrom(exprs[0].getReturnType())) {
 			Skript.error("You can't get a snapshot of a player.");
 			return false;
 		}
