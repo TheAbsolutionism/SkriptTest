@@ -1,0 +1,91 @@
+test "entity memories":
+	spawn a villager at test-location:
+		set {_entity} to entity
+
+	# Boolean
+
+	if admiring disabled memory of {_entity} is set:
+		set admiring disabled memory of {_entity} to true
+		assert admiring disabled memory of {_entity} is true with "Admiring Disabled Memory did not change"
+	if admiring item memory of {_entity} is set:
+		set admiring item memory of {_entity} to true
+		assert admiring item memory of {_entity} is true with "Admiring Item Memory did not change"
+	if golem detected recently memory of {_entity} is set:
+		set golem detected recently memory of {_entity} to true
+		assert golem detected recently memory of {_entity} is true with "Golem Detected Recently Memory did not change"
+	if has hunting cooldown memory of {_entity} is set:
+		set has hunting cooldown memory of {_entity} to true
+		assert has hunting cooldown memory of {_entity} is true with "Has Hunting Cooldown Memory did not change"
+	if hunted recently memory of {_entity} is set:
+		set hunted recently memory of {_entity} to true
+		assert hunted recently memory of {_entity} is true with "Hunted Recently Memory did not change"
+	if is tempted memory of {_entity} is set:
+		set is tempted memory of {_entity} to true
+		assert is tempted memory of {_entity} is true with "Is Tempted Memory did not change"
+	if universal anger memory of {_entity} is set:
+		set universal anger memory of {_entity} to true
+		assert universal anger memory of {_entity} is true with "Universal Anger Memory did not change"
+
+	# UUID
+
+	set {_uuid} to random uuid
+	if angry at memory of {_entity} is set:
+		set angry at memory of {_entity} to {_uuid}
+		assert angry at memory of {_entity} is {_uuid} with "Angry at Memory did not change"
+	if liked player memory of {_entity} is set:
+		set liked player memory of {_entity} to {_uuid}
+		assert liked player memory of {_entity} is {_uuid} with "Liked Player Memory did not change"
+
+	# Location
+
+	set {_loc} to location(5, 0, 0)
+	if home memory of {_entity} is set:
+		set home memory of {_entity} to {_loc}
+		assert home memory of {_entity} is {_loc} with "Home Memory did not change"
+	if job site memory of {_entity} is set:
+		set job site memory of {_entity} to {_loc}
+		assert job site memory of {_entity} is {_loc} with "Job Site Memory did not change"
+	if liked noteblock memory of {_entity} is set:
+		set liked noteblock memory of {_entity} to {_loc}
+		assert liked noteblock memory of {_entity} is {_loc} with "Liked Noteblock Memory did not change"
+	if meeting point memory of {_entity} is set:
+		set meeting point memory of {_entity} to {_loc}
+		assert meeting point memory of {_entity} is {_loc} with "Meeting Point Memory did not change"
+	if potential job site memory of {_entity} is set:
+		set potential job site memory of {_entity} to {_loc}
+		assert potential job site memory of {_entity} is {_loc} with "Potential Job Site Memory did not change"
+	if sniffer explored positions memory of {_entity} is set:
+		set sniffer explored positions memory of {_entity} to {_loc}
+		assert sniffer explored positions memory of {_entity} is {_loc} with "Sniffer Explored Positions Memory did not change"
+
+	# Number
+
+	if item pickup cooldown ticks memory of {_entity} is set:
+		set item pickup cooldown ticks memory of {_entity} to 10
+		assert item pickup cooldown ticks memory of {_entity} is 10 with "Item Pickup Cooldown Ticks Memory did not change"
+	if last slept memory of {_entity} is set:
+		set last slept memory of {_entity} to 10
+		assert last slept memory of {_entity} is 10 with "Last Slept Memory did not change"
+	if last woken memory of {_entity} is set:
+		set last woken memory of {_entity} to 10
+		assert last woken memory of {_entity} is 10 with "Last Woken Memory did not change"
+	if last worked at poi memory of {_entity} is set:
+		set last worked at poi memory of {_entity} to 10
+		assert last worked at poi memory of {_entity} is 10 with "Last Worked At POI Memory did not change"
+	if liked noteblock cooldown ticks memory of {_entity} is set:
+		set liked noteblock cooldown ticks memory of {_entity} to 10
+		assert liked noteblock cooldown ticks memory of {_entity} is 10 with "Liked Noteblock Cooldown Ticks Memory did not change"
+	if long jump cooling down memory of {_entity} is set:
+		set long jump cooling down memory of {_entity} to 10
+		assert long jump cooling down memory of {_entity} is 10 with "Long Jump Cooling Down Memory did not change"
+	if play dead ticks memory of {_entity} is set:
+		set play dead ticks memory of {_entity} to 10
+		assert play dead ticks memory of {_entity} is 10 with "Play Dead Ticks Memory did not change"
+	if ram cooldown ticks memory of {_entity} is set:
+		set ram cooldown ticks memory of {_entity} to 10
+		assert ram cooldown ticks memory of {_entity} is 10 with "Ram Cooldown Ticks Memory did not change"
+	if temptation cooldown ticks memory of {_entity} is set:
+		set temptation cooldown ticks memory of {_entity} to 10
+		assert temptation cooldown ticks memory of {_entity} is 10 with "Temptation Cooldown Ticks Memory did not change"
+
+	clear {_entity}
