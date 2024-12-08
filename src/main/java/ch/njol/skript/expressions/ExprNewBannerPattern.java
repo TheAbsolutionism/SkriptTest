@@ -7,7 +7,6 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Color;
@@ -33,38 +32,37 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 	static {
 		Skript.registerExpression(ExprNewBannerPattern.class, Pattern.class, ExpressionType.PATTERN_MATCHES_EVERYTHING,
-			"[a] %bannerpatterntype% colo[u]red %*color%",
+			"[a] %bannerpatterntype% colo[u]red %color%",
 			"[a] %*color% %bannerpatterntype%");
 	}
 
 	private Expression<PatternType> selectedPattern;
-	private Color selectedColor;
+	private Expression<Color> selectedColor;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		Literal<Color> color = null;
 		if (matchedPattern == 0) {
 			//noinspection unchecked
 			selectedPattern = (Expression<PatternType>) exprs[0];
 			//noinspection unchecked
-			color = (Literal<Color>) exprs[1];
+			selectedColor = (Expression<Color>) exprs[1];
 		} else {
 			//noinspection unchecked
-			color = (Literal<Color>) exprs[0];
-			//noinspection unchecked
 			selectedPattern = (Expression<PatternType>) exprs[1];
+			//noinspection unchecked
+			selectedColor = (Expression<Color>) exprs[0];
 		}
-		if (color == null || color.getSingle() == null) {
-			Skript.error("You must provide a valid color.");
-			return false;
-		}
-		selectedColor = color.getSingle();
 		return true;
 	}
 
 	@Override
 	protected Pattern @Nullable [] get(Event event) {
-		return new Pattern[]{new Pattern(selectedColor.asDyeColor(), selectedPattern.getSingle(event))};
+		Color color = selectedColor.getSingle(event);
+		PatternType patternType = selectedPattern.getSingle(event);
+		if (color == null || color.asDyeColor() == null || patternType == null)
+			return null;
+
+		return new Pattern[]{new Pattern(color.asDyeColor(), patternType)};
 	}
 
 	@Override

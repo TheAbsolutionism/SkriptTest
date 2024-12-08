@@ -34,3 +34,5 @@ test "invalid banner usage":
 	set the block at test-location to air
 	set the banner patterns of block at test-location to {_pattern}
 	assert the banner patterns of block at test-location is not set with "Non-Banner block should not have banner patterns"
+
+	assert a creeper banner pattern colored rgb(255, 0, 0) is not set with "RGB colors should not return a banner pattern"

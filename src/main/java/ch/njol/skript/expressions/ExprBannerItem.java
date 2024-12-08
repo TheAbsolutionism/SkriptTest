@@ -65,27 +65,31 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 				if (material != null)
 					bannerMaterials.put(object, material);
 			}
+			Skript.registerExpression(ExprBannerItem.class, ItemType.class, ExpressionType.COMBINED,
+				"[a[n]] %*bannerpatterntypes% item[s]");
 		}
-
-		Skript.registerExpression(ExprBannerItem.class, ItemType.class, ExpressionType.COMBINED,
-			"[a[n]] %*bannerpatterntypes% item[s]");
 	}
 
-	private Literal<PatternType> patternTypes;
+	private PatternType[] patternTypes;
+
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		patternTypes = ((Literal<PatternType>) exprs[0]);
+		patternTypes = ((Literal<PatternType>) exprs[0]).getArray();
+		for (PatternType type : patternTypes) {
+			if (!bannerMaterials.containsKey(type)) {
+				Skript.error("There is no item for the banner pattern type '" + type + "'.");
+				return false;
+			}
+		}
 		return true;
 	}
 
 	@Override
 	protected ItemType @Nullable [] get(Event event) {
 		List<ItemType> itemTypes = new ArrayList<>();
-		for (PatternType type : patternTypes.getArray()) {
-			if (!bannerMaterials.containsKey(type))
-				continue;
+		for (PatternType type : patternTypes) {
 			Material material = bannerMaterials.get(type);
 			ItemType itemType = new ItemType(material);
 			itemTypes.add(itemType);
@@ -95,7 +99,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	@Override
 	public boolean isSingle() {
-		return patternTypes.isSingle();
+		return patternTypes.length == 1;
 	}
 
 	@Override
@@ -105,7 +109,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return patternTypes.toString(event, debug) + " items";
+		return Arrays.toString(patternTypes) + " items";
 	}
 
 	private static @Nullable Material getMaterial(Object object) {
@@ -121,8 +125,8 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 				key = (String) PatternType.class.getMethod("toString").invoke(patternType);
 			}
 		} catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+			throw new RuntimeException(e);
+		}
 		if (key == null)
 			return null;
 		Material material = Material.getMaterial(key +  "_BANNER_PATTERN");

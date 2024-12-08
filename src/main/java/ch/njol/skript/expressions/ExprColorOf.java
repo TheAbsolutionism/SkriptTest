@@ -190,7 +190,7 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 		return "color of " + getExpr().toString(event, debug);
 	}
 
-	private Consumer<TextDisplay> getDisplayChanger(ChangeMode mode, @Nullable Color[] colors) {
+	private Consumer<TextDisplay> getDisplayChanger(ChangeMode mode, Color @Nullable [] colors) {
 		Color color = (colors != null && colors.length == 1) ? colors[0] : null;
 		return switch (mode) {
 			case RESET -> display -> {
@@ -207,7 +207,7 @@ public class ExprColorOf extends PropertyExpression<Object, Color> {
 		};
 	}
 
-	private Consumer<FireworkEffect> getFireworkChanger(ChangeMode mode, @Nullable Color[] colors) {
+	private Consumer<FireworkEffect> getFireworkChanger(ChangeMode mode, Color @Nullable [] colors) {
 		return switch (mode) {
 			case ADD -> effect -> {
 				for (Color color : colors)
