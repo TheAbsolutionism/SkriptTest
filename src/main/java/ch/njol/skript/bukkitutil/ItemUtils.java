@@ -382,7 +382,7 @@ public class ItemUtils {
 	 * @param itemStack the item to set the object to
 	 * @see #asItemStack(Object)    
 	 */
-	public static void setItem(@Nullable Object object, @NotNull ItemStack itemStack) {
+	public static void setItem(Object object, @NotNull ItemStack itemStack) {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (object instanceof Slot slot) {
 			slot.setItem(itemStack);
