@@ -53,7 +53,9 @@ import java.util.function.Consumer;
 	"Do note that other event values, such as 'player', won't work in this section.",
 	"",
 	"If you're spawning a display and want it to be empty on initialization, like not having a block display be stone, " + 
-	"set hidden config node 'spawn empty displays' to true."
+	"set hidden config node 'spawn empty displays' to true.",
+	"",
+	"NOTE (Snapshots): When spawning an entity via entity snapshots, the code within the section will not run instantaneously as compared to normal."
 })
 @Examples({
 	"spawn 3 creepers at the targeted block",

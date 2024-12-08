@@ -5,12 +5,15 @@ import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.bukkitutil.ItemUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.Player;
@@ -20,7 +23,10 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Spawn Egg Entity")
-@Description("Gets or sets the entity snapshot that the provided spawn eggs will spawn when used.")
+@Description({
+	"Gets or sets the entity snapshot that the provided spawn eggs will spawn when used.",
+	"NOTE: When using an entity data i.e 'a zombie', it will spawn a new zombie to retrieve an entity snapshot and then be removed."
+})
 @Examples({
 	"set {_item} to a zombie spawn egg",
 	"broadcast the spawn egg entity of {_item}",
@@ -33,7 +39,9 @@ import org.jetbrains.annotations.Nullable;
 	"set the spawn egg entity of {_item} to {_snapshot}",
 	"if the spawn egg entity of {_item} is {_snapshot}: # Minecraft 1.20.5+",
 	"",
-	"set the spawn egg entity of {_item} to (random element out of all entities)"
+	"set the spawn egg entity of {_item} to (random element out of all entities)",
+	"",
+	"set the spawn egg entity of {_item} to a zombie"
 })
 @RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparisons)")
 @Since("INSERT VERSION")
@@ -64,7 +72,7 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(EntitySnapshot.class, Entity.class);
+			return CollectionUtils.array(EntitySnapshot.class, Entity.class, EntityData.class);
 		return null;
 	}
 
@@ -77,6 +85,11 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 			snapshot = entitySnapshot;
 		} else if (delta[0] instanceof Entity entity) {
 			snapshot = entity.createSnapshot();
+		} else if (delta[0] instanceof EntityData<?> entityData) {
+			Location location = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+			Entity entity = entityData.spawn(location);
+			snapshot = entity.createSnapshot();
+			entity.remove();
 		}
 		if (snapshot == null)
 			return;
