@@ -9,7 +9,6 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import org.bukkit.Keyed;
 import org.bukkit.entity.Player;
@@ -52,13 +51,10 @@ public class CondDiscoveredRecipes extends Condition {
 	public boolean check(Event event) {
 		Recipe[] recipes = exprRecipe.getArray(event);
 		return exprPlayer.check(event, player -> {
-			return SimpleExpression.check(recipes, new Checker<Recipe>() {
-				@Override
-				public boolean check(Recipe recipe) {
-					if (!(recipe instanceof Keyed recipeKey))
-						return false;
-					return player.hasDiscoveredRecipe(recipeKey.getKey());
-				}
+			return SimpleExpression.check(recipes, recipe -> {
+				if (!(recipe instanceof Keyed recipeKey))
+					return false;
+				return player.hasDiscoveredRecipe(recipeKey.getKey());
 			}, isNegated(), exprRecipe.getAnd());
 		});
 	}
