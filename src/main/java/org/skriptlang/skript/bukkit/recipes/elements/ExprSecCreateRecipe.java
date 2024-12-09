@@ -20,12 +20,18 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.StonecuttingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.StonecuttingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.TransmuteRecipeEvent;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,19 +84,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"set {_recipe} to a new stonecutting recipe with id \"my_recipe\":",
 		"\tset the recipe source item to cobblestone named \"Cracked Stone\"",
 		"\tset the recipe group to \"custom group\"",
-		"\tset the recipe result to stone named \"Refurnished Stone\""
+		"\tset the recipe result to stone named \"Refurnished Stone\"",
+	"",
+	"set {_recipe} to a new transmute recipe with key \"my_recipe\":",
+		"\tset the recipe input item to leather helmet",
+		"\tset the recipe transmute item to nether star named \"Free Upgrade\"",
+		"\tset the recipe result to netherite helmet"
 })
 @Since("INSERT VERSION")
 public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
-
+	// TODO: Uncomment "Skript.error"'s when Runtime Error API is done.
 	private static final boolean SUPPORT_SMITHING = !Skript.isRunningMinecraft(1, 20, 0);
 
 	static {
 		Skript.registerExpression(ExprSecCreateRecipe.class, Recipe.class, ExpressionType.SIMPLE,
 			"a new %*recipetype% with [the] (key|id) %string%");
-		EventValues.registerEventValue(RegisterRecipeEvent.class, Recipe.class, new Getter<Recipe, RegisterRecipeEvent>() {
+		EventValues.registerEventValue(CreateRecipeEvent.class, Recipe.class, new Getter<Recipe, CreateRecipeEvent>() {
 			@Override
-			public Recipe get(RegisterRecipeEvent event) {
+			public Recipe get(CreateRecipeEvent event) {
 				return event.getMutableRecipe();
 			}
 		}, EventValues.TIME_NOW);
@@ -112,7 +123,10 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 			Skript.error("You can not create a new '" + providedType + "' recipe type.");
 			return false;
 		} else if (providedType == RecipeType.SMITHING && !SUPPORT_SMITHING) {
-			Skript.error("You can not register a 'smithing' recipe type on MC version 1.20+.");
+			Skript.error("You can not create a new 'smithing' recipe type on MC version 1.20+.");
+			return false;
+		} else if (providedType.getRecipeClass() == null) {
+			Skript.error("You can not create a new '" + providedType + "' recipe type on this MC version.");
 			return false;
 		}
 		//noinspection unchecked
@@ -120,7 +134,7 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 		AtomicBoolean delayed = new AtomicBoolean(false);
 		Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
 		//noinspection unchecked
-		trigger = loadCode(node, "register recipe", afterLoading, providedType.getEventClass());
+		trigger = loadCode(node, "create recipe", afterLoading, providedType.getEventClass());
 		if (delayed.get()) {
 			Skript.error("Delays cannot be used within a 'register recipe' section.");
 			return false;
@@ -137,12 +151,18 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 		}
 		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
 		RecipeType recipeType = providedType;
-		RegisterRecipeEvent recipeEvent = switch (recipeType) {
-			case SHAPED -> new ShapedRecipeEvent(key, recipeType);
-			case SHAPELESS -> new ShapelessRecipeEvent(key, recipeType);
-			case BLASTING, FURNACE, CAMPFIRE, SMOKING -> new CookingRecipeEvent(key, recipeType);
-			case SMITHING, SMITHING_TRANSFORM, SMITHING_TRIM -> new SmithingRecipeEvent(key, recipeType);
-			case STONECUTTING -> new StonecuttingRecipeEvent(key, recipeType);
+		CreateRecipeEvent recipeEvent = switch (recipeType) {
+			case SHAPED -> new ShapedRecipeEvent(key);
+			case SHAPELESS -> new ShapelessRecipeEvent(key);
+			case BLASTING -> new BlastingRecipeEvent(key);
+			case FURNACE -> new FurnaceRecipeEvent(key);
+			case CAMPFIRE -> new CampfireRecipeEvent(key);
+			case SMOKING -> new SmokingRecipeEvent(key);
+			case SMITHING -> new SmithingRecipeEvent(key, recipeType);
+			case SMITHING_TRANSFORM -> new SmithingTransformRecipeEvent(key);
+			case SMITHING_TRIM -> new SmithingTrimRecipeEvent(key);
+			case STONECUTTING -> new StonecuttingRecipeEvent(key);
+			case TRANSMUTE -> new TransmuteRecipeEvent(key);
 			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
 		};
 		Variables.setLocalVariables(recipeEvent, Variables.copyLocalVariables(event));

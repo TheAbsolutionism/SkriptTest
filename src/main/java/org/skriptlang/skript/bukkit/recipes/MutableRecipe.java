@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.recipes;
 
+import ch.njol.skript.Skript;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.*;
@@ -66,7 +67,7 @@ public abstract class MutableRecipe implements Recipe {
 		@Override
 		public abstract Recipe create();
 
-        public void setIngredients(int placement, RecipeChoice item) {
+		public void setIngredients(int placement, RecipeChoice item) {
 			ingredients[placement] = item;
 		}
 
@@ -92,8 +93,8 @@ public abstract class MutableRecipe implements Recipe {
 
 		public static class MutableShapedRecipe extends MutableCraftingRecipe {
 
-			public MutableShapedRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableShapedRecipe(NamespacedKey key) {
+				super(key, RecipeType.SHAPED);
 			}
 
 			private static final char[] characters = new char[]{'a','b','c','d','e','f','g','h','i'};
@@ -127,8 +128,8 @@ public abstract class MutableRecipe implements Recipe {
 
 		public static class MutableShapelessRecipe extends MutableCraftingRecipe {
 
-			public MutableShapelessRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableShapelessRecipe(NamespacedKey key) {
+				super(key, RecipeType.SHAPELESS);
 			}
 
 			@Override
@@ -232,8 +233,8 @@ public abstract class MutableRecipe implements Recipe {
 		}
 
 		public static class MutableBlastingRecipe extends MutableCookingRecipe {
-			public MutableBlastingRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableBlastingRecipe(NamespacedKey key) {
+				super(key, RecipeType.BLASTING);
 			}
 
 			@Override
@@ -243,8 +244,8 @@ public abstract class MutableRecipe implements Recipe {
 		}
 
 		public static class MutableFurnaceRecipe extends MutableCookingRecipe {
-			public MutableFurnaceRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableFurnaceRecipe(NamespacedKey key) {
+				super(key, RecipeType.FURNACE);
 			}
 
 			@Override
@@ -254,8 +255,8 @@ public abstract class MutableRecipe implements Recipe {
 		}
 
 		public static class MutableSmokingRecipe extends MutableCookingRecipe {
-			public MutableSmokingRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableSmokingRecipe(NamespacedKey key) {
+				super(key, RecipeType.SMOKING);
 			}
 
 			@Override
@@ -265,8 +266,8 @@ public abstract class MutableRecipe implements Recipe {
 		}
 
 		public static class MutableCampfireRecipe extends MutableCookingRecipe {
-			public MutableCampfireRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableCampfireRecipe(NamespacedKey key) {
+				super(key, RecipeType.CAMPFIRE);
 			}
 
 			@Override
@@ -278,9 +279,16 @@ public abstract class MutableRecipe implements Recipe {
 	}
 
 	public static class MutableSmithingRecipe extends MutableRecipe {
+
+		private static final boolean SUPPORTS_COPY_NBT = Skript.methodExists(SmithingRecipe.class, "willCopyNbt");
+		private static final boolean SUPPORTS_COPY_DATA = Skript.methodExists(SmithingRecipe.class, "willCopyDataComponents");
+		private static final boolean RUNNING_1_20_0 = Skript.isRunningMinecraft(1, 20, 0);
+
 		private RecipeChoice base;
 		private RecipeChoice template;
 		private RecipeChoice addition;
+		private Boolean copyNBT = null;
+		private Boolean copyData = null;
 
 		public MutableSmithingRecipe(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
@@ -298,6 +306,14 @@ public abstract class MutableRecipe implements Recipe {
 			this.addition = addition;
 		}
 
+		public void setCopyNBT(Boolean copyNBT) {
+			this.copyNBT = copyNBT;
+		}
+
+		public void setCopyData(Boolean copyData) {
+			this.copyData = copyData;
+		}
+
 		public RecipeChoice getBase() {
 			return base;
 		}
@@ -308,6 +324,14 @@ public abstract class MutableRecipe implements Recipe {
 
 		public RecipeChoice getAddition() {
 			return addition;
+		}
+
+		public Boolean willCopyNBT() {
+			return copyNBT;
+		}
+
+		public Boolean willCopyData() {
+			return copyData;
 		}
 
 		@Override
@@ -325,12 +349,17 @@ public abstract class MutableRecipe implements Recipe {
 				addError("You must provide an additional item when creating a smithing recipe.");
 				return null;
 			}
+			if (SUPPORTS_COPY_DATA && copyData != null) {
+				return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition(), copyData);
+			} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && copyNBT != null) {
+				return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition(), copyNBT);
+			}
 			return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition());
 		}
 
 		public static class MutableSmithingTransformRecipe extends MutableSmithingRecipe {
-			public MutableSmithingTransformRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableSmithingTransformRecipe(NamespacedKey key) {
+				super(key, RecipeType.SMITHING_TRANSFORM);
 			}
 
 			@Override
@@ -352,13 +381,18 @@ public abstract class MutableRecipe implements Recipe {
 					addError("You must provide a template item when creating a smithing recipe.");
 					return null;
 				}
+				if (SUPPORTS_COPY_DATA && willCopyData() != null) {
+					return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition(), willCopyData());
+				} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && RUNNING_1_20_0 && willCopyNBT() != null) {
+					return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition(), willCopyNBT());
+				}
 				return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition());
 			}
 		}
 
 		public static class MutableSmithingTrimRecipe extends MutableSmithingRecipe {
-			public MutableSmithingTrimRecipe(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public MutableSmithingTrimRecipe(NamespacedKey key) {
+				super(key, RecipeType.SMITHING_TRIM);
 			}
 
 			@Override
@@ -376,6 +410,11 @@ public abstract class MutableRecipe implements Recipe {
 					addError("You must provide a template item when creating a smithing recipe.");
 					return null;
 				}
+				if (SUPPORTS_COPY_DATA && willCopyData() != null) {
+					return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition(), willCopyData());
+				} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && RUNNING_1_20_0 && willCopyNBT() != null) {
+					return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition(), willCopyNBT());
+				}
 				return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition());
 			}
 		}
@@ -385,8 +424,8 @@ public abstract class MutableRecipe implements Recipe {
 		private RecipeChoice input;
 		private String group;
 
-		public MutableStonecuttingRecipe(NamespacedKey key, RecipeType recipeType) {
-			super(key, recipeType);
+		public MutableStonecuttingRecipe(NamespacedKey key) {
+			super(key, RecipeType.STONECUTTING);
 		}
 
 		public void setInput(RecipeChoice input) {
@@ -419,6 +458,48 @@ public abstract class MutableRecipe implements Recipe {
 			if (group != null && !group.isEmpty())
 				recipe.setGroup(group);
 			return recipe;
+		}
+	}
+
+	public static class MutableTransmuteRecipe extends MutableRecipe {
+
+		private RecipeChoice input, material;
+
+		public MutableTransmuteRecipe(NamespacedKey key) {
+			super(key, RecipeType.TRANSMUTE);
+		}
+
+		public void setInput(RecipeChoice input) {
+			this.input = input;
+		}
+
+		public void setMaterial(RecipeChoice material) {
+			this.material = material;
+		}
+
+		public RecipeChoice getInput() {
+			return input;
+		}
+
+		public RecipeChoice getMaterial() {
+			return material;
+		}
+
+		@Override
+		public TransmuteRecipe create() {
+			if (getResult().getType() == Material.AIR) {
+				addError("You must provide a result item when creating a recipe");
+				return null;
+			}
+			if (getInput() == null) {
+				addError("You must provide an input item when creating a transmute recipe.");
+				return null;
+			}
+			if (getMaterial() == null) {
+				addError("You must provide a transmute item when creating a transmute recipe.");
+				return null;
+			}
+			return new TransmuteRecipe(getKey(), getResult().getType(), input, material);
 		}
 	}
 

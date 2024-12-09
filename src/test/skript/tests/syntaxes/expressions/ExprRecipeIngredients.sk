@@ -63,3 +63,17 @@ test "recipe base, template and addition item" when running minecraft "1.20":
 	assert the recipe base item of {_get} = {_base} with "Mismatch of recipe base item from retrieved recipe"
 	assert the recipe template item of {_get} = {_template} with "Mismatch of recipe template item from retrieved recipe"
 	assert the recipe addition item of {_get} = {_addition} with "Mismatch of recipe addition item from retrieved recipe"
+
+test "recipe transmute item" when running minecraft "1.21.2":
+	set {_recipe} to a new transmute recipe with the key "test_recipe_transmute":
+		set the recipe input item to a leather helmet
+		set the recipe transmute item to a nether star
+		set the recipe result item to a netherite helmet
+	add {_recipe} to the server's recipes
+	set {_get} to recipe with the key "test_recipe_transmute"
+	assert the recipe input item of {_recipe} is a leather helmet with "Mismatch of recipe input item from created recipe"
+	assert the recipe transmute item of {_recipe} is a nether star with "Mismatch of recipe transmute item from created recipe"
+	assert the recipe result item of {_recipe} is a netherite helmet with "Mismatch of recipe result item from created recipe"
+	assert the recipe input item of {_get} is a leather helmet with "Mismatch of recipe input item from retrieved recipe"
+	assert the recipe transmute item of {_get} is a nether star with "Mismatch of recipe transmute item from retrieved recipe"
+	assert the recipe result item of {_get} is a netherite helmet with "Mismatch of recipe result item from retrieved recipe"

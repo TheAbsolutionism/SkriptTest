@@ -19,7 +19,7 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Group")
 @Description({
@@ -45,14 +45,8 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0].isDefault()) {
-			if (exprs[0] == null) {
-				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
-				return false;
-			}
-			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
-				isEvent = true;
-		}
+		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
+			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
@@ -70,6 +64,7 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 					return mutableStonecuttingRecipe.getGroup();
 				}
 			} else {
+				// TODO: Combine ShapedRecipe and ShapelessRecipe into CraftingRecipe when minimum version is raised to 1.20.1 or higher.
 				if (recipe instanceof ShapedRecipe shapedRecipe) {
 					return shapedRecipe.getGroup();
 				} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
@@ -88,17 +83,15 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (!isEvent) {
 			Skript.error("You can not set the recipe group of existing recipes.");
-		} else {
-			if (mode == ChangeMode.SET) {
-				return CollectionUtils.array(String.class);
-			}
+		} else if (mode == ChangeMode.SET) {
+			return CollectionUtils.array(String.class);
 		}
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+		if (!(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();
 

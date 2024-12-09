@@ -65,4 +65,5 @@ public class CondDiscoveredRecipes extends Condition {
 	public String toString(@Nullable Event event, boolean debug) {
 		return players.toString(event, debug) + (isNegated() ? " have not" : " have") + " found recipes " + recipes.toString(event, debug);
 	}
+
 }

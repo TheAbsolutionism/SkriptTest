@@ -19,7 +19,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a blasting, furnace, campfire or smoking recipe.")
@@ -42,14 +42,8 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0].isDefault()) {
-			if (exprs[0] == null) {
-				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
-				return false;
-			}
-			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
-				isEvent = true;
-		}
+		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
+			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
@@ -71,17 +65,15 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (!isEvent) {
 			Skript.error("You can not set the recipe cooking time of existing recipes.");
-		} else {
-			if (mode == ChangeMode.SET) {
-				return CollectionUtils.array(Timespan.class);
-			}
+		} else if (mode == ChangeMode.SET) {
+			return CollectionUtils.array(Timespan.class);
 		}
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+		if (!(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 
 		Timespan timespan = (Timespan) delta[0];

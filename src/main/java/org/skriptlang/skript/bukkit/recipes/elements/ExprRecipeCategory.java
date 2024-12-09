@@ -24,7 +24,7 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Category")
 @Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
@@ -55,14 +55,8 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0].isDefault()) {
-			if (exprs[0] == null) {
-				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
-				return false;
-			}
-			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
-				isEvent = true;
-		}
+		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
+			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
@@ -97,17 +91,15 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (!isEvent) {
 			Skript.error("You can not set the recipe category of existing recipes.");
-		} else {
-			if (mode == ChangeMode.SET) {
-				return CollectionUtils.array(RecipeCategory.class);
-			}
+		} else if (mode == ChangeMode.SET) {
+			return CollectionUtils.array(RecipeCategory.class);
 		}
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+		if (!(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 		RecipeCategory recipeCategory = (RecipeCategory) (delta != null ? delta[0] : null);
 		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();

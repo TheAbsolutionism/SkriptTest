@@ -18,7 +18,7 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Experience")
 @Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
@@ -41,14 +41,8 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (exprs[0].isDefault()) {
-			if (exprs[0] == null) {
-				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
-				return false;
-			}
-			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
-				isEvent = true;
-		}
+		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
+			isEvent = true;
 		//noinspection unchecked
 		setExpr((Expression<? extends Recipe>) exprs[0]);
 		return true;
@@ -70,17 +64,15 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (!isEvent) {
 			Skript.error("You can not set the recipe experience of existing recipes.");
-		} else {
-			if (mode == ChangeMode.SET) {
-				return CollectionUtils.array(Float.class);
-			}
+		} else if (mode == ChangeMode.SET) {
+			return CollectionUtils.array(Float.class);
 		}
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+		if (!(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 
 		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();

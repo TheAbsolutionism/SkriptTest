@@ -4,6 +4,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableTransmuteRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableBlastingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableCampfireRecipe;
@@ -19,24 +20,25 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRec
 /**
  * Event class used with ExprSecCreateRecipe to allow the creation of MutableRecipe
  */
-public class RegisterRecipeEvent extends Event {
+public class CreateRecipeEvent extends Event {
 	private boolean errorInSection = false;
 	private RecipeType recipeType;
 	private MutableRecipe mutableRecipe;
 
-	public RegisterRecipeEvent(NamespacedKey key, RecipeType recipeType) {
+	public CreateRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 		this.recipeType = recipeType;
 		this.mutableRecipe = switch (recipeType) {
-			case SHAPED -> new MutableShapedRecipe(key, recipeType);
-			case SHAPELESS -> new MutableShapelessRecipe(key, recipeType);
-			case BLASTING -> new MutableBlastingRecipe(key, recipeType);
-			case FURNACE -> new MutableFurnaceRecipe(key, recipeType);
-			case SMOKING -> new MutableSmokingRecipe(key, recipeType);
-			case CAMPFIRE -> new MutableCampfireRecipe(key, recipeType);
+			case SHAPED -> new MutableShapedRecipe(key);
+			case SHAPELESS -> new MutableShapelessRecipe(key);
+			case BLASTING -> new MutableBlastingRecipe(key);
+			case FURNACE -> new MutableFurnaceRecipe(key);
+			case SMOKING -> new MutableSmokingRecipe(key);
+			case CAMPFIRE -> new MutableCampfireRecipe(key);
 			case SMITHING -> new MutableSmithingRecipe(key, recipeType);
-			case SMITHING_TRANSFORM -> new MutableSmithingTransformRecipe(key, recipeType);
-			case SMITHING_TRIM -> new MutableSmithingTrimRecipe(key, recipeType);
-			case STONECUTTING -> new MutableStonecuttingRecipe(key, recipeType);
+			case SMITHING_TRANSFORM -> new MutableSmithingTransformRecipe(key);
+			case SMITHING_TRIM -> new MutableSmithingTrimRecipe(key);
+			case STONECUTTING -> new MutableStonecuttingRecipe(key);
+			case TRANSMUTE -> new MutableTransmuteRecipe(key);
 			default -> null;
 		};
 	}
@@ -61,7 +63,7 @@ public class RegisterRecipeEvent extends Event {
 	/**
 	 * Specific event to determine if the mutableRecipe is of MutableCraftingRecipe
 	 */
-	public static class CraftingRecipeEvent extends RegisterRecipeEvent {
+	public static class CraftingRecipeEvent extends CreateRecipeEvent {
 
 		public CraftingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
@@ -71,8 +73,8 @@ public class RegisterRecipeEvent extends Event {
 		 * Specific event to determine if the mutableRecipe is of MutableShapedRecipe
 		 */
 		public static class ShapedRecipeEvent extends CraftingRecipeEvent {
-			public ShapedRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public ShapedRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.SHAPED);
 			};
 		}
 
@@ -80,8 +82,8 @@ public class RegisterRecipeEvent extends Event {
 		 * Specific event to determine if the mutableRecipe is of MutableShapelessRecipe
 		 */
 		public static class ShapelessRecipeEvent extends CraftingRecipeEvent {
-			public ShapelessRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public ShapelessRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.SHAPELESS);
 			};
 		}
 	}
@@ -89,60 +91,64 @@ public class RegisterRecipeEvent extends Event {
 	/**
 	 * Specific event to determine if the mutableRecipe is of MutableCookingRecipe
 	 */
-	public static class CookingRecipeEvent extends RegisterRecipeEvent {
+	public static class CookingRecipeEvent extends CreateRecipeEvent {
 
 		public CookingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		};
 
 		public static class BlastingRecipeEvent extends CookingRecipeEvent {
-			public BlastingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public BlastingRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.BLASTING);
 			}
 		}
 
 		public static class CampfireRecipeEvent extends CookingRecipeEvent {
-			public CampfireRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public CampfireRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.CAMPFIRE);
 			}
 		}
 
 		public static class FurnaceRecipeEvent extends CookingRecipeEvent {
-			public FurnaceRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public FurnaceRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.FURNACE);
 			}
 		}
 
 		public static class SmokingRecipeEvent extends CookingRecipeEvent {
-			public SmokingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public SmokingRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.SMOKING);
 			}
 		}
 	}
 
-	public static class SmithingRecipeEvent extends RegisterRecipeEvent {
-
+	public static class SmithingRecipeEvent extends CreateRecipeEvent {
 		public SmithingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		}
 
 		public static class SmithingTransformRecipeEvent extends SmithingRecipeEvent {
-			public SmithingTransformRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public SmithingTransformRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.SMITHING_TRANSFORM);
 			}
 		}
 
 		public static class SmithingTrimRecipeEvent extends SmithingRecipeEvent {
-			public SmithingTrimRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-				super(key, recipeType);
+			public SmithingTrimRecipeEvent(NamespacedKey key) {
+				super(key, RecipeType.SMITHING_TRIM);
 			}
 		}
 	}
 
-	public static class StonecuttingRecipeEvent extends RegisterRecipeEvent {
+	public static class StonecuttingRecipeEvent extends CreateRecipeEvent {
+		public StonecuttingRecipeEvent(NamespacedKey key) {
+			super(key, RecipeType.STONECUTTING);
+		}
+	}
 
-		public StonecuttingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
-			super(key, recipeType);
+	public static class TransmuteRecipeEvent extends CreateRecipeEvent {
+		public TransmuteRecipeEvent(NamespacedKey key) {
+			super(key, RecipeType.TRANSMUTE);
 		}
 	}
 

@@ -106,7 +106,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 			case RESET -> {
 				Bukkit.resetRecipes();
 			}
-			case REMOVE -> {
+			case DELETE -> {
 				getSelectedRecipes(event).forEachRemaining(recipe -> {
 					if (recipe instanceof Keyed key)
 						Bukkit.removeRecipe(key.getKey());
@@ -176,7 +176,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 		RecipeType recipeType = recipeTypeExpr != null ? recipeTypeExpr.getSingle(event) : null;
 
-        return new CheckedIterator<Recipe>(iterator, recipe -> {
+		return new CheckedIterator<Recipe>(iterator, recipe -> {
 			if (recipe instanceof Keyed keyed) {
 				NamespacedKey key = keyed.getKey();
 				if (getMinecraft && !key.getNamespace().equalsIgnoreCase("minecraft"))

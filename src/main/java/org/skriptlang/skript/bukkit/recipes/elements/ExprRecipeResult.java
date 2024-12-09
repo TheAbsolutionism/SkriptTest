@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Result")
 @Description("The result item for a recipe.")
@@ -44,7 +44,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 				Skript.error("There is no recipe in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
-			if (getParser().isCurrentEvent(RegisterRecipeEvent.class))
+			if (getParser().isCurrentEvent(CreateRecipeEvent.class))
 				isEvent = true;
 		}
 		//noinspection unchecked
@@ -55,8 +55,6 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
-			if (recipe instanceof MutableRecipe mutableRecipe)
-				return mutableRecipe.getResult();
 			return recipe.getResult();
 		});
 	}
@@ -65,17 +63,15 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (!isEvent) {
 			Skript.error("You can not set the recipe result of existing recipes.");
-		} else {
-			if (mode == ChangeMode.SET) {
-				return CollectionUtils.array(ItemStack.class);
-			}
+		} else if (mode == ChangeMode.SET) {
+			return CollectionUtils.array(ItemStack.class);
 		}
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof RegisterRecipeEvent recipeEvent))
+		if (!(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 
 		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();

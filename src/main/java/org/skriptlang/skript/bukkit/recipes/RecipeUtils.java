@@ -5,18 +5,15 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.RegisterRecipeEvent.StonecuttingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.*;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
 
 /**
  * Utils used for getting data from {@link RecipeType}
@@ -29,7 +26,10 @@ public class RecipeUtils {
 	public enum RecipeType {
 		SHAPED(ShapedRecipe.class, ShapedRecipeEvent.class),
 		SHAPELESS(ShapelessRecipe.class, ShapelessRecipeEvent.class),
-		CRAFTING(getCraftingRecipeClass(), CraftingRecipeEvent.class),
+		TRANSMUTE(getTransmuteRecipeClass(), TransmuteRecipeEvent.class),
+		// TODO: Remove method and apply class directly when MC version is raised to 1.21.2+
+		CRAFTING(getCraftingRecipeClass(), CraftingRecipeEvent.class), // Having 'CRAFTING' under the subclasses allows for proper ExprRecipeType
+		// TODO: Remove method and apply class directly when MC version is raised to 1.20.1+
 		BLASTING(BlastingRecipe.class, BlastingRecipeEvent.class),
 		FURNACE(FurnaceRecipe.class, FurnaceRecipeEvent.class),
 		CAMPFIRE(CampfireRecipe.class, CampfireRecipeEvent.class),
@@ -71,6 +71,13 @@ public class RecipeUtils {
 				return CraftingRecipe.class;
 			return null;
 		}
+
+		private static @Nullable Class<? extends Recipe> getTransmuteRecipeClass() {
+			if (Skript.classExists("org.bukkit.inventory.TransmuteRecipe"))
+				return TransmuteRecipe.class;
+			return null;
+		}
+
 	}
 
 	/**

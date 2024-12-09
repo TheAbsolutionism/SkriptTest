@@ -31,7 +31,7 @@ test "register shapeless recipe fail":
 		set {_recipe} to a new shapeless recipe with the key "test_register_shapeless_recipe_fail":
 			set the recipe ingredients of the 1st row to iron ingot, diamond and gold ingot #Fail
 			set the recipe result to netherite sword named "test_register_shapeless_recipe_fail"
-	assert last parse logs contains "This can only be used when registering a Shaped Recipe." with "Ingredients of a row did not fail for Shapeless recipe"
+	assert last parse logs contains "This can only be used when creating a Shaped Recipe." with "Ingredients of a row did not fail for Shapeless recipe"
 
 test "register blasting recipe":
 	set {_recipe} to a new blasting recipe with the key "test_register_blasting_recipe":
@@ -133,3 +133,15 @@ test "register stonecutting recipe":
 
 	assert the recipe type of {_recipe} is stonecutting recipe with "Created recipe is not a stonecutting recipe"
 	assert the recipe type of {_get} is stonecutting recipe with "Retrieved recipe is not a stonecutting recipe"
+
+test "register transmute recipe" when running minecraft "1.21.2":
+	set {_recipe} to a new transmute recipe with the key "test_register_transmute_recipe":
+		set the recipe input item to leather helmet
+		set the recipe transmute item to nether star
+		set the recipe result item to netherite helmet
+	add {_recipe} to the server's recipes
+	set {_get} to the recipe with the key "test_register_transmute_recipe"
+	assert {_get} is set with "Transmute recipe was not added to the server"
+
+	assert the recipe type of {_recipe} is transmute recipe with "Created recipe is not a transmute recipe"
+	assert the recipe type of {_recipe} is transmute recipe with "Retrieved recipe is not a transmute recipe"
