@@ -8,6 +8,8 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.util.Checker;
 import ch.njol.util.Kleenean;
 import org.bukkit.Keyed;
 import org.bukkit.entity.Player;
@@ -33,37 +35,37 @@ public class CondDiscoveredRecipes extends Condition {
 			"%players% (hasn't|has not|haven't|have not) (discovered|unlocked) [the] [recipe[s]] %recipes%");
 	}
 
-	private Expression<Player> players;
-	private Expression<? extends Recipe> recipes;
+	private Expression<Player> exprPlayer;
+	private Expression<? extends Recipe> exprRecipe;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		players = (Expression<Player>) exprs[0];
+		exprPlayer = (Expression<Player>) exprs[0];
 		//noinspection unchecked
-		recipes = (Expression<? extends Recipe>) exprs[1];
+		exprRecipe = (Expression<? extends Recipe>) exprs[1];
 		setNegated(matchedPattern == 1);
 		return true;
 	}
 
 	@Override
 	public boolean check(Event event) {
-		return players.check(event,
-			player -> recipes.check(event,
-				recipe -> {
-					boolean result = false;
-					if (recipe instanceof Keyed recipeKey) {
-						result = player.hasDiscoveredRecipe(recipeKey.getKey());
-					}
-					return isNegated() ? !result : result;
+		Recipe[] recipes = exprRecipe.getArray(event);
+		return exprPlayer.check(event, player -> {
+			return SimpleExpression.check(recipes, new Checker<Recipe>() {
+				@Override
+				public boolean check(Recipe recipe) {
+					if (!(recipe instanceof Keyed recipeKey))
+						return false;
+					return player.hasDiscoveredRecipe(recipeKey.getKey());
 				}
-			)
-		);
+			}, isNegated(), exprRecipe.getAnd());
+		});
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return players.toString(event, debug) + (isNegated() ? " have not" : " have") + " found recipes " + recipes.toString(event, debug);
+		return exprPlayer.toString(event, debug) + (isNegated() ? " have not" : " have") + " found recipes " + exprRecipe.toString(event, debug);
 	}
 
 }
