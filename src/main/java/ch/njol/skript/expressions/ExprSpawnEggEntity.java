@@ -18,8 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawn Egg Entity")
 @Description({
-	"Gets or sets the entity snapshot that the provided spawn eggs will spawn when used.",
-	"NOTE: When using an entity data (i.e 'a zombie'), it will spawn a new zombie to retrieve an entity snapshot and then be removed."
+	"Gets or sets the entity snapshot that the provided spawn eggs will spawn when used."
 })
 @Examples({
 	"set {_item} to a zombie spawn egg",
@@ -39,11 +38,11 @@ import org.jetbrains.annotations.Nullable;
 })
 @RequiredPlugins("Minecraft 1.20.2+, Minecraft 1.20.5+ (comparisons)")
 @Since("INSERT VERSION")
-public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object> {
+public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
 
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
-			register(ExprSpawnEggEntity.class, Object.class, "spawn egg entity", "itemstacks/itemtypes/slots");
+			register(ExprSpawnEggEntity.class, EntitySnapshot.class, "spawn egg entity", "itemstacks/itemtypes/slots");
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (delta == null || delta[0] == null)
+		if (delta == null)
 			return;
 		EntitySnapshot snapshot = null;
 		if (delta[0] instanceof EntitySnapshot entitySnapshot) {
@@ -95,8 +94,8 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 	}
 
 	@Override
-	public Class<Object> getReturnType() {
-		return Object.class;
+	public Class<EntitySnapshot> getReturnType() {
+		return EntitySnapshot.class;
 	}
 
 	@Override
