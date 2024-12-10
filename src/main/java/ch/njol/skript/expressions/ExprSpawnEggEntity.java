@@ -7,16 +7,12 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.slot.Slot;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
@@ -25,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Spawn Egg Entity")
 @Description({
 	"Gets or sets the entity snapshot that the provided spawn eggs will spawn when used.",
-	"NOTE: When using an entity data i.e 'a zombie', it will spawn a new zombie to retrieve an entity snapshot and then be removed."
+	"NOTE: When using an entity data (i.e 'a zombie'), it will spawn a new zombie to retrieve an entity snapshot and then be removed."
 })
 @Examples({
 	"set {_item} to a zombie spawn egg",
@@ -50,15 +46,6 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
 			register(ExprSpawnEggEntity.class, Object.class, "spawn egg entity", "itemstacks/itemtypes/slots");
-	}
-
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (Player.class.isAssignableFrom(exprs[0].getReturnType())) {
-			Skript.error("You can't set the spawn egg entity to a player.");
-			return false;
-		}
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override

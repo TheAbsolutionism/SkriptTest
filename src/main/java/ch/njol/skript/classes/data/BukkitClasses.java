@@ -1558,9 +1558,9 @@ public class BukkitClasses {
 			Classes.registerClass(new ClassInfo<>(EntitySnapshot.class, "entitysnapshot")
 				.user("entity ?snapshots?")
 				.name("Entity Snapshot")
-				.description("Represents a snapshot of an entity's data. "
-					+ "This includes all of the data associated with an entity (it's name, health, attributes, etc.), at the time it's retrieved. "
-					+ "This acts as a template of sorts; it cannot be used to modify the entity which it represents.")
+				.description("Represents a snapshot of an entity's data. ",
+					"This includes all of the data associated with an entity (it's name, health, attributes, etc.), at the time it's retrieved. ",
+					"This acts as a template of sorts; it cannot be used to modify the entity which it represents.")
 				.requiredPlugins("Minecraft 1.20.2+")
 				.since("INSERT VERSION")
 			);

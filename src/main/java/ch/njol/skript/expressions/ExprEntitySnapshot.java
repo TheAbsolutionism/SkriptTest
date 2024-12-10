@@ -13,9 +13,10 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Snapshot")
 @Description({
-	"Returns an entity snapshot of the provided entities, which is a snapshot of all the data of the provided entities.",
-	"This data includes the values of all the entities' attributes at the time of this expression being called.",
-	"This expression can only be used to copy the full attributes of an entity. Individual attributes cannot be modified or retrieved."
+	"Returns the entity snapshot of a provided entity, which includes all the data associated with it "
+	+ "(name, health, attributes, etc.) at the time it's retrieved.",
+	"This acts as a template, and cannot be used to modify an entity's data. Individual attributes, like it's health for example, "
+	+ "also cannot be retrieved or modified from a snapshot.",
 })
 @Examples({
 	"spawn a pig at location(0, 0, 0):",
