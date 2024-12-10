@@ -9,8 +9,6 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
@@ -73,8 +71,7 @@ public class ExprSpawnEggEntity extends SimplePropertyExpression<Object, Object>
 		} else if (delta[0] instanceof Entity entity) {
 			snapshot = entity.createSnapshot();
 		} else if (delta[0] instanceof EntityData<?> entityData) {
-			Location location = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
-			Entity entity = entityData.spawn(location);
+			Entity entity = entityData.create();
 			snapshot = entity.createSnapshot();
 			entity.remove();
 		}

@@ -2,6 +2,7 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -28,11 +29,11 @@ import org.jetbrains.annotations.Nullable;
 })
 @RequiredPlugins("Minecraft 1.20.2+")
 @Since("INSERT VERSION")
-public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntitySnapshot> {
+public class ExprEntitySnapshot extends SimplePropertyExpression<Object, EntitySnapshot> {
 
 	static {
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
-			register(ExprEntitySnapshot.class, EntitySnapshot.class, "entity snapshot", "entities");
+			register(ExprEntitySnapshot.class, EntitySnapshot.class, "entity snapshot", "entities/entitydatas");
 	}
 
 	@Override
@@ -45,8 +46,16 @@ public class ExprEntitySnapshot extends SimplePropertyExpression<Entity, EntityS
 	}
 
 	@Override
-	public @Nullable EntitySnapshot convert(Entity entity) {
-		return entity.createSnapshot();
+	public @Nullable EntitySnapshot convert(Object object) {
+		if (object instanceof Entity entity) {
+			return entity.createSnapshot();
+		} else if (object instanceof EntityData<?> entityData) {
+			Entity entity = entityData.create();
+			EntitySnapshot snapshot = entity.createSnapshot();
+			entity.remove();
+			return snapshot;
+		}
+		return null;
 	}
 
 	@Override
