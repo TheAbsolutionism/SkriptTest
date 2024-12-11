@@ -668,6 +668,11 @@ public class SkriptClasses {
 				.since("2.5")
 				.serializer(new YggdrasilSerializer<GameruleValue>())
 		);
+
+		Classes.registerClass(new ClassInfo<>(TestClassInfo.class, "anvilgui")
+			.user("anvil ?guis?")
+		);
+
 	}
 	
 }
