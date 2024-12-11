@@ -4,7 +4,7 @@ import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
@@ -12,44 +12,43 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class ExprMemoryAngryAt extends SimplePropertyExpression<LivingEntity, Entity> {
+public class ExprMemoryLikedPlayer extends SimplePropertyExpression<LivingEntity, OfflinePlayer> {
 
-	private static final MemoryKey<UUID> MEMORY_KEY = MemoryKey.ANGRY_AT;
+	private static final MemoryKey<UUID> MEMORY_KEY = MemoryKey.LIKED_PLAYER;
 
 	static {
-		registerDefault(ExprMemoryAngryAt.class, Entity.class, "angry at memory", "livingentities");
+		registerDefault(ExprMemoryLikedPlayer.class, OfflinePlayer.class, "liked player memory", "livingentities");
 	}
 
 	@Override
-	public @Nullable Entity convert(LivingEntity entity) {
+	public @Nullable OfflinePlayer convert(LivingEntity entity) {
 		try {
 			UUID uuid = entity.getMemory(MEMORY_KEY);
 			if (uuid == null)
 				return null;
-			return Bukkit.getEntity(uuid);
+			return Bukkit.getOfflinePlayer(uuid);
 		} catch (Exception ignored) {}
 		return null;
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(Entity.class, UUID.class, String.class);
-		return null;
+		return switch (mode) {
+			case SET, DELETE -> CollectionUtils.array(OfflinePlayer.class, UUID.class, String.class);
+			default -> null;
+		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		UUID uuid = null;
 		if (delta != null) {
-			if (delta[0] instanceof Entity entity) {
-				uuid = entity.getUniqueId();
+			if (delta[0] instanceof OfflinePlayer offlinePlayer) {
+				uuid = offlinePlayer.getUniqueId();
 			} else if (delta[0] instanceof UUID uuid1) {
 				uuid = uuid1;
 			} else if (delta[0] instanceof String string) {
 				uuid = UUID.fromString(string);
-			} else {
-                throw new IllegalArgumentException("Invalid argument: " + delta[0]);
 			}
 		}
 
@@ -58,17 +57,16 @@ public class ExprMemoryAngryAt extends SimplePropertyExpression<LivingEntity, En
 				entity.setMemory(MEMORY_KEY, uuid);
 			} catch (Exception ignored) {}
 		}
-
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "angry at memory";
+		return "liked player memory";
 	}
 
 	@Override
-	public Class<Entity> getReturnType() {
-		return Entity.class;
+	public Class<OfflinePlayer> getReturnType() {
+		return OfflinePlayer.class;
 	}
 
 }

@@ -1,12 +1,7 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -15,30 +10,18 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-public class ExprMemoryJobSite extends SimplePropertyExpression<LivingEntity, Location> {
+public class ExprMemorySnifferPositions extends SimplePropertyExpression<LivingEntity, Location> {
 
-	private static final MemoryKey<Location> JOB_MEMORY = MemoryKey.JOB_SITE;
-	private static final MemoryKey<Location> POTENTIAL_MEMORY = MemoryKey.POTENTIAL_JOB_SITE;
+	private static final MemoryKey<Location> MEMORY_KEY = MemoryKey.SNIFFER_EXPLORED_POSITIONS;
 
 	static {
-		Skript.registerExpression(ExprMemoryJobSite.class, Location.class, ExpressionType.PROPERTY,
-			"[the] job site memory [of %livingentities%]",
-			"[the] potential job site memory [of %livingentities%]");
-	}
-
-	private boolean isPotential;
-
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		isPotential = matchedPattern == 1;
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
+		registerDefault(ExprMemorySnifferPositions.class, Location.class, "sniffer explored positions memory", "livingentities");
 	}
 
 	@Override
 	public @Nullable Location convert(LivingEntity entity) {
-		MemoryKey<Location> memory = isPotential ? POTENTIAL_MEMORY : JOB_MEMORY;
 		try {
-			return entity.getMemory(memory);
+			return entity.getMemory(MEMORY_KEY);
 		} catch (Exception ignored) {}
 		return null;
 	}
@@ -52,7 +35,6 @@ public class ExprMemoryJobSite extends SimplePropertyExpression<LivingEntity, Lo
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		MemoryKey<Location> memory = isPotential ? POTENTIAL_MEMORY : JOB_MEMORY;
 		Location location = null;
 		if (delta != null) {
 			if (delta[0] instanceof Location loc) {
@@ -64,15 +46,14 @@ public class ExprMemoryJobSite extends SimplePropertyExpression<LivingEntity, Lo
 
 		for (LivingEntity entity : getExpr().getArray(event)) {
 			try {
-				entity.setMemory(memory, location);
+				entity.setMemory(MEMORY_KEY, location);
 			} catch (Exception ignored) {}
 		}
-
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return (isPotential ? "potential" : "") + "job site";
+		return "sniffer explored positions memory";
 	}
 
 	@Override

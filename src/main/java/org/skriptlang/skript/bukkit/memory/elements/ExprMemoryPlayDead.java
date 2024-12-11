@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
+public class ExprMemoryPlayDead extends SimplePropertyExpression<LivingEntity, Timespan> {
 
-	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.ITEM_PICKUP_COOLDOWN_TICKS;
+	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.PLAY_DEAD_TICKS;
 
 	static {
-		registerDefault(ExprMemoryItemPickupCooldown.class, Timespan.class, "item pick[ ]up cool[ ]down [time] memory", "livingentities");
+		registerDefault(ExprMemoryPlayDead.class, Timespan.class, "play[ing] dead [time] memory", "livingentities");
 	}
 
 	@Override
@@ -31,7 +31,6 @@ public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<Livin
 		return null;
 	}
 
-	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
 			case ADD, REMOVE, SET, DELETE -> CollectionUtils.array(Timespan.class);
@@ -45,9 +44,9 @@ public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<Livin
 		if (delta != null) {
 			time = (int) ((Timespan) delta[0]).getAs(TimePeriod.TICK);
 		} else {
-            time = null;
-        }
-        Consumer<LivingEntity> consumer = switch (mode) {
+			time = null;
+		}
+		Consumer<LivingEntity> consumer = switch (mode) {
 			case ADD -> entity -> {
 				assert time != null;
 				Integer current = entity.getMemory(MEMORY_KEY);
@@ -73,12 +72,11 @@ public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<Livin
 				consumer.accept(entity);
 			} catch (Exception ignored) {}
 		}
-
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "item pickup cooldown time";
+		return "play dead time memory";
 	}
 
 	@Override

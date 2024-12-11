@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
+public class ExprMemoryTemptationCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
 
-	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.ITEM_PICKUP_COOLDOWN_TICKS;
+	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.TEMPTATION_COOLDOWN_TICKS;
 
 	static {
-		registerDefault(ExprMemoryItemPickupCooldown.class, Timespan.class, "item pick[ ]up cool[ ]down [time] memory", "livingentities");
+		registerDefault(ExprMemoryTemptationCooldown.class, Timespan.class, "temptation cool[ ]down [time] memory", "livingentities");
 	}
 
 	@Override
@@ -45,9 +45,9 @@ public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<Livin
 		if (delta != null) {
 			time = (int) ((Timespan) delta[0]).getAs(TimePeriod.TICK);
 		} else {
-            time = null;
-        }
-        Consumer<LivingEntity> consumer = switch (mode) {
+			time = null;
+		}
+		Consumer<LivingEntity> consumer = switch (mode) {
 			case ADD -> entity -> {
 				assert time != null;
 				Integer current = entity.getMemory(MEMORY_KEY);
@@ -78,7 +78,7 @@ public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<Livin
 
 	@Override
 	protected String getPropertyName() {
-		return "item pickup cooldown time";
+		return "temptation cooldown time memory";
 	}
 
 	@Override

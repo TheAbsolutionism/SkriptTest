@@ -10,12 +10,12 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-public class ExprMemoryHome extends SimplePropertyExpression<LivingEntity, Location> {
+public class ExprMemoryMeetingPoint extends SimplePropertyExpression<LivingEntity, Location> {
 
-	private final static MemoryKey<Location> MEMORY_KEY = MemoryKey.HOME;
+	private static final MemoryKey<Location> MEMORY_KEY = MemoryKey.MEETING_POINT;
 
 	static {
-		registerDefault(ExprMemoryHome.class, Location.class, "home memory", "livingentities");
+		registerDefault(ExprMemoryMeetingPoint.class, Location.class, "meet[ing] (point|location) memory", "livingentities");
 	}
 
 	@Override
@@ -28,9 +28,10 @@ public class ExprMemoryHome extends SimplePropertyExpression<LivingEntity, Locat
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(Location.class, Block.class);
-		return null;
+		return switch (mode) {
+			case SET, DELETE -> CollectionUtils.array(Location.class, Block.class);
+			default -> null;
+		};
 	}
 
 	@Override
@@ -49,12 +50,11 @@ public class ExprMemoryHome extends SimplePropertyExpression<LivingEntity, Locat
 				entity.setMemory(MEMORY_KEY, location);
 			} catch (Exception ignored) {}
 		}
-
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "home memory";
+		return "meeting point memory";
 	}
 
 	@Override
