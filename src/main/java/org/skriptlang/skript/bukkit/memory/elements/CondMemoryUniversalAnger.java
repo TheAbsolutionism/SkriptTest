@@ -19,7 +19,11 @@ public class CondMemoryUniversalAnger extends PropertyCondition<LivingEntity> {
 			"[the] anger state memory of %livingentities% (is|are) enabled",
 			"[the] anger state memory of %livingentities% (is|are) disabled",
 			"[the] anger state memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] anger state memory of %livingentities% (isn't|is not|aren't|are not) disabled");
+			"[the] anger state memory of %livingentities% (isn't|is not|aren't|are not) disabled",
+			"[the] %livingentities%'[s] anger state memory (is|are) enabled",
+			"[the] %livingentities%'[s] anger state memory (is|are) disabled",
+			"[the] %livingentities%'[s] anger state memory (isn't|is not|aren't|are not) enabled",
+			"[the] %livingentities%'[s] anger state memory (isn't|is not|aren't|are not) disabled");
 	}
 
 	private Expression<LivingEntity> expr;

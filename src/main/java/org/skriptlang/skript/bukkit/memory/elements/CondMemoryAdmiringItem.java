@@ -19,7 +19,11 @@ public class CondMemoryAdmiringItem extends PropertyCondition<LivingEntity> {
 			"[the] admiring item memory of %livingentities% (is|are) enabled",
 			"[the] admiring item memory of %livingentities% (is|are) disabled",
 			"[the] admiring item memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] admiring item memory of %livingentities% (isn't|is not|aren't|are not) disabled");
+			"[the] admiring item memory of %livingentities% (isn't|is not|aren't|are not) disabled",
+			"[the] %livingentities%'[s] admiring item memory (is|are) enabled",
+			"[the] %livingentities%'[s] admiring item memory (is|are) disabled",
+			"[the] %livingentities%'[s] admiring item memory (isn't|is not|aren't|are not) enabled",
+			"[the] %livingentities%'[s] admiring item memory (isn't|is not|aren't|are not) disabled");
 	}
 
 	private Expression<LivingEntity> expr;

@@ -17,7 +17,9 @@ public class EffMemoryUniversalAnger extends Effect {
 	static {
 		Skript.registerEffect(EffMemoryUniversalAnger.class,
 			"enable [the] anger state memory [of %livingentities%]",
-			"disable [the] anger state memory [of %livingentities%]");
+			"enable [the] %livingentities%'[s] anger state memory",
+			"disable [the] anger state memory [of %livingentities%]",
+			"disable [the] %livingentities%'[s] anger state memory");
 	}
 
 	private Expression<LivingEntity> expr;
@@ -25,7 +27,7 @@ public class EffMemoryUniversalAnger extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 1;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;

@@ -17,7 +17,9 @@ public class EffMemoryAdmiringDisabled extends Effect {
 	static {
 		Skript.registerEffect(EffMemoryAdmiringDisabled.class,
 			"enable [the] admiring state memory [of %livingentities%]",
-			"disable [the] admiring state memory [of %livingentities%]");
+			"enable [the] %livingentities%'[s] admiring state memory",
+			"disable [the] admiring state memory [of %livingentities%]",
+			"disable [the] %livingentities%'[s] admiring state memory");
 	}
 
 	private Expression<LivingEntity> expr;
@@ -25,7 +27,7 @@ public class EffMemoryAdmiringDisabled extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 1;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;

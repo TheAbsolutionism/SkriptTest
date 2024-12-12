@@ -19,7 +19,11 @@ public class CondMemoryHuntingCooldown extends PropertyCondition<LivingEntity> {
 			"[the] hunting cooldown memory of %livingentities% (is|are) enabled",
 			"[the] hunting cooldown memory of %livingentities% (is|are) disabled",
 			"[the] hunting cooldown memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] hunting cooldown memory of %livingentities% (isn't|is not|aren't|are not) disabled");
+			"[the] hunting cooldown memory of %livingentities% (isn't|is not|aren't|are not) disabled",
+			"[the] %livingentities%'[s] hunting cooldown memory (is|are) enabled",
+			"[the] %livingentities%'[s] hunting cooldown memory (is|are) disabled",
+			"[the] %livingentities%'[s] hunting cooldown memory (isn't|is not|aren't|are not) enabled",
+			"[the] %livingentities%'[s] hunting cooldown memory (isn't|is not|aren't|are not) disabled");
 	}
 
 	private Expression<LivingEntity> expr;

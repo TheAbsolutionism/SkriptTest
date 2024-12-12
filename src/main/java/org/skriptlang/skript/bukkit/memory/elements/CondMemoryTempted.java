@@ -19,7 +19,11 @@ public class CondMemoryTempted extends PropertyCondition<LivingEntity> {
 			"[the] temptation state memory of %livingentities% (is|are) enabled",
 			"[the] temptation state memory of %livingentities% (is|are) disabled",
 			"[the] temptation state memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] temptation state memory of %livingentities% (isn't|is not|aren't|are not) disabled");
+			"[the] temptation state memory of %livingentities% (isn't|is not|aren't|are not) disabled",
+			"[the] %livingentities%'[s] temptation state memory (is|are) enabled",
+			"[the] %livingentities%'[s] temptation state memory (is|are) disabled",
+			"[the] %livingentities%'[s] temptation state memory (isn't|is not|aren't|are not) enabled",
+			"[the] %livingentities%'[s] temptation state memory (isn't|is not|aren't|are not) disabled");
 	}
 
 	private Expression<LivingEntity> expr;

@@ -17,7 +17,9 @@ public class EffMemoryHuntingCooldown extends Effect {
 	static {
 		Skript.registerEffect(EffMemoryHuntingCooldown.class,
 			"enable [the] hunting cool[ ]down memory [of %livingentities%]",
-			"disable [the] hunting cool[ ]down memory [of %livingentities%]");
+			"enable [the] %livingentities%'[s] hunting cool[ ]down memory",
+			"disable [the] hunting cool[ ]down memory [of %livingentities%]",
+			"disable [the] %livingentities%'[s] hunting cool[ ]down memory");
 	}
 
 	private Expression<LivingEntity> expr;
@@ -25,7 +27,7 @@ public class EffMemoryHuntingCooldown extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 1;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;

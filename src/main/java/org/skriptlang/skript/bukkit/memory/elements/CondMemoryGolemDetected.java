@@ -19,7 +19,11 @@ public class CondMemoryGolemDetected extends PropertyCondition<LivingEntity> {
 			"[the] golem detected recently memory of %livingentities% (is|are) enabled",
 			"[the] golem detected recently memory of %livingentities% (is|are) disabled",
 			"[the] golem detected recently memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] golem detected recently memory of %livingentities% (isn't|is not|aren't|are not) disabled");
+			"[the] golem detected recently memory of %livingentities% (isn't|is not|aren't|are not) disabled",
+			"[the] %livingentities%'[s] golem detected recently memory (is|are) enabled",
+			"[the] %livingentities%'[s] golem detected recently memory (is|are) disabled",
+			"[the] %livingentities%'[s] golem detected recently memory (isn't|is not|aren't|are not) enabled",
+			"[the] %livingentities%'[s] golem detected recently memory (isn't|is not|aren't|are not) disabled");
 	}
 
 	private Expression<LivingEntity> expr;

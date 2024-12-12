@@ -17,7 +17,9 @@ public class EffMemoryTempted extends Effect {
 	static {
 		Skript.registerEffect(EffMemoryTempted.class,
 			"enable [the] temptation state memory [of %livingentities%]",
-			"disable [the] temptation state memory [of %livingentities%]");
+			"enable [the] %livingentities%'[s] temptation state memory",
+			"disable [the] temptation state memory [of %livingentities%]",
+			"disable [the] %livingentities%'[s] temptation state memory");
 	}
 
 	private Expression<LivingEntity> expr;
@@ -25,7 +27,7 @@ public class EffMemoryTempted extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 1;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;

@@ -17,7 +17,9 @@ public class EffMemoryGolemDetected extends Effect {
 	static {
 		Skript.registerEffect(EffMemoryGolemDetected.class,
 			"enable [the] golem detected recently memory [of %livingentities%]",
-			"disable [the] golem detected recently memory [of %livingentities%]");
+			"enable [the] %livingentities%'[s] golem detected recently memory",
+			"disable [the] golem detected recently memory [of %livingentities%]",
+			"disable [the] %livingentities%'[s] golem detected recently memory");
 	}
 
 	private Expression<LivingEntity> expr;
@@ -25,7 +27,7 @@ public class EffMemoryGolemDetected extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 1;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;
