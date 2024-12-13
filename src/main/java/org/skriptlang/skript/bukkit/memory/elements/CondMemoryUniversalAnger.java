@@ -2,6 +2,10 @@ package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -10,29 +14,33 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Is Angered")
+@Description("Checks to see if a piglin is angered.")
+@Examples({
+	"if the last spawned piglin is angry:",
+		"\tmake last spawned piglin not angry"
+})
+@Since("INSERT VERSION")
 public class CondMemoryUniversalAnger extends PropertyCondition<LivingEntity> {
 
 	private static final MemoryKey<Boolean> MEMORY_KEY = MemoryKey.UNIVERSAL_ANGER;
 
 	static {
-		Skript.registerCondition(CondMemoryTempted.class, ConditionType.PROPERTY,
+		Skript.registerCondition(CondMemoryUniversalAnger.class, ConditionType.PROPERTY,
+			"[the] %livingentities%['[s]] (is|are) (angered|angry)",
 			"[the] anger state memory of %livingentities% (is|are) enabled",
-			"[the] anger state memory of %livingentities% (is|are) disabled",
-			"[the] anger state memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] anger state memory of %livingentities% (isn't|is not|aren't|are not) disabled",
 			"[the] %livingentities%'[s] anger state memory (is|are) enabled",
-			"[the] %livingentities%'[s] anger state memory (is|are) disabled",
-			"[the] %livingentities%'[s] anger state memory (isn't|is not|aren't|are not) enabled",
-			"[the] %livingentities%'[s] anger state memory (isn't|is not|aren't|are not) disabled");
+			"[the] %livingentities%['[s]] (isn't|is not|aren't|are not) (angered|angry)",
+			"[the] anger state memory of %livingentities% (is|are) disabled",
+			"[the] %livingentities%'[s] anger state memory (is|are) disabled");
 	}
 
 	private Expression<LivingEntity> expr;
-	private boolean checkEnabled;
+	private boolean checkAnger;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		checkEnabled = matchedPattern % 2 == 0;
-		setNegated(matchedPattern % 2 == 1);
+		checkAnger = matchedPattern <= 2;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
@@ -43,10 +51,10 @@ public class CondMemoryUniversalAnger extends PropertyCondition<LivingEntity> {
 		try {
 			Boolean memory = entity.getMemory(MEMORY_KEY);
 			if (memory == null)
-				return isNegated();
-			return memory == checkEnabled;
+				return false;
+			return memory == checkAnger;
 		} catch (Exception ignored) {}
-		return isNegated();
+		return false;
 	}
 
 	@Override
@@ -56,8 +64,7 @@ public class CondMemoryUniversalAnger extends PropertyCondition<LivingEntity> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the anger state memory of " + expr.toString(event, debug) + (isNegated() ? " are not " : " are ")
-			+ (checkEnabled ? "enabled" : "dissabled");
+		return "the " + expr.toString(event, debug) + (checkAnger ? " are " : " are not ") + "angered";
 	}
 
 }

@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@Name("Liked Player")
+@Description("The player that an allay likes.")
+@Examples({
+	"broadcast the liked player memory of last spawned allay",
+	"set the liked player memory of last spawned allay to {_player}"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryLikedPlayer extends SimplePropertyExpression<LivingEntity, OfflinePlayer> {
 
 	private static final MemoryKey<UUID> MEMORY_KEY = MemoryKey.LIKED_PLAYER;

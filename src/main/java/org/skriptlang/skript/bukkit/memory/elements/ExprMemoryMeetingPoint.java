@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Location;
@@ -10,6 +14,13 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Meeting Point")
+@Description("The location of a villager's meeting point.")
+@Examples({
+	"broadcast the meeting point memory of last spawned villager",
+	"set the meeting location memory of last spawned villager to location(0, 0, 0)"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryMeetingPoint extends SimplePropertyExpression<LivingEntity, Location> {
 
 	private static final MemoryKey<Location> MEMORY_KEY = MemoryKey.MEETING_POINT;

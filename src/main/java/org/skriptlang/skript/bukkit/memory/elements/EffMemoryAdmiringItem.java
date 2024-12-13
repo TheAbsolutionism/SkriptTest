@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -10,14 +14,24 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Admiring Item")
+@Description("Make a piglin admire an item.")
+@Examples({
+	"make last spawned piglin admire an item"
+})
+@Since("INSERT VERSION")
 public class EffMemoryAdmiringItem extends Effect {
 
 	private static final MemoryKey<Boolean> MEMORY_KEY = MemoryKey.ADMIRING_ITEM;
 
 	static {
 		Skript.registerEffect(EffMemoryAdmiringItem.class,
+			"make [the] %livingentities% admire [an] item",
+			"force [the] %livingentities% to admire [an] item",
 			"enable [the] admiring item memory [of %livingentities%]",
 			"enable [the] %livingentities%'[s] admiring item memory",
+			"make [the] %livingentities% (stop admiring|not admire) [an] item",
+			"force [the] %livingentities% to (stop admiring|not admire) [an] item",
 			"disable [the] admiring item memory [of %livingentities%]",
 			"disable [the] %livingentities%'[s] admiring item memory");
 	}
@@ -27,7 +41,7 @@ public class EffMemoryAdmiringItem extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern <= 1;
+		enable = matchedPattern <= 3;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return true;

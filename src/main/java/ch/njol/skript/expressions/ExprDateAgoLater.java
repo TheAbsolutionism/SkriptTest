@@ -29,6 +29,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.WorldDate;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -39,39 +40,39 @@ import org.jetbrains.annotations.Nullable;
 			"set {_hourAfter} to 1 hour after {someOtherDate}",
 			"set {_hoursBefore} to 5 hours before {someOtherDate}"})
 @Since("2.2-dev33")
-public class ExprDateAgoLater extends SimpleExpression<Date> {
+public class ExprDateAgoLater extends SimpleExpression<Object> {
 
     static {
-        Skript.registerExpression(ExprDateAgoLater.class, Date.class, ExpressionType.COMBINED,
-                "%timespan% (ago|in the past|before [the] [date] %-date%)",
-                "%timespan% (later|(from|after) [the] [date] %-date%)");
+        Skript.registerExpression(ExprDateAgoLater.class, Object.class, ExpressionType.COMBINED,
+                "%timespan% (ago|in the past|before [the] [date] %-date/worlddate%)",
+                "%timespan% (later|(from|after) [the] [date] %-date/worlddate%)");
     }
 
-    @SuppressWarnings("null")
     private Expression<Timespan> timespan;
-    @Nullable
-    private Expression<Date> date;
+    private @Nullable Expression<?> date;
     private boolean ago;
 
     @Override
-    @SuppressWarnings({"unchecked", "null"})
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        timespan = (Expression<Timespan>) exprs[0];
-        date = (Expression<Date>) exprs[1];
+		//noinspection unchecked
+		timespan = (Expression<Timespan>) exprs[0];
+        date = exprs[1];
         ago = matchedPattern == 0;
         return true;
     }
 
     @Override
-    @Nullable
-    @SuppressWarnings("null")
-    protected Date[] get(Event e) {
-        Timespan timespan = this.timespan.getSingle(e);
-		Date date = this.date != null ? this.date.getSingle(e) : new Date();
-		if (timespan == null || date == null)
+    protected Object @Nullable [] get(Event event) {
+        Timespan timespan = this.timespan.getSingle(event);
+		Object object = date != null ? date.getSingle(event) : new Date();
+		if (timespan == null || object == null)
 			return null;
-
-        return new Date[] { ago ? date.minus(timespan) : date.plus(timespan) };
+		if (object instanceof Date date1) {
+			return new Date[]{ago ? date1.minus(timespan) : date1.plus(timespan)};
+		} else if (object instanceof WorldDate worldDate) {
+			return new WorldDate[]{ago ? worldDate.minus(timespan) : worldDate.plus(timespan)};
+		}
+		return null;
     }
 
     @Override
@@ -80,8 +81,8 @@ public class ExprDateAgoLater extends SimpleExpression<Date> {
     }
 
     @Override
-    public Class<? extends Date> getReturnType() {
-        return Date.class;
+    public Class<Object> getReturnType() {
+        return Object.class;
     }
 
     @Override
@@ -89,4 +90,5 @@ public class ExprDateAgoLater extends SimpleExpression<Date> {
         return timespan.toString(e, debug) + " " + (ago ? (date != null ? "before " + date.toString(e, debug) : "ago")
 			: (date != null ? "after " + date.toString(e, debug) : "later"));
     }
+
 }

@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Name("Ram Cooldown")
+@Description("The amount of time until a goat can ram.")
+@Examples({
+	"broadcast the ram cooldown memory of last spawned goat",
+	"add 5 seconds to the ram cooldown time memory of last spawned goat"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryRamCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.RAM_COOLDOWN_TICKS;
@@ -48,13 +59,11 @@ public class ExprMemoryRamCooldown extends SimplePropertyExpression<LivingEntity
 		}
 		Consumer<LivingEntity> consumer = switch (mode) {
 			case ADD -> entity -> {
-				assert time != null;
 				Integer current = entity.getMemory(MEMORY_KEY);
 				Integer newTime = current != null ? current + time : time;
 				entity.setMemory(MEMORY_KEY, newTime);
 			};
 			case REMOVE -> entity -> {
-				assert time != null;
 				Integer current = entity.getMemory(MEMORY_KEY);
 				Integer newTime = current != null ? current - time : time;
 				entity.setMemory(MEMORY_KEY, newTime);
@@ -81,7 +90,7 @@ public class ExprMemoryRamCooldown extends SimplePropertyExpression<LivingEntity
 
 	@Override
 	public Class<Timespan> getReturnType() {
-		return null;
+		return Timespan.class;
 	}
 
 }

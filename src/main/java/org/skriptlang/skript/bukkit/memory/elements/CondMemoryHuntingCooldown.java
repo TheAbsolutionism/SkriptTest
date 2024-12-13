@@ -2,6 +2,10 @@ package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.conditions.base.PropertyCondition;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -10,29 +14,29 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Hunting Cooldown Is Enabled")
+@Description("Checks to see if an axolotl has a hunting cooldown.")
+@Examples({
+	"if the hunting cooldown of last spawned axolotl is enabled:",
+		"\tdisable the hunting cooldown of last spawned axolotl"
+})
+@Since("INSERT VERSION")
 public class CondMemoryHuntingCooldown extends PropertyCondition<LivingEntity> {
 
 	private static final MemoryKey<Boolean> MEMORY_KEY = MemoryKey.HAS_HUNTING_COOLDOWN;
 
 	static {
 		Skript.registerCondition(CondMemoryHuntingCooldown.class, ConditionType.PROPERTY,
-			"[the] hunting cooldown memory of %livingentities% (is|are) enabled",
-			"[the] hunting cooldown memory of %livingentities% (is|are) disabled",
-			"[the] hunting cooldown memory of %livingentities% (isn't|is not|aren't|are not) enabled",
-			"[the] hunting cooldown memory of %livingentities% (isn't|is not|aren't|are not) disabled",
-			"[the] %livingentities%'[s] hunting cooldown memory (is|are) enabled",
-			"[the] %livingentities%'[s] hunting cooldown memory (is|are) disabled",
-			"[the] %livingentities%'[s] hunting cooldown memory (isn't|is not|aren't|are not) enabled",
-			"[the] %livingentities%'[s] hunting cooldown memory (isn't|is not|aren't|are not) disabled");
+			"[the] hunting cool[ ]down [memory] of %livingentities% (is|are) enabled",
+			"[the] hunting cool[ ]down [memory] of %livingentities% (is|are) disabled");
 	}
 
 	private Expression<LivingEntity> expr;
-	private boolean checkEnabled;
+	private boolean checkHunting;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		checkEnabled = matchedPattern % 2 == 0;
-		setNegated(matchedPattern % 2 == 1);
+		checkHunting = matchedPattern == 0;
 		//noinspection unchecked
 		expr = (Expression<LivingEntity>) exprs[0];
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
@@ -43,10 +47,10 @@ public class CondMemoryHuntingCooldown extends PropertyCondition<LivingEntity> {
 		try {
 			Boolean memory = entity.getMemory(MEMORY_KEY);
 			if (memory == null)
-				return isNegated();
-			return memory == checkEnabled;
+				return false;
+			return memory == checkHunting;
 		} catch (Exception ignored) {}
-		return isNegated();
+		return false;
 	}
 
 	@Override
@@ -56,8 +60,7 @@ public class CondMemoryHuntingCooldown extends PropertyCondition<LivingEntity> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the hunting cooldown memory of " + expr.toString(event, debug) + (isNegated() ? " are not " : " are ")
-			+ (checkEnabled ? "enabled" : "dissabled");
+		return "the " + expr.toString(event, debug) + (checkHunting ? "" : " does not ") + " have a hunting cooldown";
 	}
 
 }

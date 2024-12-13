@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Name("Liked Noteblock Cooldown")
+@Description("The amount of time until an allay stops putting items at the liked noteblock.")
+@Examples({
+	"broadcast the liked noteblock cooldown memory of last spawned allay",
+	"add 5 seconds to the liked noteblock cooldown time memory of last spawned allay"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryLikedNoteblockCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.LIKED_NOTEBLOCK_COOLDOWN_TICKS;

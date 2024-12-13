@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Name("Play Dead")
+@Description("The amount of time for an axolotl to play dead.")
+@Examples({
+	"broadcast the play dead memory of last spawned axolotl",
+	"add 5 seconds to the playing dead time memory of last spawned axolotl"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryPlayDead extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.PLAY_DEAD_TICKS;

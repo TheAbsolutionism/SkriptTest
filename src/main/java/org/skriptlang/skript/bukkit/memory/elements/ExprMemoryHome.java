@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Location;
@@ -9,7 +13,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-
+@Name("Entity Home")
+@Description("The home location of a villager.")
+@Examples({
+	"broadcast the home memory of last spawned villager",
+	"set the home memory of last spawned villager to location(0, 0, 0)"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryHome extends SimplePropertyExpression<LivingEntity, Location> {
 
 	private final static MemoryKey<Location> MEMORY_KEY = MemoryKey.HOME;

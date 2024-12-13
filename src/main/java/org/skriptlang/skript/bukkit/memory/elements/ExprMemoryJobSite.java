@@ -2,6 +2,10 @@ package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -15,6 +19,13 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Job Site")
+@Description("The job site or potential job site of a villager.")
+@Examples({
+	"broadcast the job site memory of last spawned villager",
+	"set the job site memory of last spawned villager to location(0, 0, 0)"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryJobSite extends SimplePropertyExpression<LivingEntity, Location> {
 
 	private static final MemoryKey<Location> JOB_MEMORY = MemoryKey.JOB_SITE;

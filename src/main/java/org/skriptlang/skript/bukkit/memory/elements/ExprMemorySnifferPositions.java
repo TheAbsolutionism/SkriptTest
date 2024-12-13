@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Location;
@@ -10,6 +14,13 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Explored Positions")
+@Description("The explored positions of a sniffer.")
+@Examples({
+	"broadcast the sniffer explored positions memory of last spawned sniffer",
+	"set the sniffer explored positions memory of last spawned sniffer to location(0, 0, 0)"
+})
+@Since("INSERT VERSION")
 public class ExprMemorySnifferPositions extends SimplePropertyExpression<LivingEntity, Location> {
 
 	private static final MemoryKey<Location> MEMORY_KEY = MemoryKey.SNIFFER_EXPLORED_POSITIONS;

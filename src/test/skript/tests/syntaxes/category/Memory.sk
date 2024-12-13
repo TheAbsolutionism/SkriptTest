@@ -1,0 +1,184 @@
+test "villager memories":
+	###
+		Combines:
+			CondMemoryGolemDetected
+			EffMemoryGolemDetected
+			ExprMemoryHome
+			ExprMemoryJobSite
+			ExprMemoryLastSlept
+			ExprMemoryLastWoken
+			ExprMemoryLastWorked
+	###
+
+	spawn a villager at test-location:
+		set {_entity} to entity
+
+	set the home memory of {_entity} to location(10, 0, 0)
+	assert the home memory of {_entity} is location(10, 0, 0) with "Home Memory did not change"
+
+	set the potential job site memory of {_entity} to location(5, 0, 0)
+	assert the potential job site memory of {_entity} is location(5, 0, 0) with "Potential Job Site Memory did not change"
+
+	set the job site memory of {_entity} to location(0, 0, 5)
+	assert the job site memory of {_entity} is location(0, 0, 5) with "Job Site Memory did not change"
+
+	set {_slept} to 10 seconds from world date of {_entity}
+	set the last slept memory of {_entity} to {_slept}
+	assert the last slept memory of {_entity} is {_slept} with "Last Slept Memory did not change"
+
+	set {_woke} to 5 seconds from world date of {_entity}
+	set the last woke memory of {_entity} to {_woke}
+	assert the last woke memory of {_entity} is {_woke} with "Last Woke Memory did not change"
+
+	set {_work} to 15 seconds from world date of {_entity}
+	set the last worked memory of {_entity} to {_work}
+	assert the last worked memory of {_entity} is {_work} with "Last Worked Memory did not change"
+
+	set the meeting point memory of {_entity} to location(7, 0, 0)
+	assert the meeting point memory of {_entity} is location(7, 0, 0) with "Meeting Point Memory did not change"
+
+	make {_entity} detect a golem
+	assert {_entity} has detected a golem recently with "Villager should have golem detected enabled"
+	make {_entity} not detect a golem
+	assert {_entity} has not detected a golem recently with "Villager should have golem detected disabled"
+
+	clear entity within {_entity}
+
+test "piglin memories":
+	###
+		Combines:
+			CondMemoryAdmiringState
+			CondMemoryAdmiringItem
+			CondMemoryUniversalAnger
+			EffMemoryAdmiringState
+			EffMemoryAdmiringItem
+			EffMemoryUniversalAnger
+			ExprMemoryAngryAt
+	###
+
+	spawn a piglin at test-location:
+		set {_entity} to entity
+
+	disable the admiring state memory of {_entity}
+	assert the admiring state memory of {_entity} is disabled with "Admiring State Memory should be disabled"
+	enable the admiring state memory of {_entity}
+	assert the admiring state memory of {_entity} is enabled with "Admiring State Memory should be enabled"
+
+	make {_entity} admire an item
+	assert {_entity} is admiring an item with "Piglin should be admiring an item"
+	make {_entity} not admire an item
+	assert {_entity} is not admiring an item with "Piglin should not be admiring an item"
+
+	make {_entity} angered
+	assert {_entity} is angered with "Piglin should be angry"
+	make {_entity} not angered
+	assert {_entity} is not angered with "Piglin should not be angry"
+
+	spawn a wither skeleton at test-location:
+		set {_target} to entity
+
+	set the angry at memory of {_entity} to {_target}
+	assert the angry at memory of {_entity} is {_target} with "Angry At Memory is not the target"
+
+	clear entity within {_target}
+	clear entity within {_entity}
+
+test "axolotl memories":
+	###
+		Combines:
+			CondMemoryHuntingCooldown
+			EffMemoryHuntingCooldown
+			ExprMemoryPlayDead
+	###
+
+	spawn axolotl at test-location:
+		set {_entity} to entity
+
+	enable the hunting cooldown of {_entity}
+	assert the hunting cooldown of {_entity} is enabled with "Hunting Cooldown Memory should be enabled"
+	disable the hunting cooldown of {_entity}
+	assert the hunting cooldown of {_entity} is disabled with "Hunting Cooldown Memory should be disabled"
+
+	set the play dead memory of {_entity} to 5 seconds
+	assert the play dead memory of {_entity} is 5 seconds with "Play Dead Memory did not change"
+
+	memoryTempted({_entity}, "Axolotl")
+
+test "allay memories":
+	###
+		Combines:
+			ExprMemoryItemPickupCooldown
+			ExprMemoryLikedNoteblockPosition
+			ExprMemoryLikeNoteblockCooldown
+	###
+
+	spawn an allay at test-location:
+		set {_entity} to entity
+
+	set the liked noteblock position memory of {_entity} to location(10, 0, 0)
+	assert the liked noteblock position memory of {_entity} is location(10, 0, 0) with "Liked Noteblock Position Memory did not change"
+
+	set the liked noteblock cooldown memory of {_entity} to 10 seconds
+	assert the liked noteblock cooldown memory of {_entity} is 10 seconds with "Liked Noteblock Cooldown Memory did not change"
+
+	set the item pickup cooldown memory of {_entity} to 5 seconds
+	assert the item pickup cooldown memory of {_entity} is 5 seconds with "Item Pickup Cooldown Memory did not change"
+
+	clear entity within {_entity}
+
+test "goat memories":
+	###
+		Combines:
+			ExprMemoryLongJumpCooldown
+			ExprMemoryRamCooldown
+	###
+
+	spawn a goat at test-location:
+		set {_entity} to entity
+
+	set the long jump cooldown memory of {_entity} to 5 seconds
+	assert the long jump cooldown memory of {_entity} is 5 seconds with "Long Jump Cooldown Memory did not change"
+
+	set the ram cooldown memory of {_entity} to 5 seconds
+	assert the ram cooldown memory of {_entity} is 5 seconds with "Ram Cooldown Memory did not change"
+
+	memoryTempted({_entity}, "Goat")
+
+test "sniffer memories":
+	# ExprMemorySnifferPositions
+
+	spawn a sniffer at test-location:
+		set {_entity} to entity
+
+	set the sniffer explored positions memory of {_entity} to location(10, 0, 0)
+	assert the sniffer explored positions memory of {_entity} is location(10, 0, 0) with "Sniffer Explored Positions Memory did not change"
+
+	clear entity within {_entity}
+
+test "camel memories":
+	spawn a camel at test-location:
+		set {_entity} to entity
+
+	memoryTempted({_entity}, "Camel")
+
+
+local function memoryTempted(entity: entity, name: string, delete: boolean = true):: boolean:
+	###
+		Combines:
+			CondMemoryTempted
+			EffMemoryTempted
+			ExprMemoryTemptationCooldown
+	###
+
+	make {_entity} tempted
+	assert {_entity} is tempted with "%{_name}% should be tempted"
+	make {_entity} not tempted
+	assert {_entity} is not tempted with "%{_name}% should not be tempted"
+
+	set the temptation cooldown memory of {_entity} to 5 seconds
+	assert the temptation cooldown memory of {_entity} is 5 seconds with "Temptation Cooldown Memory of '%{_name}%' did not change"
+
+	if {_delete} is true:
+		clear entity within {_entity}
+
+	return true

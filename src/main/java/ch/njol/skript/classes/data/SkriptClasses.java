@@ -18,20 +18,7 @@ import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.localization.RegexMessage;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.util.Color;
-import ch.njol.skript.util.ColorRGB;
-import ch.njol.skript.util.Date;
-import ch.njol.skript.util.Direction;
-import ch.njol.skript.util.EnchantmentType;
-import ch.njol.skript.util.Experience;
-import ch.njol.skript.util.GameruleValue;
-import ch.njol.skript.util.SkriptColor;
-import ch.njol.skript.util.StructureType;
-import ch.njol.skript.util.Time;
-import ch.njol.skript.util.Timeperiod;
-import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.Utils;
-import ch.njol.skript.util.WeatherType;
+import ch.njol.skript.util.*;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.skript.util.visual.VisualEffect;
 import ch.njol.skript.util.visual.VisualEffects;
@@ -668,6 +655,15 @@ public class SkriptClasses {
 				.since("2.5")
 				.serializer(new YggdrasilSerializer<GameruleValue>())
 		);
+
+		Classes.registerClass(new ClassInfo<>(WorldDate.class, "worlddate")
+			.user("world ?dates?")
+			.name("World Date")
+			.description("Represents the amount of time that has passed of a world.")
+			.since("INSERT VERSION")
+			.serializer(new YggdrasilSerializer<WorldDate>())
+		);
+
 	}
 	
 }

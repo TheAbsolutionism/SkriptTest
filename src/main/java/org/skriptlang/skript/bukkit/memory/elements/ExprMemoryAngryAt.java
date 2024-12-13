@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@Name("Angry At")
+@Description("The entity that a piglin or piglin brute is angry at.")
+@Examples({
+	"broadcast the angry at memory of last spawned piglin",
+	"set the angry at memory of last spawned piglin brute to last spawned wither"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryAngryAt extends SimplePropertyExpression<LivingEntity, Entity> {
 
 	private static final MemoryKey<UUID> MEMORY_KEY = MemoryKey.ANGRY_AT;

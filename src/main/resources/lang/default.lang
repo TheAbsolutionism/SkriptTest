@@ -2534,6 +2534,7 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
+	worlddate: world date¦s @a
 
 	# Hooks
 	money: money

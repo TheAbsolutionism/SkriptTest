@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Location;
@@ -10,12 +14,19 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Liked Noteblock")
+@Description("The location of a noteblock that an allay likes.")
+@Examples({
+	"broadcast the liked noteblock location memory of last spawned allay",
+	"set the liked noteblock position memory of last spawned allay to location(0, 0, 0)"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryLikedNoteblockPosition extends SimplePropertyExpression<LivingEntity, Location> {
 
 	private final static MemoryKey<Location> MEMORY_KEY = MemoryKey.LIKED_NOTEBLOCK_POSITION;
 
 	static {
-		registerDefault(ExprMemoryLikedNoteblockPosition.class, Location.class, "liked note[ ]block (position|location) memory", "livingentites");
+		registerDefault(ExprMemoryLikedNoteblockPosition.class, Location.class, "liked note[ ]block (position|location) memory", "livingentities");
 	}
 
 	@Override

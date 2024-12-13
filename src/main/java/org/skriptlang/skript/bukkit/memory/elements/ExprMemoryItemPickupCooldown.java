@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -12,6 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Name("Item Pickup Cooldown")
+@Description("The item pickup cooldown of an allay.")
+@Examples({
+	"broadcast the item pickup cooldown memory of last spawned allay",
+	"set the item pickup cooldown memory of last spawned allay to 5 seconds"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryItemPickupCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.ITEM_PICKUP_COOLDOWN_TICKS;

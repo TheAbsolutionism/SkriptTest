@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -12,12 +16,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Name("Temptation Cooldown")
+@Description("The amount of time until an axolotl, camel, or goat can be tempted again.")
+@Examples({
+	"broadcast the temptation cooldown memory of last spawned goat",
+	"add 5 seconds to the tempted cooldown time memory of last spawned goat"
+})
+@Since("INSERT VERSION")
 public class ExprMemoryTemptationCooldown extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	private static final MemoryKey<Integer> MEMORY_KEY = MemoryKey.TEMPTATION_COOLDOWN_TICKS;
 
 	static {
-		registerDefault(ExprMemoryTemptationCooldown.class, Timespan.class, "temptation cool[ ]down [time] memory", "livingentities");
+		registerDefault(ExprMemoryTemptationCooldown.class, Timespan.class, "(temptation|tempted) cool[ ]down [time] memory", "livingentities");
 	}
 
 	@Override

@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.memory.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -10,6 +14,15 @@ import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+@Name("Admiring State")
+@Description({
+	"Allow a piglin to be admired.",
+	"If disabled, piglins do not barter and are not distracted by gold items."
+})
+@Examples({
+	"enabled the admiring state memory of last spawned piglin"
+})
+@Since("INSERT VERSION")
 public class EffMemoryAdmiringDisabled extends Effect {
 
 	private static final MemoryKey<Boolean> MEMORY_KEY = MemoryKey.ADMIRING_DISABLED;
