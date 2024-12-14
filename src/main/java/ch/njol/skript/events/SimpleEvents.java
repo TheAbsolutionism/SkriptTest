@@ -776,10 +776,6 @@ public class SimpleEvents {
 			)
 			.since("INSERT VERSION");
 
-		Skript.registerEvent("Vehicle Update", SimpleEvent.class, VehicleUpdateEvent.class, "vehicle update")
-			.description("Called when a vehicle updates.")
-			.examples("on vehicle update:")
-			.since("INSERT VERSION");
-
 	}
+
 }

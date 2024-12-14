@@ -1905,7 +1905,7 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_PAST);
 
 		// VehicleBlockCollisionEvent
-		EventValues.registerEventValue(VehicleBlockCollisionEvent.class, Block.class, new Getter<Block, VehicleBlockCollisionEvent>() {
+		EventValues.registerEventValue(VehicleBlockCollisionEvent.class, Block.class, new Getter<>() {
 			@Override
 			public Block get(VehicleBlockCollisionEvent event) {
 				return event.getBlock();
@@ -1913,7 +1913,7 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_NOW);
 
 		// VehicleEntityCollisionEvent
-		EventValues.registerEventValue(VehicleEntityCollisionEvent.class, Entity.class, new Getter<Entity, VehicleEntityCollisionEvent>() {
+		EventValues.registerEventValue(VehicleEntityCollisionEvent.class, Entity.class, new Getter<>() {
 			@Override
 			public Entity get(VehicleEntityCollisionEvent event) {
 				return event.getEntity();
@@ -1921,13 +1921,13 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_NOW);
 
 		// VehicleMoveEvent
-		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<Location, VehicleMoveEvent>() {
+		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<>() {
 			@Override
 			public Location get(VehicleMoveEvent event) {
 				return event.getTo();
 			}
 		}, EventValues.TIME_NOW);
-		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<Location, VehicleMoveEvent>() {
+		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<>() {
 			@Override
 			public Location get(VehicleMoveEvent event) {
 				return event.getFrom();
@@ -1935,4 +1935,5 @@ public final class BukkitEventValues {
 		}, EventValues.TIME_PAST);
 
 	}
+
 }
