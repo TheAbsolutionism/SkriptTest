@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 public class EvtVehicleCollision extends SkriptEvent {
 
 	static {
-		Skript.registerEvent("Vehicle Collision", EvtVehicleCollision.class, new Class[]{VehicleCollisionEvent.class, VehicleBlockCollisionEvent.class, VehicleEntityCollisionEvent.class}
-			,"vehicle collision [(with|of) [a[n]] %-itemtypes/blockdatas/entitydatas%")
+		Skript.registerEvent("Vehicle Collision", EvtVehicleCollision.class, new Class[]{VehicleBlockCollisionEvent.class, VehicleEntityCollisionEvent.class}
+			,"vehicle collision [(with|of) [a[n]] %-itemtypes/blockdatas/entitydatas%]")
 				.description("Called when a vehicle collides with a block or entity.")
 				.examples("on vehicle collision:", "on vehicle collision with obsidian:", "on vehicle collision with a zombie:")
 				.since("INSERT VERSION");

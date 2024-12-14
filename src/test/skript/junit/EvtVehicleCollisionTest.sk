@@ -1,0 +1,29 @@
+options:
+	test: "org.skriptlang.skript.test.tests.syntaxes.events.EvtVehicleCollisionTest"
+
+test "EvtPiglinBarterJUnit" when running JUnit:
+	set {_tests::*} to "any collision", "any collision - obsidian", "any collision - sheep", "obsidian collision" and "sheep collision"
+	ensure junit test {@test} completes {_tests::*}
+
+on vehicle collision:
+	junit test is {@test}
+	complete objective "any collision" for junit test {@test}
+	if all:
+		event-block is set
+		event-block is obsidian
+	then:
+		complete objective "any collision - obsidian" for junit test {@test}
+
+	if all:
+		event-entity is set
+		event-entity is a sheep
+	then:
+		complete objective "any collision - sheep" for junit test {@test}
+
+on vehicle collision with obsidian:
+	junit test is {@test}
+	complete objective "obsidian collision" for junit test {@test}
+
+on vehicle collision with a sheep:
+	junit test is {@test}
+	complete objective "sheep collision" for junit test {@test}
