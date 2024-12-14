@@ -23,6 +23,9 @@ on vehicle collision with obsidian:
 on vehicle block collision:
 	junit test is {@test}
 	complete objective "any block collision" for junit test {@test}
+
+on vehicle block collision of obsidian:
+	junit test is {@test}
 	if event-block is obsidian:
 		complete objective "block collision - obsidian" for junit test {@test}
 
@@ -33,5 +36,8 @@ on vehicle collision with a sheep:
 on vehicle entity collision:
 	junit test is {@test}
 	complete objective "any entity collision" for junit test {@test}
+
+on vehicle entity collision with a sheep:
+	junit test is {@test}
 	if event-entity is a sheep:
 		complete objective "entity collision - sheep" for junit test {@test}
