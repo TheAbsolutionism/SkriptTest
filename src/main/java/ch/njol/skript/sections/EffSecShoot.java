@@ -100,6 +100,16 @@ public class EffSecShoot extends EffectSection {
 			}
 		};
 
+		/**
+		 * Handles spawning the entity/projectile based on the conditions of the effect and the server
+		 * @param entityData The {@link EntityData} to be spawned
+		 * @param shooter The {@link LivingEntity} that is being used to shoot {@code entityData} from
+		 * @param location The {@link Location} to spawn the {@code entityData} if {@code shooter} is not to be used
+		 * @param type The {@link Class<org.bukkit.entity.EntityType>} from {@code entityData} used to be spawned if {@code entityData} is not to be used
+		 * @param vector The {@link Vector} to set the vector of the spawned entity from {@code entityData} or {@code type}
+		 * @param consumer The {@link Consumer} to be used when spawning the entity from {@code entityDataa} or {@code type}
+		 * @return The spawned {@link Entity}
+		 */
 		public abstract @Nullable Entity shootHandler(EntityData<?> entityData, LivingEntity shooter, Location location, Class<? extends Entity> type, Vector vector, Consumer<?> consumer);
 	}
 
