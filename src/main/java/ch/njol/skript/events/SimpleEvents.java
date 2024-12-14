@@ -771,7 +771,7 @@ public class SimpleEvents {
 			.description("Called when a vehicle moves.")
 			.examples(
 				"on vehicle move:",
-					"\tbroadcast previous event-location",
+					"\tbroadcast past event-location",
 					"\tbroadcast event-location"
 			)
 			.since("INSERT VERSION");
