@@ -11,6 +11,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionList;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Date;
+import ch.njol.skript.util.WorldDate;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -40,19 +41,19 @@ public class CondPastFuture extends Condition {
 
 	static {
 		Skript.registerCondition(CondPastFuture.class,
-				"%dates% (is|are)[negated:(n't| not)] in the (past|:future)",
-				"%dates% ha(s|ve)[negated:(n't| not)] passed");
+				"%dates/worlddates% (is|are)[negated:(n't| not)] in the (past|:future)",
+				"%dates/worlddates% ha(s|ve)[negated:(n't| not)] passed");
 	}
 
-	private Expression<Date> dates;
+	private Expression<?> dates;
 	private boolean isFuture;
 
 	@Override
-	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		setNegated(parseResult.hasTag("negated"));
 		// we default to past, so we only need to check if it's future
 		isFuture = parseResult.hasTag("future");
-		dates = (Expression<Date>) expressions[0];
+		dates = exprs[0];
 		return true;
 	}
 
@@ -63,8 +64,8 @@ public class CondPastFuture extends Condition {
 			return isNegated();
 
 		// This may not be worth checking
-		if (dates instanceof ExpressionList<Date> list) {
-			for (Expression<? extends Date> dateExpression : list.getExpressions()) {
+		if (dates instanceof ExpressionList<?> list) {
+			for (Expression<?> dateExpression : list.getExpressions()) {
 				if (dateExpression instanceof ExprNow && list.getAnd())
 					return isNegated();
 			}
@@ -73,9 +74,22 @@ public class CondPastFuture extends Condition {
 		// using the same 'now' date for all checks is flawed, because the input dates are evaluated during the
 		// check, so it could cause 'now is in the future' to be true, when it should be false.
 		// This is still possible, but it's less likely to happen as the two dates are created closer together.
-		if (isFuture)
-			return dates.check(event, date -> date.compareTo(new Date()) > 0, isNegated());
-		return dates.check(event, date -> date.compareTo(new Date()) < 0, isNegated());
+		if (isFuture) {
+			return dates.check(event, object -> {
+				if (object instanceof Date date)
+					return date.compareTo(new Date()) > 0;
+				else if (object instanceof WorldDate worldDate)
+					return worldDate.compareTo(new WorldDate(worldDate.getWorld())) > 0;
+				return isNegated();
+			}, isNegated());
+		}
+		return dates.check(event, object -> {
+			if (object instanceof Date date)
+				return date.compareTo(new Date()) < 0;
+			else if (object instanceof WorldDate worldDate)
+				return worldDate.compareTo(new WorldDate(worldDate.getWorld())) < 0;
+			return isNegated();
+		}, isNegated());
 	}
 
 	@Override

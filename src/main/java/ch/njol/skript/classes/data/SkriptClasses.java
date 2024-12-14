@@ -659,7 +659,7 @@ public class SkriptClasses {
 		Classes.registerClass(new ClassInfo<>(WorldDate.class, "worlddate")
 			.user("world ?dates?")
 			.name("World Date")
-			.description("Represents the amount of time that has passed of a world.")
+			.description("Represents the amount of in game time that has passed of a world.")
 			.since("INSERT VERSION")
 			.serializer(new YggdrasilSerializer<WorldDate>())
 		);

@@ -2,12 +2,16 @@ package ch.njol.skript.util;
 
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.yggdrasil.YggdrasilSerializable;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Used to get the date of a world
+ * Used to get the minecraft date of a world
  */
 public class WorldDate implements YggdrasilSerializable {
 
@@ -15,7 +19,8 @@ public class WorldDate implements YggdrasilSerializable {
 		DAY("Days", DAY_TICKS),
 		HOUR("Hours", HOUR_TICKS),
 		MIN("Minutes", MIN_TICKS),
-		SEC("Seconds", SEC_TICKS);
+		SEC("Seconds", SEC_TICKS),
+		TICK("Ticks", 1);
 
 		private double time;
 		private String reference;
@@ -34,6 +39,10 @@ public class WorldDate implements YggdrasilSerializable {
 
 	private final World world;
 	private long totalTicks;
+
+	public WorldDate() {
+		this(Bukkit.getWorlds().get(0));
+	}
 
 	public WorldDate(World world) {
 		this.world = world;
@@ -135,19 +144,19 @@ public class WorldDate implements YggdrasilSerializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
 		long remain = totalTicks;
+		Map<TimeReference, Long> timeData = new HashMap<>();
 		for (TimeReference timeReference : TimeReference.values()) {
+			long current = 0;
 			if (remain > timeReference.time) {
-				long current = (long) Math.floor(remain / timeReference.time);
+				current = (long) Math.floor(remain / timeReference.time);
 				remain -= (long) (current * timeReference.time);
-				builder.append(timeReference.reference).append(" ").append(current).append(", ");
 			}
+			timeData.put(timeReference, current);
 		}
-		if (remain > 0) {
-			builder.append("Ticks ").append(remain);
-		}
-		return builder.toString();
+		return String.format("Minecraft Day %d, %d:%d:%d:%d",
+			timeData.get(TimeReference.DAY), timeData.get(TimeReference.HOUR), timeData.get(TimeReference.MIN),
+			timeData.get(TimeReference.SEC), timeData.get(TimeReference.TICK));
 	}
 
 }
