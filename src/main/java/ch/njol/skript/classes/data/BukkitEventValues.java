@@ -26,6 +26,7 @@ import ch.njol.skript.events.bukkit.ScriptEvent;
 import ch.njol.skript.events.bukkit.SkriptStartEvent;
 import ch.njol.skript.events.bukkit.SkriptStopEvent;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.util.Color;
 import ch.njol.skript.util.*;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
@@ -1522,6 +1523,26 @@ public final class BukkitEventValues {
 				return effects.get(0);
 			}
 		}, 0);
+		EventValues.registerEventValue(FireworkExplodeEvent.class, Color[].class, new Getter<Color[], FireworkExplodeEvent>() {
+			@Override
+			public Color @Nullable [] get(FireworkExplodeEvent event) {
+				List<FireworkEffect> effects = event.getEntity().getFireworkMeta().getEffects();
+				if (effects.isEmpty())
+					return null;
+				List<Color> colors = new ArrayList<>();
+				for (FireworkEffect fireworkEffect : effects) {
+					for (org.bukkit.Color color : fireworkEffect.getColors()) {
+						if (SkriptColor.fromBukkitColor(color) != null)
+							colors.add(SkriptColor.fromBukkitColor(color));
+						else
+							colors.add(ColorRGB.fromBukkitColor(color));
+					}
+				}
+				if (colors.isEmpty())
+					return null;
+				return colors.toArray(Color[]::new);
+			}
+		}, EventValues.TIME_NOW);
 		//PlayerRiptideEvent
 		EventValues.registerEventValue(PlayerRiptideEvent.class, ItemStack.class, new Getter<ItemStack, PlayerRiptideEvent>() {
 			@Override
@@ -1663,7 +1684,7 @@ public final class BukkitEventValues {
 			EventValues.registerEventValue(PlayerStopUsingItemEvent.class, Timespan.class, new Getter<Timespan, PlayerStopUsingItemEvent>() {
 				@Override
 				public Timespan get(PlayerStopUsingItemEvent event) {
-					return Timespan.fromTicks(event.getTicksHeldFor());
+					return new Timespan(Timespan.TimePeriod.TICK, event.getTicksHeldFor());
 				}
 			}, EventValues.TIME_NOW);
 			EventValues.registerEventValue(PlayerStopUsingItemEvent.class, ItemType.class, new Getter<ItemType, PlayerStopUsingItemEvent>() {
