@@ -398,13 +398,13 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Updates the provided object ({@code Slot}, {@code ItemType}, {@code ItemStack}) by setting it to the provided {@code ItemStack}.
+	 * Updates the provided object's ({@code Slot}, {@code ItemType}, {@code ItemStack}) {@link ItemMeta} by setting it to the provided {@code ItemStack}.
 	 *
 	 * @param object the object to update
 	 * @param itemStack the item to set the object to
 	 * @see #asItemStack(Object)
 	 */
-	public static void setItem(Object object, @NotNull ItemStack itemStack) {
+	public static void setItemMeta(Object object, @NotNull ItemStack itemStack) {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (object instanceof Slot slot) {
 			slot.setItem(itemStack);
