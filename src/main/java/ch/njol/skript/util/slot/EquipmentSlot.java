@@ -71,7 +71,7 @@ public class EquipmentSlot extends SlotWithIndex {
 			public org.bukkit.inventory.EquipmentSlot getBukkitEquipSlot() {
 				return org.bukkit.inventory.EquipmentSlot.OFF_HAND;
 			}
-			
+
 		},
 		HELMET(39) {
 			@Override
@@ -140,6 +140,23 @@ public class EquipmentSlot extends SlotWithIndex {
 			public org.bukkit.inventory.EquipmentSlot getBukkitEquipSlot() {
 				return org.bukkit.inventory.EquipmentSlot.FEET;
 			}
+		},
+
+		BODY() {
+			@Override
+			public @Nullable ItemStack get(EntityEquipment equipment) {
+				return equipment.getItem(org.bukkit.inventory.EquipmentSlot.BODY);
+			}
+
+			@Override
+			public void set(EntityEquipment equipment, @Nullable ItemStack item) {
+				equipment.setItem(org.bukkit.inventory.EquipmentSlot.BODY, item);
+			}
+
+			@Override
+			public org.bukkit.inventory.EquipmentSlot getBukkitEquipSlot() {
+				return org.bukkit.inventory.EquipmentSlot.BODY;
+			}
 		};
 		
 		public final int slotNumber;
@@ -158,7 +175,7 @@ public class EquipmentSlot extends SlotWithIndex {
 		public abstract void set(EntityEquipment e, @Nullable ItemStack item);
 
 		public abstract org.bukkit.inventory.EquipmentSlot getBukkitEquipSlot();
-		
+
 	}
 	
 	private static final EquipSlot[] values = EquipSlot.values();
