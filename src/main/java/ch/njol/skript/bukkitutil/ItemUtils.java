@@ -389,24 +389,26 @@ public class ItemUtils {
 	 * @param <T>
 	 * @return the updated item
 	 */
-	public static <T extends ItemMeta> ItemStack changeItemMeta(@NotNull ItemStack itemStack, @NotNull Consumer<T> metaChanger) {
+	public static <T extends ItemMeta> T changeItemMeta(@NotNull ItemStack itemStack, @NotNull Consumer<T> metaChanger) {
 		//noinspection unchecked
 		T itemMeta = (T) itemStack.getItemMeta();
 		metaChanger.accept(itemMeta);
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
+		return itemMeta;
 	}
 
 	/**
 	 * Updates the provided object's ({@code Slot}, {@code ItemType}, {@code ItemStack}) {@link ItemMeta} by setting it to the provided {@code ItemStack}.
 	 *
 	 * @param object the object to update
-	 * @param itemStack the item to set the object to
+	 * @param itemMeta the {@link ItemMeta} to change to
 	 * @see #asItemStack(Object)
 	 */
-	public static void setItemMeta(Object object, @NotNull ItemStack itemStack) {
-		ItemMeta itemMeta = itemStack.getItemMeta();
+	public static void setItemMeta(Object object, @NotNull ItemMeta itemMeta) {
 		if (object instanceof Slot slot) {
+			ItemStack itemStack = slot.getItem();
+			if (itemStack == null)
+				return;
+			itemStack.setItemMeta(itemMeta);
 			slot.setItem(itemStack);
 		} else if (object instanceof ItemType itemType) {
 			itemType.setItemMeta(itemMeta);
