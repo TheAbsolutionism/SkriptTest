@@ -6,8 +6,6 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.util.Checker;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
@@ -31,6 +29,7 @@ public class EvtVehicleCollision extends SkriptEvent {
 	private Literal<?> expr;
 	private boolean blockCollision;
 	private boolean entityCollision;
+	private boolean blockSpecific;
 	private Object[] types = null;
 
 	@Override
@@ -38,6 +37,7 @@ public class EvtVehicleCollision extends SkriptEvent {
 		if (args[0] != null) {
 			expr = args[0];
 			types = args[0].getArray();
+			blockSpecific = !(types instanceof EntityData<?>[]);
 		}
 		blockCollision = matchedPattern == 1;
 		entityCollision = matchedPattern == 2;
@@ -58,44 +58,25 @@ public class EvtVehicleCollision extends SkriptEvent {
 			return true;
 		}
 
-		ItemType initItemType = null;
-		BlockData initBlockData = null;
-		EntityData<?> initEntityData = null;
-		if (collisionEvent instanceof VehicleBlockCollisionEvent blockCollisionEvent) {
+		if (collisionEvent instanceof VehicleBlockCollisionEvent blockCollisionEvent && blockSpecific) {
 			Block block = blockCollisionEvent.getBlock();
-			initItemType = new ItemType(block.getType());
-			initBlockData = block.getBlockData();
-		} else if (collisionEvent instanceof VehicleEntityCollisionEvent entityCollisionEvent) {
-			initEntityData = EntityData.fromEntity(entityCollisionEvent.getEntity());
-		} else {
-			return false;
+			ItemType itemType = new ItemType(block.getType());
+			BlockData blockData = block.getBlockData();
+			for (Object object : types) {
+				if (object instanceof ItemType itemType1 && itemType1.isSupertypeOf(itemType)) {
+					return true;
+				} else if (object instanceof BlockData blockData1 && blockData1.matches(blockData)) {
+					return true;
+				}
+			}
+		} else if (collisionEvent instanceof VehicleEntityCollisionEvent entityCollisionEvent && !blockSpecific) {
+			EntityData<?> entityData = EntityData.fromEntity(entityCollisionEvent.getEntity());
+			for (EntityData<?> entityData1 : (EntityData<?>[]) types) {
+				if (entityData1.isSupertypeOf(entityData))
+					return true;
+			}
 		}
-
-		ItemType finalItemType = initItemType;
-		BlockData finalBlockData = initBlockData;
-		EntityData<?> finalEntityData = initEntityData;
-
-		Checker<Object> checker = null;
-		if (types instanceof ItemType[] itemTypes && finalItemType != null) {
-			checker = object -> {
-				ItemType itemType = (ItemType) object;
-				return itemType.isSupertypeOf(finalItemType);
-			};
-		} else if (types instanceof BlockData[] blockDatas && finalBlockData != null) {
-			checker = object -> {
-				BlockData blockData = (BlockData) object;
-				return finalBlockData.matches(blockData);
-			};
-		} else if (types instanceof EntityData<?>[] entityDatas && finalEntityData != null) {
-			checker = object -> {
-				EntityData<?> entityData = (EntityData<?>) object;
-				return entityData.isSupertypeOf(finalEntityData);
-			};
-		} else {
-			return false;
-		}
-
-		return SimpleExpression.check(types, checker, false, expr.getAnd());
+		return false;
 	}
 
 	@Override
