@@ -174,6 +174,7 @@ public class EffSecSpawn extends EffectSection {
 						for (int i = 0; i < amount; i++) {
 							Entity entity = snapshot.createEntity(location);
 							if (consumer != null) {
+								//noinspection unchecked
 								((Consumer<Entity>) consumer).accept(entity);
 							} else {
 								lastSpawned = entity;
