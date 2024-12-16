@@ -123,4 +123,5 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	public String toString(@Nullable Event event, boolean debug) {
 		return "the recipe category of " + getExpr().toString(event, debug);
 	}
+
 }

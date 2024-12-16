@@ -11,15 +11,16 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Cooking Time")
 @Description("The cooking time of a blasting, furnace, campfire or smoking recipe.")
@@ -53,9 +54,9 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	protected Timespan @Nullable [] get(Event event, Recipe[] source) {
 		return get(source, recipe -> {
 			if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-				return new Timespan(Timespan.TimePeriod.TICK, mutableCookingRecipe.getCookingTime());
+				return new Timespan(TimePeriod.TICK, mutableCookingRecipe.getCookingTime());
 			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-				return new Timespan(Timespan.TimePeriod.TICK, cookingRecipe.getCookingTime());
+				return new Timespan(TimePeriod.TICK, cookingRecipe.getCookingTime());
 			}
 			return null;
 		});

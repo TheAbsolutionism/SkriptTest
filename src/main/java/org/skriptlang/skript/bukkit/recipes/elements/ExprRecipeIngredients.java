@@ -72,13 +72,13 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 	// TODO: Uncomment "Skript.error"'s when Runtime Error API is done.
 
 	enum RecipePattern {
-		INGREDIENTS("recipe ingredients", "recipe ingredients", CraftingRecipeEvent.class,
+		INGREDIENTS("[recipe] ingredients", "recipe ingredients", CraftingRecipeEvent.class,
 			"This can only be used when creating a Shaped or Shapeless Recipe."),
-		FIRSTROW("recipe ingredients of [the] (1st|first) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
+		FIRSTROW("[recipe] ingredients of [the] (1st|first) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
 			"This can only be used when creating a Shaped Recipe."),
-		SECONDROW("recipe ingredients of [the] (2nd|second) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
+		SECONDROW("[recipe] ingredients of [the] (2nd|second) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
 			"This can only be used when creating a Shaped Recipe."),
-		THIRDROW("recipe ingredients of [the] (3rd|third) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
+		THIRDROW("[recipe] ingredients of [the] (3rd|third) row", "recipe ingredients of the first row", ShapedRecipeEvent.class,
 			"This can only be used when creating a Shaped Recipe."),
 		INPUT("recipe (input|source) [item]", "recipe input item", new Class[]{CookingRecipeEvent.class, StonecuttingRecipeEvent.class, TransmuteRecipeEvent.class},
 			"This can only be used when creating a Cooking, Blasting, Furnace, Campfire, Smoking, Stonecutting, or Transmute Recipe."),
@@ -127,17 +127,10 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		selectedPattern = recipePatterns[(int) Math.floor((double) matchedPattern / 2)];
+		selectedPattern = recipePatterns[matchedPattern / 2];
 		if (exprs[0].isDefault()) {
 			if (getParser().isCurrentEvent(CreateRecipeEvent.class)) {
-				boolean classFound = false;
-				for (Class<? extends Event> eventClass : selectedPattern.eventClasses) {
-					if (getParser().isCurrentEvent(eventClass)) {
-						classFound = true;
-						break;
-					}
-				}
-				if (!classFound) {
+				if (!getParser().isCurrentEvent(selectedPattern.eventClasses)) {
 					Skript.error(selectedPattern.error);
 					return false;
 				}
@@ -151,9 +144,6 @@ public class ExprRecipeIngredients extends PropertyExpression<Recipe, ItemStack>
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Recipe[] source) {
-		if (isEvent)
-			return null;
-
 		List<ItemStack> ingredients = new ArrayList<>();
 		for (Recipe recipe : source) {
 			switch (selectedPattern) {

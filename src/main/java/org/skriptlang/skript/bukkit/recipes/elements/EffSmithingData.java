@@ -27,7 +27,6 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEven
 })
 @RequiredPlugins("Paper 1.20.5+")
 @Since("INSERT VERSION")
-
 public class EffSmithingData extends Effect {
 
 	private static final boolean SUPPORTS_COPY_DATA = Skript.methodExists(SmithingRecipe.class, "willCopyDataComponents");
@@ -35,8 +34,8 @@ public class EffSmithingData extends Effect {
 	static {
 		if (SUPPORTS_COPY_DATA) {
 			Skript.registerEffect(EffSmithingData.class,
-				"allow [the] data component (copying|transfer) from [the] base item to [the] result item",
-				"disallow [the] data component (copying|transfer) from [the] base item to [the] result item");
+				"allow (copying|transfer) [the] data component[s] from [the] base item to [the] result item",
+				"disallow (copying|transfer) [the] data component[s] from [the] base item to [the] result item");
 		}
 	}
 

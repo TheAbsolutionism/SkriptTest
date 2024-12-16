@@ -32,7 +32,6 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEven
 })
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
-
 public class EffSmithingNBT extends Effect {
 
 	private static final boolean SUPPORTS_COPY_NBT = Skript.methodExists(SmithingRecipe.class, "willCopyNbt");

@@ -1,8 +1,8 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -26,8 +26,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @RequiredPlugins("Paper 1.20.5+")
 @Since("INSERT VERSION")
-
-public class CondSmithingData extends PropertyCondition<Recipe> {
+public class CondSmithingData extends Condition {
 
 	private static final boolean SUPPORTS_COPY_DATA = Skript.methodExists(SmithingRecipe.class, "willCopyDataComponents");
 
@@ -46,19 +45,14 @@ public class CondSmithingData extends PropertyCondition<Recipe> {
 		//noinspection unchecked
 		exprRecipe = (Expression<Recipe>) exprs[0];
 		setNegated(matchedPattern == 1);
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
+		return true;
 	}
 
 	@Override
-	public boolean check(Recipe recipe) {
-		if (!(recipe instanceof SmithingRecipe smithingRecipe))
-			return isNegated();
-		return smithingRecipe.willCopyDataComponents();
-	}
-
-	@Override
-	protected String getPropertyName() {
-		return null;
+	public boolean check(Event event) {
+		return exprRecipe.check(event, recipe -> {
+			return recipe instanceof SmithingRecipe;
+		}, isNegated());
 	}
 
 	@Override

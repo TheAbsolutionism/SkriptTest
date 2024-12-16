@@ -15,6 +15,9 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEven
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Utils used for getting data from {@link RecipeType}
  */
@@ -80,6 +83,15 @@ public class RecipeUtils {
 
 	}
 
+	private static final Map<Class<? extends Recipe>, RecipeType> recipeClassConverter = new HashMap<>();
+
+	static {
+		for (RecipeType recipeType : RecipeType.values()) {
+			if (recipeType.recipeClass != null)
+				recipeClassConverter.put(recipeType.recipeClass, recipeType);
+		}
+	}
+
 	/**
 	 * Gets {@link RecipeType} from provided recipe class.
 	 *
@@ -88,12 +100,7 @@ public class RecipeUtils {
 	 * @return Recipe Type
 	 */
 	public static @Nullable RecipeType getRecipeType(@NotNull Class<? extends Recipe> providedClass) {
-		for (RecipeType type : RecipeType.values()) {
-			if (type.recipeClass != null && type.recipeClass.isAssignableFrom(providedClass)) {
-				return type;
-			}
-		}
-		return null;
+		return recipeClassConverter.get(providedClass);
 	}
 
 	/**

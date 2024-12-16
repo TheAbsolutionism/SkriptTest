@@ -58,12 +58,12 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprAllRecipes.class, Recipe.class, ExpressionType.SIMPLE,
-			"[all [of]] [the] server['s] recipes [for %-itemstacks/itemtypes%]",
-			"[all [of]] [the] server['s] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
-			"[all [of]] [the] server['s] custom recipes [for %-itemstacks/itemtypes%]",
-			"[all [of]] [the] server['s] %recipetype% [for %-itemstacks/itemtypes%]",
-			"[all [of]] [the] server['s] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
-			"[all [of]] [the] server['s] custom %recipetype% [for %-itemstacks/itemtypes%]");
+			"[all [[of] the]|the] server['s] recipes [for %-itemstacks/itemtypes%]",
+			"[all [[of] the]|the] server['s] (mc|minecraft|vanilla) recipes [for %-itemstacks/itemtypes%]",
+			"[all [[of] the]|the] server['s] custom recipes [for %-itemstacks/itemtypes%]",
+			"[all [[of] the]|the] server['s] %recipetype% [for %-itemstacks/itemtypes%]",
+			"[all [[of] the]|the] server['s] (mc|minecraft|vanilla) %recipetype% [for %-itemstacks/itemtypes%]",
+			"[all [[of] the]|the] server['s] custom %recipetype% [for %-itemstacks/itemtypes%]");
 	}
 
 	private Expression<RecipeType> recipeTypeExpr;
@@ -77,7 +77,7 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 		} else if (matchedPattern >= 3) {
 			//noinspection unchecked
 			recipeTypeExpr = (Expression<RecipeType>) exprs[0];
-			itemExpr = exprs[1] != null ? exprs[1] : null;
+			itemExpr = exprs[1];
 		}
 		getMinecraft = matchedPattern == 1 || matchedPattern == 4;
 		getCustom = matchedPattern == 2 || matchedPattern == 5;
@@ -87,7 +87,10 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 	@Override
 	protected Recipe @Nullable [] get(Event event) {
 		List<Recipe> recipes = new ArrayList<>();
-		getSelectedRecipes(event).forEachRemaining(recipes::add);
+		CheckedIterator<Recipe> iterator = getSelectedRecipes(event);
+		if (iterator == null)
+			return null;
+		iterator.forEachRemaining(recipes::add);
 		return recipes.toArray(new Recipe[0]);
 	}
 
@@ -107,7 +110,10 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 				Bukkit.resetRecipes();
 			}
 			case DELETE -> {
-				getSelectedRecipes(event).forEachRemaining(recipe -> {
+				CheckedIterator<Recipe> iterator = getSelectedRecipes(event);
+				if (iterator == null)
+					return;
+				iterator.forEachRemaining(recipe -> {
 					if (recipe instanceof Keyed key)
 						Bukkit.removeRecipe(key.getKey());
 				});
@@ -143,17 +149,24 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 		builder.append("all of the");
-		if (getMinecraft) builder.append("minecraft");
-		else if (getCustom) builder.append("custom");
+		if (getMinecraft) {
+			builder.append("minecraft");
+		} else if (getCustom) {
+			builder.append("custom");
+		}
 		builder.append("recipes");
-		if (recipeTypeExpr != null) builder.append("of type", recipeTypeExpr);
-		if (itemExpr != null) builder.append("for", itemExpr);
+		if (recipeTypeExpr != null)
+			builder.append("of type", recipeTypeExpr);
+		if (itemExpr != null)
+			builder.append("for", itemExpr);
 		return builder.toString();
 	}
 
+	// Gets the recipes based on the provided input from the user
 	private CheckedIterator<Recipe> getSelectedRecipes(Event event) {
 		List<Recipe> recipeList = new ArrayList<>();
 		Iterator<Recipe> iterator = null;
+		// User is looking for a certain type of item(s)
 		if (itemExpr != null) {
 			List<Recipe> itemRecipes = new ArrayList<>();
 			for (Object object : itemExpr.getArray(event)) {
@@ -161,16 +174,17 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 				if (object instanceof ItemStack itemStack) {
 					stack = itemStack;
 				} else if (object instanceof ItemType itemType) {
-					stack = new ItemStack(itemType.getMaterial());
-					stack.setItemMeta(itemType.getItemMeta());
+					stack = itemType.getRandom();
 				}
 				if (stack != null)
 					itemRecipes.addAll(Bukkit.getRecipesFor(stack));
 			}
+			// If no recipes contain the items the user is looking for, return null
 			if (itemRecipes.isEmpty())
 				return null;
 			iterator = itemRecipes.iterator();
 		} else {
+			// Items not specified, getting all recipes
 			iterator = Bukkit.recipeIterator();
 		}
 
@@ -179,11 +193,14 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 		return new CheckedIterator<Recipe>(iterator, recipe -> {
 			if (recipe instanceof Keyed keyed) {
 				NamespacedKey key = keyed.getKey();
+				// If the user wants only "minecraft:" recipes
 				if (getMinecraft && !key.getNamespace().equalsIgnoreCase("minecraft"))
 					return false;
+				// If the user wants only custom recipes
 				else if (getCustom && key.getNamespace().equalsIgnoreCase("minecraft"))
 					return false;
 
+				// If the user wants a specific recipe type
 				if (recipeType != null) {
 					if (!(recipe.getClass().equals(recipeType.getRecipeClass()) || recipeType.getRecipeClass().isInstance(recipe)))
 						return false;

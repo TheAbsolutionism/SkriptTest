@@ -1,8 +1,8 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 	"NOTES:",
 	"This condition can only be used with Smithing Recipes on PaperMC version 1.19",
 	"This condition can be used with Smithing Transform and Smithing Trim Recipes on PaperMC version 1.20.0 -> 1.20.4",
-	"This condition is redundant for PaperMC versions 1.20.5+ due to the removal in favor of copying data components and will always return true"
+	"This condition is redundant for PaperMC versions 1.20.5+ due to the removal in favor of copying data components and will always return false"
 })
 @Examples({
 	"loop the server's recipes:",
@@ -31,8 +31,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
-
-public class CondSmithingNBT extends PropertyCondition<Recipe> {
+public class CondSmithingNBT extends Condition {
 
 	private static final boolean SUPPORTS_COPY_NBT = Skript.methodExists(SmithingRecipe.class, "willCopyNbt");
 	private static final boolean SUPPORTS_COPY_DATA = Skript.methodExists(SmithingRecipe.class, "willCopyDataComponents");
@@ -51,29 +50,25 @@ public class CondSmithingNBT extends PropertyCondition<Recipe> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (SUPPORTS_COPY_DATA) {
-			Skript.warning("This condition is redundant for your current Paper MC version and will always return true.");
+			Skript.warning("This condition is redundant for your current Paper MC version and will always return false.");
 		}
 		//noinspection unchecked
 		exprRecipe = (Expression<Recipe>) exprs[0];
 		setNegated(matchedPattern == 1);
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
+		return true;
 	}
 
 	@Override
-	public boolean check(Recipe recipe) {
+	public boolean check(Event event) {
 		if (SUPPORTS_COPY_DATA)
-			return true;
-		if (!(recipe instanceof SmithingRecipe smithingRecipe))
-			return isNegated();
-		if ((recipe instanceof SmithingTransformRecipe || recipe instanceof SmithingTrimRecipe) && !RUNNING_1_20_4) {
-			return isNegated();
-		}
-		return smithingRecipe.willCopyNbt();
-	}
-
-	@Override
-	protected String getPropertyName() {
-		return null;
+			return false;
+		return exprRecipe.check(event, recipe -> {
+			if (!(recipe instanceof SmithingRecipe smithingRecipe))
+				return isNegated();
+			if ((recipe instanceof SmithingTransformRecipe || recipe instanceof SmithingTrimRecipe) && !RUNNING_1_20_4)
+				return isNegated();
+			return smithingRecipe.willCopyNbt();
+		}, isNegated());
 	}
 
 	@Override
