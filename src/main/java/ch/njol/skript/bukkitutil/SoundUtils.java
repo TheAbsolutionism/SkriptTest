@@ -25,8 +25,10 @@ public final class SoundUtils {
 	public static @Nullable NamespacedKey getKey(String soundString) {
 		soundString = soundString.toUpperCase(Locale.ENGLISH);
 		if (SOUND_IS_INTERFACE) {
-			//noinspection deprecation,removal
-			return Sound.valueOf(soundString).getKey();
+			try {
+				//noinspection deprecation,removal
+				return Sound.valueOf(soundString).getKey();
+			} catch (Exception ignored) {}
 		} else {
 			try {
 				//noinspection unchecked,rawtypes
