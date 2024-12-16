@@ -6,6 +6,7 @@ import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
@@ -69,7 +70,7 @@ public class EvtVehicleCollision extends SkriptEvent {
 			return true;
 		}
 
-		if (collisionEvent instanceof VehicleBlockCollisionEvent blockCollisionEvent) {
+		if (collisionEvent instanceof VehicleBlockCollisionEvent blockCollisionEvent && (!itemTypes.isEmpty() || !blockDatas.isEmpty())) {
 			Block eventBlock = blockCollisionEvent.getBlock();
 			ItemType eventItemType = new ItemType(eventBlock.getType());
 			BlockData eventBlockData = eventBlock.getBlockData();
@@ -81,7 +82,7 @@ public class EvtVehicleCollision extends SkriptEvent {
 				if (blockData.matches(eventBlockData))
 					return true;
 			}
-		} else if (collisionEvent instanceof VehicleEntityCollisionEvent entityCollisionEvent) {
+		} else if (collisionEvent instanceof VehicleEntityCollisionEvent entityCollisionEvent && !entityDatas.isEmpty()) {
 			EntityData<?> eventEntityData = EntityData.fromEntity(entityCollisionEvent.getEntity());
 			for (EntityData<?> entityData : entityDatas) {
 				if (entityData.isSupertypeOf(eventEntityData))
@@ -93,7 +94,16 @@ public class EvtVehicleCollision extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "vehicle collision " + (expr != null ? "of " + expr.toString(event, debug) : "");
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("vehicle");
+		if (blockCollision)
+			builder.append("block");
+		else if (entityCollision)
+			builder.append("entity");
+		builder.append("collision");
+		if (expr != null)
+			builder.append("of", expr);
+		return builder.toString();
 	}
 
 }
