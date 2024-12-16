@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Banner Pattern")
 @Description("Create a new banner pattern.")
 @Examples({
-	"set {_pattern} to a new creeper banner pattern colored red",
+	"set {_pattern} to a creeper banner pattern colored red",
 	"add {_pattern} to banner patterns of {_banneritem}",
 	"remove {_pattern} from banner patterns of {_banneritem}",
 	"set the 1st banner pattern of block at location(0,0,0) to {_pattern}",
@@ -77,7 +77,7 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "a new " + selectedPattern.toString(event, debug) + " colored " + selectedColor;
+		return "a new " + selectedPattern.toString(event, debug) + " colored " + selectedColor.toString(event, debug);
 	}
 
 }

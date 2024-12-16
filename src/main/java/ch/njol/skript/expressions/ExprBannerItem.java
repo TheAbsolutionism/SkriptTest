@@ -72,7 +72,6 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	private PatternType[] patternTypes;
 
-
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
