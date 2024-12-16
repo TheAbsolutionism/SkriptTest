@@ -1,7 +1,7 @@
 options:
 	test: "org.skriptlang.skript.test.tests.syntaxes.events.EvtVehicleCollisionTest"
 
-test "EvtPiglinBarterJUnit" when running JUnit:
+test "EvtVehicleCollisionJUnit" when running JUnit:
 	set {_tests::*} to "any collision", "any collision - obsidian" and "any collision - sheep"
 	add "any block collision", "block collision - obsidian" and "obsidian collision" to {_tests::*}
 	add "any entity collision", "entity collision - sheep" and "sheep collision" to {_tests::*}
