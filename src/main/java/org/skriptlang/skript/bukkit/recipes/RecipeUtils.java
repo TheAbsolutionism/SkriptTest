@@ -100,7 +100,10 @@ public class RecipeUtils {
 	 * @return Recipe Type
 	 */
 	public static @Nullable RecipeType getRecipeType(@NotNull Class<? extends Recipe> providedClass) {
-		return recipeClassConverter.get(providedClass);
+		RecipeType recipeType = recipeClassConverter.get(providedClass);
+		if (recipeType == null)
+			recipeType = recipeClassConverter.get(providedClass.getSuperclass());
+		return recipeType;
 	}
 
 	/**

@@ -51,7 +51,9 @@ public class CondSmithingData extends Condition {
 	@Override
 	public boolean check(Event event) {
 		return exprRecipe.check(event, recipe -> {
-			return recipe instanceof SmithingRecipe;
+			if (!(recipe instanceof SmithingRecipe smithingRecipe))
+				return isNegated();
+			return smithingRecipe.willCopyDataComponents();
 		}, isNegated());
 	}
 
