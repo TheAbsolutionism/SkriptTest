@@ -77,7 +77,7 @@ public class ExprNewBannerPattern extends SimpleExpression<Pattern> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "a new " + selectedPattern.toString(event, debug) + " colored " + selectedColor.toString(event, debug);
+		return "a " + selectedPattern.toString(event, debug) + " colored " + selectedColor.toString(event, debug);
 	}
 
 }
