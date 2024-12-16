@@ -418,7 +418,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	@SuppressWarnings("null")
 	@Nullable
 	public static EntityData<?> parse(String s) {
-		Iterator<EntityDataInfo<EntityData<?>>> it = infos.iterator();
+		Iterator<EntityDataInfo<EntityData<?>>> it = new ArrayList<>(infos).iterator();
 		return SkriptParser.parseStatic(Noun.stripIndefiniteArticle(s), it, null);
 	}
 	
@@ -430,7 +430,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 */
 	@Nullable
 	public static EntityData<?> parseWithoutIndefiniteArticle(String s) {
-		Iterator<EntityDataInfo<EntityData<?>>> it = infos.iterator();
+		Iterator<EntityDataInfo<EntityData<?>>> it = new ArrayList<>(infos).iterator();
 		return SkriptParser.parseStatic(s, it, null);
 	}
 
