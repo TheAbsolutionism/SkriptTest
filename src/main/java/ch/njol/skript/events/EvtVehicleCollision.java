@@ -14,6 +14,7 @@ import org.bukkit.event.vehicle.VehicleCollisionEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EvtVehicleCollision extends SkriptEvent {
@@ -31,9 +32,9 @@ public class EvtVehicleCollision extends SkriptEvent {
 	private Literal<?> expr;
 	private boolean blockCollision;
 	private boolean entityCollision;
-	private List<ItemType> itemTypes;
-	private List<BlockData> blockDatas;
-	private List<EntityData<?>> entityDatas;
+	private final List<ItemType> itemTypes = new ArrayList<>();
+	private final List<BlockData> blockDatas = new ArrayList<>();
+	private final List<EntityData<?>> entityDatas = new ArrayList<>();
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
