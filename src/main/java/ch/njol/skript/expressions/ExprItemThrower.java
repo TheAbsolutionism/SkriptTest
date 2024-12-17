@@ -22,26 +22,27 @@ import java.util.UUID;
 	"broadcast the item thrower of all dropped items"
 })
 @Since("INSERT VERSION")
-public class ExprItemThrower extends SimplePropertyExpression<Entity, OfflinePlayer> {
+public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 
 	static {
-		registerDefault(ExprItemThrower.class, OfflinePlayer.class, "[item] thrower", "entities");
+		registerDefault(ExprItemThrower.class, Object.class, "[dropped] item thrower", "itementities");
 	}
 
 	@Override
-	public @Nullable OfflinePlayer convert(Entity entity) {
-		if (!(entity instanceof Item item))
-			return null;
+	public @Nullable Object convert(Item item) {
 		UUID uuid = item.getThrower();
 		if (uuid == null)
 			return null;
+		Entity checkEntity = Bukkit.getEntity(uuid);
+		if (checkEntity != null)
+			return checkEntity;
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(OfflinePlayer.class, String.class, UUID.class);
+			return CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class, UUID.class);
 		return null;
 	}
 
@@ -51,6 +52,8 @@ public class ExprItemThrower extends SimplePropertyExpression<Entity, OfflinePla
 		if (delta != null) {
 			if (delta[0] instanceof OfflinePlayer offlinePlayer) {
 				newId = offlinePlayer.getUniqueId();
+			} else if (delta[0] instanceof Entity entity) {
+				newId = entity.getUniqueId();
 			} else if (delta[0] instanceof UUID uuid) {
 				newId = uuid;
 			} else if (delta[0] instanceof String string) {
@@ -58,9 +61,7 @@ public class ExprItemThrower extends SimplePropertyExpression<Entity, OfflinePla
 			}
 		}
 
-		for (Entity entity : getExpr().getArray(event)) {
-			if (!(entity instanceof Item item))
-				continue;
+		for (Item item : getExpr().getArray(event)) {
 			item.setThrower(newId);
 		}
 
@@ -68,12 +69,12 @@ public class ExprItemThrower extends SimplePropertyExpression<Entity, OfflinePla
 
 	@Override
 	protected String getPropertyName() {
-		return "item thrower";
+		return "dropped item thrower";
 	}
 
 	@Override
-	public Class<OfflinePlayer> getReturnType() {
-		return OfflinePlayer.class;
+	public Class<Object> getReturnType() {
+		return Object.class;
 	}
 
 }

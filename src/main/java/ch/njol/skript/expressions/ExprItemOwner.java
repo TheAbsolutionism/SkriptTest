@@ -22,26 +22,27 @@ import java.util.UUID;
 	"broadcast the item owner of all dropped items"
 })
 @Since("INSERT VERSION")
-public class ExprItemOwner extends SimplePropertyExpression<Entity, OfflinePlayer> {
+public class ExprItemOwner extends SimplePropertyExpression<Item, Object> {
 
 	static {
-		registerDefault(ExprItemOwner.class, OfflinePlayer.class, "item owner", "entities");
+		registerDefault(ExprItemOwner.class, Object.class, "item owner", "itementities");
 	}
 
 	@Override
-	public @Nullable OfflinePlayer convert(Entity entity) {
-		if (!(entity instanceof Item item))
-			return null;
+	public @Nullable Object convert(Item item) {
 		UUID uuid = item.getOwner();
 		if (uuid == null)
 			return null;
+		Entity checkEntity = Bukkit.getEntity(uuid);
+		if (checkEntity != null)
+			return checkEntity;
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(OfflinePlayer.class, String.class, UUID.class);
+			return CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class, UUID.class);
 		return null;
 	}
 
@@ -51,6 +52,8 @@ public class ExprItemOwner extends SimplePropertyExpression<Entity, OfflinePlaye
 		if (delta != null) {
 			if (delta[0] instanceof OfflinePlayer offlinePlayer) {
 				newId = offlinePlayer.getUniqueId();
+			} else if (delta[0] instanceof Entity entity) {
+				newId = entity.getUniqueId();
 			} else if (delta[0] instanceof UUID uuid) {
 				newId = uuid;
 			} else if (delta[0] instanceof String string) {
@@ -58,22 +61,20 @@ public class ExprItemOwner extends SimplePropertyExpression<Entity, OfflinePlaye
 			}
 		}
 
-		for (Entity entity : getExpr().getArray(event)) {
-			if (!(entity instanceof Item item))
-				continue;
+		for (Item item : getExpr().getArray(event)) {
 			item.setOwner(newId);
 		}
 
 	}
 
 	@Override
-	protected String getPropertyName() {
-		return "item owner";
+	public Class<Object> getReturnType() {
+		return Object.class;
 	}
 
 	@Override
-	public Class<OfflinePlayer> getReturnType() {
-		return OfflinePlayer.class;
+	protected String getPropertyName() {
+		return "item owner";
 	}
 
 }

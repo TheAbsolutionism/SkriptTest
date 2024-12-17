@@ -9,7 +9,6 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -24,33 +23,35 @@ public class EffItemLifetime extends Effect {
 
 	static {
 		Skript.registerEffect(EffItemLifetime.class,
-			"enable unlimited lifetime (of|for) %entities%",
-			"disable unlimited lifetime (of|for) %entities%");
+			"enable unlimited lifetime for %itementities%",
+			"make [the] lifetime unlimited for %itementities%",
+			"make [the] %itementities% lifetime unlimited",
+			"disable unlimited lifetime for %itementities%",
+			"make [the] lifetime limited for %itementities%",
+			"make [the] %itementities% lifetime limited");
 	}
 
-	private Expression<Entity> exprEntity;
+	private Expression<Item> entities;
 	private boolean enable;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern == 0;
+		enable = matchedPattern <= 2;
 		//noinspection unchecked
-		exprEntity = (Expression<Entity>) exprs[0];
+		entities = (Expression<Item>) exprs[0];
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
-		for (Entity entity : exprEntity.getArray(event)) {
-			if (!(entity instanceof Item item))
-				continue;
+		for (Item item : entities.getArray(event)) {
 			item.setUnlimitedLifetime(enable);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (enable ? "enable" : "disable") + " unlimited lifetime of " + exprEntity.toString(event, debug);
+		return (enable ? "enable" : "disable") + " unlimited lifetime of " + entities.toString(event, debug);
 	}
 
 }

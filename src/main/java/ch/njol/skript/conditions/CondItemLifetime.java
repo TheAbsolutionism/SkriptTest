@@ -9,7 +9,6 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -25,35 +24,35 @@ public class CondItemLifetime extends Condition {
 
 	static {
 		Skript.registerCondition(CondItemLifetime.class, ConditionType.PROPERTY,
-			"[the] %entities% (has|have) unlimited lifetime enabled",
-			"unlimited lifetime (is|are) enabled for %entities%",
-			"[the] %entities% (has|have) unlimited lifetime disabled",
-			"unlimited lifetime (is|are) disabled for %entities%");
+			"[the] %itementities% (has|have) unlimited lifetime enabled",
+			"unlimited lifetime (is|are) enabled for %itementities%",
+			"[the] %itementities% (has|have) unlimited lifetime",
+			"[the] %itementities% (has|have) unlimited lifetime disabled",
+			"unlimited lifetime (is|are) disabled for %itementities%",
+			"[the] %itementities% (don't|do not|doesn't|does not) have unlimited lifetime");
 	}
 
-	private Expression<Entity> exprEntity;
+	private Expression<Item> entities;
 	private boolean checkEnabled;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		checkEnabled = matchedPattern <= 1;
+		checkEnabled = matchedPattern <= 2;
 		//noinspection unchecked
-		exprEntity = (Expression<Entity>) exprs[0];
+		entities = (Expression<Item>) exprs[0];
 		return true;
 	}
 
 	@Override
 	public boolean check(Event event) {
-		return exprEntity.check(event, entity -> {
-			if (!(entity instanceof Item item))
-				return false;
+		return entities.check(event, item -> {
 			return item.isUnlimitedLifetime() == checkEnabled;
 		});
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + exprEntity.toString(event, debug) + " have unlimited lifetime " + (checkEnabled ? "enabled" : "disabled");
+		return "the " + entities.toString(event, debug) + " have unlimited lifetime " + (checkEnabled ? "enabled" : "disabled");
 	}
 
 }
