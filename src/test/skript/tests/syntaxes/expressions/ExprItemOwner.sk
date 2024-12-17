@@ -1,0 +1,23 @@
+test "item owner":
+	###
+		Combines:
+			ExprItemOwner
+			ExprItemThrower
+			EffItemLifetime
+			CondItemLifetime
+	###
+	drop a stone at test-location
+	set {_drop} to last dropped item
+
+	set {_owner} to "Sahvde" parsed as offline player
+	set the item owner of {_drop} to {_owner}
+	assert the item owner of {_drop} is {_owner} with "Item Owner was not set to Sahvde"
+
+	set {_thrower} to "Fusezion" parsed as offline player
+	set the item thrower of {_drop} to {_thrower}
+	assert the item thrower of {_drop} is {_thrower} with "Item Thrower was not set to Fusezion"
+
+	enable unlimited lifetime for {_drop}
+	assert unlimited lifetime is enabled for {_drop} with "Unlimited Lifetime was not enabled"
+
+	clear entity within {_drop}
