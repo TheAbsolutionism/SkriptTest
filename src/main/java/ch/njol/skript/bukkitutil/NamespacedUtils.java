@@ -17,6 +17,31 @@ public class NamespacedUtils {
 	/**
 	 * Gets a {@link NamespacedKey} from the provided {@code key}.
 	 * If {@code key} contains a namespace identifier within, that will be the namespace.
+	 * Otherwise, it will create the key in Skript's namespace
+	 * If the key fails to convert into a {@link NamespacedKey}, will pass to {@link #createNamespacedKey(String, boolean)} to encode the key.
+	 * @param key The unparsed key
+	 * @return The resulting {@link NamespacedKey}
+	 */
+	public static NamespacedKey getNamespacedKey(@NotNull String key) {
+		return getNamespacedKey(key, true, true);
+	}
+
+	/**
+	 * Gets a {@link NamespacedKey} from the provided {@code key}.
+	 * If {@code key} contains a namespace identifier within, that will be the namespace.
+	 * Otherwise, it will create the key in Skript's namespace if {@code skriptNamespace} is true, or Minecraft's if false.
+	 * If the key fails to convert into a {@link NamespacedKey}, will pass to {@link #createNamespacedKey(String, boolean)} to encode the key.
+	 * @param key The unparsed key
+	 * @param skriptNamespace If the key should be created in Skript's namespace or Minecraft's
+	 * @return The resulting {@link NamespacedKey}
+	 */
+	public static NamespacedKey getNamespacedKey(@NotNull String key, boolean skriptNamespace) {
+		return getNamespacedKey(key, skriptNamespace, true);
+	}
+
+	/**
+	 * Gets a {@link NamespacedKey} from the provided {@code key}.
+	 * If {@code key} contains a namespace identifier within, that will be the namespace.
 	 * Otherwise, it will create the key in Skript's namespace if {@code skriptNamespace} is true, or Minecraft's if false.
 	 * If the key fails to convert into a {@link NamespacedKey} and {@code encode} is true, will pass to {@link #createNamespacedKey(String, boolean)} to encode the key.
 	 * @param key The unparsed key
@@ -39,28 +64,15 @@ public class NamespacedUtils {
 	}
 
 	/**
-	 * Gets a {@link NamespacedKey} from the provided {@code key}.
+	 * Encodes a key to allow invalid character usage within the key.
 	 * If {@code key} contains a namespace identifier within, that will be the namespace.
-	 * Otherwise, it will create the key in Skript's namespace if {@code skriptNamespace} is true, or Minecraft's if false.
-	 * If the key fails to convert into a {@link NamespacedKey}, will pass to {@link #createNamespacedKey(String, boolean)} to encode the key.
-	 * @param key The unparsed key
-	 * @param skriptNamespace If the key should be created in Skript's namespace or Minecraft's
-	 * @return The resulting {@link NamespacedKey}
+	 * Otherwise, it will create the key in Skript's namespace.
+	 *
+	 * @param key The key to use
+	 * @return The resulting {@link NamespacedKey} with an encoded key
 	 */
-	public static NamespacedKey getNamespacedKey(@NotNull String key, boolean skriptNamespace) {
-		return getNamespacedKey(key, skriptNamespace, true);
-	}
-
-	/**
-	 * Gets a {@link NamespacedKey} from the provided {@code key}.
-	 * If {@code key} contains a namespace identifier within, that will be the namespace.
-	 * Otherwise, it will create the key in Skript's namespace
-	 * If the key fails to convert into a {@link NamespacedKey}, will pass to {@link #createNamespacedKey(String, boolean)} to encode the key.
-	 * @param key The unparsed key
-	 * @return The resulting {@link NamespacedKey}
-	 */
-	public static NamespacedKey getNamespacedKey(@NotNull String key) {
-		return getNamespacedKey(key, true, true);
+	public static NamespacedKey createNamespacedKey(@NotNull String key) {
+		return createNamespacedKey(key, true);
 	}
 
 	/**
@@ -83,7 +95,7 @@ public class NamespacedUtils {
 			if (LEGAL_NAMESPACE_CHARS.contains(currentChar)) {
 				// if the original string had a ".x" in it, we need to escape it
 				// so decoding doesn't think it's a hex sequence
-				if (currentChar == '.' && key.charAt(i + 1) == 'x') {
+				if (currentChar == '.' && keyLength >= i + 1 && key.charAt(i + 1) == 'x') {
 					i += 1; // skip the "x"
 					encodedKeyBuilder.append(".x");
 					encodedKeyBuilder.append(Integer.toHexString('.'));
@@ -112,19 +124,7 @@ public class NamespacedUtils {
 	}
 
 	/**
-	 * Encodes a key to allow invalid character usage within the key.
-	 * If {@code key} contains a namespace identifier within, that will be the namespace.
-	 * Otherwise, it will create the key in Skript's namespace.
-	 *
-	 * @param key The key to use
-	 * @return The resulting {@link NamespacedKey} with an encoded key
-	 */
-	public static NamespacedKey createNamespacedKey(@NotNull String key) {
-		return createNamespacedKey(key, true);
-	}
-
-	/**
-	 * Decodes a NamespacedKey encoded by #getNamespacedKey
+	 * Decodes a NamespacedKey encoded by {@link #createNamespacedKey(String, boolean)}
 	 *
 	 * @param namespacedKey the namespaced key to decode
 	 * @return a Pair with the first element as the namespace and the second as the decoded key
@@ -137,7 +137,7 @@ public class NamespacedUtils {
 		for (int i = 0; i < encodedKeyLength; i++) {
 			char currentChar = encodedKey.charAt(i);
 			// if we are encountering a ".x" hex sequence
-			if (i != lastCharIndex && currentChar  == '.' && encodedKey.charAt(i + 1) == 'x') {
+			if (i != lastCharIndex && currentChar  == '.' && encodedKeyLength >= i + 1 && encodedKey.charAt(i + 1) == 'x') {
 				i += 2; // skip the ".x" so it isn't part of our hex string
 				StringBuilder hexString = new StringBuilder();
 				// The hex sequence continues until a . is encountered or we reach the end of the string
