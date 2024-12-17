@@ -42,7 +42,7 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class, UUID.class);
+			return CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class);
 		return null;
 	}
 
@@ -54,8 +54,6 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 				newId = offlinePlayer.getUniqueId();
 			} else if (delta[0] instanceof Entity entity) {
 				newId = entity.getUniqueId();
-			} else if (delta[0] instanceof UUID uuid) {
-				newId = uuid;
 			} else if (delta[0] instanceof String string) {
 				newId = UUID.fromString(string);
 			}
