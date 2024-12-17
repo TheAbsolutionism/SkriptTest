@@ -11,8 +11,8 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.Classes;
 import ch.njol.util.Kleenean;
-import ch.njol.util.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -109,7 +109,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return StringUtils.join(patternTypes, ",") + " items";
+		return Classes.toString(patternTypes) + " items";
 	}
 
 	private static @Nullable Material getMaterial(Object object) {
