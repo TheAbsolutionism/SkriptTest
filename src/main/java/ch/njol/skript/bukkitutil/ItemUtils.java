@@ -223,12 +223,13 @@ public class ItemUtils {
 	 * @return ItemStack from slot/itemtype
 	 */
 	public static @Nullable ItemStack asItemStack(@Nullable Object object) {
-		if (object instanceof ItemType itemType)
+		if (object instanceof ItemType itemType) {
 			return itemType.getRandom();
-		else if (object instanceof Slot slot)
+		} else if (object instanceof Slot slot) {
 			return slot.getItem();
-		else if (object instanceof ItemStack itemStack)
+		} else if (object instanceof ItemStack itemStack) {
 			return itemStack;
+		}
 		return null;
 	}
 	
@@ -389,11 +390,15 @@ public class ItemUtils {
 	 * @param <T>
 	 * @return the updated item
 	 */
-	public static <T extends ItemMeta> T changeItemMeta(@NotNull ItemStack itemStack, @NotNull Consumer<T> metaChanger) {
-		//noinspection unchecked
-		T itemMeta = (T) itemStack.getItemMeta();
-		metaChanger.accept(itemMeta);
-		return itemMeta;
+	public static <T extends ItemMeta> ItemStack changeItemMeta(@NotNull Class<T> metaClass, @NotNull ItemStack itemStack, @NotNull Consumer<T> metaChanger) {
+		ItemMeta originalMeta = itemStack.getItemMeta();
+		if (metaClass.isInstance(originalMeta)) {
+			//noinspection unchecked
+			T itemMeta = (T) originalMeta;
+			metaChanger.accept(itemMeta);
+			itemStack.setItemMeta(itemMeta);
+		}
+		return itemStack;
 	}
 
 	/**
@@ -412,8 +417,8 @@ public class ItemUtils {
 			slot.setItem(itemStack);
 		} else if (object instanceof ItemType itemType) {
 			itemType.setItemMeta(itemMeta);
-		} else if (object instanceof ItemStack itemStack1) {
-			itemStack1.setItemMeta(itemMeta);
+		} else if (object instanceof ItemStack itemStack) {
+			itemStack.setItemMeta(itemMeta);
 		}
 		throw new IllegalArgumentException("Object was not a Slot, ItemType or ItemStack.");
 	}
