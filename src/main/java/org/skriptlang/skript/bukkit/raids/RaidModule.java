@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.raids;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.EnumClassInfo;
 import ch.njol.skript.expressions.base.EventValueExpression;
@@ -16,10 +17,12 @@ import org.bukkit.event.raid.RaidStopEvent.Reason;
 import org.bukkit.event.raid.RaidTriggerEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class RaidModule {
 
-	static {
-
+	public static void load() throws IOException {
+		Skript.getAddonInstance().loadClasses("org.skriptlang.skript.bukkit.raids", "elements");
 
 		//EVENT VALUES//
 

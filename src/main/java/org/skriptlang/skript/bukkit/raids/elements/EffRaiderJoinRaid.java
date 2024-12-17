@@ -26,7 +26,7 @@ public class EffRaiderJoinRaid extends Effect {
 
 	static {
 		Skript.registerEffect(EffRaiderJoinRaid.class,
-			"allow %livingentites% to join [a] raid",
+			"allow %livingentities% to join [a] raid",
 			"disallow %livingentities% to join [a] raid");
 	}
 

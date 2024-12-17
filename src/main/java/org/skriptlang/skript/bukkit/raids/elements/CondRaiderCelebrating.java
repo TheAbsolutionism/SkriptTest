@@ -19,7 +19,7 @@ import org.bukkit.entity.Raider;
 public class CondRaiderCelebrating extends PropertyCondition<LivingEntity> {
 
 	static {
-		register(CondRaiderCelebrating.class, PropertyType.BE, "celebrating", "livingentites");
+		register(CondRaiderCelebrating.class, PropertyType.BE, "celebrating", "livingentities");
 	}
 
 	@Override

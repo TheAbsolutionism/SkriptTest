@@ -19,7 +19,7 @@ import org.bukkit.entity.Raider;
 public class CondRaiderCanJoin extends PropertyCondition<LivingEntity> {
 
 	static {
-		register(CondRaiderCanJoin.class, PropertyType.CAN, "join raid", "livingentites");
+		register(CondRaiderCanJoin.class, PropertyType.CAN, "join raid", "livingentities");
 	}
 
 	@Override

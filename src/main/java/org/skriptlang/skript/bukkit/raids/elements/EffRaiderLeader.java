@@ -27,7 +27,7 @@ public class EffRaiderLeader extends Effect {
 	static {
 		Skript.registerEffect(EffRaiderLeader.class,
 			"make %livingentities% [a] raider leader",
-			"make %livingentites% not [a] raider leader");
+			"make %livingentities% not [a] raider leader");
 	}
 
 	private Expression<LivingEntity> exprEntity;
