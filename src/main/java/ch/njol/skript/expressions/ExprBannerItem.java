@@ -72,11 +72,13 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 	}
 
 	private PatternType[] patternTypes;
+	private Literal<PatternType> literalPattern;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		patternTypes = ((Literal<PatternType>) exprs[0]).getArray();
+		literalPattern = (Literal<PatternType>) exprs[0];
+		patternTypes = literalPattern.getArray();
 		for (PatternType type : patternTypes) {
 			if (!bannerMaterials.containsKey(type)) {
 				Skript.error("There is no item for the banner pattern type '" + type + "'.");
@@ -109,7 +111,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return Classes.toString(patternTypes) + " items";
+		return literalPattern.toString(event, debug) + " items";
 	}
 
 	private static @Nullable Material getMaterial(Object object) {
