@@ -1,4 +1,4 @@
-test "smithing recipe data component copy" when running minecraft "1.20.5":
+test "smithing recipe data copy" when running minecraft "1.20.0":
 	###
 		Combines:
 			EffSmithingData
@@ -12,8 +12,8 @@ test "smithing recipe data component copy" when running minecraft "1.20.5":
 		set the recipe template item to {_template}
 		set the recipe addition item to {_addition}
 		set the recipe result to netherite sword named "test_smithing_recipe_data_component_copy"
-		disallow copying the data component from the base item to the result item
+		disallow the item data to be copied from the base item to the result item
 	add {_recipe} to the server's recipes
 	set {_get} to recipe with the key "test_smithing_recipe_data_component_copy"
-	assert {_recipe} does not allow data component copying with "Created recipe should not allow data component copying"
-	assert {_get} does not allow data component copying with "Retrieved recipe should not allow data component copying"
+	assert {_recipe} does not allow data copying with "Created recipe should not allow data component copying"
+	assert {_get} does not allow data copying with "Retrieved recipe should not allow data component copying"

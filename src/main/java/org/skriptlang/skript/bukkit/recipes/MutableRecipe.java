@@ -287,7 +287,6 @@ public abstract class MutableRecipe implements Recipe {
 		private RecipeChoice base;
 		private RecipeChoice template;
 		private RecipeChoice addition;
-		private Boolean copyNBT = null;
 		private Boolean copyData = null;
 
 		public MutableSmithingRecipe(NamespacedKey key, RecipeType recipeType) {
@@ -306,10 +305,6 @@ public abstract class MutableRecipe implements Recipe {
 			this.addition = addition;
 		}
 
-		public void setCopyNBT(Boolean copyNBT) {
-			this.copyNBT = copyNBT;
-		}
-
 		public void setCopyData(Boolean copyData) {
 			this.copyData = copyData;
 		}
@@ -326,9 +321,6 @@ public abstract class MutableRecipe implements Recipe {
 			return addition;
 		}
 
-		public Boolean willCopyNBT() {
-			return copyNBT;
-		}
 
 		public Boolean willCopyData() {
 			return copyData;
@@ -349,11 +341,8 @@ public abstract class MutableRecipe implements Recipe {
 				addError("You must provide an additional item when creating a smithing recipe.");
 				return null;
 			}
-			if (SUPPORTS_COPY_DATA && copyData != null) {
+			if ((SUPPORTS_COPY_NBT || SUPPORTS_COPY_DATA) && copyData != null)
 				return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition(), copyData);
-			} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && copyNBT != null) {
-				return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition(), copyNBT);
-			}
 			return new SmithingRecipe(getKey(), getResult(), getBase(), getAddition());
 		}
 
@@ -381,11 +370,8 @@ public abstract class MutableRecipe implements Recipe {
 					addError("You must provide a template item when creating a smithing recipe.");
 					return null;
 				}
-				if (SUPPORTS_COPY_DATA && willCopyData() != null) {
+				if (RUNNING_1_20_0 && (SUPPORTS_COPY_NBT || SUPPORTS_COPY_DATA) && willCopyData() != null)
 					return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition(), willCopyData());
-				} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && RUNNING_1_20_0 && willCopyNBT() != null) {
-					return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition(), willCopyNBT());
-				}
 				return new SmithingTransformRecipe(getKey(), getResult(), getTemplate(), getBase(), getAddition());
 			}
 		}
@@ -410,11 +396,8 @@ public abstract class MutableRecipe implements Recipe {
 					addError("You must provide a template item when creating a smithing recipe.");
 					return null;
 				}
-				if (SUPPORTS_COPY_DATA && willCopyData() != null) {
+				if (RUNNING_1_20_0 && (SUPPORTS_COPY_NBT || SUPPORTS_COPY_DATA) && willCopyData() != null)
 					return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition(), willCopyData());
-				} else if (!SUPPORTS_COPY_DATA && SUPPORTS_COPY_NBT && RUNNING_1_20_0 && willCopyNBT() != null) {
-					return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition(), willCopyNBT());
-				}
 				return new SmithingTrimRecipe(getKey(), getTemplate(), getBase(), getAddition());
 			}
 		}
