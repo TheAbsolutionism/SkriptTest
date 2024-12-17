@@ -1907,22 +1907,6 @@ public final class BukkitEventValues {
 			}
 		}, EventValues.TIME_PAST);
 
-		// VehicleBlockCollisionEvent
-		EventValues.registerEventValue(VehicleBlockCollisionEvent.class, Block.class, new Getter<>() {
-			@Override
-			public Block get(VehicleBlockCollisionEvent event) {
-				return event.getBlock();
-			}
-		}, EventValues.TIME_NOW);
-
-		// VehicleEntityCollisionEvent
-		EventValues.registerEventValue(VehicleEntityCollisionEvent.class, Entity.class, new Getter<>() {
-			@Override
-			public Entity get(VehicleEntityCollisionEvent event) {
-				return event.getEntity();
-			}
-		}, EventValues.TIME_NOW);
-
 		// VehicleMoveEvent
 		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<>() {
 			@Override

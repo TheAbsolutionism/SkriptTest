@@ -768,7 +768,9 @@ public class SimpleEvents {
 			.since("INSERT VERSION");
 
 		Skript.registerEvent("Vehicle Move", SimpleEvent.class, VehicleMoveEvent.class, "vehicle move")
-			.description("Called when a vehicle moves.")
+			.description(
+				"Called when a vehicle moves.",
+				"Please note that using this event can cause lag if there are multiple vehicle entities, i.e. Horse, Pig, Boat, Minecart")
 			.examples(
 				"on vehicle move:",
 					"\tbroadcast past event-location",
