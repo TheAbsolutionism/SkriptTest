@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -41,7 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Name("Entity Owner")
-@Description("The owner of a tameable entity (i.e. horse or wolf) or a dropped item.")
+@Description({
+	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
+	"NOTE: If the owner of a dropped item was an entity and was killed, will return their uuid in string form."
+})
 @Examples({
 	"set owner of target entity to player",
 	"delete owner of target entity",
@@ -77,7 +62,10 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			Entity checkEntity = Bukkit.getEntity(uuid);
 			if (checkEntity != null)
 				return checkEntity;
-			return Bukkit.getOfflinePlayer(uuid);
+			OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+			if (checkPlayer != null)
+				return checkPlayer;
+			return uuid.toString();
 		}
 		return null;
 	}
@@ -105,7 +93,9 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			} else if (delta[0] instanceof Entity entity) {
 				newId = entity.getUniqueId();
 			} else if (delta[0] instanceof String string) {
-				newId = UUID.fromString(string);
+				try {
+					newId = UUID.fromString(string);
+				} catch (Exception ignored) {}
 			}
 		}
 
@@ -117,12 +107,17 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			}
 		}
 	}
-	
+
 	@Override
 	public Class<Object> getReturnType() {
 		return Object.class;
 	}
-	
+
+	@Override
+	public Class<?>[] possibleReturnTypes() {
+		return CollectionUtils.array(Entity.class, OfflinePlayer.class, String.class);
+	}
+
 	@Override
 	protected String getPropertyName() {
 		return "owner";

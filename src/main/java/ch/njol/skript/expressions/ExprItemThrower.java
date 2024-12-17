@@ -17,7 +17,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Name("Item Thrower")
-@Description("The player that thrown the dropped item.")
+@Description({
+	"The entity that threw/dropped the dropped item.",
+	"NOTE: If the entity that dropped item was was killed, will return their uuid in string form."
+})
 @Examples({
 	"broadcast the item thrower of all dropped items"
 })
@@ -36,7 +39,10 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 		Entity checkEntity = Bukkit.getEntity(uuid);
 		if (checkEntity != null)
 			return checkEntity;
-		return Bukkit.getOfflinePlayer(uuid);
+		OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+		if (checkPlayer != null)
+			return checkPlayer;
+		return uuid.toString();
 	}
 
 	@Override
@@ -55,7 +61,9 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 			} else if (delta[0] instanceof Entity entity) {
 				newId = entity.getUniqueId();
 			} else if (delta[0] instanceof String string) {
-				newId = UUID.fromString(string);
+				try {
+					newId = UUID.fromString(string);
+				} catch (Exception ignored) {}
 			}
 		}
 
@@ -66,13 +74,18 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 	}
 
 	@Override
-	protected String getPropertyName() {
-		return "dropped item thrower";
+	public Class<Object> getReturnType() {
+		return Object.class;
 	}
 
 	@Override
-	public Class<Object> getReturnType() {
-		return Object.class;
+	public Class<?>[] possibleReturnTypes() {
+		return CollectionUtils.array(Entity.class, OfflinePlayer.class, String.class);
+	}
+
+	@Override
+	protected String getPropertyName() {
+		return "dropped item thrower";
 	}
 
 }

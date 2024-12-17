@@ -24,11 +24,11 @@ public class EffItemLifetime extends Effect {
 	static {
 		Skript.registerEffect(EffItemLifetime.class,
 			"enable unlimited lifetime for %itementities%",
-			"make [the] lifetime unlimited for %itementities%",
+			"make lifetime unlimited for %itementities%",
 			"make [the] %itementities% lifetime unlimited",
 			"disable unlimited lifetime for %itementities%",
 			"make [the] lifetime limited for %itementities%",
-			"make [the] %itementities% lifetime limited");
+			"make %itementities% lifetime limited");
 	}
 
 	private Expression<Item> entities;
