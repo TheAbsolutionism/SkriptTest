@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Consume Brewing Fuel")
 @Description({
-	"Make the brewing fuel event consume the fuel",
-	"By making it not consume, it will keep the fuel item and still add fuel to the brewing stand."
+	"Makes the brewing stand in the brewing fuel event consume its fuel.",
+	"By making it not consume the fuel, it will keep the fuel item and still add to the fuel level of the brewing stand."
 })
 @Examples({
 	"on brewing fuel:",
@@ -36,7 +36,7 @@ public class EffBrewingConsume extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!getParser().isCurrentEvent(BrewingStandFuelEvent.class)) {
-			Skript.error("This can only be used in a 'brewing fuel' event.");
+			Skript.error("The 'consume brewing fuel' effect only be used in a 'brewing fuel' event.");
 			return false;
 		}
 		consume = matchedPattern == 0;

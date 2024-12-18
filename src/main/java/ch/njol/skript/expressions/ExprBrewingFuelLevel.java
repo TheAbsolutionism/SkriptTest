@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-@Name("Brewind Stand Fuel Level")
-@Description("The fuel level of a brewing stand")
+@Name("Brewing Stand Fuel Level")
+@Description("The fuel level of a brewing stand.")
 @Examples({
 	"set the brewing stand fuel level of {_block} to 10",
 	"clear the brewing stand fuel level of {_block}"

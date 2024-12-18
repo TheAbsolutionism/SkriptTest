@@ -162,7 +162,7 @@ public class EvtItem extends SkriptEvent {
 			.since("INSERT VERSION");
 
 		Skript.registerEvent("Brewing Fuel", EvtItem.class, BrewingStandFuelEvent.class, "brewing fuel[ed] [of %-itemtypes%]")
-			.description("Called when a brewing stand is about to use an item to increase the fuel.")
+			.description("Called when a brewing stand is about to use an item to increase its fuel level.")
 			.examples(
 				"on brewing fuel:",
 					"\tmake the brewing stand not consume fuel",

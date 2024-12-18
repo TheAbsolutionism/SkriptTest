@@ -37,7 +37,7 @@ public class CondBrewingConsume extends Condition {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!getParser().isCurrentEvent(BrewingStandFuelEvent.class)) {
-			Skript.error("This can only be used in a 'brewing fuel' event.");
+			Skript.error("The 'brewing will consume fuel' condition only be used in a 'brewing fuel' event.");
 			return false;
 		}
 		return true;

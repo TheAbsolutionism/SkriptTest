@@ -7,7 +7,6 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.effects.Delay;
 import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Name("Brewing Stand Slot")
-@Description("A slot of a brewing stand, i.e. 1st, 2nd, 3rd bottle slot, fuel or ingredient slot.")
+@Description("A slot of a brewing stand, i.e. the 1st, 2nd, 3rd bottle slot, fuel or ingredient slot.")
 @Examples({
 	"set the brewing 1st bottle slot of {_block} to potion of water",
 	"clear the brewing second bottle slot of {_block}"
@@ -81,7 +80,6 @@ public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 	protected Slot @Nullable [] get(Event event, Block[] source) {
 		Block[] blocks = getExpr().getArray(event);
 		Block eventBlock = null;
-
 
 		if (isEvent) {
 			if (event instanceof BrewingStandFuelEvent brewingStandFuelEvent) {
