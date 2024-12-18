@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,11 @@ import java.util.UUID;
 @Name("Entity Owner")
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
-	"NOTE: If the owner of a dropped item was an entity and was killed, will return their uuid in string form."
+	"NOTES:",
+	"Getting the owner of a dropped item will only return an alive entity or online player. "
+	    + "If the entity was killed, or the player is offline, will return null.",
+	"Setting the owner of a dropped item means only that entity or player can pick it up.",
+	"Dropping an item does not automatically make the entity or player the owner."
 })
 @Examples({
 	"set owner of target entity to player",
@@ -64,10 +69,10 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			Entity checkEntity = Bukkit.getEntity(uuid);
 			if (checkEntity != null)
 				return checkEntity;
-			OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+			Player checkPlayer = Bukkit.getPlayer(uuid);
 			if (checkPlayer != null)
 				return checkPlayer;
-			return uuid.toString();
+			return null;
 		}
 		return null;
 	}

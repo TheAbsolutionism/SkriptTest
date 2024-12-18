@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,11 +20,12 @@ import java.util.UUID;
 @Name("Item Thrower")
 @Description({
 	"The entity that threw/dropped the dropped item.",
-	"NOTE: If the entity that dropped item was was killed, will return their uuid in string form."
+	"NOTES:",
+	"Getting the item thrower will only return alive entity or online player. "
+	    + "If the entity was killed, or the player is offline, will return null.",
+	"Dropping an item does not automatically make the entity or player the owner."
 })
-@Examples({
-	"broadcast the item thrower of all dropped items"
-})
+@Examples("broadcast the item thrower of all dropped items")
 @Since("INSERT VERSION")
 public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 
@@ -39,10 +41,10 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 		Entity checkEntity = Bukkit.getEntity(uuid);
 		if (checkEntity != null)
 			return checkEntity;
-		OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+		Player checkPlayer = Bukkit.getPlayer(uuid);
 		if (checkPlayer != null)
 			return checkPlayer;
-		return uuid.toString();
+		return null;
 	}
 
 	@Override

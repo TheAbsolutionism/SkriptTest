@@ -18,13 +18,13 @@ test "item owner of dropped item":
 
 	spawn a sheep at test-location:
 		set {_owner} to entity
-	set the item owner of {_drop} to {_owner}
-	assert the item owner of {_drop} is {_owner} with "Item Owner was not set to Sahvde"
+	set the dropped item owner of {_drop} to {_owner}
+	assert the dropped item owner of {_drop} is {_owner} with "Item Owner was not set to Sahvde"
 
 	spawn a pig at test-location:
 		set {_thrower} to entity
-	set the item thrower of {_drop} to {_thrower}
-	assert the item thrower of {_drop} is {_thrower} with "Item Thrower was not set to Fusezion"
+	set the dropped item thrower of {_drop} to {_thrower}
+	assert the dropped item thrower of {_drop} is {_thrower} with "Item Thrower was not set to Fusezion"
 
 	enable unlimited lifetime for {_drop}
 	assert unlimited lifetime is enabled for {_drop} with "Unlimited Lifetime was not enabled"

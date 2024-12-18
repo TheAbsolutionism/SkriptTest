@@ -24,11 +24,11 @@ public class EffItemLifetime extends Effect {
 	static {
 		Skript.registerEffect(EffItemLifetime.class,
 			"enable (unlimited|infinite) life(time|span) for [the] %itementities%",
-			"make life(time|span) (unlimited|infinite) for [the] %itementities%",
-			"make [the] %itementities% life(time|span) (unlimited|infinite)",
+			"make [the] life(time|span) (unlimited|infinite) for [the] %itementities%",
+			"make %itementities%'[s] life(time|span) (unlimited|infinite)",
 			"disable (unlimited|infinite) life(time|span) for [the] %itementities%",
-			"make life(time|span) (limited|finite) for [the] %itementities%",
-			"make [the] %itementities% life(time|span) (limited|finite)");
+			"make [the] life(time|span) (limited|finite) for [the] %itementities%",
+			"make %itementities%'[s] life(time|span) (limited|finite)");
 	}
 
 	private Expression<Item> entities;
