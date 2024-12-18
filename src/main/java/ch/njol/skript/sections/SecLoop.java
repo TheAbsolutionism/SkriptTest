@@ -17,6 +17,7 @@ import ch.njol.util.Kleenean;
 import com.google.common.collect.PeekingIterator;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Iterator;
 import java.util.List;
@@ -74,14 +75,14 @@ public class SecLoop extends LoopSection {
 		Skript.registerSection(SecLoop.class, "loop %objects%");
 	}
 
-	@SuppressWarnings("NotNullFieldNotInitialized")
-	private Expression<?> expr;
+	protected @UnknownNullability Expression<?> expression;
 
 	private final transient Map<Event, Object> current = new WeakHashMap<>();
+	private final transient Map<Event, Iterator<?>> iteratorMap = new WeakHashMap<>();
 	private final transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
 	private final transient Map<Event, Object> previous = new WeakHashMap<>();
 
-	private @Nullable TriggerItem actualNext;
+	protected @Nullable TriggerItem actualNext;
 	private boolean guaranteedToLoop;
 	private Object nextValue = null;
 	private boolean loopPeeking;
@@ -94,26 +95,26 @@ public class SecLoop extends LoopSection {
 						ParseResult parseResult,
 						SectionNode sectionNode,
 						List<TriggerItem> triggerItems) {
-		expr = LiteralUtils.defendExpression(exprs[0]);
-		if (!LiteralUtils.canInitSafely(expr)) {
+		this.expression = LiteralUtils.defendExpression(exprs[0]);
+		if (!LiteralUtils.canInitSafely(expression)) {
 			Skript.error("Can't understand this loop: '" + parseResult.expr.substring(5) + "'");
 			return false;
 		}
 
-		if (Container.class.isAssignableFrom(expr.getReturnType())) {
-			ContainerType type = expr.getReturnType().getAnnotation(ContainerType.class);
+		if (Container.class.isAssignableFrom(expression.getReturnType())) {
+			ContainerType type = expression.getReturnType().getAnnotation(ContainerType.class);
 			if (type == null)
-				throw new SkriptAPIException(expr.getReturnType().getName() + " implements Container but is missing the required @ContainerType annotation");
-			expr = new ContainerExpression((Expression<? extends Container<?>>) expr, type.value());
+				throw new SkriptAPIException(expression.getReturnType().getName() + " implements Container but is missing the required @ContainerType annotation");
+			this.expression = new ContainerExpression((Expression<? extends Container<?>>) expression, type.value());
 		}
 
-		if (expr.isSingle()) {
-			Skript.error("Can't loop '" + expr + "' because it's only a single value");
+		if (expression.isSingle()) {
+			Skript.error("Can't loop '" + expression + "' because it's only a single value");
 			return false;
 		}
 		loopPeeking = exprs[0].supportsLoopPeeking();
 
-		guaranteedToLoop = guaranteedToLoop(expr);
+		guaranteedToLoop = guaranteedToLoop(expression);
 		loadOptionalCode(sectionNode);
 		super.setNext(this);
 
@@ -123,9 +124,9 @@ public class SecLoop extends LoopSection {
 	@Override
 	@Nullable
 	protected TriggerItem walk(Event event) {
-		Iterator<?> iter = currentIter.get(event);
+		Iterator<?> iter = iteratorMap.get(event);
 		if (iter == null) {
-			iter = expr instanceof Variable<?> variable ? variable.variablesIterator(event) : expr.iterator(event);
+			iter = expression instanceof Variable<?> variable ? variable.variablesIterator(event) : expr.iterator(event);
 			if (iter != null && iter.hasNext()) {
 				currentIter.put(event, iter);
 			} else {
@@ -150,6 +151,11 @@ public class SecLoop extends LoopSection {
 		}
 	}
 
+	protected void store(Event event, Object next) {
+		this.current.put(event, next);
+		this.currentLoopCounter.put(event, (currentLoopCounter.getOrDefault(event, 0L)) + 1);
+	}
+
 	@Override
 	public @Nullable ExecutionIntent executionIntent() {
 		return guaranteedToLoop ? triggerExecutionIntent() : null;
@@ -157,7 +163,7 @@ public class SecLoop extends LoopSection {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "loop " + expr.toString(event, debug);
+		return "loop " + expression.toString(event, debug);
 	}
 
 	public @Nullable Object getCurrent(Event event) {
@@ -181,7 +187,7 @@ public class SecLoop extends LoopSection {
 	}
 
 	public Expression<?> getLoopedExpression() {
-		return expr;
+		return expression;
 	}
 
 	@Override
@@ -199,6 +205,7 @@ public class SecLoop extends LoopSection {
 	@Override
 	public void exit(Event event) {
 		current.remove(event);
+		iteratorMap.remove(event);
 		currentIter.remove(event);
 		previous.remove(event);
 		super.exit(event);
@@ -208,7 +215,7 @@ public class SecLoop extends LoopSection {
 		// If the expression is a literal, it's guaranteed to loop if it has at least one value
 		if (expression instanceof Literal<?> literal)
 			return literal.getAll().length > 0;
-		
+
 		// If the expression isn't a list, then we can't guarantee that it will loop
 		if (!(expression instanceof ExpressionList<?> list))
 			return false;
