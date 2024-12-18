@@ -124,7 +124,7 @@ public class SecLoop extends LoopSection {
 	protected @Nullable TriggerItem walk(Event event) {
 		Iterator<?> iter = iteratorMap.get(event);
 		if (iter == null) {
-			iter = expression instanceof Variable<?> variable ? variable.variablesIterator(event) : expression.iterator(event);
+			iter = expression instanceof Variable variable ? variable.variablesIterator(event) : expression.iterator(event);
 			if (iter != null && iter.hasNext()) {
 				iteratorMap.put(event, iter);
 			} else {
@@ -139,12 +139,11 @@ public class SecLoop extends LoopSection {
 		} else {
 			previous.put(event, current.get(event));
 			if (nextValue != null) {
-				current.put(event, nextValue);
+				this.store(event, nextValue);
 				nextValue = null;
 			} else if (iter.hasNext()) {
-				current.put(event, iter.next());
+				this.store(event, iter.next());
 			}
-			currentLoopCounter.put(event, (currentLoopCounter.getOrDefault(event, 0L)) + 1);
 			return walk(event, true);
 		}
 	}
