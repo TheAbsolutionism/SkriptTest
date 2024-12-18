@@ -79,7 +79,6 @@ public class SecLoop extends LoopSection {
 
 	private final transient Map<Event, Object> current = new WeakHashMap<>();
 	private final transient Map<Event, Iterator<?>> iteratorMap = new WeakHashMap<>();
-	private final transient Map<Event, Iterator<?>> currentIter = new WeakHashMap<>();
 	private final transient Map<Event, Object> previous = new WeakHashMap<>();
 
 	protected @Nullable TriggerItem actualNext;
@@ -122,13 +121,12 @@ public class SecLoop extends LoopSection {
 	}
 
 	@Override
-	@Nullable
-	protected TriggerItem walk(Event event) {
+	protected @Nullable TriggerItem walk(Event event) {
 		Iterator<?> iter = iteratorMap.get(event);
 		if (iter == null) {
-			iter = expression instanceof Variable<?> variable ? variable.variablesIterator(event) : expr.iterator(event);
+			iter = expression instanceof Variable<?> variable ? variable.variablesIterator(event) : expression.iterator(event);
 			if (iter != null && iter.hasNext()) {
-				currentIter.put(event, iter);
+				iteratorMap.put(event, iter);
 			} else {
 				iter = null;
 			}
@@ -173,7 +171,7 @@ public class SecLoop extends LoopSection {
 	public @Nullable Object getNext(Event event) {
 		if (!loopPeeking)
 			return null;
-		Iterator<?> iter = currentIter.get(event);
+		Iterator<?> iter = iteratorMap.get(event);
 		if (iter == null || !iter.hasNext())
 			return null;
 		if (iter instanceof PeekingIterator<?> peekingIterator)
@@ -206,7 +204,6 @@ public class SecLoop extends LoopSection {
 	public void exit(Event event) {
 		current.remove(event);
 		iteratorMap.remove(event);
-		currentIter.remove(event);
 		previous.remove(event);
 		super.exit(event);
 	}
@@ -244,7 +241,7 @@ public class SecLoop extends LoopSection {
 	}
 
 	public Expression<?> getExpression() {
-		return expr;
+		return expression;
 	}
 
 }
