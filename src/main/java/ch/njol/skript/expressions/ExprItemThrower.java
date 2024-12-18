@@ -21,8 +21,8 @@ import java.util.UUID;
 @Description({
 	"The entity that threw/dropped the dropped item.",
 	"NOTES:",
-	"Getting the item thrower will only return alive entity or online player. "
-	    + "If the entity was killed, or the player is offline, will return null.",
+	"Getting the item thrower will only return alive entity or a player that has played before. "
+	    + "If the entity was killed, or the player has never played before, will return null.",
 	"Dropping an item does not automatically make the entity or player the owner."
 })
 @Examples("broadcast the item thrower of all dropped items")
@@ -41,8 +41,8 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 		Entity checkEntity = Bukkit.getEntity(uuid);
 		if (checkEntity != null)
 			return checkEntity;
-		Player checkPlayer = Bukkit.getPlayer(uuid);
-		if (checkPlayer != null)
+		OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+		if (checkPlayer.hasPlayedBefore())
 			return checkPlayer;
 		return null;
 	}

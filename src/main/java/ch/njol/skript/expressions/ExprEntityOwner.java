@@ -27,8 +27,8 @@ import java.util.UUID;
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
 	"NOTES:",
-	"Getting the owner of a dropped item will only return an alive entity or online player. "
-	    + "If the entity was killed, or the player is offline, will return null.",
+	"Getting the owner of a dropped item will only return an alive entity or a player that has played before. "
+	    + "If the entity was killed, or the player has never played before, will return null.",
 	"Setting the owner of a dropped item means only that entity or player can pick it up.",
 	"Dropping an item does not automatically make the entity or player the owner."
 })
@@ -41,7 +41,7 @@ import java.util.UUID;
 })
 @Since("2.5, INSERT VERSION (dropped items)")
 public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
-	
+
 	static {
 		Skript.registerExpression(ExprEntityOwner.class, Object.class, ExpressionType.PROPERTY,
 			"[the] (owner|tamer) of %livingentities%",
@@ -69,8 +69,8 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			Entity checkEntity = Bukkit.getEntity(uuid);
 			if (checkEntity != null)
 				return checkEntity;
-			Player checkPlayer = Bukkit.getPlayer(uuid);
-			if (checkPlayer != null)
+			OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
+			if (checkPlayer.hasPlayedBefore())
 				return checkPlayer;
 			return null;
 		}
