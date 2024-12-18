@@ -1,21 +1,3 @@
-/**
- *   This file is part of Skript.
- *
- *  Skript is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Skript is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.classes.data;
 
 import ch.njol.skript.Skript;
@@ -36,6 +18,11 @@ import com.destroystokyo.paper.event.entity.EndermanAttackPlayerEvent;
 import com.destroystokyo.paper.event.entity.ProjectileCollideEvent;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
+import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
+import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
+import io.papermc.paper.event.player.PlayerTradeEvent;
+import org.bukkit.*;
 import io.papermc.paper.event.player.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -1922,6 +1909,19 @@ public final class BukkitEventValues {
 			}
 		}, EventValues.TIME_PAST);
 
+		// VehicleMoveEvent
+		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<>() {
+			@Override
+			public Location get(VehicleMoveEvent event) {
+				return event.getTo();
+			}
+		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(VehicleMoveEvent.class, Location.class, new Getter<>() {
+			@Override
+			public Location get(VehicleMoveEvent event) {
+				return event.getFrom();
+			}
+		}, EventValues.TIME_PAST);
 
 		// BeaconEffectEvent
 		if (Skript.classExists("com.destroystokyo.paper.event.block.BeaconEffectEvent")) {
@@ -1948,4 +1948,5 @@ public final class BukkitEventValues {
 			}, EventValues.TIME_NOW);
 		}
 	}
+
 }
