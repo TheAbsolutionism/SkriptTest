@@ -27,7 +27,7 @@ public class BrewingEventsTest extends SkriptJUnitTest {
 		setBlock(Material.BREWING_STAND);
 		brewingStand = (BrewingStand) getBlock().getState();
 		results.add(new ItemStack(Material.POTION));
-		results.add(new ItemStack(Material.OMINOUS_BOTTLE));
+		results.add(new ItemStack(Material.GLASS_BOTTLE));
 	}
 
 	@Test
