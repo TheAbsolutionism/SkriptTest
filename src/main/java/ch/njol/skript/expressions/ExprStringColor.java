@@ -32,9 +32,9 @@ import java.util.List;
 public class ExprStringColor extends PropertyExpression<String, String> {
 
 	private enum StringColor {
-		ALL("[all]", "all"),
-		FIRST("first", "first"),
-		LAST("last", "last");
+		ALL("[all [of]] [the]", "all the"),
+		FIRST("[the] first", "the first"),
+		LAST("[the] last", "the last");
 
 		private String pattern, toString;
 
@@ -49,7 +49,7 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 	static {
 		String[] patterns = new String[STRING_COLORS.length];
 		for (StringColor color : STRING_COLORS) {
-			patterns[color.ordinal()] = "[the] " + color.pattern + " string color[s] of %strings%";
+			patterns[color.ordinal()] = color.pattern + " string color[s] of %strings%";
 		}
 		Skript.registerExpression(ExprStringColor.class, String.class, ExpressionType.PROPERTY, patterns);
 	}
@@ -98,7 +98,7 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + selectedState.toString + " string colors of " + getExpr().toString(event, debug);
+		return selectedState.toString + " string colors of " + getExpr().toString(event, debug);
 	}
 
 	private List<String> getColors(String string) {
