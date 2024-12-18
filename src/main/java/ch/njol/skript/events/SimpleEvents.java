@@ -830,7 +830,7 @@ public class SimpleEvents {
 			)
 			.since("INSERT VERSION");
 
-		Skript.registerEvent("Brewing Start", SimpleEvent.class, BrewingStartEvent.class, "brewing start")
+		Skript.registerEvent("Brewing Start", SimpleEvent.class, BrewingStartEvent.class, "brew[ing] start")
 			.description("Called when a brewing stand starts brewing.")
 			.examples(
 				"on brewing start:",

@@ -32,7 +32,8 @@ import java.util.List;
 @Name("Brewing Stand Slot")
 @Description("A slot of a brewing stand, i.e. 1st, 2nd, 3rd bottle slot, fuel or ingredient slot.")
 @Examples({
-
+	"set the brewing 1st bottle slot of {_block} to potion of water",
+	"clear the brewing second bottle slot of {_block}"
 })
 @Since("INSERT VERSION")
 public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
@@ -56,8 +57,8 @@ public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 	static {
 		String[] patterns = new String[brewingSlots.length * 2];
 		for (BrewingSlot slot : brewingSlots) {
-			patterns[2 * slot.ordinal()] = "[the] " + slot.pattern + " slot[s] [of %blocks%]";
-			patterns[(2 * slot.ordinal()) + 1] = "%blocks%'[s] " + slot.pattern + " slot[s]";
+			patterns[2 * slot.ordinal()] = "[the] brewing [stand] " + slot.pattern + " slot[s] [of %blocks%]";
+			patterns[(2 * slot.ordinal()) + 1] = "%blocks%'[s] brewing [stand] " + slot.pattern + " slot[s]";
 		}
 		Skript.registerExpression(ExprBrewingSlot.class, Slot.class, ExpressionType.PROPERTY, patterns);
 	}

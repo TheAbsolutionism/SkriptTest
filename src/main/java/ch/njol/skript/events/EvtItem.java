@@ -152,12 +152,12 @@ public class EvtItem extends SkriptEvent {
 					.requiredPlugins("Paper 1.16+");
 		}
 
-		Skript.registerEvent("Brewing Complete", EvtItem.class, BrewEvent.class, "brew[ing] [complete[d]|finish[ed]] [of %-itemtypes%]")
+		Skript.registerEvent("Brewing Complete", EvtItem.class, BrewEvent.class, "brew[ed] [complete[d]|finish[ed]] [of %-itemtypes%]")
 			.description("Called when a brewing stand finishes brewing the ingredient and changes the potions.")
 			.examples(
 				"on brew:",
 					"\tbroadcast event-items",
-				"on brewing of speed potion:"
+				"on brew complete of speed potion:"
 			)
 			.since("INSERT VERSION");
 
@@ -166,7 +166,7 @@ public class EvtItem extends SkriptEvent {
 			.examples(
 				"on brewing fuel:",
 					"\tmake the brewing stand not consume fuel",
-				"on brewing fuel of netherwart:"
+				"on brewing fuel of blaze powder:"
 			)
 			.since("INSERT VERSION");
 
