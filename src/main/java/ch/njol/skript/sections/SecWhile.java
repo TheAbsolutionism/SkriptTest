@@ -31,9 +31,12 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
+import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 import org.skriptlang.skript.lang.condition.Conditional;
@@ -42,6 +45,7 @@ import org.skriptlang.skript.lang.condition.Conditional.Operator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Name("While Loop")
 @Description("While Loop sections are loops that will just keep repeating as long as a condition is met.")
@@ -79,6 +83,13 @@ public class SecWhile extends LoopSection {
 		}
 	}
 
+	public static class WhileEvent extends Event {
+		@Override
+		public @NotNull HandlerList getHandlers() {
+			throw new IllegalStateException();
+		}
+	}
+
 	private static final WhileState[] WHILE_STATES = WhileState.values();
 
 	static {
@@ -91,13 +102,13 @@ public class SecWhile extends LoopSection {
 
 
 	private @Nullable TriggerItem actualNext;
-	private @Nullable SecWhile whileNext, doNext;
-
+	private @Nullable SecWhile correspondingWhile, correspondingDo;
 	private boolean doWhile;
 	private boolean ranDoWhile = false;
 	private WhileState selectedState;
 	private boolean multiline;
 	private @UnknownNullability Conditional<Event> conditional;
+	private @Nullable Trigger trigger;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
@@ -165,8 +176,13 @@ public class SecWhile extends LoopSection {
 			conditional = Conditional.compound(selectedState == WhileState.ANY ? Operator.OR : Operator.AND, conditionals);
 		}
 
-		if (!multiline || selectedState == WhileState.DO)
-			loadCode(sectionNode);
+		if (selectedState == WhileState.DO) {
+			AtomicBoolean delayed = new AtomicBoolean(false);
+			Runnable afterLoading = () -> delayed.set(!getParser().getHasDelayBefore().isFalse());
+			trigger = loadCode(sectionNode, "while", WhileEvent.class);
+		} else {
+			loadOptionalCode(sectionNode);
+		}
 
 		return true;
 	}
@@ -175,34 +191,27 @@ public class SecWhile extends LoopSection {
 	protected @Nullable TriggerItem walk(Event event) {
 		Skript.adminBroadcast("Walk: " + selectedState);
 		if (selectedState == WhileState.DO) {
-			Skript.adminBroadcast("While Trigger: " + whileNext);
-			if (ranDoWhile) {
-				ranDoWhile = false;
-				return whileNext.walk(event);
-			} else {
-				ranDoWhile = true;
-				return walk(event);
-			}
+			return null;
 		} else if (checkConditions(event)) {
 			currentLoopCounter.put(event, currentLoopCounter.getOrDefault(event, 0L) + 1);
-			if (selectedState != WhileState.NORMAL && !ranDoWhile) {
-				if (doNext == null) {
-					doNext = (SecWhile) actualNext;
-					actualNext = doNext.getActualNext();
-					doNext.setWhileTrigger(this);
+			if (selectedState != WhileState.NORMAL) {
+				if (correspondingDo == null) {
+					correspondingDo = (SecWhile) actualNext;
+					actualNext = correspondingDo.getActualNext();
+					correspondingDo.setCorrespondingWhile(this);
 				}
-				Skript.adminBroadcast("Going to 'DO'");
-				return doNext;
-			} else {
-				ranDoWhile = true;
-				Skript.adminBroadcast("basic Ass");
-				return walk(event, true);
+				WhileEvent whileEvent = new WhileEvent();
+				Variables.withLocalVariables(event, whileEvent, () -> TriggerItem.walk(correspondingDo.getDoTrigger(), whileEvent));
 			}
+			ranDoWhile = true;
+			Skript.adminBroadcast("basic Ass");
+			return walk(event);
+		} else {
+			Skript.adminBroadcast("Stopping");
+			exit(event);
+			debug(event, false);
+			return actualNext;
 		}
-		Skript.adminBroadcast("Stopping");
-		exit(event);
-		debug(event, false);
-		return actualNext;
 
 		/*
 		if ((doWhile && !ranDoWhile) || checkConditions(event)) {
@@ -229,8 +238,12 @@ public class SecWhile extends LoopSection {
 		return this;
 	}
 
-	public void setWhileTrigger(@Nullable SecWhile next) {
-		whileNext = next;
+	public void setCorrespondingWhile(@Nullable SecWhile next) {
+		correspondingWhile = next;
+	}
+
+	public Trigger getDoTrigger() {
+		return trigger;
 	}
 
 	@Nullable
@@ -250,7 +263,8 @@ public class SecWhile extends LoopSection {
 	}
 
 	private boolean checkConditions(Event event) {
-		return conditional == null || conditional.evaluate(event).isTrue();
+		Skript.adminBroadcast("Conditionals: "  + conditional);
+		return conditional.evaluate(event).isTrue();
 	}
 
 	private static @Nullable SecWhile getPrecedingWhile(List<TriggerItem> triggerItems, @Nullable WhileState state) {
