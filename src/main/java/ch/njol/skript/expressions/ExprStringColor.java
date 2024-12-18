@@ -1,22 +1,3 @@
-/**
- * This file is part of Skript.
- *
- * Skript is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Skript is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Skript.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * Copyright Peter Güttinger, SkriptLang team and contributors
- */
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
@@ -39,7 +20,7 @@ import java.util.List;
 @Name("String Colors")
 @Description({
 	"Retrieve the first, the last, or all of the colors of a string.",
-	"NOTE: The retrieved colors will be in coloring format."
+	"NOTE: The retrieved colors of the string will be formatted with the color symbol."
 })
 @Examples("set {_colors::*} to the string colors of \"<red>hey<blue>yo\"")
 @Since("2.6")
@@ -120,7 +101,7 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 		int length = string.length();
 		for (int index = 0; index < length; index++) {
 			char section = string.charAt(index);
-			if (section == 167) {
+			if (section == '§') {
 				boolean checkHex = checkHex(string, index);
 				boolean checkChar = SkriptColor.checkChar(string.charAt(index + 1));
 				if (checkHex) {
@@ -145,7 +126,7 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 			return false;
 
 		for (int i = index + 2; i <= index; i += 2) {
-			if (string.charAt(i) != 167)
+			if (string.charAt(i) != '§')
 				return false;
 		}
 
