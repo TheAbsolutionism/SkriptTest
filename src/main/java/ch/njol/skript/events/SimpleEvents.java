@@ -33,19 +33,7 @@ import io.papermc.paper.event.player.PlayerDeepSleepEvent;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import io.papermc.paper.event.player.PlayerTradeEvent;
 import org.bukkit.event.Event;
-import org.bukkit.event.block.BlockCanBuildEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockFertilizeEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.block.SpongeAbsorbEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
@@ -839,6 +827,14 @@ public class SimpleEvents {
 					"\tbroadcast event-timespan",
 					"\tbroadcast past event-timespan",
 					"\tbroadcast xp cooldown change reason"
+			)
+			.since("INSERT VERSION");
+
+		Skript.registerEvent("Brewing Start", SimpleEvent.class, BrewingStartEvent.class, "brewing start")
+			.description("Called when a brewing stand starts brewing.")
+			.examples(
+				"on brewing start:",
+					"set the brewing time to 1"
 			)
 			.since("INSERT VERSION");
 

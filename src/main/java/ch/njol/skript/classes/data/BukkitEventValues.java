@@ -129,18 +129,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.DragType;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -2040,6 +2029,22 @@ public final class BukkitEventValues {
 				return new Timespan(Timespan.TimePeriod.TICK, event.getPlayer().getExpCooldown());
 			}
 		}, EventValues.TIME_PAST);
+
+		// BrewEvent
+		EventValues.registerEventValue(BrewEvent.class, ItemStack[].class, new Getter<>() {
+			@Override
+			public ItemStack @Nullable [] get(BrewEvent event) {
+				return event.getResults().toArray(new ItemStack[0]);
+			}
+		}, EventValues.TIME_NOW);
+
+		// BrewingStandFuelEvent
+		EventValues.registerEventValue(BrewingStandFuelEvent.class, ItemStack.class, new Getter<>() {
+			@Override
+			public ItemStack get(BrewingStandFuelEvent event) {
+				return event.getFuel();
+			}
+		}, EventValues.TIME_NOW);
 
 	}
 }
