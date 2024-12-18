@@ -24,19 +24,19 @@ public class CondItemLifetime extends Condition {
 
 	static {
 		Skript.registerCondition(CondItemLifetime.class, ConditionType.PROPERTY,
-			"[the] %itementities% (has|have) unlimited lifetime [enabled]",
-			"unlimited lifetime (is|are) enabled for %itementities%",
-			"[the] %itementities% (has|have) unlimited lifetime disabled",
-			"unlimited lifetime (is|are) disabled for %itementities%",
-			"[the] %itementities% (don't|do not|doesn't|does not) have unlimited lifetime");
+			"[the] %itementities% (has|have) (unlimited|infinite) life(time|span) [enabled]",
+			"(unlimited|infinite) life(time|span) (is|are) enabled for %itementities%",
+			"[the] %itementities% (has|have) (unlimited|infinite) life(time|span) disabled",
+			"(unlimited|infinite) life(time|span) (is|are) disabled for %itementities%",
+			"[the] %itementities% (don't|do not|doesn't|does not) have (unlimited|infinite) life(time|span)");
 	}
 
 	private Expression<Item> entities;
-	private boolean negated;
+	private boolean enabled;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		negated = matchedPattern <= 1;
+		enabled = matchedPattern <= 1;
 		//noinspection unchecked
 		entities = (Expression<Item>) exprs[0];
 		return true;
@@ -44,12 +44,12 @@ public class CondItemLifetime extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		return entities.check(event, Item::isUnlimitedLifetime, !negated);
+		return entities.check(event, Item::isUnlimitedLifetime, !enabled);
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + entities.toString(event, debug) + " have unlimited lifetime " + (negated ? "enabled" : "disabled");
+		return "the " + entities.toString(event, debug) + " have unlimited lifetime " + (enabled ? "enabled" : "disabled");
 	}
 
 }

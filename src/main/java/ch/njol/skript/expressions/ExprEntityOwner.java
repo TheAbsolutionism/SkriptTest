@@ -40,14 +40,16 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 	static {
 		Skript.registerExpression(ExprEntityOwner.class, Object.class, ExpressionType.PROPERTY,
 			"[the] (owner|tamer) of %livingentities%",
-			"[the] [[dropped] item] owner of %itementities%");
+			"[the] %livingentities%'[s] (owner|tamer)",
+			"[the] [dropped item] owner of %itementities%",
+			"[the] %itementities%'[s] [dropped item] owner");
 	}
 
 	private boolean useTameable;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		useTameable = matchedPattern == 0;
+		useTameable = matchedPattern <= 1;
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
