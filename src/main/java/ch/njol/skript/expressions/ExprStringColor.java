@@ -22,8 +22,13 @@ import java.util.List;
 	"Retrieve the first, the last, or all of the colors of a string.",
 	"NOTE: The retrieved colors of the string will be formatted with the color symbol."
 })
-@Examples("set {_colors::*} to the string colors of \"<red>hey<blue>yo\"")
-@Since("2.6")
+@Examples({
+	"set {_colors::*} to the string colors of \"<red>hey<blue>yo\"",
+	"",
+	"set {_color} to the first string color of \"&aGoodbye!\"",
+	"send \"%{_color}%Howdy!\" to all players"
+})
+@Since("INSERT VERSION")
 public class ExprStringColor extends PropertyExpression<String, String> {
 
 	private enum StringColor {
