@@ -1,22 +1,19 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.UUIDUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -27,9 +24,10 @@ import java.util.UUID;
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
 	"NOTES:",
-	"Getting the owner of a dropped item will only return an alive entity or a player that has played before. "
+	"Getting the owner of a dropped item will only return a loaded entity or a player that has played before. "
 	    + "If the entity was killed, or the player has never played before, will return null.",
-	"Setting the owner of a dropped item means only that entity or player can pick it up.",
+	"Setting the owner of a dropped item means only that entity or player can pick it up. "
+		+ "This is UUID based, so it can also be set to a specific UUID.",
 	"Dropping an item does not automatically make the entity or player the owner."
 })
 @Examples({
@@ -48,14 +46,6 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			"[the] %livingentities%'[s] (owner|tamer)",
 			"[the] [dropped item] owner of %itementities%",
 			"[the] %itementities%'[s] [dropped item] owner");
-	}
-
-	private boolean useTameable;
-
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		useTameable = matchedPattern <= 1;
-		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
@@ -80,11 +70,7 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, RESET -> {
-				if (useTameable)
-					yield CollectionUtils.array(OfflinePlayer.class);
-				yield CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class);
-			}
+			case SET, DELETE, RESET -> CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class);
 			default -> null;
 		};
 	}
@@ -97,12 +83,8 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			if (delta[0] instanceof OfflinePlayer offlinePlayer) {
 				newPlayer = offlinePlayer;
 				newId = offlinePlayer.getUniqueId();
-			} else if (delta[0] instanceof Entity entity) {
-				newId = entity.getUniqueId();
-			} else if (delta[0] instanceof String string) {
-				try {
-					newId = UUID.fromString(string);
-				} catch (Exception ignored) {}
+			} else {
+				newId = UUIDUtils.asUUID(delta[0]);
 			}
 		}
 
@@ -122,17 +104,12 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 
 	@Override
 	public Class<?>[] possibleReturnTypes() {
-		return CollectionUtils.array(Entity.class, OfflinePlayer.class, String.class);
+		return CollectionUtils.array(Entity.class, OfflinePlayer.class);
 	}
 
 	@Override
 	protected String getPropertyName() {
 		return "owner";
-	}
-	
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "owner of " + getExpr().toString(event, debug);
 	}
 	
 }

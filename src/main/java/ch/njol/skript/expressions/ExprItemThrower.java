@@ -1,5 +1,6 @@
 package ch.njol.skript.expressions;
 
+import ch.njol.skript.bukkitutil.UUIDUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -11,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,10 +22,13 @@ import java.util.UUID;
 	"The entity that threw/dropped the dropped item.",
 	"NOTES:",
 	"Getting the item thrower will only return alive entity or a player that has played before. "
-	    + "If the entity was killed, or the player has never played before, will return null.",
-	"Dropping an item does not automatically make the entity or player the owner."
+	    + "If the entity was killed, or the player has never played before, will return null."
 })
-@Examples("broadcast the item thrower of all dropped items")
+@Examples({
+	"broadcast the item thrower of all dropped items",
+	"set the dropped item thrower of {_dropped item} to player",
+	"clear the item thrower of {_dropped item}"
+})
 @Since("INSERT VERSION")
 public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 
@@ -58,21 +61,12 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		UUID newId = null;
 		if (delta != null) {
-			if (delta[0] instanceof OfflinePlayer offlinePlayer) {
-				newId = offlinePlayer.getUniqueId();
-			} else if (delta[0] instanceof Entity entity) {
-				newId = entity.getUniqueId();
-			} else if (delta[0] instanceof String string) {
-				try {
-					newId = UUID.fromString(string);
-				} catch (Exception ignored) {}
-			}
+			newId = UUIDUtils.asUUID(delta[0]);
 		}
 
 		for (Item item : getExpr().getArray(event)) {
 			item.setThrower(newId);
 		}
-
 	}
 
 	@Override
@@ -82,7 +76,7 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 
 	@Override
 	public Class<?>[] possibleReturnTypes() {
-		return CollectionUtils.array(Entity.class, OfflinePlayer.class, String.class);
+		return CollectionUtils.array(Entity.class, OfflinePlayer.class);
 	}
 
 	@Override
