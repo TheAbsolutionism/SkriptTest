@@ -9,6 +9,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,8 +38,8 @@ public class ExprEntitySnapshot extends SimplePropertyExpression<Object, EntityS
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (Player.class.isAssignableFrom(exprs[0].getReturnType())) {
-			Skript.error("You can't get a snapshot of a player.");
+		if (Player.class.isAssignableFrom(exprs[0].getReturnType()) || FishHook.class.isAssignableFrom(exprs[0].getReturnType())) {
+			Skript.error("One or more listed entities can not return an entity snapshot.");
 			return false;
 		}
 		return super.init(exprs, matchedPattern, isDelayed, parseResult);

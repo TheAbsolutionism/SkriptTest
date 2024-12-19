@@ -55,7 +55,7 @@ import java.util.function.Consumer;
 	"If you're spawning a display and want it to be empty on initialization, like not having a block display be stone, " + 
 	"set hidden config node 'spawn empty displays' to true.",
 	"",
-	"Note that when spawning an entity via entity snapshots, the code within the section will not run instantaneously as compared to spawning normally via ('a zombie')."
+	"Note that when spawning an entity via entity snapshots, the code within the section will not run instantaneously as compared to spawning normally (via 'a zombie')."
 })
 @Examples({
 	"spawn 3 creepers at the targeted block",
