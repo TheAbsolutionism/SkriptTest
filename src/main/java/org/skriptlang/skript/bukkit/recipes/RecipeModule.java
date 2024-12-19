@@ -6,17 +6,15 @@ import ch.njol.skript.classes.EnumClassInfo;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
-import ch.njol.skript.util.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.Recipe;
-import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import org.skriptlang.skript.lang.comparator.Comparator;
 import org.skriptlang.skript.lang.comparator.Comparators;
 import org.skriptlang.skript.lang.comparator.Relation;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 import java.io.IOException;
 
@@ -64,28 +62,15 @@ public class RecipeModule {
 		// --- EVENT VALUES --- //
 
 		//PrepareItemCraftEvent
-		EventValues.registerEventValue(PrepareItemCraftEvent.class, Recipe.class, new Getter<Recipe, PrepareItemCraftEvent>() {
-			@Override
-			public @Nullable Recipe get(PrepareItemCraftEvent event) {
-				return event.getRecipe();
-			}
-		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(PrepareItemCraftEvent.class, Recipe.class, PrepareItemCraftEvent::getRecipe);
 
 		//CraftItemEvent
-		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, new Getter<Recipe, CraftItemEvent>() {
-			@Override
-			public Recipe get(CraftItemEvent event) {
-				return event.getRecipe();
-			}
-		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(CraftItemEvent.class, Recipe.class, CraftItemEvent::getRecipe);
 
 		// PlayerRecipeDiscoverEvent
-		EventValues.registerEventValue(PlayerRecipeDiscoverEvent.class, Recipe.class, new Getter<Recipe, PlayerRecipeDiscoverEvent>() {
-			@Override
-			public @Nullable Recipe get(PlayerRecipeDiscoverEvent event) {
-				return Bukkit.getRecipe(event.getRecipe());
-			}
-		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(PlayerRecipeDiscoverEvent.class, Recipe.class,
+			event -> Bukkit.getRecipe(event.getRecipe())
+		);
 
 	}
 
