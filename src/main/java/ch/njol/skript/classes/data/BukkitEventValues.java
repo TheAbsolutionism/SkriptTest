@@ -16,6 +16,7 @@ import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
 import com.destroystokyo.paper.event.entity.EndermanAttackPlayerEvent;
 import com.destroystokyo.paper.event.entity.ProjectileCollideEvent;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
@@ -1920,6 +1921,11 @@ public final class BukkitEventValues {
 				return event.getFrom();
 			}
 		}, EventValues.TIME_PAST);
+
+		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent")) {
+			EventValues.registerEventValue(PlayerElytraBoostEvent.class, ItemStack.class, PlayerElytraBoostEvent::getItemStack);
+			EventValues.registerEventValue(PlayerElytraBoostEvent.class, Entity.class, PlayerElytraBoostEvent::getFirework);
+		}
 
 	}
 
