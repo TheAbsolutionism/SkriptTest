@@ -34,7 +34,7 @@ public class RegistryClassInfo<R extends Keyed> extends ClassInfo<R> {
 	 * @param registerComparator Whether a default comparator should be registered for this registry's classinfo
 	 */
 	public RegistryClassInfo(Class<R> registryClass, Registry<R> registry, String codeName, String languageNode, boolean registerComparator) {
-		this(registryClass, registry, codeName, languageNode, new EventValueExpression<>(registryClass), false);
+		this(registryClass, registry, codeName, languageNode, new EventValueExpression<>(registryClass), registerComparator);
 	}
 
 	/**
