@@ -61,8 +61,21 @@ import java.util.List;
 	"while player is online:",
 		"\tgive player 1 dirt",
 		"\twait 1 second # without using a delay effect the server will crash",
+	"",
+	"while all:",
+		"\tplayer is online",
+		"\tplayer's experience < 200",
+	"do:",
+		"\twait 1 second",
+		"\tadd 2 to player's experience",
+	"",
+	"while any:",
+		"\tplayer's tool is {_item}",
+		"\tplayer's offhand tool is {_item}",
+	"do:",
+		"\theal player by 1"
 })
-@Since("2.0, 2.6 (do while)")
+@Since("2.0, 2.6 (do while), INSERT VERSION (all, any)")
 public class SecWhile extends LoopSection {
 
 	private static final SkriptPattern DO_PATTERN = PatternCompiler.compile("do");
