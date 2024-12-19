@@ -36,7 +36,7 @@ public final class SoundUtils {
 				return ((Keyed) soundEnum).getKey();
 			} catch (IllegalArgumentException ignored) {}
 		}
-		return NamespacedUtils.getNamespacedKey(soundString.toLowerCase(Locale.ENGLISH), false, false);
+		return NamespacedUtils.getNamespacedKey(soundString.toLowerCase(Locale.ENGLISH), false);
 	}
 
 	/**
