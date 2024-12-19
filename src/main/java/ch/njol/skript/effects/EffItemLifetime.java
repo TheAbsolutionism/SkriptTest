@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
@@ -24,10 +25,8 @@ public class EffItemLifetime extends Effect {
 
 	static {
 		Skript.registerEffect(EffItemLifetime.class,
-			"prevent %itementities% from naturally despawning",
-			"prevent %itementities% from despawning naturally",
-			"allow %itementities% to naturally despawn",
-			"allow %itementities% to despawn naturally");
+			"(prevent|disallow) %itementities% from (naturally despawning|despawning naturally)",
+			"allow %itementities% to (naturally despawn|despawn naturally)");
 	}
 
 	private Expression<Item> entities;
@@ -35,7 +34,7 @@ public class EffItemLifetime extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		prevent = matchedPattern <= 1;
+		prevent = matchedPattern == 0;
 		//noinspection unchecked
 		entities = (Expression<Item>) exprs[0];
 		return true;
@@ -50,13 +49,13 @@ public class EffItemLifetime extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		String start = "prevent ";
-		String designation = "from ";
-		if (!prevent) {
-			start = "allow ";
-			designation = "to ";
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		if (prevent) {
+			builder.append("prevent", entities, "from naturally despawning");
+		} else {
+			builder.append("allow", entities, "to naturally despawn");
 		}
-		return start + entities.toString(event, debug) + designation + "naturally despawning";
+		return builder.toString();
 	}
 
 }

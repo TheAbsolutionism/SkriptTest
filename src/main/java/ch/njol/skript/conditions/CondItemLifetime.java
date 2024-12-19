@@ -24,10 +24,8 @@ public class CondItemLifetime extends Condition {
 
 	static {
 		Skript.registerCondition(CondItemLifetime.class, ConditionType.PROPERTY,
-			"%itementities% can despawn naturally",
-			"%itementities% can naturally despawn",
-			"%itementities% (can not|can't) despawn naturally",
-			"%itementities% (can not|can't) naturally despawn"
+			"%itementities% can (despawn naturally|naturally despawn)",
+			"%itementities% (can not|can't) (despawn naturally|naturally despawn)"
 		);
 	}
 
@@ -36,7 +34,7 @@ public class CondItemLifetime extends Condition {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		canDespawn = matchedPattern <= 1;
+		canDespawn = matchedPattern == 0;
 		//noinspection unchecked
 		entities = (Expression<Item>) exprs[0];
 		return true;
@@ -49,7 +47,7 @@ public class CondItemLifetime extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + entities.toString(event, debug) + (canDespawn ? " can " : " can not ") + "despawn naturally";
+		return entities.toString(event, debug) + (canDespawn ? " can " : " can not ") + "despawn naturally";
 	}
 
 }
