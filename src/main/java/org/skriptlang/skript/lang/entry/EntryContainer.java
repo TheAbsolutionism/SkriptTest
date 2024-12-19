@@ -172,19 +172,12 @@ public class EntryContainer {
 	}
 
 	/**
-	 * Check to see if an entry data with the key matching {@code key} exists.
+	 * Check to see if an entry data with the key matching {@code key} was used.
 	 * @param key The key to check
-	 * @return true if an entry data with the matching key exists
+	 * @return true if an entry data with the matching key was used.
 	 */
 	public boolean hasEntry(@NotNull String key) {
-		if (entryValidator == null || handledNodes == null)
-			return false;
-
-		for (EntryData<?> entryData : entryValidator.getEntryData()) {
-			if (entryData.getKey().equalsIgnoreCase(key))
-				return true;
-		}
-		return false;
+		return handledNodes.containsKey(key);
 	}
 
 }
