@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+/**
+ * Utility class for quick {@link UUID} methods.
+ */
 public class UUIDUtils {
 
 	/**

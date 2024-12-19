@@ -13,30 +13,29 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Unlimited Item Lifetime")
-@Description("Makes a dropped item have unlimited lifetime, meaning it won't despawn from vanilla Minecraft timer.")
+@Name("Item Despawn")
+@Description("Prevent a dropped item from naturally despawning through Minecraft's timer.")
 @Examples({
-	"enabled unlimited lifetime of all dropped items"
+	"prevent all dropped items from naturally despawning",
+	"allow all dropped items to naturally despawn"
 })
 @Since("INSERT VERSION")
 public class EffItemLifetime extends Effect {
 
 	static {
 		Skript.registerEffect(EffItemLifetime.class,
-			"enable (unlimited|infinite) life(time|span) for [the] %itementities%",
-			"make [the] life(time|span) (unlimited|infinite) for [the] %itementities%",
-			"make %itementities%'[s] life(time|span) (unlimited|infinite)",
-			"disable (unlimited|infinite) life(time|span) for [the] %itementities%",
-			"make [the] life(time|span) (limited|finite) for [the] %itementities%",
-			"make %itementities%'[s] life(time|span) (limited|finite)");
+			"prevent %itementities% from naturally despawning",
+			"prevent %itementities% from despawning naturally",
+			"allow %itementities% to naturally despawn",
+			"allow %itementities% to despawn naturally");
 	}
 
 	private Expression<Item> entities;
-	private boolean enable;
+	private boolean prevent;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enable = matchedPattern <= 2;
+		prevent = matchedPattern <= 1;
 		//noinspection unchecked
 		entities = (Expression<Item>) exprs[0];
 		return true;
@@ -45,13 +44,19 @@ public class EffItemLifetime extends Effect {
 	@Override
 	protected void execute(Event event) {
 		for (Item item : entities.getArray(event)) {
-			item.setUnlimitedLifetime(enable);
+			item.setUnlimitedLifetime(prevent);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (enable ? "enable" : "disable") + " unlimited lifetime of " + entities.toString(event, debug);
+		String start = "prevent ";
+		String designation = "from ";
+		if (!prevent) {
+			start = "allow ";
+			designation = "to ";
+		}
+		return start + entities.toString(event, debug) + designation + "naturally despawning";
 	}
 
 }

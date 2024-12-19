@@ -43,9 +43,9 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 	static {
 		Skript.registerExpression(ExprEntityOwner.class, Object.class, ExpressionType.PROPERTY,
 			"[the] (owner|tamer) of %livingentities%",
-			"[the] %livingentities%'[s] (owner|tamer)",
+			"%livingentities%'[s] (owner|tamer)",
 			"[the] [dropped item] owner of %itementities%",
-			"[the] %itementities%'[s] [dropped item] owner");
+			"%itementities%'[s] [dropped item] owner");
 	}
 
 	@Override

@@ -7,7 +7,7 @@ test "dropped item lifetime":
 	drop a stone at test-location
 	set {_drop} to last dropped item
 
-	enable unlimited lifetime for {_drop}
-	assert unlimited lifetime is enabled for {_drop} with "Unlimited Lifetime was not enabled"
+	prevent {_drop} from naturally despawning
+	assert {_drop} can not despawn naturally with "Dropped Item should not be able to despawn"
 
 	clear entity within {_drop}

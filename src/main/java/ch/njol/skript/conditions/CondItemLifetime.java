@@ -13,30 +13,30 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Item Has Unlimited Lifetime")
-@Description("Checks if the dropped item has unlimited lifetime enabled or disabled.")
+@Name("Will Despawn")
+@Description("Checks if the dropped item will be despawned naturally through Minecraft's timer.")
 @Examples({
-	"if all dropped items have unlimited lifetime disabled:",
-		"\tenable unlimited lifetime for all dropped items"
+	"if all dropped items can despawn naturally:",
+		"\tprevent all dropped items from naturally despawning"
 })
 @Since("INSERT VERSION")
 public class CondItemLifetime extends Condition {
 
 	static {
 		Skript.registerCondition(CondItemLifetime.class, ConditionType.PROPERTY,
-			"[the] %itementities% (has|have) (unlimited|infinite) life(time|span) [enabled]",
-			"(unlimited|infinite) life(time|span) (is|are) enabled for %itementities%",
-			"[the] %itementities% (has|have) (unlimited|infinite) life(time|span) disabled",
-			"(unlimited|infinite) life(time|span) (is|are) disabled for %itementities%",
-			"[the] %itementities% (don't|do not|doesn't|does not) have (unlimited|infinite) life(time|span)");
+			"%itementities% can despawn naturally",
+			"%itementities% can naturally despawn",
+			"%itementities% (can not|can't) despawn naturally",
+			"%itementities% (can not|can't) naturally despawn"
+		);
 	}
 
 	private Expression<Item> entities;
-	private boolean enabled;
+	private boolean canDespawn;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		enabled = matchedPattern <= 1;
+		canDespawn = matchedPattern <= 1;
 		//noinspection unchecked
 		entities = (Expression<Item>) exprs[0];
 		return true;
@@ -44,12 +44,12 @@ public class CondItemLifetime extends Condition {
 
 	@Override
 	public boolean check(Event event) {
-		return entities.check(event, Item::isUnlimitedLifetime, !enabled);
+		return entities.check(event, Item::isUnlimitedLifetime, canDespawn);
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + entities.toString(event, debug) + " have unlimited lifetime " + (enabled ? "enabled" : "disabled");
+		return "the " + entities.toString(event, debug) + (canDespawn ? " can " : " can not ") + "despawn naturally";
 	}
 
 }
