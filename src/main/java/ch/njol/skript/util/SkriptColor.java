@@ -251,6 +251,11 @@ public enum SkriptColor implements Color {
 		return s.replace('\u00A7', '&');
 	}
 
+	/**
+	 * Retrieve a {@link SkriptColor} correlating to the color character from {@code character}
+	 * @param character
+	 * @return The resulting {@link SkriptColor}
+	 */
 	public static @Nullable SkriptColor fromColorChar(char character) {
 		return BY_CHAR.get(character);
 	}

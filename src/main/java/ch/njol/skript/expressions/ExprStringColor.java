@@ -10,9 +10,12 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.util.ColorRGB;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -26,21 +29,19 @@ import java.util.List;
 @Examples({
 	"set {_colors::*} to the string colors of \"<red>hey<blue>yo\"",
 	"",
-	"set {_color} to the first string color of \"&aGoodbye!\"",
+	"set {_color} to the first string color code of \"&aGoodbye!\"",
 	"send \"%{_color}%Howdy!\" to all players"
 })
 @Since("INSERT VERSION")
-public class ExprStringColor extends PropertyExpression<String, String> {
+public class ExprStringColor extends PropertyExpression<String, Object> {
 
-	private enum StringColor {
-		ALL, FIRST, LAST;
-	}
+	private enum StringColor {ALL, FIRST, LAST;}
 
 	private static final StringColor[] STRING_COLORS = StringColor.values();
 
 	static {
-		Skript.registerExpression(ExprStringColor.class, String.class, ExpressionType.PROPERTY,
-			"[all [of]] [the] string color[s] [code:code[s]] of %strings%",
+		Skript.registerExpression(ExprStringColor.class, Object.class, ExpressionType.PROPERTY,
+			"[all [of the|the]|the] string color[s] [code:code[s]] of %strings%",
 			"[the] first string color[s] [code:code[s]] of %strings%",
 			"[the] last string color[s] [code:code[s]] of %strings%");
 	}
@@ -58,20 +59,25 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 	}
 
 	@Override
-	protected String @Nullable [] get(Event event, String[] source) {
-		List<String> colors = new ArrayList<>();
+	protected Object @Nullable [] get(Event event, String[] source) {
+		List<Object> colors = new ArrayList<>();
 		for (String string : getExpr().getArray(event)) {
-			List<String> stringColors = getColors(string);
+			List<Object> stringColors = getColors(string);
 			if (stringColors.isEmpty())
 				continue;
 			colors.addAll(stringColors);
 		}
-		return colors.toArray(new String[0]);
+		return colors.toArray(new Object[0]);
 	}
 
 	@Override
-	public Class<String> getReturnType() {
-		return String.class;
+	public Class<Object> getReturnType() {
+		return Object.class;
+	}
+
+	@Override
+	public Class<?>[] possibleReturnTypes() {
+		return CollectionUtils.array(String.class, SkriptColor.class, ColorRGB.class);
 	}
 
 	@Override
@@ -97,10 +103,10 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 		return builder.toString();
 	}
 
-	private List<String> getColors(String string) {
-		List<String> colors = new ArrayList<>();
+	private List<Object> getColors(String string) {
+		List<Object> colors = new ArrayList<>();
 		int length = string.length();
-		String last = null;
+		Object last = null;
 		for (int index = 0; index < length; index++) {
 			if (string.charAt(index) == '§') {
 				boolean checkHex = checkHex(string, index);
@@ -110,7 +116,13 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 					// Then the following chars of the hex, ex: ff0000 = §f§f§0§0§0§0
 					// Currently 'index' is '§' from the '§x' indicator.
 					// Adding + 14 to the substring, will get the full hex: §x§f§f§0§0§0§0
-					String result = string.substring(index, index + 14);
+					String hexString = string.substring(index, index + 14);
+					Object result;
+					if (getCodes) {
+						result = hexString;
+					} else {
+						result = fromHex(hexString);
+					}
 					last = result;
 					colors.add(result);
 					if (selectedState == StringColor.FIRST)
@@ -120,7 +132,13 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 				} else if (checkChar != null) {
 					// Character colors are vanilla colors such as §a, §b, §c etc.
 					// Currently, 'index' is '§'
-					String result = string.substring(index, index + 2);
+					String colorString = string.substring(index, index + 2);
+					Object result;
+					if (getCodes) {
+						result = colorString;
+					} else {
+						result = checkChar;
+					}
 					colors.add(result);
 					last = result;
 					if (selectedState == StringColor.FIRST)
@@ -160,6 +178,29 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 		}
 
 		return true;
+	}
+
+	public static ColorRGB fromHex(@NotNull String hex) {
+		if (hex.startsWith("§x"))
+			hex = hex.substring(2);
+		hex = hex.replaceAll("§",  "");
+
+		int length = hex.length();
+		int alpha = 255, red, green, blue;
+
+		if (length == 6) {
+			red = Integer.parseInt(hex.substring(0, 2), 16);
+			green = Integer.parseInt(hex.substring(2, 4), 16);
+			blue = Integer.parseInt(hex.substring(4, 6), 16);
+		} else if (length == 8) {
+			alpha = Integer.parseInt(hex.substring(0, 2), 16);
+			red = Integer.parseInt(hex.substring(2, 4), 16);
+			green = Integer.parseInt(hex.substring(4, 6), 16);
+			blue = Integer.parseInt(hex.substring(6, 8), 16);
+		} else {
+			throw new UnsupportedOperationException("Unsupported hex format - requires #RRGGBB or #AARRGGBB");
+		}
+		return ColorRGB.fromRGBA(red, green, blue, alpha);
 	}
 
 }
