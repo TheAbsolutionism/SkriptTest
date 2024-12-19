@@ -10,7 +10,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -23,7 +22,6 @@ import java.util.UUID;
 @Name("Entity Owner")
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
-	"NOTES:",
 	"Getting the owner of a dropped item will only return a loaded entity or a player that has played before. "
 	    + "If the entity was killed, or the player has never played before, will return null.",
 	"Setting the owner of a dropped item means only that entity or player can pick it up. "

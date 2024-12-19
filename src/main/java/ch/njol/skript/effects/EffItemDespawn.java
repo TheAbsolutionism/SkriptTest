@@ -21,10 +21,10 @@ import org.jetbrains.annotations.Nullable;
 	"allow all dropped items to naturally despawn"
 })
 @Since("INSERT VERSION")
-public class EffItemLifetime extends Effect {
+public class EffItemDespawn extends Effect {
 
 	static {
-		Skript.registerEffect(EffItemLifetime.class,
+		Skript.registerEffect(EffItemDespawn.class,
 			"(prevent|disallow) %itementities% from (naturally despawning|despawning naturally)",
 			"allow %itementities% to (naturally despawn|despawn naturally)");
 	}

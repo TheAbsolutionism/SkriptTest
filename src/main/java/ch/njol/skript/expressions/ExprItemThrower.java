@@ -19,8 +19,7 @@ import java.util.UUID;
 @Name("Item Thrower")
 @Description({
 	"The entity that threw/dropped the dropped item.",
-	"NOTES:",
-	"Getting the item thrower will only return alive entity or a player that has played before. "
+	"Getting the item thrower will only return a living entity or a player that has played before. "
 	    + "If the entity was killed, or the player has never played before, this will return null."
 })
 @Examples({
