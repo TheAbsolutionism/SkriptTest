@@ -45,15 +45,15 @@ public class ExprBrewingTime extends SimplePropertyExpression<Block, Integer> {
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		Integer providedValue = delta != null ? (Integer) delta[0] : 0;
+		int providedValue = delta != null ? (Integer) delta[0] : 0;
 		Consumer<BrewingStand> consumer = switch (mode) {
 			case ADD -> brewingStand -> {
-				Integer current = brewingStand.getBrewingTime();
+				int current = brewingStand.getBrewingTime();
 				int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
 				brewingStand.setBrewingTime(newValue);
 			};
 			case REMOVE -> brewingStand -> {
-				Integer current = brewingStand.getBrewingTime();
+				int current = brewingStand.getBrewingTime();
 				int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
 				brewingStand.setBrewingTime(newValue);
 			};

@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class ExprBrewingFuelLevel extends SimplePropertyExpression<Block, Integer> {
 
 	static {
-		registerDefault(ExprBrewingFuelLevel.class, Integer.class, "brewing [stand] fuel level", "blocks");
+		registerDefault(ExprBrewingFuelLevel.class, Integer.class, "brewing [stand] fuel (level|amount)", "blocks");
 	}
 
 	@Override
@@ -45,15 +45,15 @@ public class ExprBrewingFuelLevel extends SimplePropertyExpression<Block, Intege
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		Integer providedValue = delta != null ? (Integer) delta[0] : 0;
+		int providedValue = delta != null ? (Integer) delta[0] : 0;
 		Consumer<BrewingStand> consumer = switch (mode) {
 			case ADD -> brewingStand -> {
-				Integer current = brewingStand.getFuelLevel();
+				int current = brewingStand.getFuelLevel();
 				int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
 				brewingStand.setFuelLevel(newValue);
 			};
 			case REMOVE -> brewingStand -> {
-				Integer current = brewingStand.getFuelLevel();
+				int current = brewingStand.getFuelLevel();
 				int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
 				brewingStand.setFuelLevel(newValue);
 			};

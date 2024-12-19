@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Brewing Will Consume Fuel")
 @Description({
-	"Checks if the 'brewing fuel' event will consume the fuel.",
+	"Checks if the 'brewing fuel' event will consume fuel.",
 	"By making it not consume, it will keep the fuel item and still add fuel to the brewing stand."
 })
 @Examples({
@@ -29,7 +29,7 @@ public class CondBrewingConsume extends Condition {
 	static {
 		Skript.registerCondition(CondBrewingConsume.class,
 			"[the] brewing stand will consume [the] fuel",
-			"[the] brewing stand will not consume [the] fuel");
+			"[the] brewing stand (will not|won't) consume [the] fuel");
 	}
 
 	private boolean checkConsume;
