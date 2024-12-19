@@ -25,7 +25,7 @@ public class CondElytraBoostConsume extends Condition {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent")) {
 			Skript.registerCondition(CondElytraBoostConsume.class,
 				"[the] (boosting|used) firework will be consumed",
-				"[the] (boosting|used) firework will not be consumed");
+				"[the] (boosting|used) firework (will not|won't) be consumed");
 		}
 	}
 

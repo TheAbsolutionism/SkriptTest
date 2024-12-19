@@ -51,7 +51,7 @@ public class EffElytraBoostConsume extends Effect {
 	public String toString(@Nullable Event event, boolean debug) {
 		if (consume)
 			return "allow the boosting firework to be consumed";
-		return "prevent the boosting firework from being consume";
+		return "prevent the boosting firework from being consumed";
 	}
 
 }

@@ -25,10 +25,8 @@ public class PlayerElytraBoostEventTest extends SkriptJUnitTest {
 	@Before
 	public void setUp() {
 		player = EasyMock.niceMock(Player.class);
-		EntityType entityType = null;
-		if (EntityType.valueOf("FIREWORK") != null) {
-			entityType = EntityType.valueOf("FIREWORK");
-		} else if (EntityType.valueOf("FIREWORK_ROCKET") != null) {
+		EntityType entityType = EntityType.valueOf("FIREWORK");
+		if (entityType == null) {
 			entityType = EntityType.valueOf("FIREWORK_ROCKET");
 		}
 		assert entityType != null;
@@ -54,7 +52,7 @@ public class PlayerElytraBoostEventTest extends SkriptJUnitTest {
 		try {
 			Event event;
 			if (newerConstructor) {
-				event = (Event) constructor.newInstance(player, new ItemStack(Material.FIREWORK_ROCKET), firework,  EquipmentSlot.HAND);
+				event = (Event) constructor.newInstance(player, new ItemStack(Material.FIREWORK_ROCKET), firework, EquipmentSlot.HAND);
 			} else {
 				event = (Event) constructor.newInstance(player, new ItemStack(Material.FIREWORK_ROCKET), firework);
 			}
