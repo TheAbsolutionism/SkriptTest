@@ -9,6 +9,7 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
@@ -32,33 +33,25 @@ import java.util.List;
 public class ExprStringColor extends PropertyExpression<String, String> {
 
 	private enum StringColor {
-		ALL("[all [of]] [the]", "all the"),
-		FIRST("[the] first", "the first"),
-		LAST("[the] last", "the last");
-
-		private String pattern, toString;
-
-		StringColor(String pattern, String toString) {
-			this.pattern = pattern;
-			this.toString = toString;
-		}
+		ALL, FIRST, LAST;
 	}
 
 	private static final StringColor[] STRING_COLORS = StringColor.values();
 
 	static {
-		String[] patterns = new String[STRING_COLORS.length];
-		for (StringColor color : STRING_COLORS) {
-			patterns[color.ordinal()] = color.pattern + " string color[s] of %strings%";
-		}
-		Skript.registerExpression(ExprStringColor.class, String.class, ExpressionType.PROPERTY, patterns);
+		Skript.registerExpression(ExprStringColor.class, String.class, ExpressionType.PROPERTY,
+			"[all [of]] [the] string color[s] [code:code[s]] of %strings%",
+			"[the] first string color[s] [code:code[s]] of %strings%",
+			"[the] last string color[s] [code:code[s]] of %strings%");
 	}
 
 	private StringColor selectedState;
+	private boolean getCodes;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		selectedState = STRING_COLORS[matchedPattern];
+		getCodes = parseResult.hasTag("code");
 		//noinspection unchecked
 		setExpr((Expression<String>) exprs[0]);
 		return true;
@@ -71,16 +64,8 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 			List<String> stringColors = getColors(string);
 			if (stringColors.isEmpty())
 				continue;
-			if (selectedState == StringColor.ALL) {
-				colors.addAll(stringColors);
-			} else if (selectedState == StringColor.FIRST) {
-				colors.add(stringColors.get(0));
-			} else if (selectedState == StringColor.LAST) {
-				colors.add(stringColors.get(stringColors.size() - 1));
-			}
+			colors.addAll(stringColors);
 		}
-		if (colors.isEmpty())
-			return null;
 		return colors.toArray(new String[0]);
 	}
 
@@ -98,27 +83,56 @@ public class ExprStringColor extends PropertyExpression<String, String> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return selectedState.toString + " string colors of " + getExpr().toString(event, debug);
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append(switch (selectedState) {
+			case ALL -> "all of the";
+			case FIRST -> "the first";
+			case LAST -> "the last";
+		});
+		if (getCodes)
+			builder.append("string color codes");
+		else
+			builder.append("string colors");
+		builder.append("of", getExpr());
+		return builder.toString();
 	}
 
 	private List<String> getColors(String string) {
 		List<String> colors = new ArrayList<>();
 		int length = string.length();
+		String last = null;
 		for (int index = 0; index < length; index++) {
-			char section = string.charAt(index);
-			if (section == '§') {
+			if (string.charAt(index) == '§') {
 				boolean checkHex = checkHex(string, index);
-				boolean checkChar = SkriptColor.checkChar(string.charAt(index + 1));
+				SkriptColor checkChar = SkriptColor.fromColorChar(string.charAt(index + 1));
 				if (checkHex) {
+					// Hex colors contain 14 chars, "§x" indicating the following 12 characters will be for the hex.
+					// Then the following chars of the hex, ex: ff0000 = §f§f§0§0§0§0
+					// Currently 'index' is '§' from the '§x' indicator.
+					// Adding + 14 to the substring, will get the full hex: §x§f§f§0§0§0§0
 					String result = string.substring(index, index + 14);
+					last = result;
 					colors.add(result);
+					if (selectedState == StringColor.FIRST)
+						break;
+					// Adding 13 to the index, because it will add 1 after this cycle is done
 					index += 13;
-				} else if (checkChar) {
+				} else if (checkChar != null) {
+					// Character colors are vanilla colors such as §a, §b, §c etc.
+					// Currently, 'index' is '§'
 					String result = string.substring(index, index + 2);
 					colors.add(result);
+					last = result;
+					if (selectedState == StringColor.FIRST)
+						break;
+					// Adding 1 to the index, because it will add 1 after this cycle is done
 					index += 1;
 				}
 			}
+		}
+		if (selectedState == StringColor.LAST) {
+			colors.clear();
+			colors.add(last);
 		}
 		return colors;
 	}
