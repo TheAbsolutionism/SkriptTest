@@ -32,7 +32,7 @@ public class EnumClassInfo<T extends Enum<T>> extends ClassInfo<T> {
 	 * @param enumClass The class
 	 * @param codeName The name used in patterns
 	 * @param languageNode The language node of the type
-	 * @param registerComparator Allow a default comparator to be made
+	 * @param registerComparator Whether a default comparator should be registered for this enum's classinfo
 	 */
 	public EnumClassInfo(Class<T> enumClass, String codeName, String languageNode, boolean registerComparator) {
 		this(enumClass, codeName, languageNode, new EventValueExpression<>(enumClass), registerComparator);
@@ -53,7 +53,7 @@ public class EnumClassInfo<T extends Enum<T>> extends ClassInfo<T> {
 	 * @param codeName The name used in patterns
 	 * @param languageNode The language node of the type
 	 * @param defaultExpression The default expression of the type
-	 * @param registerComparator Allow a default comparator to be made
+	 * @param registerComparator Whether a default comparator should be registered for this enum's classinfo
 	 */
 	public EnumClassInfo(Class<T> enumClass, String codeName, String languageNode, DefaultExpression<T> defaultExpression, boolean registerComparator) {
 		super(enumClass, codeName);
