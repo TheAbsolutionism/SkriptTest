@@ -21,10 +21,8 @@ import org.jetbrains.annotations.Nullable;
 @Since("INSERT VERSION")
 public class CondElytraBoostConsume extends Condition {
 
-	private static final boolean ELYTRA_BOOST_EXISTS = Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent");
-
 	static {
-		if (ELYTRA_BOOST_EXISTS) {
+		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent")) {
 			Skript.registerCondition(CondElytraBoostConsume.class,
 				"[the] (boosting|used) firework will be consumed",
 				"[the] (boosting|used) firework will not be consumed");
@@ -36,7 +34,7 @@ public class CondElytraBoostConsume extends Condition {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!getParser().isCurrentEvent(PlayerElytraBoostEvent.class)) {
-			Skript.error("This can only be used in an 'elytra boost' event.");
+			Skript.error("This condition can only be used in an 'elytra boost' event.");
 			return false;
 		}
 		checkConsume = matchedPattern == 0;

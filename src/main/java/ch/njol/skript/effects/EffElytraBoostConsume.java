@@ -20,12 +20,10 @@ import org.jetbrains.annotations.Nullable;
 @Since("INSERT VERSION")
 public class EffElytraBoostConsume extends Effect {
 
-	private static final boolean ELYTRA_BOOST_EXISTS = Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent");
-
 	static {
-		if (ELYTRA_BOOST_EXISTS) {
+		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent")) {
 			Skript.registerEffect(EffElytraBoostConsume.class,
-				"prevent [the] (boosting|used) firework from being consumed",
+				"(prevent|disallow) [the] (boosting|used) firework from being consumed",
 				"allow [the] (boosting|used) firework to be consumed");
 		}
 	}
@@ -35,7 +33,7 @@ public class EffElytraBoostConsume extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (!getParser().isCurrentEvent(PlayerElytraBoostEvent.class)) {
-			Skript.error("This can only be used in an 'elytra boost' event.");
+			Skript.error("This effect can only be used in an 'elytra boost' event.");
 			return false;
 		}
 		consume = matchedPattern == 1;
