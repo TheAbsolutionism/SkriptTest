@@ -33,7 +33,8 @@ public class PlayerElytraBoostEventTest extends SkriptJUnitTest {
 
 	@After
 	public void cleanUp() {
-		firework.remove();
+		if (firework != null)
+			firework.remove();
 	}
 
 }
