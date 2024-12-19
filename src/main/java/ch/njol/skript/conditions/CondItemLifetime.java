@@ -1,17 +1,14 @@
 package ch.njol.skript.conditions;
 
-import ch.njol.skript.Skript;
+import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Item;
-import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
 
 @Name("Will Despawn")
 @Description("Checks if the dropped item will be despawned naturally through Minecraft's timer.")
@@ -20,13 +17,10 @@ import org.jetbrains.annotations.Nullable;
 		"\tprevent all dropped items from naturally despawning"
 })
 @Since("INSERT VERSION")
-public class CondItemLifetime extends Condition {
+public class CondItemLifetime extends PropertyCondition<Item> {
 
 	static {
-		Skript.registerCondition(CondItemLifetime.class, ConditionType.PROPERTY,
-			"%itementities% can (despawn naturally|naturally despawn)",
-			"%itementities% (can not|can't) (despawn naturally|naturally despawn)"
-		);
+		PropertyCondition.register(CondItemLifetime.class, PropertyType.CAN, "(despawn naturally|naturally despawn)", "itementities");
 	}
 
 	private Expression<Item> entities;
@@ -41,13 +35,13 @@ public class CondItemLifetime extends Condition {
 	}
 
 	@Override
-	public boolean check(Event event) {
-		return entities.check(event, Item::isUnlimitedLifetime, canDespawn);
+	public boolean check(Item item) {
+		return item.isUnlimitedLifetime();
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return entities.toString(event, debug) + (canDespawn ? " can " : " can not ") + "despawn naturally";
+	protected String getPropertyName() {
+		return "naturally despawn";
 	}
 
 }

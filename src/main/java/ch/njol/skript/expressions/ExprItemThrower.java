@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -22,7 +21,7 @@ import java.util.UUID;
 	"The entity that threw/dropped the dropped item.",
 	"NOTES:",
 	"Getting the item thrower will only return alive entity or a player that has played before. "
-	    + "If the entity was killed, or the player has never played before, will return null."
+	    + "If the entity was killed, or the player has never played before, this will return null."
 })
 @Examples({
 	"broadcast the item thrower of all dropped items",
@@ -41,13 +40,7 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 		UUID uuid = item.getThrower();
 		if (uuid == null)
 			return null;
-		Entity checkEntity = Bukkit.getEntity(uuid);
-		if (checkEntity != null)
-			return checkEntity;
-		OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
-		if (checkPlayer.hasPlayedBefore())
-			return checkPlayer;
-		return null;
+		return UUIDUtils.fromUUID(uuid, true);
 	}
 
 	@Override

@@ -56,13 +56,7 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 			UUID uuid = item.getOwner();
 			if (uuid == null)
 				return null;
-			Entity checkEntity = Bukkit.getEntity(uuid);
-			if (checkEntity != null)
-				return checkEntity;
-			OfflinePlayer checkPlayer = Bukkit.getOfflinePlayer(uuid);
-			if (checkPlayer.hasPlayedBefore())
-				return checkPlayer;
-			return null;
+			return UUIDUtils.fromUUID(uuid, true);
 		}
 		return null;
 	}
