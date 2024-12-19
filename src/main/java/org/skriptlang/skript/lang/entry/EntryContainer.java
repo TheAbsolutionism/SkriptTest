@@ -21,6 +21,7 @@ package org.skriptlang.skript.lang.entry;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.parser.ParserInstance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -168,6 +169,17 @@ public class EntryContainer {
 		parser.setNode(oldNode);
 
 		return value;
+	}
+
+	public boolean hasEntry(@NotNull String key) {
+		if (entryValidator == null || handledNodes == null)
+			return false;
+
+		for (EntryData<?> entryData : entryValidator.getEntryData()) {
+			if (entryData.getKey().equals(key))
+				return true;
+		}
+		return false;
 	}
 
 }
