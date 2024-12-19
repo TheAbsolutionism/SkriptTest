@@ -60,6 +60,16 @@ test "while all":
 	assert {_count1} is 5 with "Count 1 should be 5"
 	assert {_count2} is 0 with "Count 2 should be 0"
 
+	do while all:
+		{_count1} > 6
+		{_count2} < 0
+	do:
+		add 1 to {_count1}
+		remove 1 from {_count2}
+
+	assert {_count1} is 6 with "Count 1 should be 6"
+	assert {_count2} is -1  with "Count 2 should be -1"
+
 test "while any":
 	set {_count1} to 0
 	set {_count2} to 5
@@ -71,3 +81,13 @@ test "while any":
 		remove 1 from {_count2}
 	assert {_count1} is 6 with "Count 1 should be 6"
 	assert {_count2} is -1 with "Count 2 should be -1"
+
+	do while any:
+		{_count1} > 5
+		{_count2} < -1
+	do:
+		remove 1 from {_count1}
+		add 1 to {_count2}
+
+	assert {_count1} is 5 with "Count 1 should be 5"
+	assert {_count2} is 0 with "Count 2 should be 0"

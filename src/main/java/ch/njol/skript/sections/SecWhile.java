@@ -31,6 +31,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
+import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
@@ -47,72 +48,66 @@ import java.util.List;
 @Description("While Loop sections are loops that will just keep repeating as long as a condition is met.")
 @Examples({
 	"while size of all players < 5:",
-	"\tsend \"More players are needed to begin the adventure\" to all players",
-	"\twait 5 seconds",
+		"\tsend \"More players are needed to begin the adventure\" to all players",
+		"\twait 5 seconds",
 	"",
 	"set {_counter} to 1",
 	"do while {_counter} > 1: # false but will increase {_counter} by 1 then get out",
-	"\tadd 1 to {_counter}",
+		"\tadd 1 to {_counter}",
 	"",
 	"# Be careful when using while loops with conditions that are almost ",
 	"# always true for a long time without using 'wait %timespan%' inside it, ",
 	"# otherwise it will probably hang and crash your server.",
 	"while player is online:",
-	"\tgive player 1 dirt",
-	"\twait 1 second # without using a delay effect the server will crash",
+		"\tgive player 1 dirt",
+		"\twait 1 second # without using a delay effect the server will crash",
 })
 @Since("2.0, 2.6 (do while)")
 public class SecWhile extends LoopSection {
 
 	private static final SkriptPattern DO_PATTERN = PatternCompiler.compile("do");
 
-	private enum WhileState{
-		NORMAL("[:do] while <.+>"),
-		ALL("[:do] while all"),
-		ANY("[:do] while (any|at least one of)"),
-		DO("do");
+	private enum WhileState {NORMAL, ANY, DO}
 
-		private String pattern;
-
-		WhileState(String pattern) {
-			this.pattern = pattern;
-		}
-	}
-
-	private static final WhileState[] WHILE_STATES = WhileState.values();
+	private static final Patterns<WhileState> WHILE_STATE_PATTERNS = new Patterns<>(new Object[][] {
+		{"[:do] while <.+>", WhileState.NORMAL},
+		{"[:do] while [all]", WhileState.NORMAL},
+		{"[:do] while (any|at least one of)", WhileState.ANY},
+		{DO_PATTERN.toString(), WhileState.DO}
+	});
 
 	static {
-		String[] patterns  = new String[WHILE_STATES.length];
-		for (WhileState state : WHILE_STATES) {
-			patterns[state.ordinal()] = state.pattern;
-		}
-		Skript.registerSection(SecWhile.class, patterns);
+		Skript.registerSection(SecWhile.class, WHILE_STATE_PATTERNS.getPatterns());
 	}
 
 	private @Nullable TriggerItem actualNext;
 	private boolean doWhile;
 	private boolean ranDoWhile = false;
-	private WhileState selectedState;
+	private WhileState state;
 	private boolean multiline;
 	private @UnknownNullability Conditional<Event> conditional;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
-		selectedState = WHILE_STATES[matchedPattern];
+		state = WHILE_STATE_PATTERNS.getInfo(matchedPattern);
 		doWhile = parseResult.hasTag("do");
-		multiline = parseResult.regexes.isEmpty() && selectedState != WhileState.DO && selectedState != WhileState.NORMAL;
+		multiline = parseResult.regexes.isEmpty() && state != WhileState.DO;
 		ParserInstance parser = getParser();
 
-		String prefixError = "while " + (selectedState == WhileState.ALL ? "all" : "any");
-		if (selectedState == WhileState.DO) {
-			// This instance is the 'do' ,  so now we have to check to make sure it is following directly after a 'while all' or 'while any'
-			SecWhile precedingSecWhile = getPrecedingWhile(triggerItems, null);
-			if (precedingSecWhile == null || !precedingSecWhile.multiline) {
+		String prefixError = "while " + (state == WhileState.ANY ? "any" : "all");
+		if (state == WhileState.DO) {
+			// This instance is the 'do' , so now we have to check to make sure it is following directly after a 'while all' or 'while any'
+			SecWhile precedingSecWhile;
+			if (triggerItems.get(triggerItems.size() - 1) instanceof SecWhile preceding && preceding.multiline) {
+				precedingSecWhile = preceding;
+			} else {
 				Skript.error("'do' has to be placed just after a multiline 'while all' or 'while any' section");
 				return false;
 			}
-			// Grab the conditions that were defined in the 'while all' or 'while any' to be used in this instance
+			// Grab the conditions that were defined in the preceding SecWhile to be used in this instance
 			conditional = precedingSecWhile.getConditional();
+			// Check to see if the preceding SecWhile used "[:do]" to be used in this instance
+			doWhile = precedingSecWhile.isDoWhile();
 		} else if (multiline) {
 			// This instance is a 'while all' or 'while any'
 			// So we have to check to make sure a 'do' section is followed directly after
@@ -130,7 +125,7 @@ public class SecWhile extends LoopSection {
 			}
 		}
 
-		if (selectedState != WhileState.DO) {
+		if (state != WhileState.DO) {
 			List<Conditional<Event>> conditionals = new ArrayList<>();
 
 			if (multiline) {
@@ -157,13 +152,13 @@ public class SecWhile extends LoopSection {
 				parser.setNode(sectionNode);
 			} else {
 				String expr = parseResult.regexes.get(0).group();
-				Condition condition1 = Condition.parse(expr, parseResult.hasTag("implicit") ? null : "Can't understand this condition: '" + expr +  "'");
-				if (condition1 == null)
+				Condition condition = Condition.parse(expr, "Can't understand this condition: '" + expr +  "'");
+				if (condition == null)
 					return false;
-				conditionals.add(condition1);
+				conditionals.add(condition);
 			}
 
-			conditional = Conditional.compound(selectedState == WhileState.ANY ? Operator.OR : Operator.AND, conditionals);
+			conditional = Conditional.compound(state == WhileState.ANY ? Operator.OR : Operator.AND, conditionals);
 		}
 
 		loadOptionalCode(sectionNode);
@@ -174,7 +169,7 @@ public class SecWhile extends LoopSection {
 
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
-		if (selectedState == WhileState.ALL || selectedState == WhileState.ANY) {
+		if (multiline) {
 			// Condition checking is handled in the correlating 'do' section
 			// So we can skip this
 			return actualNext;
@@ -190,10 +185,15 @@ public class SecWhile extends LoopSection {
 	}
 
 	@Override
-	public @Nullable ExecutionIntent executionIntent() {
-		if (multiline && (selectedState == WhileState.ALL || selectedState == WhileState.ANY))
+	protected @Nullable ExecutionIntent triggerExecutionIntent() {
+		if (multiline && state != WhileState.DO)
 			return null;
-		return doWhile ? triggerExecutionIntent() : super.executionIntent();
+		return super.triggerExecutionIntent();
+	}
+
+	@Override
+	public @Nullable ExecutionIntent executionIntent() {
+		return doWhile ? triggerExecutionIntent() : null;
 	}
 
 	@Override
@@ -210,16 +210,13 @@ public class SecWhile extends LoopSection {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		switch (selectedState) {
-			case NORMAL -> {
-				if (doWhile)
-					builder.append("do");
-				builder.append("while");
-			}
-			case ALL -> builder.append("while all");
-			case ANY -> builder.append("while any");
-			case DO -> builder.append("do");
-		}
+		if (doWhile && state != WhileState.DO)
+			builder.append("do");
+		builder.append(switch (state) {
+			case NORMAL -> "while";
+			case ANY -> "while any";
+			case DO -> "do";
+		});
 		builder.append(conditional);
 		return builder.toString();
 	}
@@ -234,17 +231,8 @@ public class SecWhile extends LoopSection {
 		return conditional;
 	}
 
-	private static @Nullable SecWhile getPrecedingWhile(List<TriggerItem> triggerItems, @Nullable WhileState state) {
-		for (int i = triggerItems.size() - 1; i >= 0; i++) {
-			TriggerItem triggerItem = triggerItems.get(i);
-			if (triggerItem instanceof SecWhile precedingSecWhile) {
-				if (state == null || precedingSecWhile.selectedState == state)
-					return precedingSecWhile;
-			} else {
-				return null;
-			}
-		}
-		return null;
+	private boolean isDoWhile() {
+		return doWhile;
 	}
 
 	private @Nullable Node getNextNode(Node precedingNode, ParserInstance parser) {
