@@ -34,8 +34,6 @@ import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 import org.skriptlang.skript.lang.condition.Conditional;
@@ -78,13 +76,6 @@ public class SecWhile extends LoopSection {
 
 		WhileState(String pattern) {
 			this.pattern = pattern;
-		}
-	}
-
-	public static class WhileEvent extends Event {
-		@Override
-		public @NotNull HandlerList getHandlers() {
-			throw new IllegalStateException();
 		}
 	}
 
