@@ -41,7 +41,7 @@ public class RecipeModule {
 			.since("INSERT VERSION")
 		);
 
-		Classes.registerClass(new EnumClassInfo<>(RecipeType.class, "recipetype", "recipe types")
+		Classes.registerClass(new EnumClassInfo<>(RecipeType.class, "recipetype", "recipe types", false)
 			.user("recipe ?types?")
 			.name("Recipe Type")
 			.description("Represents the type of a recipe.")
