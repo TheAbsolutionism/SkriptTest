@@ -1,7 +1,6 @@
 package ch.njol.skript.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -22,7 +21,6 @@ import org.skriptlang.skript.lang.condition.Conditional;
 import org.skriptlang.skript.lang.condition.Conditional.Operator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Name("Conditionals")
@@ -137,7 +135,7 @@ public class SecConditional extends Section {
 		} else {
 			// if this is a multiline if, we need to check if there is a "then" section after this
 			if (multiline) {
-				boolean checkSubsiding = checkSubsidingElement(sectionNode, parser, THEN_PATTERN);
+				boolean checkSubsiding = checkFollowingElement(sectionNode, parser, THEN_PATTERN);
 				if (!checkSubsiding) {
 					Skript.error(prefixError + " has to be placed just before a 'then' section");
 					return false;
@@ -198,7 +196,7 @@ public class SecConditional extends Section {
 
 		// Get the execution intent of the entire conditional chain.
 		if (type == ConditionalType.ELSE) {
-			List<SecConditional> conditionals =  getPrecedingElements(SecConditional.class, triggerItems, secConditional -> secConditional.type != ConditionalType.ELSE);
+			List<SecConditional> conditionals = getPrecedingElements(SecConditional.class, triggerItems, secConditional -> secConditional.type != ConditionalType.ELSE);
 			conditionals.add(0, this);
 			for (SecConditional conditional : conditionals) {
 				// Continue if the current conditional doesn't have executable code (the 'if' section of a multiline).
@@ -323,82 +321,8 @@ public class SecConditional extends Section {
 		return hasDelayAfter;
 	}
 
-	/**
-	 * Gets the closest conditional section in the list of trigger items
-	 * @param triggerItems the list of items to search for the closest conditional section in
-	 * @param type the type of conditional section to find. if null is provided, any type is allowed.
-	 * @return the closest conditional section
-	 */
-	private static @Nullable SecConditional getPrecedingConditional(List<TriggerItem> triggerItems, @Nullable ConditionalType type) {
-		// loop through the triggerItems in reverse order so that we find the most recent items first
-		for (int i = triggerItems.size() - 1; i >= 0; i--) {
-			TriggerItem triggerItem = triggerItems.get(i);
-			if (triggerItem instanceof SecConditional precedingSecConditional) {
-				if (precedingSecConditional.type == ConditionalType.ELSE) {
-					// if the conditional is an else, return null because it belongs to a different condition and ends
-					// this one
-					return null;
-				} else if (type == null || precedingSecConditional.type == type) {
-					// if the conditional matches the type argument, we found our most recent preceding conditional section
-					return precedingSecConditional;
-				}
-			} else {
-				return null;
-			}
-		}
-		return null;
-	}
-
-	private static List<SecConditional> getPrecedingConditionals(List<TriggerItem> triggerItems) {
-		List<SecConditional> conditionals = new ArrayList<>();
-		// loop through the triggerItems in reverse order so that we find the most recent items first
-		for (int i = triggerItems.size() - 1; i >= 0; i--) {
-			TriggerItem triggerItem = triggerItems.get(i);
-			if (!(triggerItem instanceof SecConditional conditional))
-				break;
-			if (conditional.type == ConditionalType.ELSE)
-				// if the conditional is an else, break because it belongs to a different condition and ends
-				// this one
-				break;
-			conditionals.add(conditional);
-		}
-		return conditionals;
-	}
-
-	private static List<SecConditional> getElseIfs(List<TriggerItem> triggerItems) {
-		List<SecConditional> list = new ArrayList<>();
-		for (int i = triggerItems.size() - 1; i >= 0; i--) {
-			TriggerItem triggerItem = triggerItems.get(i);
-			if (triggerItem instanceof SecConditional precedingSecConditional && precedingSecConditional.type == ConditionalType.ELSE_IF) {
-				list.add(precedingSecConditional);
-			} else {
-				break;
-			}
-		}
-		return list;
-	}
-
 	private boolean checkConditions(Event event) {
 		return conditional == null || conditional.evaluate(event).isTrue();
-	}
-
-	private @Nullable Node getNextNode(Node precedingNode, ParserInstance parser) {
-		// iterating over the parent node causes the current node to change, so we need to store it to reset it later
-		Node originalCurrentNode = parser.getNode();
-		SectionNode parentNode = precedingNode.getParent();
-		if (parentNode == null)
-			return null;
-		Iterator<Node> parentIterator = parentNode.iterator();
-		while (parentIterator.hasNext()) {
-			Node current = parentIterator.next();
-			if (current == precedingNode) {
-				Node nextNode = parentIterator.hasNext() ? parentIterator.next() : null;
-				parser.setNode(originalCurrentNode);
-				return nextNode;
-			}
-		}
-		parser.setNode(originalCurrentNode);
-		return null;
 	}
 
 }

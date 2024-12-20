@@ -19,7 +19,6 @@
 package ch.njol.skript.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -39,7 +38,6 @@ import org.skriptlang.skript.lang.condition.Conditional;
 import org.skriptlang.skript.lang.condition.Conditional.Operator;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Name("While Loop")
@@ -122,7 +120,7 @@ public class SecWhile extends LoopSection {
 		} else if (multiline) {
 			// This instance is a 'while all' or 'while any'
 			// So we have to check to make sure a 'do' section is followed directly after
-			boolean checkSubsiding = checkSubsidingElement(sectionNode, parser, DO_PATTERN);
+			boolean checkSubsiding = checkFollowingElement(sectionNode, parser, DO_PATTERN);
 			if (!checkSubsiding) {
 				Skript.error(prefixError + " has to be placed just before a 'do' section.");
 				return false;
@@ -211,25 +209,6 @@ public class SecWhile extends LoopSection {
 	public void exit(Event event) {
 		ranDoWhile = false;
 		super.exit(event);
-	}
-
-	private @Nullable Node getNextNode(Node precedingNode, ParserInstance parser) {
-		// iterating over the parent node causes the current node to change, so we need to store it to reset it later
-		Node originalCurrentNode = parser.getNode();
-		SectionNode parentNode = precedingNode.getParent();
-		if (parentNode == null)
-			return null;
-		Iterator<Node> parentIterator = parentNode.iterator();
-		while (parentIterator.hasNext()) {
-			Node current = parentIterator.next();
-			if (current == precedingNode) {
-				Node nextNode = parentIterator.hasNext() ? parentIterator.next() : null;
-				parser.setNode(originalCurrentNode);
-				return nextNode;
-			}
-		}
-		parser.setNode(originalCurrentNode);
-		return null;
 	}
 
 }

@@ -204,10 +204,11 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Get the first element instance of {@code tClass}
-	 * @param tClass
-	 * @param triggerItems
-	 * @return
+	 * Gets the first preceding element if it's instance of {@code tClass}
+	 * Returns null if the first element is not instance of {@code tClass}
+	 * @param tClass The class of the expected element
+	 * @param triggerItems The trigger items to look through
+	 * @return The expected element
 	 * @param <T>
 	 */
 	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems) {
@@ -215,12 +216,13 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Get the first element instance of {@code tClass} that passes {@code checker}
-	 * If an element does not pass {@code checker} will return null
-	 * @param tClass
-	 * @param triggerItems
-	 * @param checker
-	 * @return
+	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}
+	 * Returns null if the first element is not instance of {@code tClass}
+	 * Returns null if the first element does not pass {@code checker}
+	 * @param tClass The class of the expected element
+	 * @param triggerItems The trigger items to look through
+	 * @param checker The {@link Checker} to return the element if it passes or if null
+	 * @return The eexpected element
 	 * @param <T>
 	 */
 	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, Checker<T> checker) {
@@ -228,22 +230,26 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Get the first element instance of {@code tClass} that passes {@code checker} and does not pass {@code forceStop}
-	 * @param tClass
-	 * @param triggerItems
-	 * @param checker
-	 * @param forceStop
-	 * @return
+	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}
+	 * Returns null if the first element is not instance of {@code tClass}
+	 * Returns expected element if {@code checker} is null, or it passes
+	 * Returns null if {@code stopper} is set and passes
+	 * @param tClass The class of the expected element
+	 * @param triggerItems The trigger items to look through
+	 * @param checker The {@link Checker} to return the element if it passes or if null
+	 * @param stopper The {@link Checker} to return null if the element passes
+	 * @return The expected element
 	 * @param <T>
 	 */
-	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker, @Nullable Checker<T> forceStop) {
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker, @Nullable Checker<T> stopper) {
+		// loop through the triggerItems in reverse order so that we find the most recent items first
 		for (int i = triggerItems.size() - 1; i >= 0; i--) {
 			TriggerItem triggerItem = triggerItems.get(i);
 			if (!tClass.isInstance(triggerItem))
 				return null;
 			//noinspection unchecked
 			T element = (T) triggerItem;
-			if (forceStop != null && forceStop.check(element))
+			if (stopper != null && stopper.check(element))
 				return null;
 			if (checker == null || checker.check(element))
 				return element;
@@ -251,12 +257,29 @@ public abstract class TriggerItem implements Debuggable {
 		return null;
 	}
 
+	/**
+	 * Gets all consecutive preceding elements that are instance of {@code tClass}
+	 * @param tclass The class of the expected elements
+	 * @param triggerItems The trigger items to look through
+	 * @return List of expected elements
+	 * @param <T>
+	 */
 	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tclass, List<TriggerItem> triggerItems) {
 		return getPrecedingElements(tclass, triggerItems, null);
 	}
 
+	/**
+	 * Gets all consecutive preceding elements that are instance of {@code tClass} and pass {@code checker}
+	 * If an element fails {@code checker} , the elements that have already passed are returned
+	 * @param tClass The class of the expected elements
+	 * @param triggerItems The trigger items to look through
+	 * @param checker The {@link Checker} to check the elements
+	 * @return List of expected elements
+	 * @param <T>
+	 */
 	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker)  {
 		List<T> elementList = new ArrayList<>();
+		// loop through the triggerItems in reverse order so that we find the most recent items first
 		for (int i = triggerItems.size() - 1; i >= 0; i--) {
 			TriggerItem triggerItem = triggerItems.get(i);
 			if (!tClass.isInstance(triggerItem))
@@ -270,8 +293,15 @@ public abstract class TriggerItem implements Debuggable {
 		return elementList;
 	}
 
-	public static boolean checkSubsidingElement(SectionNode sectionNode, ParserInstance parser, SkriptPattern pattern) {
-		return checkSubsidingElement(sectionNode, parser, node -> {
+	/**
+	 * Check if the following {@link Node} , directly after {@code sectionNode}, is instance of {@link SectionNode} and {@link Node#getKey()} matches {@code pattern}
+	 * @param sectionNode The {@link SectionNode} of the current element
+	 * @param parser A {@link ParserInstance}
+	 * @param pattern A {@link SkriptPattern} to match {@link Node#getKey()} of the following {@link Node}
+	 * @return true if the following {@link Node} is a {@link SectionNode} and {@link Node#getKey()} matches {@code pattern}
+	 */
+	public static boolean checkFollowingElement(SectionNode sectionNode, ParserInstance parser, SkriptPattern pattern) {
+		return checkFollowingElement(sectionNode, parser, node -> {
 			if (!(node instanceof SectionNode) || node.getKey() == null)
 				return false;
 			String nextKey = ScriptLoader.replaceOptions(node.getKey());
@@ -281,7 +311,15 @@ public abstract class TriggerItem implements Debuggable {
 		});
 	}
 
-	public static boolean checkSubsidingElement(SectionNode sectionNode, ParserInstance parser, Checker<Node> checker) {
+	/**
+	 * Check if the following {@link Node} , directly after {@code sectionNode} exists and passes {@code checker}
+	 * @param sectionNode The {@link SectionNode} of the current element
+	 * @param parser A {@link ParserInstance}
+	 * @param checker The {@link Checker} to check the {@link Node}
+	 * @return true if the following {@link Node} passes {@code checker}
+	 */
+	public static boolean checkFollowingElement(SectionNode sectionNode, ParserInstance parser, Checker<Node> checker) {
+		// iterating over the parent node causes the current node to change, so we need to store it to reset it later
 		Node originalNode = parser.getNode();
 		SectionNode parentNode = sectionNode.getParent();
 		if (parentNode == null)
@@ -301,6 +339,14 @@ public abstract class TriggerItem implements Debuggable {
 		return checker.check(nextNode);
 	}
 
+	/**
+	 * Parse a multiline condition to ensure the conditions are valid
+	 * Returns null if any of the conditions fail to parse
+	 * @param sectionNode The {@link SectionNode} of the current element and houses the conditions
+	 * @param parser A {@link ParserInstance}
+	 * @param sectionType String displaying the section type to be used within {@link Skript#error(String)} if conditions fail to parse
+	 * @return {@link List} of the successfully parsed {@link Conditional<Event>}
+	 */
 	public static @Nullable List<Conditional<Event>> parseMultiline(SectionNode sectionNode, ParserInstance parser, String sectionType)  {
 		List<Conditional<Event>> conditionals = new ArrayList<>();
 		int nodeCount = Iterables.size(sectionNode);
