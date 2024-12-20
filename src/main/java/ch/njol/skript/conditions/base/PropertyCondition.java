@@ -109,23 +109,23 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		switch (propertyType) {
 			case BE:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-					"%" + type + "% (is|are) " + property,
-					"%" + type + "% (isn't|is not|aren't|are not) " + property);
+						"%" + type + "% (is|are) " + property,
+						"%" + type + "% (isn't|is not|aren't|are not) " + property);
 				break;
 			case CAN:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-					"%" + type + "% can " + property,
-					"%" + type + "% (can't|cannot|can not) " + property);
+						"%" + type + "% can " + property,
+						"%" + type + "% (can't|cannot|can not) " + property);
 				break;
 			case HAVE:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-					"%" + type + "% (has|have) " + property,
-					"%" + type + "% (doesn't|does not|do not|don't) have " + property);
+						"%" + type + "% (has|have) " + property,
+						"%" + type + "% (doesn't|does not|do not|don't) have " + property);
 				break;
 			case WILL:
 				Skript.registerCondition(condition,
-					"%" + type + "% will " + property,
-					"%" + type + "% (will (not|neither)|won't) " + property);
+						"%" + type + "% will " + property,
+						"%" + type + "% (will (not|neither)|won't) " + property);
 				break;
 			default:
 				assert false;
