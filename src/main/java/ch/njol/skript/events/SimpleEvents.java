@@ -794,7 +794,11 @@ public class SimpleEvents {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerElytraBoostEvent")) {
 			Skript.registerEvent("Elytra Boost", SimpleEvent.class, PlayerElytraBoostEvent.class, "elytra boost")
 				.description("Called when a player uses a firework to boost their fly speed when flying with an elytra.")
-				.examples("on elytra boost:")
+				.examples(
+					"on elytra boost:",
+						"\tif the used firework will be consumed:",
+							"\t\tprevent the used firework from being consume"
+				)
 				.requiredPlugins("Paper")
 				.since("INSERT VERSION");
 		}

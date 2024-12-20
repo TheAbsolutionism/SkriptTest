@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
 @Description("Prevent the firework used in an 'elytra boost' event to be consumed.")
 @Examples({
 	"on elytra boost:",
-		"prevent the boosting firework from being consumed"
+		"\tif the used firework will be consumed:",
+			"\t\tprevent the used firework from being consume"
 })
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
