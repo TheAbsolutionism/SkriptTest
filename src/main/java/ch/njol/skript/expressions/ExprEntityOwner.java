@@ -23,7 +23,7 @@ import java.util.UUID;
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
 	"Getting the owner of a dropped item will only return a loaded entity or a player that has played before. "
-	    + "If the entity was killed, or the player has never played before, will return null.",
+		+ "If the entity was killed, or the player has never played before, will return null.",
 	"Setting the owner of a dropped item means only that entity or player can pick it up. "
 		+ "This is UUID based, so it can also be set to a specific UUID.",
 	"Dropping an item does not automatically make the entity or player the owner."

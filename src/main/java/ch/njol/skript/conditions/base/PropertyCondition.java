@@ -18,7 +18,6 @@
  */
 package ch.njol.skript.conditions.base;
 
-import ch.njol.skript.lang.SyntaxStringBuilder;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,29 +107,28 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 			throw new SkriptAPIException("The type argument must not contain any '%'s");
 
 		switch (propertyType) {
-			case BE -> {
+			case BE:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
 					"%" + type + "% (is|are) " + property,
 					"%" + type + "% (isn't|is not|aren't|are not) " + property);
-			}
-			case CAN -> {
+				break;
+			case CAN:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
 					"%" + type + "% can " + property,
 					"%" + type + "% (can't|cannot|can not) " + property);
-			}
-			case HAVE -> {
+				break;
+			case HAVE:
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
 					"%" + type + "% (has|have) " + property,
 					"%" + type + "% (doesn't|does not|do not|don't) have " + property);
-			}
-			case WILL -> {
+				break;
+			case WILL:
 				Skript.registerCondition(condition,
 					"%" + type + "% will " + property,
 					"%" + type + "% (will (not|neither)|won't) " + property);
-			}
-			default -> {
+				break;
+			default:
 				assert false;
-			}
 		}
 	}
 
@@ -170,27 +168,25 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		return toString(this, getPropertyType(), event, debug, expr, getPropertyName());
 	}
 
-	public static String toString(Condition condition, PropertyType propertyType, @Nullable Event event, boolean debug, Expression<?> expr, String property) {
-		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append(expr);
-		builder.append(switch (propertyType) {
-			case BE -> (expr.isSingle() ? "is " : "are ") + (condition.isNegated() ? "not" : "");
-			case CAN -> (condition.isNegated() ? "can't" : "can");
-			case HAVE -> {
+	public static String toString(Condition condition, PropertyType propertyType, @Nullable Event event,
+								  boolean debug, Expression<?> expr, String property) {
+		switch (propertyType) {
+			case BE:
+				return expr.toString(event, debug) + (expr.isSingle() ? " is " : " are ") + (condition.isNegated() ? "not " : "") + property;
+			case CAN:
+				return expr.toString(event, debug) + (condition.isNegated() ? " can't " : " can ") + property;
+			case HAVE:
 				if (expr.isSingle()) {
-					yield (condition.isNegated() ? "doesn't have" : "has");
+					return expr.toString(event, debug) + (condition.isNegated() ? " doesn't have " : " has ") + property;
 				} else {
-					yield (condition.isNegated() ? "don't have" : "have");
+					return expr.toString(event, debug) + (condition.isNegated() ? " don't have " : " have ") + property;
 				}
-			}
-			case WILL -> (condition.isNegated() ? "won't " : "will ") + "be";
-			default -> {
+			case WILL:
+				return expr.toString(event, debug) + (condition.isNegated() ? " won't " : " will ") + "be " + property;
+			default:
 				assert false;
-				yield null;
-			}
-		});
-		builder.append(property);
-		return builder.toString();
+				return null;
+		}
 	}
 
 }

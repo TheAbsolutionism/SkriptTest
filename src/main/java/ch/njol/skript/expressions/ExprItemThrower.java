@@ -20,7 +20,7 @@ import java.util.UUID;
 @Description({
 	"The entity that threw/dropped the dropped item.",
 	"Getting the item thrower will only return a living entity or a player that has played before. "
-	    + "If the entity was killed, or the player has never played before, this will return null."
+		+ "If the entity was killed, or the player has never played before, this will return null."
 })
 @Examples({
 	"broadcast the item thrower of all dropped items",
