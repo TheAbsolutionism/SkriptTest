@@ -26,6 +26,7 @@ public class EffItemDespawn extends Effect {
 	static {
 		Skript.registerEffect(EffItemDespawn.class,
 			"(prevent|disallow) %itementities% from (naturally despawning|despawning naturally)",
+			"allow natural despawning of %itementities%",
 			"allow %itementities% to (naturally despawn|despawn naturally)");
 	}
 

@@ -18,6 +18,7 @@
  */
 package ch.njol.skript.conditions.base;
 
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,7 +81,13 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		 * Indicates that the condition is in a form of <code>something will/be something</code>,
 		 * also possibly in the negated form
 		 */
-		WILL
+		WILL,
+
+		/**
+		 * Indicates that the condition is in a multiform of <code>something will/be something</code> and <code>something can something</code>
+		 * also possibly in the negated form
+		 */
+		CAN_WILL
 	}
 
 	private Expression<? extends T> expr;
@@ -107,28 +114,34 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 			throw new SkriptAPIException("The type argument must not contain any '%'s");
 
 		switch (propertyType) {
-			case BE:
+			case BE -> {
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-						"%" + type + "% (is|are) " + property,
-						"%" + type + "% (isn't|is not|aren't|are not) " + property);
-				break;
-			case CAN:
+					"%" + type + "% (is|are) " + property,
+					"%" + type + "% (isn't|is not|aren't|are not) " + property);
+			}
+			case CAN -> {
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-						"%" + type + "% can " + property,
-						"%" + type + "% (can't|cannot|can not) " + property);
-				break;
-			case HAVE:
+					"%" + type + "% can " + property,
+					"%" + type + "% (can't|cannot|can not) " + property);
+			}
+			case HAVE -> {
 				Skript.registerCondition(condition, ConditionType.PROPERTY,
-						"%" + type + "% (has|have) " + property,
-						"%" + type + "% (doesn't|does not|do not|don't) have " + property);
-				break;
-			case WILL:
+					"%" + type + "% (has|have) " + property,
+					"%" + type + "% (doesn't|does not|do not|don't) have " + property);
+			}
+			case WILL -> {
 				Skript.registerCondition(condition,
-						"%" + type + "% will " + property,
-						"%" + type + "% (will (not|neither)|won't) " + property);
-				break;
-			default:
+					"%" + type + "% will " + property,
+					"%" + type + "% (will (not|neither)|won't) " + property);
+			}
+			case CAN_WILL -> {
+				Skript.registerCondition(condition,
+					"%" + type + "% (will|can) " + property,
+					"%" + type + "% (will (not|neither)|won't|can not|can't) "  + property);
+			}
+			default -> {
 				assert false;
+			}
 		}
 	}
 
@@ -168,25 +181,27 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		return toString(this, getPropertyType(), event, debug, expr, getPropertyName());
 	}
 
-	public static String toString(Condition condition, PropertyType propertyType, @Nullable Event event,
-								  boolean debug, Expression<?> expr, String property) {
-		switch (propertyType) {
-			case BE:
-				return expr.toString(event, debug) + (expr.isSingle() ? " is " : " are ") + (condition.isNegated() ? "not " : "") + property;
-			case CAN:
-				return expr.toString(event, debug) + (condition.isNegated() ? " can't " : " can ") + property;
-			case HAVE:
+	public static String toString(Condition condition, PropertyType propertyType, @Nullable Event event, boolean debug, Expression<?> expr, String property) {
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append(expr);
+		builder.append(switch (propertyType) {
+			case BE -> (expr.isSingle() ? "is " : "are ") + (condition.isNegated() ? "not" : "");
+			case CAN -> (condition.isNegated() ? "can't" : "can");
+			case HAVE -> {
 				if (expr.isSingle()) {
-					return expr.toString(event, debug) + (condition.isNegated() ? " doesn't have " : " has ") + property;
+					yield (condition.isNegated() ? "doesn't have" : "has");
 				} else {
-					return expr.toString(event, debug) + (condition.isNegated() ? " don't have " : " have ") + property;
+					yield (condition.isNegated() ? "don't have" : "have");
 				}
-			case WILL:
-				return expr.toString(event, debug) + (condition.isNegated() ? " won't " : " will ") + "be " + property;
-			default:
+			}
+			case WILL, CAN_WILL -> (condition.isNegated() ? "won't " : "will ") + "be";
+			default -> {
 				assert false;
-				return null;
-		}
+				yield null;
+			}
+		});
+		builder.append(property);
+		return builder.toString();
 	}
 
 }
