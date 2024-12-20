@@ -18,7 +18,6 @@
  */
 package ch.njol.skript.sections;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
@@ -33,7 +32,6 @@ import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
-import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -80,7 +78,9 @@ public class SecWhile extends LoopSection {
 
 	private static final SkriptPattern DO_PATTERN = PatternCompiler.compile("do");
 
-	private enum WhileState {NORMAL, ANY, DO}
+	private enum WhileState {
+		NORMAL, ANY, DO
+	}
 
 	private static final Patterns<WhileState> WHILE_STATE_PATTERNS = new Patterns<>(new Object[][] {
 		{"[:do] while <.+>", WhileState.NORMAL},
@@ -104,36 +104,27 @@ public class SecWhile extends LoopSection {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
 		state = WHILE_STATE_PATTERNS.getInfo(matchedPattern);
 		doWhile = parseResult.hasTag("do");
-		multiline = parseResult.regexes.isEmpty() && state != WhileState.DO;
+		multiline = matchedPattern == 1 || matchedPattern == 2;
 		ParserInstance parser = getParser();
 
 		String prefixError = "while " + (state == WhileState.ANY ? "any" : "all");
 		if (state == WhileState.DO) {
 			// This instance is the 'do' , so now we have to check to make sure it is following directly after a 'while all' or 'while any'
-			SecWhile precedingSecWhile;
-			if (triggerItems.get(triggerItems.size() - 1) instanceof SecWhile preceding && preceding.multiline) {
-				precedingSecWhile = preceding;
-			} else {
+			SecWhile precedingSecWhile = getPrecedingElement(SecWhile.class, triggerItems, secWhile -> secWhile.multiline);
+			if (precedingSecWhile == null) {
 				Skript.error("'do' has to be placed just after a multiline 'while all' or 'while any' section");
 				return false;
 			}
 			// Grab the conditions that were defined in the preceding SecWhile to be used in this instance
-			conditional = precedingSecWhile.getConditional();
+			conditional = precedingSecWhile.conditional;
 			// Check to see if the preceding SecWhile used "[:do]" to be used in this instance
-			doWhile = precedingSecWhile.isDoWhile();
+			doWhile = precedingSecWhile.doWhile;
 		} else if (multiline) {
 			// This instance is a 'while all' or 'while any'
 			// So we have to check to make sure a 'do' section is followed directly after
-			Node nextNode = getNextNode(sectionNode, parser);
-			String error = prefixError + " has to be placed just before a 'do' section.";
-			if (nextNode instanceof SectionNode && nextNode.getKey() != null) {
-				String nextKey = ScriptLoader.replaceOptions(nextNode.getKey());
-				if (DO_PATTERN.match(nextKey) == null) {
-					Skript.error(error);
-					return false;
-				}
-			} else {
-				Skript.error(error);
+			boolean checkSubsiding = checkSubsidingElement(sectionNode, parser, DO_PATTERN);
+			if (!checkSubsiding) {
+				Skript.error(prefixError + " has to be placed just before a 'do' section.");
 				return false;
 			}
 		}
@@ -142,27 +133,9 @@ public class SecWhile extends LoopSection {
 			List<Conditional<Event>> conditionals = new ArrayList<>();
 
 			if (multiline) {
-				int nonEmptyNodeCount = Iterables.size(sectionNode);
-				if (nonEmptyNodeCount < 2) {
-					Skript.error(prefixError + " sections must contain at least two conditions.");
+				conditionals = parseMultiline(sectionNode, parser, prefixError);
+				if (conditionals == null)
 					return false;
-				}
-				for (Node childNode : sectionNode) {
-					if (childNode instanceof SectionNode) {
-						Skript.error(prefixError + " sections may not contain other sections.");
-						return false;
-					}
-					String childKey = childNode.getKey();
-					if (childKey == null)
-						continue;
-					childKey = ScriptLoader.replaceOptions(childKey);
-					parser.setNode(childNode);
-					Condition condition1 = Condition.parse(childKey, "Can't understand the condition: '" + childKey + "'");
-					if (condition1 == null)
-						return false;
-					conditionals.add(condition1);
-				}
-				parser.setNode(sectionNode);
 			} else {
 				String expr = parseResult.regexes.get(0).group();
 				Condition condition = Condition.parse(expr, "Can't understand this condition: '" + expr +  "'");
@@ -238,14 +211,6 @@ public class SecWhile extends LoopSection {
 	public void exit(Event event) {
 		ranDoWhile = false;
 		super.exit(event);
-	}
-
-	private Conditional<Event> getConditional() {
-		return conditional;
-	}
-
-	private boolean isDoWhile() {
-		return doWhile;
 	}
 
 	private @Nullable Node getNextNode(Node precedingNode, ParserInstance parser) {

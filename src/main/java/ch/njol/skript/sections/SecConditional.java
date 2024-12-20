@@ -1,6 +1,5 @@
 package ch.njol.skript.sections;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
@@ -16,7 +15,6 @@ import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
-import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -99,6 +97,7 @@ public class SecConditional extends Section {
 		multiline = parseResult.regexes.isEmpty() && type != ConditionalType.ELSE;
 		ParserInstance parser = getParser();
 
+		String prefixError = ifAny ? "'if any'" : "'if all'";
 		// ensure this conditional is chained correctly (e.g. an else must have an if)
 		if (type != ConditionalType.IF) {
 			if (type == ConditionalType.THEN) {
@@ -110,14 +109,20 @@ public class SecConditional extends Section {
 				 *  then: # this shouldn't be possible
 				 *    set {_uh oh} to true
 				 */
-				SecConditional precedingConditional = getPrecedingConditional(triggerItems, null);
-				if (precedingConditional == null || !precedingConditional.multiline) {
+				SecConditional precedingConditional = getPrecedingElement(SecConditional.class, triggerItems,
+					secConditional -> secConditional.multiline,
+					secConditional -> secConditional.type == ConditionalType.ELSE
+				);
+				if (precedingConditional == null) {
 					Skript.error("'then' has to placed just after a multiline 'if' or 'else if' section");
 					return false;
 				}
 			} else {
 				// find the latest 'if' section so that we can ensure this section is placed properly (e.g. ensure a 'if' occurs before an 'else')
-				SecConditional precedingIf = getPrecedingConditional(triggerItems, ConditionalType.IF);
+				SecConditional precedingIf = getPrecedingElement(SecConditional.class, triggerItems,
+					secConditional -> secConditional.type == ConditionalType.IF,
+					secConditional -> secConditional.type == ConditionalType.ELSE
+				);
 				if (precedingIf == null) {
 					if (type == ConditionalType.ELSE_IF) {
 						Skript.error("'else if' has to be placed just after another 'if' or 'else if' section");
@@ -132,16 +137,9 @@ public class SecConditional extends Section {
 		} else {
 			// if this is a multiline if, we need to check if there is a "then" section after this
 			if (multiline) {
-				Node nextNode = getNextNode(sectionNode, parser);
-				String error = (ifAny ? "'if any'" : "'if all'") + " has to be placed just before a 'then' section";
-				if (nextNode instanceof SectionNode && nextNode.getKey() != null) {
-					String nextNodeKey = ScriptLoader.replaceOptions(nextNode.getKey());
-					if (THEN_PATTERN.match(nextNodeKey) == null) {
-						Skript.error(error);
-						return false;
-					}
-				} else {
-					Skript.error(error);
+				boolean checkSubsiding = checkSubsidingElement(sectionNode, parser, THEN_PATTERN);
+				if (!checkSubsiding) {
+					Skript.error(prefixError + " has to be placed just before a 'then' section");
 					return false;
 				}
 			}
@@ -163,29 +161,9 @@ public class SecConditional extends Section {
 
 			// if this is a multiline "if", we have to parse each line as its own condition
 			if (multiline) {
-				// we have to get the size of the iterator here as SectionNode#size includes empty/void nodes
-				int nonEmptyNodeCount = Iterables.size(sectionNode);
-				if (nonEmptyNodeCount < 2) {
-					Skript.error((ifAny ? "'if any'" : "'if all'") + " sections must contain at least two conditions");
+				conditionals = parseMultiline(sectionNode, parser, prefixError);
+				if (conditionals == null)
 					return false;
-				}
-				for (Node childNode : sectionNode) {
-					if (childNode instanceof SectionNode) {
-						Skript.error((ifAny ? "'if any'" : "'if all'") + " sections may not contain other sections");
-						return false;
-					}
-					String childKey = childNode.getKey();
-					if (childKey != null) {
-						childKey = ScriptLoader.replaceOptions(childKey);
-						parser.setNode(childNode);
-						Condition condition = Condition.parse(childKey, "Can't understand this condition: '" + childKey + "'");
-						// if this condition was invalid, don't bother parsing the rest
-						if (condition == null)
-							return false;
-						conditionals.add(condition);
-					}
-				}
-				parser.setNode(sectionNode);
 			} else {
 				// otherwise, this is just a simple single line "if", with the condition on the same line
 				String expr = parseResult.regexes.get(0).group();
@@ -220,7 +198,7 @@ public class SecConditional extends Section {
 
 		// Get the execution intent of the entire conditional chain.
 		if (type == ConditionalType.ELSE) {
-			List<SecConditional> conditionals = getPrecedingConditionals(triggerItems);
+			List<SecConditional> conditionals =  getPrecedingElements(SecConditional.class, triggerItems, secConditional -> secConditional.type != ConditionalType.ELSE);
 			conditionals.add(0, this);
 			for (SecConditional conditional : conditionals) {
 				// Continue if the current conditional doesn't have executable code (the 'if' section of a multiline).
@@ -252,12 +230,16 @@ public class SecConditional extends Section {
 			return true;
 
 		if (type == ConditionalType.ELSE) {
-			SecConditional precedingIf = getPrecedingConditional(triggerItems, ConditionalType.IF);
+			SecConditional precedingIf = getPrecedingElement(SecConditional.class, triggerItems,
+				secConditional -> secConditional.type == ConditionalType.IF,
+				secConditional -> secConditional.type == ConditionalType.ELSE
+			);
 			assert precedingIf != null; // at this point, we've validated the section so this can't be null
 			// In an else section, ...
 			if (hasDelayAfter.isTrue()
 					&& precedingIf.hasDelayAfter.isTrue()
-					&& getElseIfs(triggerItems).stream().map(SecConditional::getHasDelayAfter).allMatch(Kleenean::isTrue)) {
+					&& getPrecedingElements(SecConditional.class, triggerItems, secConditional -> secConditional.type == ConditionalType.ELSE_IF)
+							.stream().map(SecConditional::getHasDelayAfter).allMatch(Kleenean::isTrue)) {
 				// ... if the if section, all else-if sections and the else section have definite delays,
 				//  mark delayed as TRUE.
 				parser.setHasDelayBefore(Kleenean.TRUE);

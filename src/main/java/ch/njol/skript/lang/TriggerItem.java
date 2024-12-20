@@ -18,14 +18,25 @@
  */
 package ch.njol.skript.lang;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
+import ch.njol.skript.config.Node;
+import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.parser.ParserInstance;
+import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.util.SkriptColor;
+import ch.njol.util.Checker;
 import ch.njol.util.StringUtils;
+import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.condition.Conditional;
 import org.skriptlang.skript.lang.script.Script;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents a trigger item, i.e. a trigger section, a condition or an effect.
@@ -190,6 +201,132 @@ public abstract class TriggerItem implements Debuggable {
 	 */
 	public @Nullable TriggerItem getActualNext() {
 		return next;
+	}
+
+	/**
+	 * Get the first element instance of {@code tClass}
+	 * @param tClass
+	 * @param triggerItems
+	 * @return
+	 * @param <T>
+	 */
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems) {
+		return getPrecedingElement(tClass, triggerItems, null, null);
+	}
+
+	/**
+	 * Get the first element instance of {@code tClass} that passes {@code checker}
+	 * If an element does not pass {@code checker} will return null
+	 * @param tClass
+	 * @param triggerItems
+	 * @param checker
+	 * @return
+	 * @param <T>
+	 */
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, Checker<T> checker) {
+		return getPrecedingElement(tClass, triggerItems, checker, o -> !checker.check(o));
+	}
+
+	/**
+	 * Get the first element instance of {@code tClass} that passes {@code checker} and does not pass {@code forceStop}
+	 * @param tClass
+	 * @param triggerItems
+	 * @param checker
+	 * @param forceStop
+	 * @return
+	 * @param <T>
+	 */
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker, @Nullable Checker<T> forceStop) {
+		for (int i = triggerItems.size() - 1; i >= 0; i--) {
+			TriggerItem triggerItem = triggerItems.get(i);
+			if (!tClass.isInstance(triggerItem))
+				return null;
+			//noinspection unchecked
+			T element = (T) triggerItem;
+			if (forceStop != null && forceStop.check(element))
+				return null;
+			if (checker == null || checker.check(element))
+				return element;
+		}
+		return null;
+	}
+
+	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tclass, List<TriggerItem> triggerItems) {
+		return getPrecedingElements(tclass, triggerItems, null);
+	}
+
+	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker)  {
+		List<T> elementList = new ArrayList<>();
+		for (int i = triggerItems.size() - 1; i >= 0; i--) {
+			TriggerItem triggerItem = triggerItems.get(i);
+			if (!tClass.isInstance(triggerItem))
+				break;
+			//noinspection unchecked
+			T element = (T) triggerItem;
+			if (checker != null && !checker.check(element))
+				break;
+			elementList.add(element);
+		}
+		return elementList;
+	}
+
+	public static boolean checkSubsidingElement(SectionNode sectionNode, ParserInstance parser, SkriptPattern pattern) {
+		return checkSubsidingElement(sectionNode, parser, node -> {
+			if (!(node instanceof SectionNode) || node.getKey() == null)
+				return false;
+			String nextKey = ScriptLoader.replaceOptions(node.getKey());
+			if (pattern.match(nextKey) == null)
+				return false;
+			return true;
+		});
+	}
+
+	public static boolean checkSubsidingElement(SectionNode sectionNode, ParserInstance parser, Checker<Node> checker) {
+		Node originalNode = parser.getNode();
+		SectionNode parentNode = sectionNode.getParent();
+		if (parentNode == null)
+			return false;
+		Iterator<Node> nodeIterator = parentNode.iterator();
+		Node nextNode = null;
+		while (nodeIterator.hasNext()) {
+			Node current = nodeIterator.next();
+			if (current == sectionNode) {
+				nextNode = nodeIterator.hasNext() ? nodeIterator.next() : null;
+				break;
+			}
+		}
+		parser.setNode(originalNode);
+		if (nextNode == null)
+			return false;
+		return checker.check(nextNode);
+	}
+
+	public static @Nullable List<Conditional<Event>> parseMultiline(SectionNode sectionNode, ParserInstance parser, String sectionType)  {
+		List<Conditional<Event>> conditionals = new ArrayList<>();
+		int nodeCount = Iterables.size(sectionNode);
+		// we have to get the size of the iterator here as SectionNode#size includes empty/void nodes
+		if (nodeCount < 2) {
+			Skript.error(sectionType + " sections must contain atleast two conditions.");
+			return null;
+		}
+		for (Node childNode : sectionNode) {
+			if (childNode instanceof SectionNode) {
+				Skript.error(sectionType + " section may not contain other sections.");
+				return null;
+			}
+			String childKey = childNode.getKey();
+			if (childKey == null)
+				continue;
+			childKey = ScriptLoader.replaceOptions(childKey);
+			parser.setNode(childNode);
+			Condition condition = Condition.parse(childKey, "Can't understand this condition: '" + childKey + "'");
+			// if this condition was invalid, don't bother parsing the rest
+			if (condition == null)
+				return null;
+			conditionals.add(condition);
+		}
+		parser.setNode(sectionNode);
+		return conditionals;
 	}
 
 }
