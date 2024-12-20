@@ -11,7 +11,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Consume Boosting Firework")
-@Description("Prevent the used firework used in an 'elytra boost' event to be consumed.")
+@Description("Prevent the firework used in an 'elytra boost' event to be consumed.")
 @Examples({
 	"on elytra boost:",
 		"prevent the boosting firework from being consumed"
