@@ -17,7 +17,8 @@ import org.bukkit.entity.Item;
 public class CondItemDespawn extends PropertyCondition<Item> {
 
 	static {
-		PropertyCondition.register(CondItemDespawn.class, PropertyType.CAN_WILL, "(despawn naturally|naturally despawn)", "itementities");
+		PropertyCondition.register(CondItemDespawn.class, PropertyType.WILL, "(despawn naturally|naturally despawn)", "itementities");
+		PropertyCondition.register(CondItemDespawn.class, PropertyType.CAN, "(despawn naturally|naturally despawn)", "itementities");
 	}
 
 	@Override

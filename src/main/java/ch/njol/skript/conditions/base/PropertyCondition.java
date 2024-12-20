@@ -81,13 +81,7 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 		 * Indicates that the condition is in a form of <code>something will/be something</code>,
 		 * also possibly in the negated form
 		 */
-		WILL,
-
-		/**
-		 * Indicates that the condition is in a multiform of <code>something will/be something</code> and <code>something can something</code>
-		 * also possibly in the negated form
-		 */
-		CAN_WILL
+		WILL
 	}
 
 	private Expression<? extends T> expr;
@@ -133,11 +127,6 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 				Skript.registerCondition(condition,
 					"%" + type + "% will " + property,
 					"%" + type + "% (will (not|neither)|won't) " + property);
-			}
-			case CAN_WILL -> {
-				Skript.registerCondition(condition,
-					"%" + type + "% (will|can) " + property,
-					"%" + type + "% (will (not|neither)|won't|can not|can't) "  + property);
 			}
 			default -> {
 				assert false;
@@ -194,7 +183,7 @@ public abstract class PropertyCondition<T> extends Condition implements Checker<
 					yield (condition.isNegated() ? "don't have" : "have");
 				}
 			}
-			case WILL, CAN_WILL -> (condition.isNegated() ? "won't " : "will ") + "be";
+			case WILL -> (condition.isNegated() ? "won't " : "will ") + "be";
 			default -> {
 				assert false;
 				yield null;
