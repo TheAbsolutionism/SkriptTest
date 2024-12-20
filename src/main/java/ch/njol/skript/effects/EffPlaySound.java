@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
-import java.util.regex.Pattern;
 
 @Name("Play Sound")
 @Description({
@@ -67,8 +66,6 @@ public class EffPlaySound extends Effect {
 	private static final boolean ENTITY_EMITTER_SOUND = Skript.methodExists(Player.class, "playSound", Entity.class, Sound.class, SoundCategory.class, float.class, float.class);
 	private static final boolean ENTITY_EMITTER_STRING = Skript.methodExists(Player.class, "playSound", Entity.class, String.class, SoundCategory.class, float.class, float.class);
 	private static final boolean ENTITY_EMITTER = ENTITY_EMITTER_SOUND || ENTITY_EMITTER_STRING;
-  
-	public static final Pattern KEY_PATTERN = Pattern.compile("([a-z0-9._-]+:)?([a-z0-9/._-]+)");
 
 	static {
 		String seedOption = HAS_SEED ? "[[with] seed %-number%] " : "";
