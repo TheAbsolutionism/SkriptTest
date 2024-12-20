@@ -30,14 +30,12 @@ public class NamespacedUtils {
 	 */
 	public static @Nullable NamespacedKey getNamespacedKey(@NotNull String key, boolean skriptNamespace) {
 		NamespacedKey namespacedKey;
-		if (skriptNamespace)
+		if (skriptNamespace) {
 			namespacedKey = NamespacedKey.fromString(key, Skript.getInstance());
-		else
+		} else {
 			namespacedKey = NamespacedKey.fromString(key);
-		if (namespacedKey != null)
-			return namespacedKey;
-
-		return null;
+		}
+		return namespacedKey;
 	}
 
 }
