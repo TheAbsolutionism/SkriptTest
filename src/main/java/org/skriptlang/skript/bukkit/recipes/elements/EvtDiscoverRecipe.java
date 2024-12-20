@@ -9,7 +9,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
@@ -51,7 +50,7 @@ public class EvtDiscoverRecipe extends SkriptEvent {
 			return true;
 		NamespacedKey eventRecipeKey = discoverEvent.getRecipe();
 		for (String string : recipes.getArray(event)) {
-			if (eventRecipeKey.equals(NamespacedUtils.getNamespacedKey(string)))
+			if (eventRecipeKey.equals(NamespacedKey.fromString(string, Skript.getInstance())))
 				return true;
 		}
 		return false;

@@ -9,7 +9,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Name("Recipe")
-@Description("Returns the recipe registered with the provided name.")
+@Description("Returns the recipe registered with the provided id.")
 @Examples({
 	"set {_recipe} to recipe with the key \"my_recipe\"",
 	"set {_recipes::*} to recipes with the ids \"my_recipe\" and \"custom_recipe\""
@@ -47,7 +46,9 @@ public class ExprGetRecipe extends SimpleExpression<Recipe> {
 	protected Recipe @Nullable [] get(Event event) {
 		List<Recipe> recipeList = new ArrayList<>();
 		for (String name : recipeNames.getArray(event)) {
-			NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
+			NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
+			if (key == null)
+				continue;
 			Recipe check = Bukkit.getRecipe(key);
 			if (check != null)
 				recipeList.add(check);

@@ -1,7 +1,6 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.bukkitutil.NamespacedUtils;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -11,15 +10,12 @@ import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
-import ch.njol.skript.util.Getter;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
-import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent;
@@ -32,6 +28,8 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEven
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.StonecuttingRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.TransmuteRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
+import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -99,12 +97,7 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 	static {
 		Skript.registerExpression(ExprSecCreateRecipe.class, Recipe.class, ExpressionType.SIMPLE,
 			"a new %*recipetype% with [the] (key|id) %string%");
-		EventValues.registerEventValue(CreateRecipeEvent.class, Recipe.class, new Getter<Recipe, CreateRecipeEvent>() {
-			@Override
-			public Recipe get(CreateRecipeEvent event) {
-				return event.getMutableRecipe();
-			}
-		}, EventValues.TIME_NOW);
+		EventValues.registerEventValue(CreateRecipeEvent.class, Recipe.class, CreateRecipeEvent::getMutableRecipe);
 	}
 
 	private RecipeType providedType;
@@ -136,7 +129,7 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 		//noinspection unchecked
 		trigger = loadCode(node, "create recipe", afterLoading, providedType.getEventClass());
 		if (delayed.get()) {
-			Skript.error("Delays cannot be used within a 'register recipe' section.");
+			Skript.error("Delays cannot be used within a 'create recipe' section.");
 			return false;
 		}
 		return true;
@@ -149,31 +142,33 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 			//Skript.error("The id for a recipe must not be null nor empty.");
 			return null;
 		}
-		NamespacedKey key = NamespacedUtils.getNamespacedKey(name);
-		RecipeType recipeType = providedType;
-		CreateRecipeEvent recipeEvent = switch (recipeType) {
+		NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
+		if (key == null) {
+			//Skript.error("The provided id is invalid.")
+			return null;
+		}
+		CreateRecipeEvent recipeEvent = switch (providedType) {
 			case SHAPED -> new ShapedRecipeEvent(key);
 			case SHAPELESS -> new ShapelessRecipeEvent(key);
 			case BLASTING -> new BlastingRecipeEvent(key);
 			case FURNACE -> new FurnaceRecipeEvent(key);
 			case CAMPFIRE -> new CampfireRecipeEvent(key);
 			case SMOKING -> new SmokingRecipeEvent(key);
-			case SMITHING -> new SmithingRecipeEvent(key, recipeType);
+			case SMITHING -> new SmithingRecipeEvent(key, providedType);
 			case SMITHING_TRANSFORM -> new SmithingTransformRecipeEvent(key);
 			case SMITHING_TRIM -> new SmithingTrimRecipeEvent(key);
 			case STONECUTTING -> new StonecuttingRecipeEvent(key);
 			case TRANSMUTE -> new TransmuteRecipeEvent(key);
-			default -> throw new IllegalStateException("Unexpected value: " + recipeType);
+			default -> throw new IllegalStateException("Unexpected value: " + providedType);
 		};
-		Variables.setLocalVariables(recipeEvent, Variables.copyLocalVariables(event));
-		TriggerItem.walk(trigger, recipeEvent);
-		Variables.setLocalVariables(event, Variables.copyLocalVariables(recipeEvent));
-		Variables.removeLocals(recipeEvent);
+		Variables.withLocalVariables(event, recipeEvent, () -> TriggerItem.walk(trigger, recipeEvent));
+		// If any of the used expressions or effects produce an error, fail creation
 		if (recipeEvent.getErrorInSection())
 			return null;
 
 		MutableRecipe recipeWrapper = recipeEvent.getMutableRecipe();
 		Recipe recipe = recipeWrapper.create();
+		// If the recipe failed to build
 		if (recipe == null) {
 			//Skript.error(recipeWrapper.getErrors().toString());
 			return null;
