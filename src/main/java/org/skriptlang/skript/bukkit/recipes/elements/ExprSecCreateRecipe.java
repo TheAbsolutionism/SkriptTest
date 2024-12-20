@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Name("New Recipe")
 @Description({
 	"Create a custom recipe for any of the following types:",
-	"Shaped, Shapeless, Blasting, Furnace, Campfire, Smoking, Smithing Transform, Smithing Trim or Stonecutting.",
-	"NOTES:",
+	"shaped, shapeless, blasting, furnace, campfire, smoking, smithing transform, smithing trim, stonecutting or transmute.",
+	"",
 	"All recipes except Smithing Trim require a 'result item'.",
 	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type.",
 	"Groups only apply to Shaped, Shapeless, Cooking, and Stonecutting Recipes.",
@@ -70,7 +70,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe group to \"custom group\"",
 		"\tset the recipe category to misc cooking category",
 		"\tset the recipe input item to coal named \"Ash\"",
-		"\tset the recipe resulting item to gunpowder named \"Dust\"",
+		"\tset the recipe result item to gunpowder named \"Dust\"",
 	"",
 	"#Smithing Trim follows the same format, except for 'result item'",
 	"set {_recipe} to a new smithing transform recipe with key \"my_recipe\":",

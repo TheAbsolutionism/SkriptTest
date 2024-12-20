@@ -45,7 +45,7 @@ public class EffRemoveRecipe extends Effect {
 		for (Recipe recipe : recipes.getArray(event)) {
 			if (recipe instanceof Keyed recipeKey) {
 				NamespacedKey key = recipeKey.getKey();
-				if (key != null && Bukkit.getRecipe(key) != null)
+				if (Bukkit.getRecipe(key) != null)
 					Bukkit.removeRecipe(key);
 			}
 		}

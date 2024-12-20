@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
@@ -68,7 +69,15 @@ public class EffDiscoverRecipe extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "make " + players.toString(event, debug) + (isDiscover ? " discover" : " undiscover") + " recipes " + recipes.toString(event, debug);
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("make", players);
+		if (isDiscover) {
+			builder.append("discover");
+		} else {
+			builder.append("undiscover");
+		}
+		builder.append("recipes", recipes);
+		return builder.toString();
 	}
 
 }

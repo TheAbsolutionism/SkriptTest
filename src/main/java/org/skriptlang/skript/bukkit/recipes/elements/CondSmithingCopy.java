@@ -83,7 +83,7 @@ public class CondSmithingCopy extends Condition {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return exprRecipe.toString(event, debug) + (isNegated() ? "does not" : "") + " allow [item] data copying";
+		return exprRecipe.toString(event, debug) + (isNegated() ? "does not" : "") + " allow data copying";
 	}
 
 }

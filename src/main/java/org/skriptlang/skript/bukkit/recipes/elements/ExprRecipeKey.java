@@ -6,7 +6,6 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import org.bukkit.Keyed;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
@@ -43,11 +42,6 @@ public class ExprRecipeKey extends SimplePropertyExpression<Recipe, String> {
 	@Override
 	public Class<String> getReturnType() {
 		return String.class;
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe keys of " + getExpr().toString(event, debug);
 	}
 
 }

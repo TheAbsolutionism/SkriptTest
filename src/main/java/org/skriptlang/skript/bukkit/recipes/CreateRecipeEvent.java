@@ -47,7 +47,6 @@ public class CreateRecipeEvent extends Event {
 		this.errorInSection = true;
 	}
 
-
 	public boolean getErrorInSection() {
 		return errorInSection;
 	}

@@ -18,7 +18,7 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
 @Name("Allow Data Copy")
 @Description({
 	"Allow the recipe to copy data from the base item to the result item.",
-	"NOTES:",
+	"",
 	"This condition can only be used with Smithing Recipes on PaperMC version 1.19",
 	"This condition can be used with Smithing Transform and Smithing Trim Recipes on PaperMC version 1.20.0+",
 })
@@ -32,6 +32,7 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
 public class EffSmithingCopy extends Effect {
+
 	private static final boolean SUPPORTS_COPY_NBT = Skript.methodExists(SmithingRecipe.class, "willCopyNbt");
 	private static final boolean SUPPORTS_COPY_DATA = Skript.methodExists(SmithingRecipe.class, "willCopyDataComponents");
 	private static final boolean RUNNING_1_20_0 = Skript.isRunningMinecraft(1, 20, 0);

@@ -31,8 +31,8 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 
 	static {
 		Skript.registerExpression(ExprRecipeResult.class, ItemStack.class, ExpressionType.PROPERTY,
-			"[the] recipe result[ing] [item] [of %recipes%]",
-			"%recipes%'[s] recipe result[ing] [item]");
+			"[the] recipe result [item] [of %recipes%]",
+			"%recipes%'[s] recipe result [item]");
 	}
 
 	private boolean isEvent = false;
@@ -54,9 +54,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			return recipe.getResult();
-		});
+		return get(source, Recipe::getResult);
 	}
 
 	@Override
@@ -71,7 +69,7 @@ public class ExprRecipeResult extends PropertyExpression<Recipe, ItemStack> {
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		if (!(event instanceof CreateRecipeEvent recipeEvent))
+		if (delta == null || !(event instanceof CreateRecipeEvent recipeEvent))
 			return;
 
 		MutableRecipe mutableRecipe = recipeEvent.getMutableRecipe();

@@ -12,7 +12,6 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.Recipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import org.skriptlang.skript.lang.comparator.Comparator;
 import org.skriptlang.skript.lang.comparator.Comparators;
 import org.skriptlang.skript.lang.comparator.Relation;
 
@@ -50,13 +49,10 @@ public class RecipeModule {
 
 		// --- COMPARATORS --- //
 
-		Comparators.registerComparator(RecipeType.class, RecipeType.class, new Comparator<RecipeType, RecipeType>() {
-			@Override
-			public Relation compare(RecipeType type1, RecipeType type2) {
-				if (type1.getRecipeClass() != null && type2.getRecipeClass() != null)
-					return Relation.get(type2.getRecipeClass().isAssignableFrom(type1.getRecipeClass()));
-				return Relation.NOT_EQUAL;
-			}
+		Comparators.registerComparator(RecipeType.class, RecipeType.class, (type1, type2) -> {
+			if (type1.getRecipeClass() != null && type2.getRecipeClass() != null)
+				return Relation.get(type2.getRecipeClass().isAssignableFrom(type1.getRecipeClass()));
+			return Relation.NOT_EQUAL;
 		});
 
 		// --- EVENT VALUES --- //

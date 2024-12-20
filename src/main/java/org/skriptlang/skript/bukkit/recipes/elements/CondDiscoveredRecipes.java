@@ -50,13 +50,13 @@ public class CondDiscoveredRecipes extends Condition {
 	@Override
 	public boolean check(Event event) {
 		Recipe[] recipes = exprRecipe.getArray(event);
-		return exprPlayer.check(event, player -> {
-			return SimpleExpression.check(recipes, recipe -> {
+		return exprPlayer.check(event, player ->
+			SimpleExpression.check(recipes, recipe -> {
 				if (!(recipe instanceof Keyed recipeKey))
-					return false;
+					return isNegated();
 				return player.hasDiscoveredRecipe(recipeKey.getKey());
-			}, isNegated(), exprRecipe.getAnd());
-		});
+			}, isNegated(), exprRecipe.getAnd())
+		);
 	}
 
 	@Override

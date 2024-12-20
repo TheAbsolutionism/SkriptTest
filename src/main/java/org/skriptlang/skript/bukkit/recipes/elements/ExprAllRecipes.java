@@ -37,10 +37,9 @@ import java.util.List;
 	"<li>For specific items</li>",
 	"</ul>",
 	"",
-	"NOTES:",
-	"- When resetting the server recipes, all custom recipes from any plugin will be removed, regardless of specifying additional data. "
+	"When resetting the server recipes, all custom recipes from any plugin will be removed, regardless of specifying additional data. "
 		+ "Only vanilla recipes will be present.",
-	"- When deleting the server recipes, you are allowed to delete recipes using the options listed above.",
+	"When deleting the server recipes, you are allowed to delete recipes using the options listed above.",
 })
 @Examples({
 	"set {_list::*} to all of the server's recipe of type shaped recipe for netherite ingot",

@@ -5,12 +5,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 
 @Name("Recipe Type")
 @Description("Get the recipe type of a recipe.")
@@ -40,11 +39,6 @@ public class ExprRecipeType extends SimplePropertyExpression<Recipe, RecipeType>
 	@Override
 	public Class<RecipeType> getReturnType() {
 		return RecipeType.class;
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe type of " + getExpr().toString(event, debug);
 	}
 
 }

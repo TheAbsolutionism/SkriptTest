@@ -50,7 +50,7 @@ import java.util.*;
 	"",
 	"set {_recipe} to a shapeless recipe with id \"my_recipe\":",
 		"\tset recipe ingredients to iron ingot, gold ingot, iron ingot, nether star, 5 obsidian, nether star, iron ingot, gold ingot and iron ingot",
-		"\tset recipe resulting item to beacon named \"OP Beacon\"",
+		"\tset recipe result item to beacon named \"OP Beacon\"",
 	"",
 	"set {_recipe} to new blasting recipe with the id \"my_recipe\":",
 		"\tset the recipe input item to netherite ingot named \"Impure Netherite\"",
