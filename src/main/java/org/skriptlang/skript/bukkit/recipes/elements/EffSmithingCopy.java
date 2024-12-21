@@ -19,8 +19,8 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
 @Description({
 	"Allow the recipe to copy data from the base item to the result item.",
 	"",
-	"This condition can only be used with Smithing Recipes on PaperMC version 1.19",
-	"This condition can be used with Smithing Transform and Smithing Trim Recipes on PaperMC version 1.20.0+",
+	"This condition can only be used with smithing recipes on PaperMC version 1.19",
+	"This condition can be used with smithing transform and smithing trim recipes on PaperMC version 1.20.0+",
 })
 @Examples({
 	"set {_recipe} to a new smithing transform recipe:",

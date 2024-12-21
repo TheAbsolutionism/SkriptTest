@@ -39,13 +39,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"Create a custom recipe for any of the following types:",
 	"shaped, shapeless, blasting, furnace, campfire, smoking, smithing transform, smithing trim, stonecutting or transmute.",
 	"",
-	"All recipes except Smithing Trim require a 'result item'.",
-	"Blasting, Furnace, Campfire and Smoking all fall under Cooking Recipe Type.",
-	"Groups only apply to Shaped, Shapeless, Cooking, and Stonecutting Recipes.",
-	"Category only applies to Shaped, Shapeless and Cooking Recipes.",
-	"You can not create a Cooking, Crafting and Complex Recipe type.",
+	"All recipes except smithing trim require a 'result item'.",
+	"Blasting, furnace, campfire and smoking all fall under cooking recipe type.",
+	"Groups only apply to shaped, shapeless, cooking, and stonecutting recipes.",
+	"Category only applies to shaped, shapeless and cooking recipes.",
+	"You can not create a cooking, crafting and complex recipe type.",
 	"Custom recipes are not persistent across server restart.",
-	"MC versions below 1.20 convert Smithing Transform and Smithing Trim Recipes to a Smithing Recipe when added to the server."
+	"MC versions below 1.20 convert smithing transform and smithing trim recipes to a smithing recipe when added to the server."
 })
 @Examples({
 	"set {_recipe} to a new shaped recipe with the key \"my_recipe\":",
