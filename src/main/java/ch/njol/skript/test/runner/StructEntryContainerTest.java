@@ -5,13 +5,27 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.Trigger;
+import ch.njol.skript.lang.TriggerItem;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
+import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
 
+import java.util.List;
+
 public class StructEntryContainerTest extends Structure {
+
+	public static class TestEvent extends Event {
+		@Override
+		public @NotNull HandlerList getHandlers() {
+			throw new IllegalStateException();
+		}
+	}
 
 	static {
 		Skript.registerStructure(StructEntryContainerTest.class,
@@ -37,12 +51,10 @@ public class StructEntryContainerTest extends Structure {
 	@Override
 	public boolean load() {
 		SectionNode section = entryContainer.get("has entry", SectionNode.class, false);
-		String structureKey = ScriptLoader.replaceOptions(section.getKey());
-		Structure structure = Structure.parse(structureKey, section, "");
-		getParser().setCurrentStructure(structure);
-		if (structure != null) {
-			structure.postLoad();
-		}
+		List<TriggerItem> triggerItems = ScriptLoader.loadItems(section);
+		Script script = getParser().getCurrentScript();
+		Trigger trigger = new Trigger(script, "entry container test", null, triggerItems);
+		trigger.execute(new TestEvent());
 		return true;
 	}
 
