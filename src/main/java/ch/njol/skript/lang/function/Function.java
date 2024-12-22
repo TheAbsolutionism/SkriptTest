@@ -18,7 +18,6 @@
  */
 package ch.njol.skript.lang.function;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.util.coll.CollectionUtils;
@@ -119,7 +118,6 @@ public abstract class Function<T> {
 			 */
 			if (!executeWithNulls && val.length == 0)
 				return null;
-			Skript.adminBroadcast("Function Param: "  + Arrays.toString(val));
 			ps[i] = val;
 		}
 		

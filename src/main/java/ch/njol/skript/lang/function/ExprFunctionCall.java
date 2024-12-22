@@ -18,24 +18,24 @@
  */
 package ch.njol.skript.lang.function;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.KeyProviderExpression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converters;
 
-import java.util.Arrays;
-
-public class ExprFunctionCall<T> extends SimpleExpression<T> {
+public class ExprFunctionCall<T> extends SimpleExpression<T> implements KeyProviderExpression<T> {
 
 	private final FunctionReference<?> function;
 	private final Class<? extends T>[] returnTypes;
 	private final Class<T> returnType;
+	private String[] indices;
 
 	public ExprFunctionCall(FunctionReference<T> function) {
 		this(function, function.returnTypes);
@@ -60,10 +60,12 @@ public class ExprFunctionCall<T> extends SimpleExpression<T> {
 	@Override
 	protected T @Nullable [] get(Event event) {
 		Object[] returnValue = function.execute(event);
+		if (function.getFunction() instanceof ScriptFunction<?> scriptFunction) {
+			String[] indices = scriptFunction.getReturnIndices();
+			if (indices != null)
+				this.indices = indices;
+		}
 		function.resetReturnValue();
-		Skript.adminBroadcast("Return Value: " + Arrays.toString(returnValue));
-		Skript.adminBroadcast("Return Types: " + Arrays.toString(returnTypes));
-		Skript.adminBroadcast("Return Type: " + returnType);
 		return Converters.convert(returnValue, returnTypes, returnType);
 	}
 
@@ -77,6 +79,11 @@ public class ExprFunctionCall<T> extends SimpleExpression<T> {
 			return new ExprFunctionCall<>(function, to);
 		}
 		return null;
+	}
+
+	@Override
+	public @NotNull String @NotNull [] getArrayKeys(Event event) throws IllegalStateException {
+		return indices;
 	}
 
 	@Override

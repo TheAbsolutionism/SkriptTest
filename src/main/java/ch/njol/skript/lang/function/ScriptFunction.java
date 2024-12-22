@@ -23,6 +23,7 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ReturnHandler;
 import ch.njol.skript.lang.Trigger;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Pair;
@@ -31,12 +32,17 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.script.Script;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class ScriptFunction<T> extends Function<T> implements ReturnHandler<T> {
 
 	private final Trigger trigger;
 
 	private boolean returnValueSet;
 	private T @Nullable [] returnValues;
+	private String[] returnIndices;
 
 	/**
 	 * @deprecated use {@link ScriptFunction#ScriptFunction(Signature, SectionNode)}
@@ -106,6 +112,13 @@ public class ScriptFunction<T> extends Function<T> implements ReturnHandler<T> {
 	public final void returnValues(Event event, Expression<? extends T> value) {
 		assert !returnValueSet;
 		returnValueSet = true;
+		if (value instanceof Variable<? extends T> variable && !variable.isSingle()) {
+			List<String> indices = new ArrayList<>();
+			Iterator<Pair<String, Object>> iter = variable.variablesIterator(event);
+			while (iter.hasNext())
+				indices.add(iter.next().getFirst());
+			this.returnIndices = indices.toArray(String[]::new);
+		}
 		this.returnValues = value.getArray(event);
 	}
 
@@ -117,6 +130,10 @@ public class ScriptFunction<T> extends Function<T> implements ReturnHandler<T> {
 	@Override
 	public final @Nullable Class<? extends T> returnValueType() {
 		return getReturnType() != null ? getReturnType().getC() : null;
+	}
+
+	public String[] getReturnIndices() {
+		return returnIndices;
 	}
 
 }
