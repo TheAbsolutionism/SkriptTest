@@ -25,11 +25,13 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.config.Node;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.log.RetainingLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Contract;
 import ch.njol.skript.util.LiteralUtils;
+import ch.njol.util.Pair;
 import ch.njol.util.StringUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +39,7 @@ import org.skriptlang.skript.lang.converter.Converters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -290,13 +293,16 @@ public class FunctionReference<T> implements Contract {
 			Skript.error("Couldn't resolve call for '" + functionName + "'.");
 			return null; // Return nothing and hope it works
 		}
+
+		boolean isScriptFunction = function instanceof ScriptFunction;
 		
 		// Prepare parameter values for calling
 		Object[][] params = new Object[singleListParam ? 1 : parameters.length][];
 		if (singleListParam && parameters.length > 1) { // All parameters to one list
 			List<Object> l = new ArrayList<>();
-			for (Expression<?> parameter : parameters)
+			for (Expression<?> parameter : parameters) {
 				l.addAll(Arrays.asList(parameter.getArray(event)));
+			}
 			params[0] = l.toArray();
 			
 			// Don't allow mutating across function boundary; same hack is applied to variables
@@ -307,13 +313,22 @@ public class FunctionReference<T> implements Contract {
 			for (int i = 0; i < parameters.length; i++) {
 				Object[] array = parameters[i].getArray(event);
 				params[i] = Arrays.copyOf(array, array.length);
-				// Don't allow mutating across function boundary; same hack is applied to variables
-				for (int j = 0; j < params[i].length; j++) {
-					params[i][j] = Classes.clone(params[i][j]);
+				if (isScriptFunction  && parameters[i] instanceof Variable<?> var && !var.isSingle()) {
+					Iterator<Pair<String, Object>> iter = var.variablesIterator(event);
+					List<Pair<String, Object>> pairs = new ArrayList<>();
+					while (iter.hasNext()) {
+						Pair<String, Object> current = iter.next();
+						pairs.add(current.clone());
+					}
+					params[i] = pairs.toArray(Pair[]::new);
+				} else {
+					// Don't allow mutating across function boundary; same hack is applied to variables
+					for (int j = 0; j < params[i].length; j++) {
+						params[i][j] = Classes.clone(params[i][j]);
+					}
 				}
 			}
 		}
-		
 		// Execute the function
 		return function.execute(params);
 	}

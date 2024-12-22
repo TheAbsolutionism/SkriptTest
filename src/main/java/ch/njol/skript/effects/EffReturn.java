@@ -114,6 +114,7 @@ public class EffReturn extends Effect {
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
 		debug(event, false);
+		Skript.adminBroadcast("EffReturn: " + value);
 		//noinspection rawtypes,unchecked
 		((ReturnHandler) handler).returnValues(event, value);
 

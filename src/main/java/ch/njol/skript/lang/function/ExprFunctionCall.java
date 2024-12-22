@@ -18,6 +18,7 @@
  */
 package ch.njol.skript.lang.function;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
@@ -27,6 +28,8 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converters;
+
+import java.util.Arrays;
 
 public class ExprFunctionCall<T> extends SimpleExpression<T> {
 
@@ -58,6 +61,9 @@ public class ExprFunctionCall<T> extends SimpleExpression<T> {
 	protected T @Nullable [] get(Event event) {
 		Object[] returnValue = function.execute(event);
 		function.resetReturnValue();
+		Skript.adminBroadcast("Return Value: " + Arrays.toString(returnValue));
+		Skript.adminBroadcast("Return Types: " + Arrays.toString(returnTypes));
+		Skript.adminBroadcast("Return Type: " + returnType);
 		return Converters.convert(returnValue, returnTypes, returnType);
 	}
 
