@@ -79,14 +79,14 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = furnaceExprs[(int) Math2.floor( matchedPattern / 2)];
+		type = furnaceExprs[matchedPattern / 2];
 		if (exprs[0] != null) {
 			explicitlyBlock = true;
 			//noinspection unchecked
 			setExpr((Expression<Block>) exprs[0]);
 		} else {
 			if (!getParser().isCurrentEvent(FurnaceBurnEvent.class, FurnaceStartSmeltEvent.class, FurnaceExtractEvent.class, FurnaceSmeltEvent.class)) {
-				Skript.error("There's no furnace in a " + getParser().getCurrentEventName() + " event.");
+				Skript.error("There's no furnace in a '" + getParser().getCurrentEventName() + "' event.");
 				return false;
 			}
 			explicitlyBlock = false;
@@ -98,7 +98,8 @@ public class ExprFurnaceTime extends PropertyExpression<Block, Timespan> {
 	@Override
 	protected Timespan @Nullable [] get(Event event, Block[] source) {
 		return get(source, block -> {
-			Furnace furnace = (block != null && block.getState() instanceof Furnace furnaceCheck) ? furnaceCheck : null;
+			if (block == null || !(block.getState() instanceof Furnace furnace))
+				return null;
 			switch (type) {
 				case COOKTIME -> {
 					return new Timespan(Timespan.TimePeriod.TICK, (int) furnace.getCookTime());
