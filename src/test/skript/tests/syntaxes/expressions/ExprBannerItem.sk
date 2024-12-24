@@ -4,4 +4,4 @@ test "banner item":
 
 	parse:
 		set {_invalid} to a base banner pattern item
-	assert last parse logs contains "There is no item for the banner pattern type 'BASE'." with "Base banner pattern type should not get an item (unless updated)"
+	assert {_invalid} is not set with "Base banner pattern type should not get an item (unless updated)"
