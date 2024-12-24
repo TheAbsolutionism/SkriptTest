@@ -1620,24 +1620,6 @@ public final class BukkitEventValues {
 			}, EventValues.TIME_NOW);
 		}
 
-		// LootGenerateEvent
-		if (Skript.classExists("org.bukkit.event.world.LootGenerateEvent")) {
-			EventValues.registerEventValue(LootGenerateEvent.class, Entity.class, new Getter<Entity, LootGenerateEvent>() {
-				@Override
-				@Nullable
-				public Entity get(LootGenerateEvent event) {
-					return event.getEntity();
-				}
-			}, EventValues.TIME_NOW);
-			EventValues.registerEventValue(LootGenerateEvent.class, Location.class, new Getter<Location, LootGenerateEvent>() {
-				@Override
-				@Nullable
-				public Location get(LootGenerateEvent event) {
-					return event.getLootContext().getLocation();
-				}
-			}, EventValues.TIME_NOW);
-		}
-
 		// EntityResurrectEvent
 		EventValues.registerEventValue(EntityResurrectEvent.class, Slot.class, new Getter<Slot, EntityResurrectEvent>() {
 			@Override
@@ -1800,6 +1782,12 @@ public final class BukkitEventValues {
 				return event.getRegainReason();
 			}
 		}, EventValues.TIME_NOW);
+
+		// FurnaceExtractEvent
+		EventValues.registerEventValue(FurnaceExtractEvent.class, Player.class, FurnaceExtractEvent::getPlayer);
+		EventValues.registerEventValue(FurnaceExtractEvent.class, ItemStack[].class,
+			event -> new ItemStack[]{ItemStack.of(event.getItemType(), event.getItemAmount())
+		});
 
 		// BlockDropItemEvent
 		EventValues.registerEventValue(BlockDropItemEvent.class, Block.class, new Getter<Block, BlockDropItemEvent>() {
