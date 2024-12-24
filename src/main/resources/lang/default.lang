@@ -2480,6 +2480,7 @@ equipment slot:
 	boots: feet slot, boots slot
 	tool: tool slot, hand slot, main hand slot
 	off_hand: off hand slot
+	body: body slot, body armor slot
 
 # -- Input Keys --
 input keys:
