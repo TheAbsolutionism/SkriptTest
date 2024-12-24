@@ -19,22 +19,22 @@ public final class SoundUtils {
 
 	/**
 	 * Gets the key of a sound, given its enum-name-style name.
-	 * If no sound is found, will create a new namespaced key from the given soundString.
 	 * @param soundString The enum name to use to find the sound.
 	 * @return The key of the sound.
 	 */
 	public static @Nullable NamespacedKey getKey(String soundString) {
 		soundString = soundString.toUpperCase(Locale.ENGLISH);
 		if (SOUND_IS_INTERFACE) {
-			//noinspection deprecation
-			return Sound.valueOf(soundString).getKey();
+			try {
+				//noinspection deprecation,removal
+				return Sound.valueOf(soundString).getKey();
+			} catch (Exception ignored) {}
 		} else {
 			try {
 				//noinspection unchecked,rawtypes
 				Enum soundEnum = Enum.valueOf((Class) Sound.class, soundString);
 				return ((Keyed) soundEnum).getKey();
-			} catch (IllegalArgumentException ignore) {
-			}
+			} catch (IllegalArgumentException ignored) {}
 		}
 		return NamespacedKey.fromString(soundString.toLowerCase(Locale.ENGLISH));
 	}
@@ -46,7 +46,7 @@ public final class SoundUtils {
 	 */
 	public static @NotNull NamespacedKey getKey(Sound sound) {
 		if (SOUND_IS_INTERFACE) {
-			//noinspection deprecation
+			//noinspection deprecation,removal
 			return sound.getKey();
 		} else {
 			return ((Keyed) sound).getKey();
@@ -54,11 +54,11 @@ public final class SoundUtils {
 	}
 
 	/**
-	 * returns the sound of a given string.
-	 * @param soundString The sound string to get the sound
-	 * @return The sound if found
+	 * Retrieves the sound correlating to the provided {@code soundString}
+	 * @param soundString The string to get the correlating sound
+	 * @return The correlating {@link Sound}
 	 */
-	public static Sound getSound(String soundString) {
+	public static @Nullable Sound getSound(String soundString) {
 		NamespacedKey key = getKey(soundString);
 		if (key == null)
 			return null;
