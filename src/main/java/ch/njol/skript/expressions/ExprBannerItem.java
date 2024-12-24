@@ -11,7 +11,6 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.registrations.Classes;
 import ch.njol.util.Kleenean;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -101,7 +100,7 @@ public class ExprBannerItem extends SimpleExpression<ItemType> {
 
 	@Override
 	public boolean isSingle() {
-		return patternTypes.length == 1;
+		return literalPattern.isSingle();
 	}
 
 	@Override
