@@ -34,16 +34,16 @@ public class EvtGrowTest extends SkriptJUnitTest {
 		if (canRun) {
 			int maxIterations = 100;
 			int iterations = 0;
-			while (plant.getBlockData() instanceof Ageable ageable && ageable.getAge() != ageable.getMaximumAge()) {
+			while (plant.getBlockData() instanceof Ageable ageable && ageable.getAge() < ageable.getMaximumAge()) {
 				plant.applyBoneMeal(BlockFace.UP);
 				if (iterations++ > maxIterations)
-					return;
+					break;
 			}
 			iterations = 0;
 			while (birch.getType() == Material.BIRCH_SAPLING) {
 				birch.applyBoneMeal(BlockFace.UP);
 				if (iterations++ > maxIterations)
-					return;
+					break;
 			}
 		}
 	}
