@@ -28,11 +28,12 @@ public class StructEntryContainerTest extends Structure {
 	}
 
 	static {
-		Skript.registerStructure(StructEntryContainerTest.class,
-			EntryValidator.builder()
-				.addSection("has entry", true)
-				.build(),
-			"test entry container");
+		if (TestMode.ENABLED)
+			Skript.registerStructure(StructEntryContainerTest.class,
+				EntryValidator.builder()
+					.addSection("has entry", true)
+					.build(),
+				"test entry container");
 	}
 
 	private EntryContainer entryContainer;
