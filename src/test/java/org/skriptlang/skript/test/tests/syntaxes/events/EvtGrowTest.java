@@ -33,7 +33,7 @@ public class EvtGrowTest extends SkriptJUnitTest {
 		if (canRun) {
 			int maxIterations = 100;
 			int iterations = 0;
-			while (((Ageable) plant.getBlockData()).getAge() != ((Ageable) plant.getBlockData()).getMaximumAge()) {
+			while (plant.getBlockData() instanceof Ageable ageable && ageable.getAge() != ageable.getMaximumAge()) {
 				plant.applyBoneMeal(BlockFace.UP);
 				if (iterations++ > maxIterations)
 					return;
