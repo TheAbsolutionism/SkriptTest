@@ -21,8 +21,9 @@ public class EvtGrowTest extends SkriptJUnitTest {
 
 	@Before
 	public void setBlocks() {
-		plant = setBlock(Material.WHEAT);
-		plant.getRelative(0,-1,0).setType(Material.FARMLAND);
+		Block farmland = setBlock(Material.FARMLAND);
+		farmland.getRelative(0, 1, 0).setType(Material.WHEAT);
+		plant = farmland.getRelative(0, 1, 0);
 		birch = plant.getRelative(10,0,0);
 		birch.getRelative(0,-1,0).setType(Material.DIRT);
 		birch.setType(Material.BIRCH_SAPLING);
