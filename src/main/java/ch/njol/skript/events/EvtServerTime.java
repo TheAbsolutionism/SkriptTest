@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class EvtServerTime extends SkriptEvent {
 
@@ -29,14 +29,14 @@ public class EvtServerTime extends SkriptEvent {
 	}
 
 	private static final TimeState[] TIME_STATES = TimeState.values();
-	private static final int HOUR_12_TICKS = 864000;
-	private static final int HOUR_24_TICKS = HOUR_12_TICKS * 2;
+	private static final int HOUR_12_SECONDS = 43200;
+	private static final int HOUR_24_SECONDS = HOUR_12_SECONDS * 2;
 
 	static {
-		Skript.registerEvent("Server Time", EvtServerTime.class, ServerTimeEvent.class, "" +
-			"(server|real) time (of|at) %integer%:%integer%",
-			"(server|real) time (of|at) %integer%:%integer%[ ]pm",
-			"(server|real) time (of|at) %integer%:%integer%[ ]am")
+		Skript.registerEvent("Server Time", EvtServerTime.class, ServerTimeEvent.class,
+			"(server|real) time (of|at) %integer%.%integer%",
+			"(server|real) time (of|at) %integer%.%integer%[ ]am",
+			"(server|real) time (of|at) %integer%.%integer%[ ]pm")
 				.description()
 				.examples()
 				.since("INSERT VERSION");
@@ -73,7 +73,7 @@ public class EvtServerTime extends SkriptEvent {
 
 	@Override
 	public boolean postLoad() {
-		updateScheduler();
+		updateScheduler(false);
 		return true;
 	}
 
@@ -98,25 +98,42 @@ public class EvtServerTime extends SkriptEvent {
 		return null;
 	}
 
-	private void updateScheduler() {
+	private void updateScheduler(boolean executed) {
 		if (unloaded)
 			return;
-		long ticks = ticksTilTime();
-		Skript.adminBroadcast("Ticks until: " + ticks);
+		long ticks;
+		if (executed) {
+			if (state == TimeState.ANY) {
+				nextTime += HOUR_12_SECONDS;
+				ticks = HOUR_12_SECONDS * 20;
+			} else {
+				nextTime += HOUR_24_SECONDS;
+				ticks = HOUR_24_SECONDS * 20;
+			}
+		} else {
+			ticks = ticksTilTime();
+		}
+		Skript.adminBroadcast("[" + state.toString() + "] Ticks until: " + ticks);
 		currentTask = Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), this::checkExecute, ticks);
 	}
 
 	private long ticksTilTime() {
 		LocalDateTime currentTime = LocalDateTime.now();
-		String currentM = currentTime.format(DateTimeFormatter.ofPattern("a"));
+		boolean isPM = currentTime.getHour() >= 11;
 		LocalDateTime expectedTime = currentTime.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
-		if (state != TimeState.ANY && !currentM.equalsIgnoreCase(state.toString()))
-			expectedTime = expectedTime.plusHours(12);
+		Skript.adminBroadcast("[" + state.toString() + "] Current Time: " + currentTime);
+		Skript.adminBroadcast("[" + state.toString() + "] Expected Time: " + expectedTime);
+		if (state != TimeState.ANY) {
+			boolean expectedPM = state == TimeState.PM;
+			if (expectedPM != isPM)
+				expectedTime = expectedTime.plusHours(12);
+		}
 		long currentEpoch = currentTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(currentTime));
 		long expectedEpoch = expectedTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(expectedTime));
+		(new Date()).toInstant().
 		long diff = Math.abs(currentEpoch - expectedEpoch);
 		nextTime = expectedEpoch;
-		return diff * 20;
+		return (diff - 1) * 20;
 	}
 
 	private void checkExecute() {
@@ -127,7 +144,7 @@ public class EvtServerTime extends SkriptEvent {
 		if (Math.abs(nextTime - currentEpoch) <= 10) {
 			execute();
 		} else {
-			updateScheduler();
+			updateScheduler(false);
 		}
 	}
 
@@ -138,7 +155,7 @@ public class EvtServerTime extends SkriptEvent {
 		trigger.execute(event);
 		SkriptEventHandler.logTriggerEnd(trigger);
 		SkriptEventHandler.logEventEnd();
-		updateScheduler();
+		updateScheduler(true);
 	}
 
 }
