@@ -6,9 +6,8 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -16,9 +15,9 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Experience")
 @Description("The experience of a blasting, furnace, campfire, or smoking recipe.")
@@ -29,12 +28,10 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 		"\tset the recipe result to copper ingot named \"Pure Copper\""
 })
 @Since("INSERT VERSION")
-public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
+public class ExprRecipeExperience extends SimplePropertyExpression<Recipe, Float> {
 
 	static {
-		Skript.registerExpression(ExprRecipeExperience.class, Float.class, ExpressionType.PROPERTY,
-			"[the] recipe [e]xp[erience] [of %recipes%]",
-			"%recipes%'[s] recipe [e]xp[erience]");
+		registerDefault(ExprRecipeExperience.class, Float.class,  "recipe [e]xp[erience]", "recipes");
 	}
 
 	private boolean isEvent = false;
@@ -43,21 +40,17 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
 			isEvent = true;
-		//noinspection unchecked
-		setExpr((Expression<? extends Recipe>) exprs[0]);
-		return true;
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
-	protected Float @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-				return mutableCookingRecipe.getExperience();
-			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-				return cookingRecipe.getExperience();
-			}
-			return null;
-		});
+	public @Nullable Float convert(Recipe recipe) {
+		if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+			return mutableCookingRecipe.getExperience();
+		} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+			return cookingRecipe.getExperience();
+		}
+		return null;
 	}
 
 	@Override
@@ -89,8 +82,8 @@ public class ExprRecipeExperience extends PropertyExpression<Recipe, Float> {
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe experience of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "recipe experience";
 	}
 
 }

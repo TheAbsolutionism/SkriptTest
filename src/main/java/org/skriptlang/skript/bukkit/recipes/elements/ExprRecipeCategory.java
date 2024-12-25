@@ -6,9 +6,8 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -20,11 +19,11 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.recipe.CookingBookCategory;
 import org.bukkit.inventory.recipe.CraftingBookCategory;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeCategory;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Category")
 @Description("The recipe category of a shaped, shapeless, blasting, furnace, campfire or smoking recipe.")
@@ -43,12 +42,10 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 		"\tbroadcast recipe category of loop-recipe"
 })
 @Since("INSERT VERSION")
-public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategory> {
+public class ExprRecipeCategory extends SimplePropertyExpression<Recipe, RecipeCategory> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCategory.class, RecipeCategory.class, ExpressionType.PROPERTY,
-			"[the] recipe category [of %recipes%]",
-			"%recipes%'[s] recipe category");
+		registerDefault(ExprRecipeCategory.class, RecipeCategory.class, "recipe category", "recipes");
 	}
 
 	private boolean isEvent = false;
@@ -57,34 +54,31 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
 			isEvent = true;
-		//noinspection unchecked
-		setExpr((Expression<? extends Recipe>) exprs[0]);
-		return true;
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
-	protected RecipeCategory @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			Enum<?> category = null;
-			if (recipe instanceof MutableRecipe mutableRecipe) {
-				if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
-					category = mutableCraftingRecipe.getCategory();
-				} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-					category = mutableCookingRecipe.getCategory();
-				}
-			} else {
-				if (recipe instanceof ShapedRecipe shapedRecipe) {
-					category = shapedRecipe.getCategory();
-				} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-					category = shapelessRecipe.getCategory();
-				} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-					category = cookingRecipe.getCategory();
-				}
+	public @Nullable RecipeCategory convert(Recipe recipe) {
+		Enum<?> category = null;
+		if (recipe instanceof MutableRecipe mutableRecipe) {
+			if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
+				category = mutableCraftingRecipe.getCategory();
+			} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+				category = mutableCookingRecipe.getCategory();
 			}
-			if (category != null)
-				return RecipeCategory.convertBukkitToSkript(category);
-			return null;
-		});
+		} else {
+			// TODO: Combine ShapedRecipe and ShapelessRecipe into CraftingRecipe when minimum version is raised to 1.20.1 or higher.
+			if (recipe instanceof ShapedRecipe shapedRecipe) {
+				category = shapedRecipe.getCategory();
+			} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+				category = shapelessRecipe.getCategory();
+			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+				category = cookingRecipe.getCategory();
+			}
+		}
+		if (category != null)
+			return RecipeCategory.convertBukkitToSkript(category);
+		return null;
 	}
 
 	@Override
@@ -120,8 +114,8 @@ public class ExprRecipeCategory extends PropertyExpression<Recipe, RecipeCategor
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe category of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "recipe category";
 	}
 
 }

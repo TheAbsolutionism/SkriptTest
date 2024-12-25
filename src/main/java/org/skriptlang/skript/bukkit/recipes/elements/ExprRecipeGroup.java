@@ -6,20 +6,19 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 
 @Name("Recipe Group")
 @Description({
@@ -33,12 +32,10 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 		"\tset the recipe result to nether star"
 })
 @Since("INSERT VERSION")
-public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
+public class ExprRecipeGroup extends SimplePropertyExpression<Recipe, String> {
 
 	static {
-		Skript.registerExpression(ExprRecipeGroup.class, String.class, ExpressionType.PROPERTY,
-			"[the] recipe group [of %recipes%]",
-			"%recipes%'[s] recipe group");
+		registerDefault(ExprRecipeGroup.class, String.class, "recipe group", "recipes");
 	}
 
 	private boolean isEvent = false;
@@ -47,36 +44,32 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
 			isEvent = true;
-		//noinspection unchecked
-		setExpr((Expression<? extends Recipe>) exprs[0]);
-		return true;
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
-	protected String[] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			if (recipe instanceof MutableRecipe)  {
-				if (recipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
-					return mutableCraftingRecipe.getGroup();
-				} else if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-					return mutableCookingRecipe.getGroup();
-				} else if (recipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
-					return mutableStonecuttingRecipe.getGroup();
-				}
-			} else {
-				// TODO: Combine ShapedRecipe and ShapelessRecipe into CraftingRecipe when minimum version is raised to 1.20.1 or higher.
-				if (recipe instanceof ShapedRecipe shapedRecipe) {
-					return shapedRecipe.getGroup();
-				} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-					return shapelessRecipe.getGroup();
-				} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-					return cookingRecipe.getGroup();
-				} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
-					return stonecuttingRecipe.getGroup();
-				}
+	public @Nullable String convert(Recipe recipe) {
+		if (recipe instanceof MutableRecipe)  {
+			if (recipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
+				return mutableCraftingRecipe.getGroup();
+			} else if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+				return mutableCookingRecipe.getGroup();
+			} else if (recipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
+				return mutableStonecuttingRecipe.getGroup();
 			}
-			return null;
-		});
+		} else {
+			// TODO: Combine ShapedRecipe and ShapelessRecipe into CraftingRecipe when minimum version is raised to 1.20.1 or higher.
+			if (recipe instanceof ShapedRecipe shapedRecipe) {
+				return shapedRecipe.getGroup();
+			} else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+				return shapelessRecipe.getGroup();
+			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+				return cookingRecipe.getGroup();
+			} else if (recipe instanceof StonecuttingRecipe stonecuttingRecipe) {
+				return stonecuttingRecipe.getGroup();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -114,8 +107,8 @@ public class ExprRecipeGroup extends PropertyExpression<Recipe, String> {
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe group of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "recipe group";
 	}
 
 }

@@ -6,9 +6,8 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -31,12 +30,10 @@ import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
 		"\tset the recipe result to gold ingot named \"Pure Gold\""
 })
 @Since("INSERT VERSION")
-public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> {
+public class ExprRecipeCookingTime extends SimplePropertyExpression<Recipe, Timespan> {
 
 	static {
-		Skript.registerExpression(ExprRecipeCookingTime.class, Timespan.class, ExpressionType.PROPERTY,
-			"[the] recipe cook[ing] time [of %recipes%]",
-			"%recipes%'[s] recipe cook[ing] time");
+		registerDefault(ExprRecipeCookingTime.class, Timespan.class, "recipe cook[ing] time", "recipes");
 	}
 
 	private boolean isEvent = false;
@@ -45,21 +42,17 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		if (exprs[0].isDefault() && getParser().isCurrentEvent(CreateRecipeEvent.class))
 			isEvent = true;
-		//noinspection unchecked
-		setExpr((Expression<? extends Recipe>) exprs[0]);
-		return true;
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
-	protected Timespan @Nullable [] get(Event event, Recipe[] source) {
-		return get(source, recipe -> {
-			if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-				return new Timespan(TimePeriod.TICK, mutableCookingRecipe.getCookingTime());
-			} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
-				return new Timespan(TimePeriod.TICK, cookingRecipe.getCookingTime());
-			}
-			return null;
-		});
+	public @Nullable Timespan convert(Recipe recipe) {
+		if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
+			return new Timespan(TimePeriod.TICK, mutableCookingRecipe.getCookingTime());
+		} else if (recipe instanceof CookingRecipe<?> cookingRecipe) {
+			return new Timespan(TimePeriod.TICK, cookingRecipe.getCookingTime());
+		}
+		return null;
 	}
 
 	@Override
@@ -90,8 +83,8 @@ public class ExprRecipeCookingTime extends PropertyExpression<Recipe, Timespan> 
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the recipe cooking time of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "recipe cooking time";
 	}
 
 }
