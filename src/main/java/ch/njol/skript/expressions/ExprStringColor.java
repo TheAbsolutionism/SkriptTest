@@ -14,6 +14,7 @@ import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +24,8 @@ import java.util.List;
 
 @Name("String Colors")
 @Description({
-	"Retrieve the first, the last, or all of the colors of a string.",
-	"NOTE: The retrieved colors of the string will be formatted with the color symbol."
+	"Retrieve the first, the last, or all of the color objects or color codes of a string.",
+	"The retrieved color codes of the string will be formatted with the color symbol."
 })
 @Examples({
 	"set {_colors::*} to the string colors of \"<red>hey<blue>yo\"",
@@ -73,6 +74,11 @@ public class ExprStringColor extends PropertyExpression<String, Object> {
 	@Override
 	public Class<?> getReturnType() {
 		return getCodes ? String.class : Color.class;
+	}
+
+	@Override
+	public Class<?>[] possibleReturnTypes() {
+		return CollectionUtils.array(String.class, SkriptColor.class, ColorRGB.class);
 	}
 
 	@Override
