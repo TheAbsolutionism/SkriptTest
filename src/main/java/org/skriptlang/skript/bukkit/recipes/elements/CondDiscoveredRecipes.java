@@ -52,8 +52,8 @@ public class CondDiscoveredRecipes extends Condition {
 		Recipe[] recipes = exprRecipe.getArray(event);
 		return exprPlayer.check(event, player ->
 			SimpleExpression.check(recipes, recipe -> {
-				if (!(recipe instanceof Keyed recipeKey))
-					return isNegated();
+				assert recipe instanceof Keyed;
+				Keyed recipeKey = (Keyed) recipe;
 				return player.hasDiscoveredRecipe(recipeKey.getKey());
 			}, isNegated(), exprRecipe.getAnd())
 		);

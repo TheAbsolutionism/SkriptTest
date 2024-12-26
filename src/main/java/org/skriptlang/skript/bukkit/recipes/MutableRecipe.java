@@ -55,7 +55,7 @@ public abstract class MutableRecipe implements Recipe {
 
 	public abstract Recipe create();
 
-	public abstract static class MutableCraftingRecipe extends MutableRecipe {
+	public abstract static class MutableCraftingRecipe extends MutableRecipe implements MutableGroupRecipe {
 		private final RecipeChoice[] ingredients = new RecipeChoice[9];
 		private String group;
 		private CraftingBookCategory category;
@@ -157,7 +157,7 @@ public abstract class MutableRecipe implements Recipe {
 		}
 	}
 
-	public static class MutableCookingRecipe extends MutableRecipe {
+	public static class MutableCookingRecipe extends MutableRecipe implements MutableGroupRecipe {
 		private RecipeChoice input;
 		private String group;
 		private CookingBookCategory category;
@@ -403,7 +403,7 @@ public abstract class MutableRecipe implements Recipe {
 		}
 	}
 
-	public static class MutableStonecuttingRecipe extends MutableRecipe {
+	public static class MutableStonecuttingRecipe extends MutableRecipe implements MutableGroupRecipe {
 		private RecipeChoice input;
 		private String group;
 
@@ -484,6 +484,14 @@ public abstract class MutableRecipe implements Recipe {
 			}
 			return new TransmuteRecipe(getKey(), getResult().getType(), input, material);
 		}
+	}
+
+	/**
+	 * Interface used to have mutable recipes, that are able to have groups, to be combined
+	 */
+	public interface MutableGroupRecipe {
+		String getGroup();
+		void setGroup(String object);
 	}
 
 }

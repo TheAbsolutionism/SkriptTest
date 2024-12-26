@@ -16,9 +16,7 @@ import org.bukkit.inventory.*;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableGroupRecipe;
 
 @Name("Recipe Group")
 @Description({
@@ -49,14 +47,8 @@ public class ExprRecipeGroup extends SimplePropertyExpression<Recipe, String> {
 
 	@Override
 	public @Nullable String convert(Recipe recipe) {
-		if (recipe instanceof MutableRecipe)  {
-			if (recipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
-				return mutableCraftingRecipe.getGroup();
-			} else if (recipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-				return mutableCookingRecipe.getGroup();
-			} else if (recipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
-				return mutableStonecuttingRecipe.getGroup();
-			}
+		if (recipe instanceof MutableGroupRecipe mutableGroupRecipe)  {
+			return mutableGroupRecipe.getGroup();
 		} else {
 			// TODO: Combine ShapedRecipe and ShapelessRecipe into CraftingRecipe when minimum version is raised to 1.20.1 or higher.
 			if (recipe instanceof ShapedRecipe shapedRecipe) {
@@ -92,13 +84,8 @@ public class ExprRecipeGroup extends SimplePropertyExpression<Recipe, String> {
 		if (group.isEmpty())
 			return;
 
-		if (mutableRecipe instanceof MutableCraftingRecipe mutableCraftingRecipe) {
-			mutableCraftingRecipe.setGroup(group);
-		} else if (mutableRecipe instanceof MutableCookingRecipe mutableCookingRecipe) {
-			mutableCookingRecipe.setGroup(group);
-		} else if (mutableRecipe instanceof MutableStonecuttingRecipe mutableStonecuttingRecipe) {
-			mutableStonecuttingRecipe.setGroup(group);
-		}
+		if (mutableRecipe instanceof MutableGroupRecipe mutableGroupRecipe)
+			mutableGroupRecipe.setGroup(group);
 	}
 
 	@Override

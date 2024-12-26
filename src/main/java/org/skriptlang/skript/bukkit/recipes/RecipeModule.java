@@ -29,7 +29,6 @@ public class RecipeModule {
 			.name("Recipe")
 			.description("Represents a recipe.")
 			.usage("recipes")
-			.examples("all recipes")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(Recipe.class)));
 
