@@ -10,10 +10,10 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
-import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,13 +71,8 @@ public class ExprStringColor extends PropertyExpression<String, Object> {
 	}
 
 	@Override
-	public Class<Object> getReturnType() {
-		return Object.class;
-	}
-
-	@Override
-	public Class<?>[] possibleReturnTypes() {
-		return CollectionUtils.array(String.class, SkriptColor.class, ColorRGB.class);
+	public Class<?> getReturnType() {
+		return getCodes ? String.class : Color.class;
 	}
 
 	@Override
