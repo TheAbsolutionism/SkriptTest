@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 	"A warden can be angry towards multiple entities with different anger levels.",
 })
 @Examples({
-	"if the most angered entity of last spawned warden is not last spawned pig:",
-		"\tset the most angered entity of last spawned warden to last spawned pig"
+	"if the most angered entity of last spawned warden is not player:",
+		"\tset the most angered entity of last spawned warden to player"
 })
 @Since("INSERT VERSION")
 public class ExprWardenAngryAt extends SimplePropertyExpression<LivingEntity, LivingEntity> {

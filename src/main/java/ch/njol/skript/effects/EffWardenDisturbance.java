@@ -56,7 +56,7 @@ public class EffWardenDisturbance extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "make " + wardens.toString(event, debug) + " semse a disturbance at " + location.toString(event, debug);
+		return "make " + wardens.toString(event, debug) + " semse a disturbance " + location.toString(event, debug);
 	}
 
 }

@@ -31,8 +31,8 @@ import java.util.function.BiConsumer;
 	"Anger level maxes out at 150."
 })
 @Examples({
-	"set the anger level of last spawned warden towards last spawned pig to 20",
-	"clear the last spawned warden's anger level towards last spawned pig"
+	"set the anger level of last spawned warden towards player to 20",
+	"clear the last spawned warden's anger level towards player"
 })
 @Since("INSERT VERSION")
 public class ExprWardenEntityAnger extends SimpleExpression<Integer> {
