@@ -35,7 +35,7 @@ public class EffReleaseEntityStorage extends Effect {
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "release [clear:and (clear|empty)] [the] " + type.getCodeName() + " [stored entities] of %blocks%";
+			patterns[type.ordinal()] = "release [clear:and (clear|empty)] [the] " + type.getName() + " [stored entities] of %blocks%";
 		}
 		Skript.registerEffect(EffReleaseEntityStorage.class, patterns);
 	}
@@ -69,7 +69,7 @@ public class EffReleaseEntityStorage extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "release the "  + storageType.getCodeName() + " stored entities of " + blocks.toString(event, debug);
+		return "release the "  + storageType.getName() + " stored entities of " + blocks.toString(event, debug);
 	}
 
 }

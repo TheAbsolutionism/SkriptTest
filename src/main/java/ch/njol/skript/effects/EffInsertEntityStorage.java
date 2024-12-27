@@ -34,7 +34,7 @@ public class EffInsertEntityStorage extends Effect {
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "(add|insert) %livingentities% in[ ]to [the] " + type.getCodeName() + " of %blocks%";
+			patterns[type.ordinal()] = "(add|insert) %livingentities% in[ ]to [the] " + type.getName() + " of %blocks%";
 		}
 		Skript.registerEffect(EffInsertEntityStorage.class, patterns);
 	}
@@ -88,7 +88,7 @@ public class EffInsertEntityStorage extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "add " + entities.toString(event, debug) + " into the " + storageType.getCodeName() + " of " + blocks.toString(event, debug);
+		return "add " + entities.toString(event, debug) + " into the " + storageType.getName() + " of " + blocks.toString(event, debug);
 	}
 
 }

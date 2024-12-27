@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples("broadcast the beehive storage entity count of {_beehive}")
 @Since("INSERT VERSION")
-public class ExprEntityStorageEntiyCount extends PropertyExpression<Block, Integer> {
+public class ExprEntityStorageEntityCount extends PropertyExpression<Block, Integer> {
 
 	// Future proofing for any EntityBlockStorage added later on
 
@@ -32,9 +32,9 @@ public class ExprEntityStorageEntiyCount extends PropertyExpression<Block, Integ
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "[the] " + type.getCodeName() + " entity (count|amount) [of %blocks%]";
+			patterns[type.ordinal()] = "[the] " + type.getName() + " entity (count|amount) [of %blocks%]";
 		}
-		Skript.registerExpression(ExprEntityStorageEntiyCount.class, Integer.class, ExpressionType.PROPERTY, patterns);
+		Skript.registerExpression(ExprEntityStorageEntityCount.class, Integer.class, ExpressionType.PROPERTY, patterns);
 	}
 
 	private EntityBlockStorageType storageType;
@@ -65,7 +65,7 @@ public class ExprEntityStorageEntiyCount extends PropertyExpression<Block, Integ
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + storageType.getCodeName() + " entity count of " + getExpr().toString(event, debug);
+		return "the " + storageType.getName() + " entity count of " + getExpr().toString(event, debug);
 	}
 
 }

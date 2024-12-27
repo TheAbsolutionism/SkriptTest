@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Storage Is Full")
 @Description({
-	"Checks to see if an entity block storage is full (i.e beehive).",
+	"Checks to see if an entity block storage (i.e beehive) is full.",
 	"Using a specific block storage type will restrict the blocks provided to match the type.",
 	"Any blocks provided not matching the block storage type will fail the condition."
 })
@@ -36,8 +36,8 @@ public class CondEntityStorageIsFull extends Condition {
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length * 2];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal() * 2] = "[the] " + type.getCodeName() + " of %blocks% (is|are) full";
-			patterns[(type.ordinal() * 2) + 1] = "[the] " + type.getCodeName() + " of %blocks% (isn't|is not|aren't|are not) full";
+			patterns[type.ordinal() * 2] = "[the] " + type.getName() + " of %blocks% (is|are) full";
+			patterns[(type.ordinal() * 2) + 1] = "[the] " + type.getName() + " of %blocks% (isn't|is not|aren't|are not) full";
 		}
 		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY, patterns);
 	}
@@ -69,7 +69,7 @@ public class CondEntityStorageIsFull extends Condition {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("the", storageType.getCodeName(), "of", blocks);
+		builder.append("the", storageType.getName(), "of", blocks);
 		if (blocks.isSingle()) {
 			builder.append("is");
 		} else {

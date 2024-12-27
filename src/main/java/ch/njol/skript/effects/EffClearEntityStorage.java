@@ -31,7 +31,7 @@ public class EffClearEntityStorage extends Effect {
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "(clear|empty) [the] " + type.getCodeName() + " [stored entities] of %blocks%";
+			patterns[type.ordinal()] = "(clear|empty) [the] " + type.getName() + " [stored entities] of %blocks%";
 		}
 		Skript.registerEffect(EffClearEntityStorage.class, patterns);
 	}
@@ -62,7 +62,7 @@ public class EffClearEntityStorage extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "clear the "  + storageType.getCodeName() + " stored entities of " + blocks.toString(event, debug);
+		return "clear the "  + storageType.getName() + " stored entities of " + blocks.toString(event, debug);
 	}
 
 }

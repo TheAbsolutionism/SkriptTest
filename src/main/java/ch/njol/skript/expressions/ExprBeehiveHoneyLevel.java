@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 @Name("Beehive Honey Level")
 @Description({
 	"The current or max honey level of a beehive.",
-	"The max level is 5 and can not be changed."
+	"The max level is 5, which cannot be changed."
 })
 @Examples("set the honey level of {_beehive} to the max honey level of {_beehive}")
 @Since("INSERT VERSION")
@@ -88,7 +88,7 @@ public class ExprBeehiveHoneyLevel extends SimplePropertyExpression<Block, Integ
 
 	@Override
 	protected String getPropertyName() {
-		return (isMax ? "maximum" : "") + "honey level";
+		return (isMax ? "maximum " : "") + "honey level";
 	}
 
 }

@@ -22,18 +22,18 @@ public class EntityBlockStorageUtils {
 
 		private Class<? extends EntityBlockStorage<?>> entityStorageClass = null;
 		private Class<? extends Entity> entityClass = null;
-		private final String codeName;
+		private final String name;
 		private boolean superType = false;
 
-		EntityBlockStorageType(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<? extends Entity> entityClass, String codeName) {
+		EntityBlockStorageType(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<? extends Entity> entityClass, String name) {
 			this.entityStorageClass = entityStorageClass;
 			this.entityClass = entityClass;
-			this.codeName = codeName;
+			this.name = name;
 		}
 
-		EntityBlockStorageType(String codeName) {
+		EntityBlockStorageType(String name) {
 			superType = true;
-			this.codeName = codeName;
+			this.name = name;
 		}
 
 		public @Nullable Class<? extends EntityBlockStorage<?>> getEntityStorageClass() {
@@ -44,8 +44,8 @@ public class EntityBlockStorageUtils {
 			return entityClass;
 		}
 
-		public String getCodeName() {
-			return codeName;
+		public String getName() {
+			return name;
 		}
 
 		public boolean isSuperType() {

@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 @Name("Entity Storage Max Entities")
 @Description({
-	"The max number of entities an entity block storage can store (i.e. beehive).",
+	"The max number of entities an entity block storage (i.e. beehive) can store.",
 	"Using a specific block storage type will restrict the blocks provided to match the type."
 })
 @Examples("set the beehive storage max entities of {_beehive} to 100")
@@ -37,7 +37,7 @@ public class ExprEntityStorageMaxEntities extends PropertyExpression<Block, Inte
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "[the] " + type.getCodeName() + " max entities [of %blocks%]";
+			patterns[type.ordinal()] = "[the] " + type.getName() + " max entities [of %blocks%]";
 		}
 		Skript.registerExpression(ExprEntityStorageMaxEntities.class, Integer.class, ExpressionType.PROPERTY, patterns);
 	}
@@ -103,7 +103,7 @@ public class ExprEntityStorageMaxEntities extends PropertyExpression<Block, Inte
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + storageType.getCodeName() + " max entities of " + getExpr().toString(event, debug);
+		return "the " + storageType.getName() + " max entities of " + getExpr().toString(event, debug);
 	}
 
 }
