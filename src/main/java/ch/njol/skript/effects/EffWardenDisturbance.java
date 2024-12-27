@@ -48,9 +48,8 @@ public class EffWardenDisturbance extends Effect {
 		if (finalLocation == null)
 			return;
 		for (LivingEntity livingEntity : wardens.getArray(event)) {
-			if (!(livingEntity instanceof Warden warden))
-				continue;
-			warden.setDisturbanceLocation(finalLocation);
+			if (livingEntity instanceof Warden warden)
+				warden.setDisturbanceLocation(finalLocation);
 		}
 	}
 

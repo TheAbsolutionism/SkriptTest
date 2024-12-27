@@ -47,9 +47,8 @@ public class ExprWardenAngryAt extends SimplePropertyExpression<LivingEntity, Li
 		assert delta != null;
 		LivingEntity target = (LivingEntity) delta[0];
 		for (LivingEntity livingEntity : getExpr().getArray(event)) {
-			if (!(livingEntity instanceof Warden warden))
-				continue;
-			warden.setAnger(target, 150);
+			if (livingEntity instanceof Warden warden)
+				warden.setAnger(target, 150);
 		}
 	}
 

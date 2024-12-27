@@ -9,6 +9,10 @@ test "warden entity anger":
 		set {_rng} to a random integer between 1 and 79
 		set the anger level of {_warden} towards loop-value to {_rng}
 		assert the anger level of {_warden} towards loop-value is {_rng} with "Anger level was not correctly set"
+		remove 99999 from the anger level of {_warden} towards loop-value
+		assert the anger level of {_warden} towards loop-value is 0 with "Anger level should be clamped to 0 min"
+		add 99999 to the anger level of {_warden} towards loop-value
+		assert the anger level of {_warden} towards loop-value is 150 with "Anger level should be clamped to 150 max"
 		clear the anger level of {_warden} towards loop-value
 		assert the anger level of {_warden} towards loop-value is 0 with "Anger level was not cleared"
 
