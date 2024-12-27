@@ -32,7 +32,7 @@ public class CondEntityStorageIsFull extends Condition {
 	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
 
 	static {
-		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
+		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length * 2];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
 			patterns[type.ordinal() * 2] = "[the] " + type.getCodeName() + " of %blocks% (is|are) full";
 			patterns[(type.ordinal() * 2) + 1] = "[the] " + type.getCodeName() + " of %blocks% (isn't|is not|aren't|are not) full";

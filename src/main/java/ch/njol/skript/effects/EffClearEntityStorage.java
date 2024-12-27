@@ -15,27 +15,23 @@ import org.bukkit.block.EntityBlockStorage;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Release Entity Storage")
+@Name("Clear Entity Storage")
 @Description({
-	"Release the entities stored in an entity block storage (i.e. beehive).",
+	"Clear the stored entities of an entity block storage (i.e. beehive).",
 	"Using a specific block storage type will restrict the blocks provided to match the type.",
-	"Please note that releasing entities without `and clear` will effectively duplicate the entities."
 })
-@Examples({
-	"release the beehive storage of {_beehive}",
-	"release and clear the beehive storage stored entities of {_hive}"
-})
+@Examples("clear the beehive storage of {_beehive}")
 @Since("INSERT VERSION")
-public class EffReleaseEntityStorage extends Effect {
+public class EffClearEntityStorage extends Effect {
 
 	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
 
 	static {
 		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
 		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "release [clear:and (clear|empty)] [the] " + type.getCodeName() + " [stored entities] of %blocks%";
+			patterns[type.ordinal()] = "(clear|empty) [the] " + type.getCodeName() + " [stored entities] of %blocks%";
 		}
-		Skript.registerEffect(EffReleaseEntityStorage.class, patterns);
+		Skript.registerEffect(EffClearEntityStorage.class, patterns);
 	}
 
 	private EntityBlockStorageType storageType;
@@ -47,7 +43,6 @@ public class EffReleaseEntityStorage extends Effect {
 		storageType = ENTITY_BLOCK_STORAGE_TYPES[matchedPattern];
 		//noinspection unchecked
 		blocks = (Expression<Block>) exprs[0];
-		clear = parseResult.hasTag("clear");
 		return true;
 	}
 
@@ -58,16 +53,14 @@ public class EffReleaseEntityStorage extends Effect {
 				continue;
 			if (!storageType.isSuperType() && !storageType.getEntityStorageClass().isInstance(blockStorage))
 				continue;
-			blockStorage.releaseEntities();
-			if (clear)
-				blockStorage.clearEntities();
+			blockStorage.clearEntities();
 			blockStorage.update(true, false);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "release the "  + storageType.getCodeName() + " stored entities of " + blocks.toString(event, debug);
+		return "clear the "  + storageType.getCodeName() + " stored entities of " + blocks.toString(event, debug);
 	}
 
 }

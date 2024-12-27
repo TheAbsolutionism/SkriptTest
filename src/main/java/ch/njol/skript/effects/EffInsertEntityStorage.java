@@ -82,6 +82,7 @@ public class EffInsertEntityStorage extends Effect {
 			R typedEntity = (R) entity;
 			blockStorage.addEntity(typedEntity);
 		}
+		blockStorage.update(true, false);
 	}
 
 	@Override
