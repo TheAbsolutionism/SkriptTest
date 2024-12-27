@@ -77,6 +77,7 @@ public class ExprBeehiveHoneyLevel extends SimplePropertyExpression<Block, Integ
 			if (!(block.getBlockData() instanceof Beehive beehive))
 				continue;
 			consumer.accept(beehive);
+			block.setBlockData(beehive);
 		}
 	}
 
