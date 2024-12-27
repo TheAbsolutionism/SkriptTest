@@ -1,11 +1,9 @@
-test "beehive storage entity count":
+test "beehive storage entities":
 	###
 		Combines:
-			ExprEntityStorageEntityCount
+			ExprEntityStorageEntities
 			ExprEntityStorageMaxEntities
-			EffInsertEntityStorage
 			EffReleaseEntityStorage
-			EffClearEntityStorage
 			CondEntityStorageIsFull
 	###
 
@@ -19,18 +17,18 @@ test "beehive storage entity count":
 	assert the beehive storage max entities of {_hive} is 20 with "Beehive storage max entities was not changed"
 	spawn 10 bees at test-location:
 		add entity to {_bees::*}
-	insert {_bees::*} into the beehive storage of {_hive}
-	assert the beehive storage entity count of {_hive} is 10 with "Beehive storage did not have bees added"
+	add {_bees::*} to the beehive storage stored entities of {_hive}
+	assert the beehive storage stored entities of {_hive} is 10 with "Beehive storage did not have bees added"
 	assert the beehive storage of {_hive} is not full with "Beehive storage should not be full"
 
 	spawn 10 bees at test-location:
 		add entity to {_bees2::*}
-	insert {_bees2::*} into the beehive storage of {_hive}
-	assert the beehive storage entity count of {_hive} is 20 with "Beehive storage did not have additional bees added"
+	add {_bees2::*} to the beehive storage stored entities of {_hive}
+	assert the beehive storage stored entities of {_hive} is 20 with "Beehive storage did not have additional bees added"
 	assert the beehive storage of {_hive} is full with "Beehive storage should be full"
 
 	release and clear the beehive storage of {_hive}
-	assert the beehive storage entity count of {_hive} is 0 with "Beehive storage should be empty after releasing and clearing"
+	assert the beehive storage stored entities of {_hive} is 0 with "Beehive storage should be empty after releasing and clearing"
 
 	clear all bees
 	set block at test-block to {_old}

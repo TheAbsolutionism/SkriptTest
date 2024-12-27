@@ -10,7 +10,7 @@ import org.bukkit.block.Block;
 
 @Name("Is Sedated")
 @Description("Checks if a beehive is sedated from a nearby campfire.")
-@Examples("if {_beehive} is sedated")
+@Examples("if {_beehive} is sedated:")
 @Since("INSERT VERSION")
 public class CondIsSedated extends PropertyCondition<Block> {
 

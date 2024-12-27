@@ -66,7 +66,7 @@ public class ExprEntityStorageMaxEntities extends PropertyExpression<Block, Inte
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, ADD, REMOVE -> CollectionUtils.array(Integer.class);
+			case SET, ADD, REMOVE, RESET -> CollectionUtils.array(Integer.class);
 			default -> null;
 		};
 	}
@@ -84,6 +84,7 @@ public class ExprEntityStorageMaxEntities extends PropertyExpression<Block, Inte
 				int current = blockStorage.getMaxEntities();
 				blockStorage.setMaxEntities(Math2.fit(0, current - value, Integer.MAX_VALUE));
 			};
+			case RESET -> blockStorage -> blockStorage.setMaxEntities(3);
 			default -> throw new IllegalStateException("Unexpected value: " + mode);
 		};
 		for (Block block : getExpr().getArray(event)) {
