@@ -13,13 +13,16 @@ import java.util.Map;
 
 public class EntityBlockStorageUtils {
 
+	// Future proofing for any EntityBlockStorage added later on
+	// Any new EntityBlockStorage extensions should only need to be added here
+
 	public enum EntityBlockStorageType {
 		ENTITY_STORAGE("entity block storage"),
 		BEEHIVE(Beehive.class, Bee.class, "beehive storage");
 
 		private Class<? extends EntityBlockStorage<?>> entityStorageClass = null;
 		private Class<? extends Entity> entityClass = null;
-		private String codeName;
+		private final String codeName;
 		private boolean superType = false;
 
 		EntityBlockStorageType(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<? extends Entity> entityClass, String codeName) {

@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 @Since("INSERT VERSION")
 public class EffReleaseEntityStorage extends Effect {
 
+	// Future proofing for any EntityBlockStorage added later on
+
 	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
 
 	static {

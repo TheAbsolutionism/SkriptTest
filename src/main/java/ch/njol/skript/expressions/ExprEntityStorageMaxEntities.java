@@ -30,6 +30,8 @@ import java.util.function.Consumer;
 @Since("INSERT VERSION")
 public class ExprEntityStorageMaxEntities extends PropertyExpression<Block, Integer> {
 
+	// Future proofing for any EntityBlockStorage added later on
+
 	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
 
 	static {
