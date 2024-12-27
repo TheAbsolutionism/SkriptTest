@@ -1,0 +1,10 @@
+test "beehive honey level":
+	set {_old} to block at test-block
+	set block at test-block to beehive
+	set {_hive} to block at test-block
+	set the honey level of {_hive} to the max honey level of {_hive}
+	assert the honey level of {_hive} is the max honey level of {_hive} with "Beehive honey level was not set to max"
+	remove 2 from the honey level of {_hive}
+	assert the honey level of {_hive} is (the max honey level of {_hive} - 2) with "Beehive honey level did not decrease by 2"
+
+	set block at test-block to {_old}
