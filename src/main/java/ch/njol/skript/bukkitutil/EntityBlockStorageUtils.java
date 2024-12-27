@@ -1,7 +1,6 @@
 package ch.njol.skript.bukkitutil;
 
 import org.bukkit.block.Beehive;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.EntityBlockStorage;
 import org.bukkit.entity.Bee;
@@ -17,6 +16,7 @@ public class EntityBlockStorageUtils {
 	// Any new EntityBlockStorage extensions should only need to be added here
 
 	public enum EntityBlockStorageType {
+
 		ENTITY_STORAGE("entity block storage"),
 		BEEHIVE(Beehive.class, Bee.class, "beehive storage");
 
@@ -51,6 +51,7 @@ public class EntityBlockStorageUtils {
 		public boolean isSuperType() {
 			return superType;
 		}
+
 	}
 
 	private static final Map<Class<? extends BlockState>, EntityBlockStorageType> blockStateToEntityStorage = new HashMap<>();
@@ -60,10 +61,6 @@ public class EntityBlockStorageUtils {
 			if (!type.superType)
 				blockStateToEntityStorage.put(type.entityStorageClass, type);
 		}
-	}
-
-	public static @Nullable EntityBlockStorageType getEnityBlockStorageType(Block block) {
-		return getEntityBlockStorageType(block.getState());
 	}
 
 	public static @Nullable EntityBlockStorageType getEntityBlockStorageType(BlockState blockState) {

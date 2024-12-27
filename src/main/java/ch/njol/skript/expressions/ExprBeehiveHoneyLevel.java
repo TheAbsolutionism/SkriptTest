@@ -19,7 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 @Name("Beehive Honey Level")
-@Description("The current or max honey level of a beehive.")
+@Description({
+	"The current or max honey level of a beehive.",
+	"The max level is 5 and can not be changed."
+})
 @Examples("set the honey level of {_beehive} to the max honey level of {_beehive}")
 @Since("INSERT VERSION")
 public class ExprBeehiveHoneyLevel extends SimplePropertyExpression<Block, Integer> {
@@ -59,14 +62,14 @@ public class ExprBeehiveHoneyLevel extends SimplePropertyExpression<Block, Integ
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int value = delta != null ? (int) delta[0] : 0;
 		Consumer<Beehive> consumer = switch (mode)  {
-			case SET -> beehive -> beehive.setHoneyLevel(Math2.fit(0, value, Integer.MAX_VALUE));
+			case SET -> beehive -> beehive.setHoneyLevel(Math2.fit(0, value, 5));
 			case ADD -> beehive -> {
 				int current = beehive.getHoneyLevel();
-				beehive.setHoneyLevel(Math2.fit(0, current + value, Integer.MAX_VALUE));
+				beehive.setHoneyLevel(Math2.fit(0, current + value, 5));
 			};
 			case REMOVE -> beehive -> {
 				int current = beehive.getHoneyLevel();
-				beehive.setHoneyLevel(Math2.fit(0, current - value, Integer.MAX_VALUE));
+				beehive.setHoneyLevel(Math2.fit(0, current - value, 5));
 			};
 			default -> throw new IllegalStateException("Unexpected value: " + mode);
 		};

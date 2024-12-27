@@ -12,7 +12,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.EntityBlockStorage;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -67,24 +66,24 @@ public class EffInsertEntityStorage extends Effect {
 					continue;
 				addEntities(newType.getEntityStorageClass(), newType.getEntityClass(), blockStorage, entities);
 			} else if (storageType.getEntityStorageClass().isInstance(block.getState())) {
-				addEntities(storageType.getEntityStorageClass(), storageType.getEntityClass(), block.getState(), entities);
+				addEntities(storageType.getEntityStorageClass(), storageType.getEntityClass(), blockStorage, entities);
 			}
 		}
 	}
 
-	private <T extends EntityBlockStorage<R>, R extends Entity> void addEntities(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<R> entityClass, BlockState blockState, Entity[] entities) {
+	private <T extends EntityBlockStorage<R>, R extends Entity> void addEntities(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<R> entityClass, EntityBlockStorage<?> blockStorage, Entity[] entities) {
 		//noinspection unchecked
-		T blockStorage = (T) blockState;
+		T typedStorage = (T) blockStorage;
 		for (Entity entity : entities) {
 			if (!entityClass.isInstance(entity))
 				continue;
-			if (blockStorage.getEntityCount() >= blockStorage.getMaxEntities())
+			if (typedStorage.getEntityCount() >= typedStorage.getMaxEntities())
 				break;
 			//noinspection unchecked
 			R typedEntity = (R) entity;
-			blockStorage.addEntity(typedEntity);
+			typedStorage.addEntity(typedEntity);
 		}
-		blockStorage.update(true, false);
+		typedStorage.update(true, false);
 	}
 
 	@Override
