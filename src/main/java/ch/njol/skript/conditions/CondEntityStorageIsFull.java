@@ -16,18 +16,18 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Storage Is Full")
-@Description("Checks to see if an entity block storage (i.e beehive) is full.")
+@Description("Checks to see if the stored entities of an entity block storage (i.e beehive) is full.")
 @Examples({
-	"if the entity block storage of {_beehive} is full:",
-		"\trelease the entity block storage of {_beehive}"
+	"if the stored entities of {_beehive} is full:",
+		"\trelease the stored entities of {_beehive}"
 })
 @Since("INSERT VERSION")
 public class CondEntityStorageIsFull extends Condition {
 
 	static {
 		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY,
-			"[the] entity block storage of %blocks% (is|are) full",
-			"[the] entity block storage of %blocks% (isn't|is not|aren't|are not) full");
+			"[the] stored entities of %blocks% (is|are) full",
+			"[the] stored entities of %blocks% (isn't|is not|aren't|are not) full");
 	}
 
 	private Expression<Block> blocks;
@@ -53,7 +53,7 @@ public class CondEntityStorageIsFull extends Condition {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("the entity block storage of", blocks);
+		builder.append("the stored entities of", blocks);
 		if (blocks.isSingle()) {
 			builder.append("is");
 		} else {

@@ -20,13 +20,13 @@ import java.util.List;
 
 @Name("Release Entity Storage")
 @Description({
-	"Release the entities stored in an entity block storage (i.e. beehive).",
+	"Release the stored entities in an entity block storage (i.e. beehive).",
 	"Providing a timespan will make the released entities unable to go back into the entity block storage for that amount of time.",
 	"Due to unstable behaviour on older versions, this effect requires Minecraft version 1.21+."
 })
 @Examples({
 	"release the stored entities of {_beehive}",
-	"release the entity block storage stored entities of {_hive} for 5 seconds"
+	"release the stored entities of {_hive} for 5 seconds"
 })
 @RequiredPlugins("Minecraft 1.21")
 @Since("INSERT VERSION")
@@ -42,7 +42,7 @@ public class EffReleaseEntityStorage extends Effect {
 	static {
 		if (Skript.isRunningMinecraft(1, 21, 0)) {
 			Skript.registerEffect(EffReleaseEntityStorage.class,
-				"(release|evict) [the] [entity block storage] stored entities of %blocks% [for %-timespan%]");
+				"(release|evict) [the] stored entities of %blocks% [for %-timespan%]");
 		}
 	}
 
@@ -81,7 +81,7 @@ public class EffReleaseEntityStorage extends Effect {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("release the entity block storage stored entities of", blocks);
+		builder.append("release the stored entities of", blocks);
 		if (timespan != null)
 			builder.append("for", timespan);
 		return builder.toString();
