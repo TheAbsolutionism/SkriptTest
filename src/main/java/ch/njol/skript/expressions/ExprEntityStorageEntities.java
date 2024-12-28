@@ -1,21 +1,16 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.bukkitutil.EntityBlockStorageUtils;
-import ch.njol.skript.bukkitutil.EntityBlockStorageUtils.EntityBlockStorageType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.expressions.base.PropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Kleenean;
+import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.EntityBlockStorage;
+import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
@@ -26,54 +21,46 @@ import org.jetbrains.annotations.Nullable;
 	"The entities stored inside an entity block storage (i.e. beehive).",
 	"This does not return a list of all the entities stored inside the block. This can only return the number of entities stored.",
 	"Adding entities into a block must be of the required type (i.e. a bee for beehive).",
-	"Requires a Paper server to clear the stored entities inside the block.",
-	"Using a specific block storage type will restrict the blocks provided to match the type."
+	"Due to unstable behavior on older versions, adding entities to an entity block storage requires Minecraft version 1.21+.",
+	"Requires a Paper server to clear the stored entities inside the block."
 })
 @Examples({
-	"broadcast the beehive storage stored entities of {_beehive}",
-	"add last spawned bee to the beehive storage entities of {_beehive}",
-	"clear the beehive storage stored entities of {_beehive} # Require Paper"
+	"broadcast the stored entities of {_beehive}",
+	"add last spawned bee to the entity block storage stored entities of {_beehive}",
+	"clear the stored entities of {_beehive} # Require Paper"
 })
 @Since("INSERT VERSION")
-public class ExprEntityStorageEntities extends PropertyExpression<Block, Integer> {
+public class ExprEntityStorageEntities extends SimplePropertyExpression<Block, Integer> {
 
-	// Future proofing for any EntityBlockStorage added later on
+	/*
+		Minecraft versions 1.19.4 -> 1.20.6 have unstable behavior.
+		Entity is either not added, or added but still exists.
+		Releasing entities on these versions is also unstable.
+		Either entities are not released or are released and not clearing the stored entities.
+		Causes are unknown.
+	 */
 
 	private static final boolean SUPPORTS_CLEAR = Skript.methodExists(EntityBlockStorage.class, "clearEntities");
-	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
+	private static final boolean RUNNING_1_21_0 = Skript.isRunningMinecraft(1, 21, 0);
 
 	static {
-		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length];
-		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal()] = "[the] " + type.getName() + " [stored] entities [of %blocks%]";
-		}
-		Skript.registerExpression(ExprEntityStorageEntities.class, Integer.class, ExpressionType.PROPERTY, patterns);
-	}
-
-	private EntityBlockStorageType storageType;
-
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		storageType = ENTITY_BLOCK_STORAGE_TYPES[matchedPattern];
-		//noinspection unchecked
-		setExpr((Expression<Block>) exprs[0]);
-		return true;
+		registerDefault(ExprEntityStorageEntities.class, Integer.class, "[entity block storage] stored entities", "blocks");
 	}
 
 	@Override
-	protected Integer @Nullable [] get(Event event, Block[] source) {
-		return get(source, block -> {
-			if (!(block.getState() instanceof EntityBlockStorage<?> blockStorage))
-				return null;
-			if (!storageType.isSuperType() && !storageType.getEntityStorageClass().isInstance(blockStorage))
-				return null;
+	public @Nullable Integer convert(Block block) {
+		if (block.getState() instanceof EntityBlockStorage<?> blockStorage)
 			return blockStorage.getEntityCount();
-		});
+		return null;
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.ADD) {
+			if (!RUNNING_1_21_0) {
+				Skript.error("Adding entities requires Minecraft version 1.21+");
+				return null;
+			}
 			return CollectionUtils.array(LivingEntity[].class);
 		} else if (mode == ChangeMode.DELETE) {
 			if (!SUPPORTS_CLEAR) {
@@ -91,22 +78,15 @@ public class ExprEntityStorageEntities extends PropertyExpression<Block, Integer
 		for (Block block : getExpr().getArray(event)) {
 			if (!(block.getState() instanceof EntityBlockStorage<?> blockStorage))
 				continue;
-			EntityBlockStorageType thisType = storageType;
-			if (storageType.isSuperType()) {
-				thisType = EntityBlockStorageUtils.getEntityBlockStorageType(blockStorage);
-				if (thisType == null)
-					continue;
-			} else if (!storageType.getEntityStorageClass().isInstance(blockStorage))
-				continue;
 			if (mode == ChangeMode.DELETE) {
 				blockStorage.clearEntities();
 			} else if (mode == ChangeMode.ADD && entities != null) {
-				addEntities(thisType.getEntityStorageClass(), thisType.getEntityClass(), blockStorage, entities);
+				addEntities(blockStorage.getClass(), Bee.class, blockStorage, entities);
 			}
 		}
 	}
 
-	private <T extends EntityBlockStorage<R>, R extends Entity> void addEntities(Class<? extends EntityBlockStorage<?>> entityStorageClass, Class<R> entityClass, EntityBlockStorage<?> blockStorage, Entity[] entities) {
+	private <T extends EntityBlockStorage<R>, R extends Entity> void addEntities(Class<T> entityStorageClass, Class<R> entityClass, EntityBlockStorage<?> blockStorage, Entity[] entities) {
 		//noinspection unchecked
 		T typedStorage = (T) blockStorage;
 		for (Entity entity : entities) {
@@ -127,8 +107,8 @@ public class ExprEntityStorageEntities extends PropertyExpression<Block, Integer
 	}
 
 	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "the " + storageType.getName() + " stored entities of " + getExpr().toString(event, debug);
+	protected String getPropertyName() {
+		return "entity block storage stored entities";
 	}
 
 }

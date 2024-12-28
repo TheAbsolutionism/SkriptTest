@@ -1,7 +1,6 @@
 package ch.njol.skript.conditions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.bukkitutil.EntityBlockStorageUtils.EntityBlockStorageType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -17,38 +16,25 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Storage Is Full")
-@Description({
-	"Checks to see if an entity block storage (i.e beehive) is full.",
-	"Using a specific block storage type will restrict the blocks provided to match the type.",
-	"Any blocks provided not matching the block storage type will fail the condition."
-})
+@Description("Checks to see if an entity block storage (i.e beehive) is full.")
 @Examples({
-	"if the beehive storage of {_beehive} is full:",
-		"release the beehive storage of {_beehive}"
+	"if the entity block storage of {_beehive} is full:",
+		"\trelease the entity block storage of {_beehive}"
 })
 @Since("INSERT VERSION")
 public class CondEntityStorageIsFull extends Condition {
 
-	// Future proofing for any EntityBlockStorage added later on
-
-	private static final EntityBlockStorageType[] ENTITY_BLOCK_STORAGE_TYPES = EntityBlockStorageType.values();
-
 	static {
-		String[] patterns = new String[ENTITY_BLOCK_STORAGE_TYPES.length * 2];
-		for (EntityBlockStorageType type : ENTITY_BLOCK_STORAGE_TYPES) {
-			patterns[type.ordinal() * 2] = "[the] " + type.getName() + " of %blocks% (is|are) full";
-			patterns[(type.ordinal() * 2) + 1] = "[the] " + type.getName() + " of %blocks% (isn't|is not|aren't|are not) full";
-		}
-		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY, patterns);
+		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY,
+			"[the] entity block storage of %blocks% (is|are) full",
+			"[the] entity block storage of %blocks% (isn't|is not|aren't|are not) full");
 	}
 
-	private EntityBlockStorageType storageType;
 	private Expression<Block> blocks;
 	private boolean checkFull;
 
 	@Override
 	public boolean init(Expression<?>[] exrps, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		storageType = ENTITY_BLOCK_STORAGE_TYPES[matchedPattern / 2];
 		checkFull = matchedPattern % 2 == 0;
 		//noinspection unchecked
 		blocks = (Expression<Block>) exrps[0];
@@ -60,8 +46,6 @@ public class CondEntityStorageIsFull extends Condition {
 		return blocks.check(event, block -> {
 			if (!(block.getState() instanceof EntityBlockStorage<?> blockStorage))
 				return false;
-			if (!storageType.isSuperType() && !storageType.getEntityStorageClass().isInstance(blockStorage))
-				return false;
 			return blockStorage.isFull() == checkFull;
 		});
 	}
@@ -69,7 +53,7 @@ public class CondEntityStorageIsFull extends Condition {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("the", storageType.getName(), "of", blocks);
+		builder.append("the entity block storage of", blocks);
 		if (blocks.isSingle()) {
 			builder.append("is");
 		} else {
