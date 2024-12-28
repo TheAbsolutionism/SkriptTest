@@ -12,10 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.PriorityQueue;
-import java.util.TimeZone;
+import java.util.*;
 
 public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTime> {
 
@@ -51,35 +48,29 @@ public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTi
 	@Override
 	public boolean postLoad() {
 		int adjustedHour = time.getHour();
-		if (time.getTimeState() == TimeState.AM) {
-			adjustedHour += 12;
-		} else if (time.getTimeState() == TimeState.PM) {
-			adjustedHour -= 12;
-		}
 		Calendar currentCalendar = Calendar.getInstance();
 		currentCalendar.setTimeZone(TimeZone.getDefault());
 		long currentEpoch = currentCalendar.getTimeInMillis();
 		Calendar expectedCalendar = Calendar.getInstance();
 		expectedCalendar.setTimeZone(TimeZone.getDefault());
-		expectedCalendar.set(Calendar.HOUR, adjustedHour);
 		expectedCalendar.set(Calendar.MINUTE, time.getMinute());
 		expectedCalendar.set(Calendar.SECOND, 0);
 		expectedCalendar.set(Calendar.MILLISECOND, 0);
-		long expectedEpoch = expectedCalendar.getTimeInMillis();
-		Skript.adminBroadcast("--------------------------------------");
-		Skript.adminBroadcast("[" + time + "] Prior: " + expectedEpoch + " | " + expectedCalendar.getTime());
-		if (expectedEpoch < currentEpoch) {
+		expectedCalendar.set(Calendar.HOUR_OF_DAY, adjustedHour);
+		if (expectedCalendar.before(currentCalendar)) {
 			if (time.getTimeState() == TimeState.ANY) {
-				expectedCalendar.add(Calendar.HOUR, 12);
+				expectedCalendar.add(Calendar.HOUR_OF_DAY, 12);
 			} else {
-				expectedCalendar.add(Calendar.HOUR, 24);
+				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
-			expectedEpoch = expectedCalendar.getTimeInMillis();
 		}
+		long expectedEpoch = expectedCalendar.getTimeInMillis();
+		Skript.adminBroadcast("-----------------------------");
 		Skript.adminBroadcast("[" + time + "] Current Time: " + currentEpoch + " | " + currentCalendar.getTime());
 		Skript.adminBroadcast("[" + time + "] Expected Time: " + expectedEpoch + " | " + expectedCalendar.getTime());
 		executionTime = expectedEpoch;
 		instances.add(this);
+		refreshThread();
 		return true;
 	}
 
@@ -106,7 +97,6 @@ public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTi
 	}
 
 	private void execute() {
-		Skript.adminBroadcast("Executing");
 		ServerTimeEvent event = new ServerTimeEvent();
 		SkriptEventHandler.logEventStart(event);
 		SkriptEventHandler.logTriggerStart(trigger);
@@ -121,12 +111,14 @@ public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTi
 	}
 
 	private static Thread thread;
+	private static volatile boolean running;
 
 	static {
-		createThread();
+		startThread();
 	}
 
-	private static void createThread() {
+	private static void startThread() {
+		running = true;
 		if (thread == null) {
 			thread = new Thread(EvtServerTime::run);
 			thread.start();
@@ -136,34 +128,41 @@ public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTi
 	}
 
 	private static void stopThread() {
+		running = false;
 		if (thread != null)
 			thread.interrupt();
 	}
 
+	private static void refreshThread() {
+		if (thread == null || !thread.isAlive()) {
+			startThread();
+		} else {
+			thread.interrupt();
+		}
+	}
+
 	private static void run() {
 		long defaultWait = 60000;
-		Skript.adminBroadcast("Thread Started");
-		while (true) {
+		while (running) {
 			long currentWait = defaultWait;
 			if (!instances.isEmpty()) {
 				EvtServerTime evtServerTime = instances.peek();
 				long currentTime = (new Date()).getTime();
 				if (currentTime >= evtServerTime.executionTime) {
 					evtServerTime.execute();
-					Skript.adminBroadcast("Before: " + evtServerTime.executionTime);
 					if (evtServerTime.time.getTimeState() == TimeState.ANY) {
 						evtServerTime.executionTime += HOUR_12_MILLISECONDS;
 					} else {
 						evtServerTime.executionTime += HOUR_24_MILLISECONDS;
 					}
-					Skript.adminBroadcast("After: " + evtServerTime.executionTime);
+					instances.remove(evtServerTime);
+					instances.offer(evtServerTime);
 					if (instances.size() > 1)
 						currentWait = 0;
 				} else if ((evtServerTime.executionTime - currentTime) < defaultWait) {
 					currentWait = evtServerTime.executionTime - currentTime;
 				}
 			}
-			Skript.adminBroadcast("Sleeping: " + currentWait);
 			try {
 				//noinspection BusyWait
 				Thread.sleep(currentWait);

@@ -140,11 +140,8 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 				}
 				TimeState state = TimeState.AM;
 				if (m.group(4).equalsIgnoreCase("pm")) {
-					if (hours < 12)
-						hours += 12;
+					hours += 12;
 					state = TimeState.PM;
-				} else if (hours == 12) {
-					hours = 0;
 				}
 				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, state);
 			}
