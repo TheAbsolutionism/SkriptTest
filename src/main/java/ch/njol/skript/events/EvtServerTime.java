@@ -5,17 +5,19 @@ import ch.njol.skript.SkriptEventHandler;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import org.bukkit.Bukkit;
+import ch.njol.skript.util.Time;
+import ch.njol.skript.util.Time.TimeState;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.PriorityQueue;
+import java.util.TimeZone;
 
-public class EvtServerTime extends SkriptEvent {
+public class EvtServerTime extends SkriptEvent implements Comparable<EvtServerTime> {
 
 	public static class ServerTimeEvent extends Event {
 		@Override
@@ -24,63 +26,68 @@ public class EvtServerTime extends SkriptEvent {
 		}
 	}
 
-	private enum TimeState {
-		ANY, AM, PM
-	}
-
-	private static final TimeState[] TIME_STATES = TimeState.values();
-	private static final int HOUR_12_SECONDS = 43200;
-	private static final int HOUR_24_SECONDS = HOUR_12_SECONDS * 2;
+	private static final long HOUR_12_MILLISECONDS = 43200000;
+	private static final long HOUR_24_MILLISECONDS = HOUR_12_MILLISECONDS * 2;
+	private static final PriorityQueue<EvtServerTime> instances = new PriorityQueue<>(EvtServerTime::compareTo);
 
 	static {
 		Skript.registerEvent("Server Time", EvtServerTime.class, ServerTimeEvent.class,
-			"(server|real) time (of|at) %integer%.%integer%",
-			"(server|real) time (of|at) %integer%.%integer%[ ]am",
-			"(server|real) time (of|at) %integer%.%integer%[ ]pm")
+			"(server|real) time (of|at) %time%")
 				.description()
 				.examples()
 				.since("INSERT VERSION");
 	}
 
-	private TimeState state;
-	private int hour;
-	private int minute;
-	private long nextTime;
-	private int currentTask;
-	private boolean unloaded = false;
+	private Time time;
+	private long executionTime;
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
-		state = TIME_STATES[matchedPattern];
 		//noinspection unchecked
-		int hour = ((Literal<Integer>) args[0]).getSingle();
-		if (hour < 1 || hour > 12) {
-			Skript.error("The hour can not be below 1 or above 12.");
-			return false;
-		}
-		//noinspection unchecked
-		int minute = ((Literal<Integer>) args[1]).getSingle();
-		if (minute < 0 || minute > 60) {
-			Skript.adminBroadcast("The minute can not be below 0 or above 60.");
-		} else if (minute == 60) {
-			minute = 0;
-			hour++;
-		}
-		this.hour = hour;
-		this.minute = minute;
+		time = ((Literal<Time>) args[0]).getSingle();
 		return true;
 	}
 
 	@Override
 	public boolean postLoad() {
-		updateScheduler(false);
+		int adjustedHour = time.getHour();
+		if (time.getTimeState() == TimeState.AM) {
+			adjustedHour += 12;
+		} else if (time.getTimeState() == TimeState.PM) {
+			adjustedHour -= 12;
+		}
+		Calendar currentCalendar = Calendar.getInstance();
+		currentCalendar.setTimeZone(TimeZone.getDefault());
+		long currentEpoch = currentCalendar.getTimeInMillis();
+		Calendar expectedCalendar = Calendar.getInstance();
+		expectedCalendar.setTimeZone(TimeZone.getDefault());
+		expectedCalendar.set(Calendar.HOUR, adjustedHour);
+		expectedCalendar.set(Calendar.MINUTE, time.getMinute());
+		expectedCalendar.set(Calendar.SECOND, 0);
+		expectedCalendar.set(Calendar.MILLISECOND, 0);
+		long expectedEpoch = expectedCalendar.getTimeInMillis();
+		Skript.adminBroadcast("--------------------------------------");
+		Skript.adminBroadcast("[" + time + "] Prior: " + expectedEpoch + " | " + expectedCalendar.getTime());
+		if (expectedEpoch < currentEpoch) {
+			if (time.getTimeState() == TimeState.ANY) {
+				expectedCalendar.add(Calendar.HOUR, 12);
+			} else {
+				expectedCalendar.add(Calendar.HOUR, 24);
+			}
+			expectedEpoch = expectedCalendar.getTimeInMillis();
+		}
+		Skript.adminBroadcast("[" + time + "] Current Time: " + currentEpoch + " | " + currentCalendar.getTime());
+		Skript.adminBroadcast("[" + time + "] Expected Time: " + expectedEpoch + " | " + expectedCalendar.getTime());
+		executionTime = expectedEpoch;
+		instances.add(this);
 		return true;
 	}
 
 	@Override
 	public void unload() {
-		unloaded = true;
-		Bukkit.getScheduler().cancelTask(currentTask);
+		instances.remove(this);
+		if (instances.isEmpty())
+			stopThread();
 	}
 
 	@Override
@@ -98,64 +105,70 @@ public class EvtServerTime extends SkriptEvent {
 		return null;
 	}
 
-	private void updateScheduler(boolean executed) {
-		if (unloaded)
-			return;
-		long ticks;
-		if (executed) {
-			if (state == TimeState.ANY) {
-				nextTime += HOUR_12_SECONDS;
-				ticks = HOUR_12_SECONDS * 20;
-			} else {
-				nextTime += HOUR_24_SECONDS;
-				ticks = HOUR_24_SECONDS * 20;
-			}
-		} else {
-			ticks = ticksTilTime();
-		}
-		Skript.adminBroadcast("[" + state.toString() + "] Ticks until: " + ticks);
-		currentTask = Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), this::checkExecute, ticks);
-	}
-
-	private long ticksTilTime() {
-		LocalDateTime currentTime = LocalDateTime.now();
-		boolean isPM = currentTime.getHour() >= 11;
-		LocalDateTime expectedTime = currentTime.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
-		Skript.adminBroadcast("[" + state.toString() + "] Current Time: " + currentTime);
-		Skript.adminBroadcast("[" + state.toString() + "] Expected Time: " + expectedTime);
-		if (state != TimeState.ANY) {
-			boolean expectedPM = state == TimeState.PM;
-			if (expectedPM != isPM)
-				expectedTime = expectedTime.plusHours(12);
-		}
-		long currentEpoch = currentTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(currentTime));
-		long expectedEpoch = expectedTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(expectedTime));
-		(new Date()).toInstant().
-		long diff = Math.abs(currentEpoch - expectedEpoch);
-		nextTime = expectedEpoch;
-		return (diff - 1) * 20;
-	}
-
-	private void checkExecute() {
-		if (unloaded)
-			return;
-		LocalDateTime currentTime = LocalDateTime.now();
-		long currentEpoch = currentTime.toEpochSecond(ZoneOffset.systemDefault().getRules().getOffset(currentTime));
-		if (Math.abs(nextTime - currentEpoch) <= 10) {
-			execute();
-		} else {
-			updateScheduler(false);
-		}
-	}
-
 	private void execute() {
+		Skript.adminBroadcast("Executing");
 		ServerTimeEvent event = new ServerTimeEvent();
 		SkriptEventHandler.logEventStart(event);
 		SkriptEventHandler.logTriggerStart(trigger);
 		trigger.execute(event);
 		SkriptEventHandler.logTriggerEnd(trigger);
 		SkriptEventHandler.logEventEnd();
-		updateScheduler(true);
+	}
+
+	@Override
+	public int compareTo(@Nullable EvtServerTime event) {
+		return (int) (event == null ? executionTime : executionTime - event.executionTime);
+	}
+
+	private static Thread thread;
+
+	static {
+		createThread();
+	}
+
+	private static void createThread() {
+		if (thread == null) {
+			thread = new Thread(EvtServerTime::run);
+			thread.start();
+		} else if (!thread.isAlive()) {
+			thread.start();
+		}
+	}
+
+	private static void stopThread() {
+		if (thread != null)
+			thread.interrupt();
+	}
+
+	private static void run() {
+		long defaultWait = 60000;
+		Skript.adminBroadcast("Thread Started");
+		while (true) {
+			long currentWait = defaultWait;
+			if (!instances.isEmpty()) {
+				EvtServerTime evtServerTime = instances.peek();
+				long currentTime = (new Date()).getTime();
+				if (currentTime >= evtServerTime.executionTime) {
+					evtServerTime.execute();
+					Skript.adminBroadcast("Before: " + evtServerTime.executionTime);
+					if (evtServerTime.time.getTimeState() == TimeState.ANY) {
+						evtServerTime.executionTime += HOUR_12_MILLISECONDS;
+					} else {
+						evtServerTime.executionTime += HOUR_24_MILLISECONDS;
+					}
+					Skript.adminBroadcast("After: " + evtServerTime.executionTime);
+					if (instances.size() > 1)
+						currentWait = 0;
+				} else if ((evtServerTime.executionTime - currentTime) < defaultWait) {
+					currentWait = evtServerTime.executionTime - currentTime;
+				}
+			}
+			Skript.adminBroadcast("Sleeping: " + currentWait);
+			try {
+				//noinspection BusyWait
+				Thread.sleep(currentWait);
+			} catch (InterruptedException ignored) {}
+		}
 	}
 
 }
