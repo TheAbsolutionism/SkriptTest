@@ -20,18 +20,17 @@ import org.jetbrains.annotations.Nullable;
 	"clear the flower target of {_beehive}"
 })
 @Since("INSERT VERSION")
-public class ExprBeehiveFlower extends SimplePropertyExpression<Block, Block> {
+public class ExprBeehiveFlower extends SimplePropertyExpression<Block, Location> {
 
 	static {
-		registerDefault(ExprBeehiveFlower.class, Block.class, "flower target", "blocks");
+		registerDefault(ExprBeehiveFlower.class, Location.class, "flower target", "blocks");
 	}
 
 	@Override
-	public @Nullable Block convert(Block block) {
+	public @Nullable Location convert(Block block) {
 		if (!(block.getState() instanceof Beehive beehive))
 			return null;
-		Location location = beehive.getFlower();
-		return location != null ? location.getBlock() : null;
+		return beehive.getFlower();
 	}
 
 	@Override
@@ -60,8 +59,8 @@ public class ExprBeehiveFlower extends SimplePropertyExpression<Block, Block> {
 	}
 
 	@Override
-	public Class<Block> getReturnType() {
-		return Block.class;
+	public Class<Location> getReturnType() {
+		return Location.class;
 	}
 
 	@Override

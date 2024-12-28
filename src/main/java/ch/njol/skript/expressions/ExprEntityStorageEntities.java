@@ -37,7 +37,6 @@ public class ExprEntityStorageEntities extends SimplePropertyExpression<Block, I
 		Entity is either not added, or added but still exists.
 		Releasing entities on these versions is also unstable.
 		Either entities are not released or are released and not clearing the stored entities.
-		Causes are unknown.
 	 */
 
 	private static final boolean SUPPORTS_CLEAR = Skript.methodExists(EntityBlockStorage.class, "clearEntities");

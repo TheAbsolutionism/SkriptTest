@@ -6,7 +6,7 @@ test "beehive flower":
 	set block at {_old2} to flower
 	set {_flower} to block at {_old2}
 	set the flower target of {_hive} to {_flower}
-	assert the flower target of {_hive} is {_flower} with "Beehive flower target did not change"
+	assert the block at (flower target of {_hive}) is {_flower} with "Beehive flower target did not change"
 	clear the flower target of {_hive}
 	assert the flower target of {_hive} is not set with "Beehive flower target was not cleared"
 

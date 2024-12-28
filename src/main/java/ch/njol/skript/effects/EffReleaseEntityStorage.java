@@ -39,10 +39,8 @@ public class EffReleaseEntityStorage extends Effect {
 		Entities are either not added, or added but still exist.
 	 */
 
-	private static final boolean RUNNING_1_21_0 = Skript.isRunningMinecraft(1, 21, 0);
-
 	static {
-		if (RUNNING_1_21_0) {
+		if (Skript.isRunningMinecraft(1, 21, 0)) {
 			Skript.registerEffect(EffReleaseEntityStorage.class,
 				"(release|evict) [the] [entity block storage] stored entities of %blocks% [for %-timespan%]");
 		}
