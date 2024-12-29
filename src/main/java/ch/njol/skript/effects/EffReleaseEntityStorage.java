@@ -21,12 +21,12 @@ import java.util.List;
 @Name("Release Entity Storage")
 @Description({
 	"Release the stored entities in an entity block storage (i.e. beehive).",
-	"Providing a timespan will make the released entities unable to go back into the entity block storage for that amount of time.",
+	"Providing a timespan will make the released bees unable to go back into the beehive for that amount of time.",
 	"Due to unstable behaviour on older versions, this effect requires Minecraft version 1.21+."
 })
 @Examples({
 	"release the stored entities of {_beehive}",
-	"release the stored entities of {_hive} for 5 seconds"
+	"release the entity storage of {_hive} for 5 seconds"
 })
 @RequiredPlugins("Minecraft 1.21")
 @Since("INSERT VERSION")
@@ -42,7 +42,7 @@ public class EffReleaseEntityStorage extends Effect {
 	static {
 		if (Skript.isRunningMinecraft(1, 21, 0)) {
 			Skript.registerEffect(EffReleaseEntityStorage.class,
-				"(release|evict) [the] stored entities of %blocks% [for %-timespan%]");
+				"(release|evict) [the] (stored entities|entity storage) of %blocks% [for %-timespan%]");
 		}
 	}
 
@@ -53,6 +53,9 @@ public class EffReleaseEntityStorage extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		blocks = (Expression<Block>) exprs[0];
+		if (exprs[1] != null)
+			//noinspection unchecked
+			timespan = (Expression<Timespan>) exprs[1];
 		return true;
 	}
 

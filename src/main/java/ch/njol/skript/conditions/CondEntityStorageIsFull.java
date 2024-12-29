@@ -16,26 +16,25 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Entity Storage Is Full")
-@Description("Checks to see if the stored entities of an entity block storage (i.e beehive) is full.")
+@Description("Checks to see if the an entity block storage (i.e beehive) is full.")
 @Examples({
-	"if the stored entities of {_beehive} is full:",
-		"\trelease the stored entities of {_beehive}"
+	"if the entity storage of {_beehive} is full:",
+		"\trelease the entity storage of {_beehive}"
 })
 @Since("INSERT VERSION")
 public class CondEntityStorageIsFull extends Condition {
 
 	static {
 		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY,
-			"[the] stored entities of %blocks% (is|are) full",
-			"[the] stored entities of %blocks% (isn't|is not|aren't|are not) full");
+			"[the] entity storage of %blocks% (is|are) full",
+			"[the] entity storage of %blocks% (isn't|is not|aren't|are not) full");
 	}
 
 	private Expression<Block> blocks;
-	private boolean checkFull;
 
 	@Override
 	public boolean init(Expression<?>[] exrps, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		checkFull = matchedPattern % 2 == 0;
+		setNegated(matchedPattern % 2 == 1);
 		//noinspection unchecked
 		blocks = (Expression<Block>) exrps[0];
 		return true;
@@ -46,20 +45,20 @@ public class CondEntityStorageIsFull extends Condition {
 		return blocks.check(event, block -> {
 			if (!(block.getState() instanceof EntityBlockStorage<?> blockStorage))
 				return false;
-			return blockStorage.isFull() == checkFull;
-		});
+			return blockStorage.isFull();
+		}, isNegated());
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("the stored entities of", blocks);
+		builder.append("the entity storage of", blocks);
 		if (blocks.isSingle()) {
 			builder.append("is");
 		} else {
 			builder.append("are");
 		}
-		if (!checkFull)
+		if (isNegated())
 			builder.append("not");
 		builder.append("full");
 		return builder.toString();
