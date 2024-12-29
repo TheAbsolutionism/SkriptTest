@@ -1557,6 +1557,7 @@ public class BukkitClasses {
 			.since("INSERT VERSION"));
 
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
+			boolean SUPPORTS_GET_AS = Skript.methodExists(EntitySnapshot.class, "getAsString");
 			Classes.registerClass(new ClassInfo<>(EntitySnapshot.class, "entitysnapshot")
 				.user("entity ?snapshots?")
 				.name("Entity Snapshot")
@@ -1566,6 +1567,24 @@ public class BukkitClasses {
 					"Individual attributes of a snapshot cannot be modified or retrieved.")
 				.requiredPlugins("Minecraft 1.20.2+")
 				.since("INSERT VERSION")
+				.parser(new Parser<EntitySnapshot>() {
+					@Override
+					public boolean canParse(ParseContext context) {
+						return false;
+					}
+
+					@Override
+					public String toString(EntitySnapshot o, int flags) {
+						if (SUPPORTS_GET_AS)
+							return o.getAsString();
+						return o.getEntityType() + " snapshot";
+					}
+
+					@Override
+					public String toVariableNameString(EntitySnapshot o) {
+						return o.getEntityType() + " snapshot";
+					}
+				})
 			);
 		}
 
