@@ -1557,7 +1557,7 @@ public class BukkitClasses {
 			.since("INSERT VERSION"));
 
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
-			boolean SUPPORTS_GET_AS = Skript.methodExists(EntitySnapshot.class, "getAsString");
+			boolean supportsGetAs = Skript.methodExists(EntitySnapshot.class, "getAsString");
 			Classes.registerClass(new ClassInfo<>(EntitySnapshot.class, "entitysnapshot")
 				.user("entity ?snapshots?")
 				.name("Entity Snapshot")
@@ -1567,22 +1567,22 @@ public class BukkitClasses {
 					"Individual attributes of a snapshot cannot be modified or retrieved.")
 				.requiredPlugins("Minecraft 1.20.2+")
 				.since("INSERT VERSION")
-				.parser(new Parser<EntitySnapshot>() {
+				.parser(new Parser<>() {
 					@Override
 					public boolean canParse(ParseContext context) {
 						return false;
 					}
 
 					@Override
-					public String toString(EntitySnapshot o, int flags) {
-						if (SUPPORTS_GET_AS)
-							return o.getAsString();
-						return o.getEntityType() + " snapshot";
+					public String toString(EntitySnapshot snapshot, int flags) {
+						if (supportsGetAs)
+							return snapshot.getAsString();
+						return snapshot.getEntityType().toString().toLowerCase(Locale.ENGLISH).replace('_', ' ') + " snapshot";
 					}
 
 					@Override
-					public String toVariableNameString(EntitySnapshot o) {
-						return o.getEntityType() + " snapshot";
+					public String toVariableNameString(EntitySnapshot snapshot) {
+						return snapshot.getEntityType() + " snapshot";
 					}
 				})
 			);
