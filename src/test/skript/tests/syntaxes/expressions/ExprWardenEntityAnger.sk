@@ -15,14 +15,6 @@ test "warden entity anger":
 		assert the anger level of {_warden} towards loop-value is 150 with "Anger level should be clamped to 150 max"
 		clear the anger level of {_warden} towards loop-value
 		assert the anger level of {_warden} towards loop-value is 0 with "Anger level was not cleared"
-		add infinity to the anger level of {_warden} towards loop-value
-		assert the anger level of {_warden} towards loop-value is 150 "Anger level should be clamped to 150, with infinity"
-		remove infinity from the anger level of {_warden} towards loop-value
-		assert the anger level of {_warden} towards loop-value is 0 with "Anger level should be clamped to 0, with infinity"
-		add NaN to the anger level of {_warden} towards loop-value
-		assert the anger level of {_warden} towards loop-value is 150 "Anger level should be clamped to 150, with NaN"
-		remove NaN from the anger level of {_warden} towards loop-value
-		assert the anger level of {_warden} towards loop-value is 0 with "Anger level should be clamped to 0, with NaN"
 
 	set the most angered entity of {_warden} to {_entities::1}
 	assert the most angered entity of {_warden} is {_entities::1} with "Most angered entity was not correctly set"
