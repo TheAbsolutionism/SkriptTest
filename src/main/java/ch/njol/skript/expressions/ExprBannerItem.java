@@ -26,7 +26,7 @@ import java.util.*;
 @Name("Banner Pattern Item")
 @Description({
 	"Gets the item from a banner pattern type.",
-	"NOTE: Not all banner pattern types have an item.",
+	"Note that not all banner pattern types have an item.",
 })
 @Examples({
 	"set {_item} to creeper charged banner pattern item",
@@ -36,7 +36,7 @@ import java.util.*;
 @Since("INSERT VERSION")
 public class ExprBannerItem extends SimpleExpression<ItemType> {
 
-	private static Map<Object, Material> bannerMaterials = new HashMap<>();
+	private static final Map<Object, Material> bannerMaterials = new HashMap<>();
 	private static boolean PATTERN_TYPE_IS_REGISTRY = false;
 
 	static {

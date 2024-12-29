@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Banner Pattern")
-@Description("Create a new banner pattern.")
+@Description("Creates a new banner pattern.")
 @Examples({
 	"set {_pattern} to a creeper banner pattern colored red",
 	"add {_pattern} to banner patterns of {_banneritem}",

@@ -33,11 +33,11 @@ import java.util.function.Consumer;
 
 @Name("Banner Patterns")
 @Description({
-	"Banner patterns of a banner.",
-	"NOTE: In order to set a specific position of a banner, there needs to be that many patterns on the banner.",
+	"Gets or sets the banner patterns of a banner.",
+	"In order to set a specific position of a banner, there needs to be that many patterns already on the banner.",
 	"This expression will add filler patterns to the banner to allow the specified position to be set.",
-	"Example, setting the 3rd banner pattern of a banner that has no patterns on it, will internally add 3 base patterns to "
-	+ "the banner allowing the 3rd banner pattern to be set"
+	"For Example, setting the 3rd banner pattern of a banner that has no patterns on it, will internally add 3 base patterns, "
+	+ "allowing the 3rd banner pattern to be set."
 })
 @Examples({
 	"broadcast banner patterns of {_banneritem}",
@@ -104,7 +104,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	}
 
 	/**
-	 * Gets the appropriate {@link Consumer<BannerMeta>} to be used within the {@link #change(Event, Object[], ChangeMode)}
+	 * Gets the appropriate {@link Consumer<BannerMeta>} to be used within {@link #change(Event, Object[], ChangeMode)}.
 	 * @param mode The {@link ChangeMode} to get the consumer matching the behavior
 	 * @param placement The specific pattern to set {@code pattern}
 	 * @param pattern The pattern to be applied
@@ -130,7 +130,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	}
 
 	/**
-	 * Gets the appropriate {@link Consumer<Banner>} to be used within the {@link #change(Event, Object[], ChangeMode)}
+	 * Gets the appropriate {@link Consumer<Banner>} to be used within {@link #change(Event, Object[], ChangeMode)}.
 	 * @param mode The {@link ChangeMode} to get the consumer matching the behavior
 	 * @param placement The specific pattern to set {@code pattern}
 	 * @param pattern The pattern to be applied
@@ -156,7 +156,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	}
 
 	/**
-	 * Gets the appropriate {@link Consumer<BannerMeta>} to be used within the {@link #change(Event, Object[], ChangeMode)}
+	 * Gets the appropriate {@link Consumer<BannerMeta>} to be used within {@link #change(Event, Object[], ChangeMode)}.
 	 * @param mode The {@link ChangeMode} to get the consumer matching the behavior
 	 * @param patterns Patterns to be added, removed, or set to corresponding with the {@code mode}
 	 * @return {@link Consumer<BannerMeta>} to be applied to objects within {@link #change(Event, Object[], ChangeMode)}
@@ -182,7 +182,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	}
 
 	/**
-	 * Gets the appropriate {@link Consumer<Banner>} to be used within the {@link #change(Event, Object[], ChangeMode)}
+	 * Gets the appropriate {@link Consumer<Banner>} to be used within {@link #change(Event, Object[], ChangeMode)}.
 	 * @param mode The {@link ChangeMode} to get the consumer matching the behavior
 	 * @param patterns Patterns to be added, removed, or set to corresponding with the {@code mode}
 	 * @return {@link Consumer<Banner>} to be applied to objects within {@link #change(Event, Object[], ChangeMode)}
@@ -210,16 +210,8 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE -> {
-				if (patternNumber != null)
-					yield CollectionUtils.array(Pattern.class);
-				yield CollectionUtils.array(Pattern[].class);
-			}
-			case REMOVE, ADD -> {
-				if (patternNumber != null)
-					yield null;
-				yield CollectionUtils.array(Pattern[].class);
-			}
+			case SET, DELETE -> (patternNumber != null) ? CollectionUtils.array(Pattern.class) : CollectionUtils.array(Pattern[].class);
+			case REMOVE, ADD -> (patternNumber != null) ? null : CollectionUtils.array(Pattern[].class);
 			default -> null;
 		};
 	}
@@ -227,9 +219,7 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		Pattern[] patterns = (Pattern[]) delta;
-		int placement = 0;
-		if (patternNumber != null)
-			placement = patternNumber.getSingle(event);
+		int placement = patternNumber == null ? 0 : patternNumber.getSingle(event);
 		List<Pattern> patternList = patterns != null ? Arrays.stream(patterns).toList() : new ArrayList<>();
 
 		Consumer<BannerMeta> metaChanger = null;
@@ -280,11 +270,11 @@ public class ExprBannerPatterns extends PropertyExpression<Object, Pattern> {
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 		if (patternNumber != null) {
-			builder.append(patternNumber, "banner pattern");
+			builder.append("banner pattern", patternNumber);
 		} else {
 			builder.append("banner patterns");
 		}
-		builder.append(objects);
+		builder.append("of", objects);
 		return builder.toString();
 	}
 
