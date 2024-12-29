@@ -4,43 +4,19 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableTransmuteRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableBlastingRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableCampfireRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableFurnaceRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableSmokingRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapedRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapelessRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTransformRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTrimRecipe;
-import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
 
 /**
  * Event class used with ExprSecCreateRecipe to allow the creation of MutableRecipe
  */
 public class CreateRecipeEvent extends Event {
 	private boolean errorInSection = false;
-	private RecipeType recipeType;
-	private MutableRecipe mutableRecipe;
+	private final RecipeType recipeType;
+	private final MutableRecipe mutableRecipe;
 
 	public CreateRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 		this.recipeType = recipeType;
-		this.mutableRecipe = switch (recipeType) {
-			case SHAPED -> new MutableShapedRecipe(key);
-			case SHAPELESS -> new MutableShapelessRecipe(key);
-			case BLASTING -> new MutableBlastingRecipe(key);
-			case FURNACE -> new MutableFurnaceRecipe(key);
-			case SMOKING -> new MutableSmokingRecipe(key);
-			case CAMPFIRE -> new MutableCampfireRecipe(key);
-			case SMITHING -> new MutableSmithingRecipe(key, recipeType);
-			case SMITHING_TRANSFORM -> new MutableSmithingTransformRecipe(key);
-			case SMITHING_TRIM -> new MutableSmithingTrimRecipe(key);
-			case STONECUTTING -> new MutableStonecuttingRecipe(key);
-			case TRANSMUTE -> new MutableTransmuteRecipe(key);
-			default -> null;
-		};
+		this.mutableRecipe = recipeType.createMutableRecipe(key);
 	}
 
 	public void setErrorInSection() {

@@ -17,17 +17,6 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.BlastingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.CampfireRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.FurnaceRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CookingRecipeEvent.SmokingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapedRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.StonecuttingRecipeEvent;
-import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.TransmuteRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
@@ -147,20 +136,10 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 			//Skript.error("The provided id is invalid.")
 			return null;
 		}
-		CreateRecipeEvent recipeEvent = switch (providedType) {
-			case SHAPED -> new ShapedRecipeEvent(key);
-			case SHAPELESS -> new ShapelessRecipeEvent(key);
-			case BLASTING -> new BlastingRecipeEvent(key);
-			case FURNACE -> new FurnaceRecipeEvent(key);
-			case CAMPFIRE -> new CampfireRecipeEvent(key);
-			case SMOKING -> new SmokingRecipeEvent(key);
-			case SMITHING -> new SmithingRecipeEvent(key, providedType);
-			case SMITHING_TRANSFORM -> new SmithingTransformRecipeEvent(key);
-			case SMITHING_TRIM -> new SmithingTrimRecipeEvent(key);
-			case STONECUTTING -> new StonecuttingRecipeEvent(key);
-			case TRANSMUTE -> new TransmuteRecipeEvent(key);
-			default -> throw new IllegalStateException("Unexpected value: " + providedType);
-		};
+		CreateRecipeEvent recipeEvent = providedType.createRecipeEvent(key);
+		if (recipeEvent == null)
+			throw new IllegalStateException("Unexpected value: " + providedType);
+
 		Variables.withLocalVariables(event, recipeEvent, () -> TriggerItem.walk(trigger, recipeEvent));
 		// If any of the used expressions or effects produce an error, fail creation
 		if (recipeEvent.getErrorInSection())

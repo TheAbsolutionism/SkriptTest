@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.recipes;
 
 import ch.njol.skript.Skript;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,18 @@ import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEven
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.CraftingRecipeEvent.ShapelessRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTransformRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent.SmithingRecipeEvent.SmithingTrimRecipeEvent;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableBlastingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableCampfireRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableFurnaceRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableSmokingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapedRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapelessRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTransformRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTrimRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableStonecuttingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableTransmuteRecipe;
+import org.skriptlang.skript.bukkit.recipes.elements.ExprSecCreateRecipe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,22 +40,196 @@ public class RecipeUtils {
 	 * Enum for storing all types of Recipes (until Bukkit makes an enum or registry)
 	 */
 	public enum RecipeType {
-		SHAPED(ShapedRecipe.class, ShapedRecipeEvent.class),
-		SHAPELESS(ShapelessRecipe.class, ShapelessRecipeEvent.class),
-		TRANSMUTE(getTransmuteRecipeClass(), TransmuteRecipeEvent.class),
+		SHAPED(ShapedRecipe.class, ShapedRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new ShapedRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableShapedRecipe(key);
+			}
+
+		},
+		SHAPELESS(ShapelessRecipe.class, ShapelessRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new ShapelessRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableShapelessRecipe(key);
+			}
+
+		},
 		// TODO: Remove method and apply class directly when MC version is raised to 1.21.2+
-		CRAFTING(getCraftingRecipeClass(), CraftingRecipeEvent.class), // Having 'CRAFTING' under the subclasses allows for proper ExprRecipeType
+		TRANSMUTE(getTransmuteRecipeClass(), TransmuteRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new TransmuteRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableTransmuteRecipe(key);
+			}
+
+		},
 		// TODO: Remove method and apply class directly when MC version is raised to 1.20.1+
-		BLASTING(BlastingRecipe.class, BlastingRecipeEvent.class),
-		FURNACE(FurnaceRecipe.class, FurnaceRecipeEvent.class),
-		CAMPFIRE(CampfireRecipe.class, CampfireRecipeEvent.class),
-		SMOKING(SmokingRecipe.class, SmokingRecipeEvent.class),
-		COOKING(CookingRecipe.class, CookingRecipeEvent.class), // Having 'COOKING' under the subclasses allows for proper ExprRecipeType
-		SMITHING_TRANSFORM(SmithingTransformRecipe.class, SmithingTransformRecipeEvent.class),
-		SMITHING_TRIM(SmithingTrimRecipe.class, SmithingTrimRecipeEvent.class),
-		SMITHING(SmithingRecipe.class, SmithingRecipeEvent.class), // Having 'SMITHING' under the subclasses allows for proper ExprRecipeType
-		STONECUTTING(StonecuttingRecipe.class, StonecuttingRecipeEvent.class),
-		COMPLEX(ComplexRecipe.class, null);
+		// Having 'CRAFTING' under the subclasses allows for proper ExprRecipeType
+		CRAFTING(getCraftingRecipeClass(), CraftingRecipeEvent.class) {
+			// A 'CraftingRecipeEvent' should never be created
+			@Override
+			public @Nullable CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return null;
+			}
+			// A 'MutableCraftingRecipe' should never be created
+			@Override
+			public @Nullable MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return null;
+			}
+
+		},
+		BLASTING(BlastingRecipe.class, BlastingRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new BlastingRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableBlastingRecipe(key);
+			}
+
+		},
+		FURNACE(FurnaceRecipe.class, FurnaceRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new FurnaceRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableFurnaceRecipe(key);
+			}
+
+		},
+		CAMPFIRE(CampfireRecipe.class, CampfireRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new CampfireRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableCampfireRecipe(key);
+			}
+
+		},
+		SMOKING(SmokingRecipe.class, SmokingRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new SmokingRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableSmokingRecipe(key);
+			}
+
+		},
+		// Having 'COOKING' under the subclasses allows for proper ExprRecipeType
+		COOKING(CookingRecipe.class, CookingRecipeEvent.class) {
+			// A 'CookingRecipeEvent' should never be created
+			@Override
+			public @Nullable CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return null;
+			}
+			// A 'MutableCookingRecipe' should never be created
+			@Override
+			public @Nullable MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return null;
+			}
+
+		},
+		SMITHING_TRANSFORM(SmithingTransformRecipe.class, SmithingTransformRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new SmithingTransformRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableSmithingTransformRecipe(key);
+			}
+
+		},
+		SMITHING_TRIM(SmithingTrimRecipe.class, SmithingTrimRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new SmithingTrimRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableSmithingTrimRecipe(key);
+			}
+
+		},
+		// Having 'SMITHING' under the subclasses allows for proper ExprRecipeType
+		SMITHING(SmithingRecipe.class, SmithingRecipeEvent.class) {
+			// TODO: return null after minimum support version is raised to 1.20+
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new SmithingRecipeEvent(key, this);
+			}
+			// TODO: return null after minimum support version is raised to 1.20+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableSmithingRecipe(key, this);
+			}
+
+		},
+		STONECUTTING(StonecuttingRecipe.class, StonecuttingRecipeEvent.class) {
+			@Override
+			public CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return new StonecuttingRecipeEvent(key);
+			}
+
+			@Override
+			public MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return new MutableStonecuttingRecipe(key);
+			}
+		},
+		COMPLEX(ComplexRecipe.class, null) {
+			// A 'CompleRecipeEvent' does not exist
+			@Override
+			public @Nullable CreateRecipeEvent createRecipeEvent(NamespacedKey key) {
+				return null;
+			}
+			// A 'MutableComplexRecipe' does not exist
+			@Override
+			public @Nullable MutableRecipe createMutableRecipe(NamespacedKey key) {
+				return null;
+			}
+		};
+
+		/**
+		 * Create a {@link CreateRecipeEvent} used for {@link ExprSecCreateRecipe}
+		 * @param key The key to create a recipe
+		 * @return
+		 */
+		public abstract @Nullable CreateRecipeEvent createRecipeEvent(NamespacedKey key);
+
+		/**
+		 * Create a {@link MutableRecipe} designed to alter attributes before final creation.
+		 * Used for {@link ExprSecCreateRecipe}.
+		 * @param key
+		 * @return
+		 */
+		public abstract @Nullable MutableRecipe createMutableRecipe(NamespacedKey key);
 
 		private final @Nullable Class<? extends Recipe> recipeClass;
 		private final @Nullable Class<? extends Event> eventClass;
