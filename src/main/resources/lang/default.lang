@@ -2622,6 +2622,9 @@ types:
 	experience.pattern: (e?xp|experience( points?)?)
 	classinfo: type¦s @a
 	visualeffect: visual effect¦s @a
+	named: named thing¦s @a
+	numbered: numbered thing¦s @a
+	containing: container¦s @a
 	recipetype: recipe type¦s @a
 	recipecategory: recipe categor¦y¦ies @a
 
