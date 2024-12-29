@@ -265,7 +265,8 @@ public class DefaultConverters {
 
 		Converters.registerConverter(String.class, World.class, Bukkit::getWorld);
 
-		Converters.registerConverter(EntitySnapshot.class, EntityData.class, snapshot -> EntityUtils.toSkriptEntityData(snapshot.getEntityType()));
+		if (Skript.classExists("org.bukkit.entity.EntitySnapshot"))
+			Converters.registerConverter(EntitySnapshot.class, EntityData.class, snapshot -> EntityUtils.toSkriptEntityData(snapshot.getEntityType()));
 
 //		// Entity - String (UUID) // Very slow, thus disabled for now
 //		Converters.registerConverter(String.class, Entity.class, new Converter<String, Entity>() {
