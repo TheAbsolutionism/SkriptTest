@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Make Disturbance")
-@Description("Make a warden sense a disturbance at a location.")
+@Description("Make a warden sense a disturbance at a location, causing the warden to investigate that area.")
 @Examples("make last spawned warden sense a disturbance at location(0, 0, 0)")
 @Since("INSERT VERSION")
 public class EffWardenDisturbance extends Effect {

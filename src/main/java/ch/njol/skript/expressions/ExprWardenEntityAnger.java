@@ -81,7 +81,7 @@ public class ExprWardenEntityAnger extends SimpleExpression<Integer> {
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int value = delta != null ? (Integer) delta[0] : 0;
 		BiConsumer<Warden, Entity> consumer = switch (mode) {
-			case SET -> (warden, entity) -> warden.setAnger(entity, value);
+			case SET -> (warden, entity) -> warden.setAnger(entity, Math2.fit(0, value, 150));
 			case DELETE -> Warden::clearAnger;
 			case ADD -> (warden, entity) -> {
 				int current = warden.getAnger(entity);

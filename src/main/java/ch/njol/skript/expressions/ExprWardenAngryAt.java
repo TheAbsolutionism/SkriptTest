@@ -12,7 +12,7 @@ import org.bukkit.entity.Warden;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Warden Angry At")
+@Name("Warden Most Angered At")
 @Description({
 	"The entity a warden is most angry at.",
 	"A warden can be angry towards multiple entities with different anger levels.",
