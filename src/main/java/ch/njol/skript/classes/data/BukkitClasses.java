@@ -1557,7 +1557,6 @@ public class BukkitClasses {
 			.since("INSERT VERSION"));
 
 		if (Skript.classExists("org.bukkit.entity.EntitySnapshot")) {
-			boolean supportsGetAs = Skript.methodExists(EntitySnapshot.class, "getAsString");
 			Classes.registerClass(new ClassInfo<>(EntitySnapshot.class, "entitysnapshot")
 				.user("entity ?snapshots?")
 				.name("Entity Snapshot")
@@ -1575,14 +1574,12 @@ public class BukkitClasses {
 
 					@Override
 					public String toString(EntitySnapshot snapshot, int flags) {
-						if (supportsGetAs)
-							return snapshot.getAsString();
 						return snapshot.getEntityType().toString().toLowerCase(Locale.ENGLISH).replace('_', ' ') + " snapshot";
 					}
 
 					@Override
 					public String toVariableNameString(EntitySnapshot snapshot) {
-						return snapshot.getEntityType() + " snapshot";
+						return snapshot.getEntityType().toString().toLowerCase(Locale.ENGLISH).replace('_', ' ') + " snapshot";
 					}
 				})
 			);
