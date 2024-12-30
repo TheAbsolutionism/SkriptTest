@@ -31,7 +31,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	private int minute;
 	private TimeState timeState;
 
-	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)?", Pattern.CASE_INSENSITIVE);
+	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile("\\d?\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
 
 	public Time() {
