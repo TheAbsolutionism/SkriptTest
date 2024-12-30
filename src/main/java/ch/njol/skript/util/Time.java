@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	public enum TimeState {
-		ANY, AM, PM
+		O_CLOCK, AM, PM, MILITARY
 	}
 
 	private final static int TICKS_PER_HOUR = 1000, TICKS_PER_DAY = 24 * TICKS_PER_HOUR;
@@ -31,7 +31,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	private int minute;
 	private TimeState timeState;
 
-	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm|o'clock)?", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile("\\d?\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
 
 	public Time() {
@@ -78,7 +78,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	@Override
 	public String toString() {
 		String string = toString(time);
-		return string + ((timeState == null || timeState == TimeState.ANY ? "" : timeState));
+		return string + ((timeState == null || timeState == TimeState.MILITARY ? "" : timeState));
 	}
 	
 	public static String toString(final int ticks) {
@@ -120,7 +120,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 				Skript.error("" + m_error_60_minutes);
 				return null;
 			}
-			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, TimeState.ANY);
+			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, TimeState.MILITARY);
 		} else {
 			final Matcher m = DAY_TIME_PATTERN.matcher(s);
 			if (m.matches()) {
@@ -138,10 +138,12 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 					Skript.error("" + m_error_60_minutes);
 					return null;
 				}
-				TimeState state = TimeState.AM;
+				TimeState state = TimeState.O_CLOCK;
 				if (m.group(4).equalsIgnoreCase("pm")) {
 					hours += 12;
 					state = TimeState.PM;
+				} else if (m.group(4).equalsIgnoreCase("am")) {
+					state = TimeState.AM;
 				}
 				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, state);
 			}
@@ -151,7 +153,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	@Override
 	public int hashCode() {
-		return time;
+		return time * (timeState.ordinal() + 1);
 	}
 	
 	@Override
@@ -160,10 +162,9 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Time))
+		if (!(obj instanceof Time other))
 			return false;
-		final Time other = (Time) obj;
-		return time == other.time;
+		return time == other.time && timeState == other.timeState;
 	}
 	
 	@Override
