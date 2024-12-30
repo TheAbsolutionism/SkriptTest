@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	public enum TimeState {
-		O_CLOCK, AM, PM, MILITARY
+		AM, PM, TWENTY_FOUR_HOUR
 	}
 
 	private final static int TICKS_PER_HOUR = 1000, TICKS_PER_DAY = 24 * TICKS_PER_HOUR;
@@ -31,7 +31,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	private int minute;
 	private TimeState timeState;
 
-	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm|o'clock)?", Pattern.CASE_INSENSITIVE);
+	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)?", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile("\\d?\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
 
 	public Time() {
@@ -78,7 +78,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	@Override
 	public String toString() {
 		String string = toString(time);
-		return string + ((timeState == null || timeState == TimeState.MILITARY ? "" : timeState));
+		return string + ((timeState == null || timeState == TimeState.TWENTY_FOUR_HOUR ? "" : timeState));
 	}
 	
 	public static String toString(final int ticks) {
@@ -120,7 +120,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 				Skript.error("" + m_error_60_minutes);
 				return null;
 			}
-			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, TimeState.MILITARY);
+			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, TimeState.TWENTY_FOUR_HOUR);
 		} else {
 			final Matcher m = DAY_TIME_PATTERN.matcher(s);
 			if (m.matches()) {
@@ -138,12 +138,10 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 					Skript.error("" + m_error_60_minutes);
 					return null;
 				}
-				TimeState state = TimeState.O_CLOCK;
+				TimeState state = TimeState.AM;
 				if (m.group(4).equalsIgnoreCase("pm")) {
 					hours += 12;
 					state = TimeState.PM;
-				} else if (m.group(4).equalsIgnoreCase("am")) {
-					state = TimeState.AM;
 				}
 				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, state);
 			}

@@ -6,7 +6,6 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Time;
-import ch.njol.skript.util.Time.TimeState;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -29,68 +28,61 @@ public class EvtServerTime extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Server Time", EvtServerTime.class, ServerTimeEvent.class,
-			"(server|real) time (of|at) %time%")
-				.description(
-					"Called when the local time of the server reaches the provided time.",
-					"Accepts 24 hour format, am/pm, and o'clock.",
-					"Using o'clock, will be every 12 hours instead of every 24 as compared to 24 hour and am/pm."
-				)
+			"(server|real) time (of|at) %times%")
+				.description("Called when the local time of the server reaches the provided time.")
 				.examples(
 					"on server time of 14:20:",
 					"on real time at 2:30am:",
 					"on server time at 6:10 pm:",
-					"on real time of 5:00 o'clock:",
-						"\t# Will be called at 5 am and 5 pm / 5:00 and 17:00"
+					"on real time of 5:00 am and 5:00 pm:",
+					"on server time of 5:00 and 17:00:"
 				)
 				.since("INSERT VERSION");
 
 		timer = new Timer("EvtServerTime-Tasks");
 	}
 
-	private Time time;
-	private long executionTime;
-	private TimerTask task;
+	private Literal<Time> times;
 	private boolean unloaded = false;
+	private List<ServerTimeInfo> infoList = new ArrayList<>();
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
 		//noinspection unchecked
-		time = ((Literal<Time>) args[0]).getSingle();
+		times = (Literal<Time>) args[0];
 		return true;
 	}
 
 	@Override
 	public boolean postLoad() {
-		int adjustedHour = time.getHour();
 		Calendar currentCalendar = Calendar.getInstance();
 		currentCalendar.setTimeZone(TimeZone.getDefault());
-		Calendar expectedCalendar = Calendar.getInstance();
-		expectedCalendar.setTimeZone(TimeZone.getDefault());
-		expectedCalendar.set(Calendar.MINUTE, time.getMinute());
-		expectedCalendar.set(Calendar.SECOND, 0);
-		expectedCalendar.set(Calendar.MILLISECOND, 0);
-		expectedCalendar.set(Calendar.HOUR_OF_DAY, adjustedHour);
-		// Ensure the execution time is in the future and not the past
-		while (expectedCalendar.before(currentCalendar)) {
-			if (time.getTimeState() == TimeState.O_CLOCK) {
-				expectedCalendar.add(Calendar.HOUR_OF_DAY, 12);
-			} else {
+		for (Time time : times.getArray()) {
+			Calendar expectedCalendar = Calendar.getInstance();
+			expectedCalendar.setTimeZone(TimeZone.getDefault());
+			expectedCalendar.set(Calendar.MINUTE, time.getMinute());
+			expectedCalendar.set(Calendar.SECOND, 0);
+			expectedCalendar.set(Calendar.MILLISECOND, 0);
+			expectedCalendar.set(Calendar.HOUR_OF_DAY, time.getHour());
+			// Ensure the execution time is in the future and not the past
+			while (expectedCalendar.before(currentCalendar)) {
 				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
+			ServerTimeInfo info = new ServerTimeInfo(time, expectedCalendar.getTimeInMillis());
+			infoList.add(info);
+			createNewTask(info);
 		}
-        executionTime = expectedCalendar.getTimeInMillis();
-		// Initial scheduling of this 'EvtServerTime'
-		createNewTask();
 		return true;
 	}
 
 	@Override
 	public void unload() {
 		unloaded = true;
-		if (task != null) {
-			task.cancel();
-			timer.purge();
+		for (ServerTimeInfo info : infoList) {
+			if (info.task != null)
+				info.task.cancel();
 		}
+		timer.purge();
 	}
 
 	@Override
@@ -105,7 +97,7 @@ public class EvtServerTime extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "server time of " + time.toString();
+		return "server time of " + times.toString(event, debug);
 	}
 
 	private void execute() {
@@ -117,30 +109,39 @@ public class EvtServerTime extends SkriptEvent {
 		SkriptEventHandler.logEventEnd();
 	}
 
-	private void preExecute() {
+	private void preExecute(ServerTimeInfo info) {
 		// Safety check, ensure this 'EvtServerTime' was not unloaded
 		if (unloaded)
 			return;
 		// Bump the next execution time by the appropriate amount
-		if (time.getTimeState() == TimeState.O_CLOCK) {
-			executionTime += HOUR_12_MILLISECONDS;
-		} else {
-			executionTime += HOUR_24_MILLISECONDS;
-		}
+		info.executionTime += HOUR_24_MILLISECONDS;
 		// Reschedule task for new executionTime
-		createNewTask();
+		createNewTask(info);
 		// Activate trigger
 		execute();
 	}
 
-	private void createNewTask() {
-		task = new TimerTask() {
+	private void createNewTask(ServerTimeInfo info) {
+		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				preExecute();
+				preExecute(info);
 			}
 		};
-		timer.schedule(task, new Date(executionTime));
+		info.task = task;
+		timer.schedule(task, new Date(info.executionTime));
+	}
+
+	private static class ServerTimeInfo {
+		private long executionTime;
+		private final Time time;
+		private TimerTask task;
+
+		public ServerTimeInfo(Time time, long executionTime) {
+			this.time = time;
+			this.executionTime = executionTime;
+		}
+
 	}
 
 }
