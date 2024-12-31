@@ -1580,7 +1580,7 @@ public class BukkitClasses {
 
 					@Override
 					public String toVariableNameString(EntitySnapshot snapshot) {
-						return EntityUtils.toSkriptEntityData(snapshot.getEntityType()).toString() + " snapshot";
+						return toString(snapshot, 0);
 					}
 				})
 			);
