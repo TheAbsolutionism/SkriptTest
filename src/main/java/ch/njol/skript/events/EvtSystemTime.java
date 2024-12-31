@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class EvtServerTime extends SkriptEvent {
+public class EvtSystemTime extends SkriptEvent {
 
-	public static class ServerTimeEvent extends Event {
+	public static class SystemTimeEvent extends Event {
 		@Override
 		public @NotNull HandlerList getHandlers() {
 			throw new IllegalStateException();
@@ -26,15 +26,15 @@ public class EvtServerTime extends SkriptEvent {
 	private static final Timer timer;
 
 	static {
-		Skript.registerEvent("Server Time", EvtServerTime.class, ServerTimeEvent.class,
-			"(server|real) time (of|at) %times%")
-				.description("Called when the local time of the server reaches the provided time.")
+		Skript.registerEvent("Server Time", EvtSystemTime.class, SystemTimeEvent.class,
+			"(system|real) time (of|at) %times%")
+				.description("Called when the local time of the system reaches the provided time.")
 				.examples(
-					"on server time of 14:20:",
+					"on system time of 14:20:",
 					"on real time at 2:30am:",
-					"on server time at 6:10 pm:",
+					"on system time at 6:10 pm:",
 					"on real time of 5:00 am and 5:00 pm:",
-					"on server time of 5:00 and 17:00:"
+					"on system time of 5:00 and 17:00:"
 				)
 				.since("INSERT VERSION");
 
@@ -43,7 +43,7 @@ public class EvtServerTime extends SkriptEvent {
 
 	private Literal<Time> times;
 	private boolean unloaded = false;
-	private List<ServerTimeInfo> infoList = new ArrayList<>();
+	private final List<SystemTimeInfo> infoList = new ArrayList<>();
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
@@ -67,7 +67,7 @@ public class EvtServerTime extends SkriptEvent {
 			while (expectedCalendar.before(currentCalendar)) {
 				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
-			ServerTimeInfo info = new ServerTimeInfo(time, expectedCalendar.getTimeInMillis());
+			SystemTimeInfo info = new SystemTimeInfo(time, expectedCalendar.getTimeInMillis());
 			infoList.add(info);
 			createNewTask(info);
 		}
@@ -77,7 +77,7 @@ public class EvtServerTime extends SkriptEvent {
 	@Override
 	public void unload() {
 		unloaded = true;
-		for (ServerTimeInfo info : infoList) {
+		for (SystemTimeInfo info : infoList) {
 			if (info.task != null)
 				info.task.cancel();
 		}
@@ -100,7 +100,7 @@ public class EvtServerTime extends SkriptEvent {
 	}
 
 	private void execute() {
-		ServerTimeEvent event = new ServerTimeEvent();
+		SystemTimeEvent event = new SystemTimeEvent();
 		SkriptEventHandler.logEventStart(event);
 		SkriptEventHandler.logTriggerStart(trigger);
 		trigger.execute(event);
@@ -108,7 +108,7 @@ public class EvtServerTime extends SkriptEvent {
 		SkriptEventHandler.logEventEnd();
 	}
 
-	private void preExecute(ServerTimeInfo info) {
+	private void preExecute(SystemTimeInfo info) {
 		// Safety check, ensure this 'EvtServerTime' was not unloaded
 		if (unloaded)
 			return;
@@ -120,7 +120,7 @@ public class EvtServerTime extends SkriptEvent {
 		execute();
 	}
 
-	private void createNewTask(ServerTimeInfo info) {
+	private void createNewTask(SystemTimeInfo info) {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
@@ -131,12 +131,12 @@ public class EvtServerTime extends SkriptEvent {
 		timer.schedule(task, new Date(info.executionTime));
 	}
 
-	private static class ServerTimeInfo {
+	private static class SystemTimeInfo {
 		private long executionTime;
 		private final Time time;
 		private TimerTask task;
 
-		public ServerTimeInfo(Time time, long executionTime) {
+		public SystemTimeInfo(Time time, long executionTime) {
 			this.time = time;
 			this.executionTime = executionTime;
 		}
