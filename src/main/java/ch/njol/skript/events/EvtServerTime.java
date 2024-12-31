@@ -22,8 +22,7 @@ public class EvtServerTime extends SkriptEvent {
 		}
 	}
 
-	private static final long HOUR_12_MILLISECONDS = 43200000;
-	private static final long HOUR_24_MILLISECONDS = HOUR_12_MILLISECONDS * 2;
+	private static final long HOUR_24_MILLISECONDS = 1000 * 60 * 60 * 24;
 	private static final Timer timer;
 
 	static {
