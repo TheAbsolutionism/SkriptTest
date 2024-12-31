@@ -9,6 +9,6 @@ test "beehive honey level":
 	add 9999 to the honey level of {_hive}
 	assert the honey level of {_hive} is 5 with "Honey level should be clamped to 5"
 	remove 9999 from the honey level of {_hive}
-	assert the honey level of {_hive} is 9 with "Honey level should be clamped to 0"
+	assert the honey level of {_hive} is 0 with "Honey level should be clamped to 0"
 
 	set block at test-block to {_old}
