@@ -36,15 +36,17 @@ import java.util.List;
 @Since("INSERT VERSION")
 public class ExprStringColor extends PropertyExpression<String, Object> {
 
-	private enum StringColor {ALL, FIRST, LAST;}
+	private enum StringColor {
+		ALL, FIRST, LAST
+	}
 
 	private static final StringColor[] STRING_COLORS = StringColor.values();
 
 	static {
 		Skript.registerExpression(ExprStringColor.class, Object.class, ExpressionType.PROPERTY,
-			"[all [of the|the]|the] string color[s] [code:code[s]] of %strings%",
-			"[the] first string color[s] [code:code[s]] of %strings%",
-			"[the] last string color[s] [code:code[s]] of %strings%");
+			"[all [of the|the]|the] string colo[u]r[s] [code:code[s]] of %strings%",
+			"[the] first string colo[u]r[s] [code:code[s]] of %strings%",
+			"[the] last string colo[u]r[s] [code:code[s]] of %strings%");
 	}
 
 	private StringColor selectedState;
@@ -181,7 +183,7 @@ public class ExprStringColor extends PropertyExpression<String, Object> {
 		return true;
 	}
 
-	public static ColorRGB fromHex(@NotNull String hex) {
+	private ColorRGB fromHex(@NotNull String hex) {
 		if (hex.startsWith("§x"))
 			hex = hex.substring(2);
 		hex = hex.replaceAll("§",  "");
