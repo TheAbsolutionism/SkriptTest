@@ -26,7 +26,7 @@ public class EvtSystemTime extends SkriptEvent {
 	private static final Timer timer;
 
 	static {
-		Skript.registerEvent("Server Time", EvtSystemTime.class, SystemTimeEvent.class,
+		Skript.registerEvent("System Time", EvtSystemTime.class, SystemTimeEvent.class,
 			"(system|real) time (of|at) %times%")
 				.description("Called when the local time of the system reaches the provided time.")
 				.examples(
