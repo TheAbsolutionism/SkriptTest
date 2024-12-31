@@ -18,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@Name("Release Entity Storage")
+@Name("Release From Entity Storage")
 @Description({
-	"Release the stored entities in an entity block storage (i.e. beehive).",
+	"Releases the stored entities in an entity block storage (i.e. beehive).",
 	"When using beehives, providing a timespan will prevent the released bees from re-entering the beehive for that amount of time.",
 	"Due to unstable behaviour on older versions, this effect requires Minecraft version 1.21+."
 })

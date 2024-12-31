@@ -27,14 +27,16 @@ public class CondEntityStorageIsFull extends Condition {
 	static {
 		Skript.registerCondition(CondEntityStorageIsFull.class, ConditionType.PROPERTY,
 			"[the] entity storage of %blocks% (is|are) full",
-			"[the] entity storage of %blocks% (isn't|is not|aren't|are not) full");
+			"%blocks%'[s] entity storage (is|are) full",
+			"[the] entity storage of %blocks% (isn't|is not|aren't|are not) full",
+			"%blocks%'[s] entity storage (isn't|is not|aren't|are not) full");
 	}
 
 	private Expression<Block> blocks;
 
 	@Override
 	public boolean init(Expression<?>[] exrps, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setNegated(matchedPattern % 2 == 1);
+		setNegated(matchedPattern >= 2);
 		//noinspection unchecked
 		blocks = (Expression<Block>) exrps[0];
 		return true;

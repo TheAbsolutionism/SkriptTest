@@ -8,7 +8,7 @@ import ch.njol.skript.doc.Since;
 import org.bukkit.block.Beehive;
 import org.bukkit.block.Block;
 
-@Name("Is Sedated")
+@Name("Beehive Is Sedated")
 @Description("Checks if a beehive is sedated from a nearby campfire.")
 @Examples("if {_beehive} is sedated:")
 @Since("INSERT VERSION")
