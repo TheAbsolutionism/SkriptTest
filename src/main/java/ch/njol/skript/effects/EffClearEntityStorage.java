@@ -21,7 +21,7 @@ public class EffClearEntityStorage extends Effect {
 	static {
 		if (Skript.methodExists(EntityBlockStorage.class, "clearEntities"))
 			Skript.registerEffect(EffClearEntityStorage.class,
-				"(clear|delete) the entity storage of %blocks%");
+				"(clear|empty) the (stored entities|entity storage) of %blocks%");
 	}
 
 	private Expression<Block> blocks;

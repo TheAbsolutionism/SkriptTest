@@ -20,9 +20,9 @@ import java.util.Map;
 
 @Name("Insert Entity Storage")
 @Description({
-	"Add an entity into an entity block storage (i.e beehive).",
-	"The entity must be of the required type of block storage (i.e. bee for beehive).",
-	"Due to unstable behavior on older versions, adding entities to an entity block storage requires Minecraft version 1.21+."
+	"Add an entity into the entity storage of a block (e.g. beehive).",
+	"The entity must be of the right type for the block (e.g. bee for beehive).",
+	"Due to unstable behavior on older versions, adding entities to an entity storage requires Minecraft version 1.21+."
 })
 @Examples("add last spawned bee into the entity storage of {_beehive}")
 @RequiredPlugins("Minecraft 1.21+")
@@ -41,34 +41,32 @@ public class EffInsertEntityStorage extends Effect {
 	static {
 		if (Skript.isRunningMinecraft(1, 21, 0)) {
 			Skript.registerEffect(EffInsertEntityStorage.class,
-				"(add|insert) %livingentities% [in[ ]]to [the] entity storage of %blocks%");
+				"(add|insert) %livingentities% [in[ ]]to [the] (stored entities|entity storage) of %block%");
 			STORAGES.put(Beehive.class, Bee.class);
 		}
 	}
 
 	private Expression<? extends Entity> entities;
-	private Expression<Block> blocks;
+	private Expression<Block> block;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<? extends Entity>) exprs[0];
 		//noinspection unchecked
-		blocks = (Expression<Block>) exprs[1];
+		block = (Expression<Block>) exprs[1];
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
-		Entity[] entities = this.entities.getArray(event);
-		for (Block block : blocks.getArray(event)) {
-			if (!(block.getState() instanceof EntityBlockStorage<?> blockStorage))
-				continue;
-			Class<? extends Entity> entityClass = getEntityClass(blockStorage);
-			if (entityClass != null) {
-				addEntities(entityClass, blockStorage, entities);
-			}
-		}
+		Block block = this.block.getSingle(event);
+		if (block == null || !(block.getState() instanceof EntityBlockStorage<?> blockStorage))
+			return;
+		Class<? extends Entity> entityClass = getEntityClass(blockStorage);
+		if (entityClass == null)
+			return;
+		addEntities(entityClass, blockStorage, this.entities.getArray(event));
 	}
 
 	private <T extends EntityBlockStorage<R>, R extends Entity> void addEntities(Class<R> entityClass, BlockState blockState, Entity[] entities) {
@@ -96,7 +94,7 @@ public class EffInsertEntityStorage extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "add " + entities.toString(event, debug) + " into the entity storage of " + blocks.toString(event, debug);
+		return "add " + entities.toString(event, debug) + " into the entity storage of " + block.toString(event, debug);
 	}
 
 }

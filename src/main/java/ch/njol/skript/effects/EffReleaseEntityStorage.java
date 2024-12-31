@@ -21,7 +21,7 @@ import java.util.List;
 @Name("Release Entity Storage")
 @Description({
 	"Release the stored entities in an entity block storage (i.e. beehive).",
-	"Providing a timespan will make the released bees unable to go back into the beehive for that amount of time.",
+	"When using beehives, providing a timespan will prevent the released bees from re-entering the beehive for that amount of time.",
 	"Due to unstable behaviour on older versions, this effect requires Minecraft version 1.21+."
 })
 @Examples({
