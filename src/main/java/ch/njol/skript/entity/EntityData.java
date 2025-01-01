@@ -21,6 +21,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.NotSerializableException;
@@ -186,7 +187,9 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		});
 	}
 
-	private final static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T> implements LanguageChangeListener {
+	private final static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T>
+		implements LanguageChangeListener {
+
 		final String codeName;
 		final String[] codeNames;
 		final int defaultName;
@@ -633,6 +636,11 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	@Deprecated
 	protected boolean deserialize(final String s) {
 		return false;
+	}
+
+	@Override
+	public @NotNull String getSyntaxTypeName() {
+		return "entity data";
 	}
 
 	@SuppressWarnings({"unchecked", "deprecation"})
