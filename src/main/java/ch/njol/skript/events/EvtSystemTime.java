@@ -38,7 +38,7 @@ public class EvtSystemTime extends SkriptEvent {
 				)
 				.since("INSERT VERSION");
 
-		timer = new Timer("EvtServerTime-Tasks");
+		timer = new Timer("EvtSystemTime-Tasks");
 	}
 
 	private Literal<Time> times;
@@ -96,7 +96,7 @@ public class EvtSystemTime extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "server time of " + times.toString(event, debug);
+		return "system time of " + times.toString(event, debug);
 	}
 
 	private void execute() {
