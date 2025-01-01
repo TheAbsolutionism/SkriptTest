@@ -1,22 +1,17 @@
 package ch.njol.skript.entity;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Villager.Profession;
-import org.jetbrains.annotations.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Profession;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.*;
 
 /**
  * @author Peter Güttinger
@@ -68,9 +63,8 @@ public class VillagerData extends EntityData<Villager> {
 			}
 		}
 	}
-	
-	@Nullable
-	private Profession profession = null;
+
+	private @Nullable Profession profession = null;
 	
 	public VillagerData() {}
 	
@@ -80,30 +74,30 @@ public class VillagerData extends EntityData<Villager> {
 	}
 	
 	@Override
-	protected boolean init(final Literal<?>[] exprs, final int matchedPattern, final ParseResult parseResult) {
+	protected boolean init(Literal<?>[] exprs, int matchedPattern, ParseResult parseResult) {
 		if (matchedPattern > 0)
 			profession = professions.get(matchedPattern - 1);
 		return true;
 	}
 	
 	@Override
-	protected boolean init(final @Nullable Class<? extends Villager> c, final @Nullable Villager e) {
-		profession = e == null ? null : e.getProfession();
+	protected boolean init(@Nullable Class<? extends Villager> villagerClass, @Nullable Villager villager) {
+		profession = villager == null ? null : villager.getProfession();
 		return true;
 	}
 	
 	@Override
-	public void set(final Villager entity) {
+	public void set(Villager villager) {
 		Profession prof = profession == null ? CollectionUtils.getRandom(professions) : profession;
 		assert prof != null;
-		entity.setProfession(prof);
+		villager.setProfession(prof);
 		if (profession == Profession.NITWIT)
-			entity.setRecipes(Collections.emptyList());
+			villager.setRecipes(Collections.emptyList());
 	}
 	
 	@Override
-	protected boolean match(final Villager entity) {
-		return profession == null || entity.getProfession() == profession;
+	protected boolean match(Villager villager) {
+		return profession == null || villager.getProfession() == profession;
 	}
 	
 	@Override
@@ -117,11 +111,10 @@ public class VillagerData extends EntityData<Villager> {
 	}
 	
 	@Override
-	protected boolean equals_i(final EntityData<?> obj) {
-		if (!(obj instanceof VillagerData))
+	protected boolean equals_i(EntityData<?> obj) {
+		if (!(obj instanceof VillagerData villagerData))
 			return false;
-		final VillagerData other = (VillagerData) obj;
-		return profession == other.profession;
+		return profession == villagerData.profession;
 	}
 	
 //		return profession == null ? "" : profession.name();
@@ -139,9 +132,9 @@ public class VillagerData extends EntityData<Villager> {
 	}
 	
 	@Override
-	public boolean isSupertypeOf(final EntityData<?> e) {
-		if (e instanceof VillagerData)
-			return profession == null || Objects.equals(((VillagerData) e).profession, profession);
+	public boolean isSupertypeOf(EntityData<?> entityData) {
+		if (entityData instanceof VillagerData villagerData)
+			return profession == null || profession.equals(villagerData.profession);
 		return false;
 	}
 	
