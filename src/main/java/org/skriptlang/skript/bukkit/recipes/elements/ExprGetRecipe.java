@@ -23,14 +23,14 @@ import java.util.List;
 @Description("Returns the recipe registered with the provided id.")
 @Examples({
 	"set {_recipe} to recipe with the key \"my_recipe\"",
-	"set {_recipes::*} to recipes with the ids \"my_recipe\" and \"custom_recipe\""
+	"set {_recipes::*} to recipes from the ids \"my_recipe\" and \"custom_recipe\""
 })
 @Since("INSERT VERSION")
 public class ExprGetRecipe extends SimpleExpression<Recipe> {
 
 	static {
 		Skript.registerExpression(ExprGetRecipe.class, Recipe.class, ExpressionType.SIMPLE,
-			"[the] recipe[s] [with [the] (key|id)[s]] %strings%");
+			"[the] recipe[s] (with|from) [the] (key|id)[s] %strings%");
 	}
 
 	private Expression<String> recipeNames;

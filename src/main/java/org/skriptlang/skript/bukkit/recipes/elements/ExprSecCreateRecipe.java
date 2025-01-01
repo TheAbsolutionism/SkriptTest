@@ -80,7 +80,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 })
 @Since("INSERT VERSION")
 public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
-	// TODO: Uncomment "Skript.error"'s when Runtime Error API is done.
+
 	private static final boolean SUPPORT_SMITHING = !Skript.isRunningMinecraft(1, 20, 0);
 
 	static {
@@ -128,12 +128,12 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 	protected Recipe @Nullable [] get(Event event) {
 		String name = providedName.getSingle(event);
 		if (name == null || name.isEmpty()) {
-			//Skript.error("The id for a recipe must not be null nor empty.");
+			Skript.error("The id for a recipe must not be null nor empty.");
 			return null;
 		}
 		NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
 		if (key == null) {
-			//Skript.error("The provided id is invalid.")
+			Skript.error("The provided id is invalid.");
 			return null;
 		}
 		CreateRecipeEvent recipeEvent = providedType.createRecipeEvent(key);
@@ -149,7 +149,7 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 		Recipe recipe = recipeWrapper.create();
 		// If the recipe failed to build
 		if (recipe == null) {
-			//Skript.error(recipeWrapper.getErrors().toString());
+			Skript.error(recipeWrapper.getErrors().toString());
 			return null;
 		}
 		return new Recipe[]{recipe};

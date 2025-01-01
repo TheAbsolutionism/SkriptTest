@@ -42,7 +42,7 @@ test "crafting recipe values":
 	###
 
 	set {_recipe} to a new shaped recipe with the key "test_crafting_recipe_values":
-		set the recipe ingredients to oak log, oak plank and oak wood
+		set the recipe ingredients to oak log, oak planks and oak wood
 		set the recipe category to misc crafting category
 		set the recipe group to "test_crafting_recipe_values"
 		set the recipe result to oak sapling
