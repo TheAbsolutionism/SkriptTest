@@ -9,14 +9,12 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import org.bukkit.entity.Camel;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Sprint")
-@Description("Make a player or camel start or stop sprinting.")
+@Name("Sprinting")
+@Description("Make a player start or stop sprinting.")
 @Examples({
 	"make player start sprinting",
 	"make last spawned camel sprint"
@@ -26,35 +24,31 @@ public class EffSprinting extends Effect {
 
 	static {
 		Skript.registerEffect(EffSprinting.class,
-			"make %livingentities% (start sprinting|sprint)",
-			"make %livingentities% (stop sprinting|not sprint)");
+			"make %players% (start sprinting|sprint)",
+			"make %players% (stop sprinting|not sprint)");
 	}
 
-	private Expression<LivingEntity> entities;
+	private Expression<Player> players;
 	private boolean sprint;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		entities = (Expression<LivingEntity>) exprs[0];
+		players = (Expression<Player>) exprs[0];
 		sprint = matchedPattern == 0;
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
-		for (LivingEntity entity : entities.getArray(event)) {
-			if (entity instanceof Player player) {
-				player.setSprinting(sprint);
-			} else if (entity instanceof Camel camel) {
-				camel.setDashing(sprint);
-			}
+		for (Player player : players.getArray(event)) {
+			player.setSprinting(sprint);
 		}
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "make " + entities.toString(event, debug) + (sprint ? " start" : " stop") + " sprinting";
+		return "make " + players.toString(event, debug) + (sprint ? " start" : " stop") + " sprinting";
 	}
 
 }

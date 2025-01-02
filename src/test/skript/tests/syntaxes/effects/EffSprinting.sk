@@ -1,8 +1,0 @@
-test "camel sprinting":
-	spawn a camel at test-location:
-		set {_entity} to entity
-	make {_entity} start sprinting
-	assert {_entity} is sprinting with "Camel should be sprinting"
-	make {_entity} stop sprinting
-	assert {_entity} is not sprinting with "Camel should not be sprinting"
-	clear entity within {_entity}

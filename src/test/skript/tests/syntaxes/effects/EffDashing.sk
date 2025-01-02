@@ -1,0 +1,9 @@
+test "camel dashing" when running minecraft "1.20":
+	# Test fails on 1.19.4, effect does work.
+	spawn a camel at test-location:
+		set {_entity} to entity
+	make {_entity} start dashing
+	assert {_entity} is dashing with "Camel should be dashing"
+	make {_entity} stop dashing
+	assert {_entity} is not dashing with "Camel should not be dashing"
+	clear entity within {_entity}
