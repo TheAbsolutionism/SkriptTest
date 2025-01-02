@@ -7,17 +7,14 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import org.bukkit.entity.LivingEntity;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Is Sleeping")
 @Description("Checks whether an entity is sleeping.")
 @Examples({
 	"# cut your enemies' throats in their sleep >=)",
-		"on attack:",
-		"	attacker is holding a sword",
-		"	victim is sleeping",
-		"	increase the damage by 1000"
+	"on attack:",
+		"\tattacker is holding a sword",
+		"\tvictim is sleeping",
+		"\tincrease the damage by 1000"
 })
 @Since("1.4.4, INSERT VERSION (livingentities)")
 public class CondIsSleeping extends PropertyCondition<LivingEntity> {

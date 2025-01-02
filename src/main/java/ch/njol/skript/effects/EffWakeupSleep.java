@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Wakeup And Sleep")
 @Description({
-	"Make bats and foxes sleep or wakeup.",
+	"Make bats and foxes sleep or wake up.",
 	"Make villagers sleep by providing a location of a bed.",
 	"Make players sleep by providing a location of a bed and 'with force' to bypass nearby monsters.",
 	"Using 'without spawn location update' will make players wake up without setting their spawn location to the bed."
@@ -35,8 +35,10 @@ public class EffWakeupSleep extends Effect {
 
 	static {
 		Skript.registerEffect(EffWakeupSleep.class,
-			"make %livingentities% (start sleeping|[go[ ]to] sleep) [%-direction% %-location%] [force:with force]",
-			"make %livingentities% (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]");
+			"make %livingentities% (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
+			"make %players% (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
+			"make %livingentities% (stop sleeping|wake[ ]up)",
+			"make %players% (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -98,9 +100,8 @@ public class EffWakeupSleep extends Effect {
 			builder.append("stop");
 		}
 		builder.append("sleeping");
-		if (location != null) {
+		if (location != null)
 			builder.append(location);
-		}
 		if (force)
 			builder.append("with force");
 		if (!setSpawn)

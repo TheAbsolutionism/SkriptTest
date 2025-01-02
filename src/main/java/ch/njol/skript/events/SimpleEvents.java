@@ -764,7 +764,7 @@ public class SimpleEvents {
 		}
 
 		Skript.registerEvent("Bat Toggle Sleep", SimpleEvent.class, BatToggleSleepEvent.class, "bat toggle sleep")
-			.description("Called when a bat attempts to go to sleep or wakeup.")
+			.description("Called when a bat attempts to go to sleep or wakes up.")
 			.examples("on bat toggle sleep:")
 			.since("INSERT VERSION");
 
