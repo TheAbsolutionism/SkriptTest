@@ -224,7 +224,7 @@ public class RecipeUtils {
 		public abstract @Nullable CreateRecipeEvent createRecipeEvent(NamespacedKey key);
 
 		/**
-		 * Create a {@link MutableRecipe} designed to alter attributes before final creation.
+		 * Create a {@link MutableRecipe} designed to set data before final creation.
 		 * Used for {@link ExprSecCreateRecipe}.
 		 * @param key
 		 * @return

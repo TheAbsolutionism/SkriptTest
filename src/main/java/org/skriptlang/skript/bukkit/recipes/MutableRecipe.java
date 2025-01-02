@@ -14,7 +14,6 @@ import java.util.List;
 
 /**
  * Mutable Recipe class allowing data to be set before creation of a recipe.
- * Wraps all types of recipe.
  */
 public abstract class MutableRecipe implements Recipe {
 

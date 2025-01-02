@@ -471,7 +471,7 @@ public final class BukkitEventValues {
 			if (first instanceof Player player) // Needs to be player... Usually it is
 				return player;
 			return null;
-		}, 0);
+		});
 		// CraftEvents - recipe namespaced key strings
 		EventValues.registerEventValue(CraftItemEvent.class, String.class, event -> {
 			Recipe recipe = event.getRecipe();

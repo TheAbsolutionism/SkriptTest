@@ -4,10 +4,20 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.*;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableBlastingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableCampfireRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableFurnaceRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCookingRecipe.MutableSmokingRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapedRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableCraftingRecipe.MutableShapelessRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTransformRecipe;
+import org.skriptlang.skript.bukkit.recipes.MutableRecipe.MutableSmithingRecipe.MutableSmithingTrimRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
 
 /**
  * Event class used with ExprSecCreateRecipe to allow the creation of MutableRecipe
+ * Allows elements used to determine if the recipe being created is of the required type
  */
 public class CreateRecipeEvent extends Event {
 	private boolean errorInSection = false;
@@ -36,7 +46,7 @@ public class CreateRecipeEvent extends Event {
 	}
 
 	/**
-	 * Specific event to determine if the mutableRecipe is of MutableCraftingRecipe
+	 * Event correlating to creating a {@link MutableCraftingRecipe}
 	 */
 	public static class CraftingRecipeEvent extends CreateRecipeEvent {
 
@@ -45,7 +55,7 @@ public class CreateRecipeEvent extends Event {
 		};
 
 		/**
-		 * Specific event to determine if the mutableRecipe is of MutableShapedRecipe
+		 * Event correlating to creating a {@link MutableShapedRecipe}
 		 */
 		public static class ShapedRecipeEvent extends CraftingRecipeEvent {
 			public ShapedRecipeEvent(NamespacedKey key) {
@@ -54,7 +64,7 @@ public class CreateRecipeEvent extends Event {
 		}
 
 		/**
-		 * Specific event to determine if the mutableRecipe is of MutableShapelessRecipe
+		 * Event correlating to creating a {@link MutableShapelessRecipe}
 		 */
 		public static class ShapelessRecipeEvent extends CraftingRecipeEvent {
 			public ShapelessRecipeEvent(NamespacedKey key) {
@@ -64,7 +74,7 @@ public class CreateRecipeEvent extends Event {
 	}
 
 	/**
-	 * Specific event to determine if the mutableRecipe is of MutableCookingRecipe
+	 * Event correlating to creating a {@link MutableCookingRecipe}
 	 */
 	public static class CookingRecipeEvent extends CreateRecipeEvent {
 
@@ -72,24 +82,36 @@ public class CreateRecipeEvent extends Event {
 			super(key, recipeType);
 		};
 
+		/**
+		 * Event correlating to creating a {@link MutableBlastingRecipe}
+		 */
 		public static class BlastingRecipeEvent extends CookingRecipeEvent {
 			public BlastingRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.BLASTING);
 			}
 		}
 
+		/**
+		 * Event correlating to creating a {@link MutableCampfireRecipe}
+		 */
 		public static class CampfireRecipeEvent extends CookingRecipeEvent {
 			public CampfireRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.CAMPFIRE);
 			}
 		}
 
+		/**
+		 * Event correlating to creating a {@link MutableFurnaceRecipe}
+		 */
 		public static class FurnaceRecipeEvent extends CookingRecipeEvent {
 			public FurnaceRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.FURNACE);
 			}
 		}
 
+		/**
+		 * Event correlating to creating a {@link MutableSmokingRecipe}
+		 */
 		public static class SmokingRecipeEvent extends CookingRecipeEvent {
 			public SmokingRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.SMOKING);
@@ -97,17 +119,26 @@ public class CreateRecipeEvent extends Event {
 		}
 	}
 
+	/**
+	 * Event correlating to creating a {@link MutableSmithingRecipe}
+	 */
 	public static class SmithingRecipeEvent extends CreateRecipeEvent {
 		public SmithingRecipeEvent(NamespacedKey key, RecipeType recipeType) {
 			super(key, recipeType);
 		}
 
+		/**
+		 * Event correlating to creating a {@link MutableSmithingTransformRecipe}
+		 */
 		public static class SmithingTransformRecipeEvent extends SmithingRecipeEvent {
 			public SmithingTransformRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.SMITHING_TRANSFORM);
 			}
 		}
 
+		/**
+		 * Event correlating to creating a {@link MutableSmithingTrimRecipe}
+		 */
 		public static class SmithingTrimRecipeEvent extends SmithingRecipeEvent {
 			public SmithingTrimRecipeEvent(NamespacedKey key) {
 				super(key, RecipeType.SMITHING_TRIM);
@@ -115,12 +146,18 @@ public class CreateRecipeEvent extends Event {
 		}
 	}
 
+	/**
+	 * Event correlating to creating a {@link MutableStonecuttingRecipe}
+	 */
 	public static class StonecuttingRecipeEvent extends CreateRecipeEvent {
 		public StonecuttingRecipeEvent(NamespacedKey key) {
 			super(key, RecipeType.STONECUTTING);
 		}
 	}
 
+	/**
+	 * Event correlating to creating a {@link MutableTransmuteRecipe}
+	 */
 	public static class TransmuteRecipeEvent extends CreateRecipeEvent {
 		public TransmuteRecipeEvent(NamespacedKey key) {
 			super(key, RecipeType.TRANSMUTE);
@@ -131,4 +168,5 @@ public class CreateRecipeEvent extends Event {
 	public @NotNull HandlerList getHandlers() {
 		throw new IllegalStateException();
 	}
+
 }

@@ -38,7 +38,7 @@ import java.util.List;
 	"</ul>",
 	"",
 	"When resetting the server recipes, all custom recipes from any plugin will be removed, regardless of specifying additional data. "
-		+ "Only vanilla recipes will be present.",
+		+ "Only vanilla recipes will remain.",
 	"When deleting the server recipes, you are allowed to delete recipes using the options listed above.",
 })
 @Examples({
@@ -48,9 +48,9 @@ import java.util.List;
 	"",
 	"reset all of the server's recipes",
 	"",
-	"delete all recipes for netherite ingot",
-	"clear all of the minecraft recipes",
-	"delete all of the custom shaped recipes"
+	"delete all the server's recipes for netherite ingot",
+	"clear all of the server minecraft recipes",
+	"delete all of the server's custom shaped recipes"
 })
 @Since("INSERT VERSION")
 public class ExprAllRecipes extends SimpleExpression<Recipe> {
@@ -153,9 +153,9 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 		} else if (getCustom) {
 			builder.append("custom");
 		}
-		builder.append("recipes");
 		if (recipeTypeExpr != null)
-			builder.append("of type", recipeTypeExpr);
+			builder.append(recipeTypeExpr);
+		builder.append("recipes");
 		if (itemExpr != null)
 			builder.append("for", itemExpr);
 		return builder.toString();
@@ -163,7 +163,6 @@ public class ExprAllRecipes extends SimpleExpression<Recipe> {
 
 	// Gets the recipes based on the provided input from the user
 	private CheckedIterator<Recipe> getSelectedRecipes(Event event) {
-		List<Recipe> recipeList = new ArrayList<>();
 		Iterator<Recipe> iterator = null;
 		// User is looking for a certain type of item(s)
 		if (itemExpr != null) {
