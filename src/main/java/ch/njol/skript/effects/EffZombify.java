@@ -59,8 +59,11 @@ public class EffZombify extends Effect {
 	@Override
 	protected void execute(Event event) {
 		int ticks = 0;
-		if (timespan != null)
-			ticks = (int) timespan.getSingle(event).getAs(TimePeriod.TICK);
+		if (timespan != null) {
+			Timespan timespan = this.timespan.getSingle(event);
+			if (timespan != null)
+				ticks = (int) timespan.getAs(TimePeriod.TICK);
+		}
 		for (LivingEntity entity : entities.getAll(event)) {
 			if (zombify && entity instanceof Villager villager) {
 				villager.zombify();
