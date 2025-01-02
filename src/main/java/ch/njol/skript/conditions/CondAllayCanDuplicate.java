@@ -18,7 +18,7 @@ import org.bukkit.entity.LivingEntity;
 public class CondAllayCanDuplicate extends PropertyCondition<LivingEntity> {
 
 	static {
-		PropertyCondition.register(CondAllayCanDuplicate.class, PropertyType.CAN, "(duplicate|clone)", "livingentities");
+		register(CondAllayCanDuplicate.class, PropertyType.CAN, "(duplicate|clone)", "livingentities");
 	}
 
 	@Override

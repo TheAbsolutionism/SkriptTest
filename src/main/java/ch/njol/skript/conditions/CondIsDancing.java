@@ -19,7 +19,7 @@ import org.bukkit.entity.Parrot;
 public class CondIsDancing extends PropertyCondition<LivingEntity> {
 
 	static {
-		PropertyCondition.register(CondIsDancing.class, PropertyType.BE, "dancing", "livingentities");
+		register(CondIsDancing.class, "dancing", "livingentities");
 	}
 
 	@Override

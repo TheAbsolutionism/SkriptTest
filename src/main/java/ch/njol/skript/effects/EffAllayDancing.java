@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @Description({
 	"Make an allay start or stop dancing.",
 	"By providing a location when making an allay dance, checks to see if the block at the location is a jukebox and playing music.",
-	"By not providing a location, the allay will non-stop dance."
+	"By not providing a location, the allay will dance forever."
 })
 @Examples({
 	"if last spawned allay is not dancing:",

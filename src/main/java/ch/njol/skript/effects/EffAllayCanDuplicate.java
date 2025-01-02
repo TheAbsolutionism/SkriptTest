@@ -15,7 +15,10 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Allay Duplicate")
-@Description("Set whether an allay can or cannot duplicate itself.")
+@Description({
+	"Set whether an allay can or cannot duplicate itself.",
+	"This is not the same as breeding allays."
+})
 @Examples({
 	"allow all allays to duplicate",
 	"disallow all allays to duplicate"
