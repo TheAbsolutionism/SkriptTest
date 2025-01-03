@@ -10,7 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Parrot;
 
 @Name("Is Dancing")
-@Description("Checks to see if an entity is dancing. (e.g allays and parrots)")
+@Description("Checks to see if an entity is dancing, such as allays or parrots.")
 @Examples({
 	"if last spawned allay is dancing:",
 		"\tbroadcast \"Dance Party!\""
