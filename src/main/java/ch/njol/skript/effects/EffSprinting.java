@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 @Description("Make a player start or stop sprinting.")
 @Examples({
 	"make player start sprinting",
-	"make last spawned camel sprint"
+	"force player to start sprinting"
 })
 @Since("INSERT VERSION")
 public class EffSprinting extends Effect {
@@ -25,7 +25,9 @@ public class EffSprinting extends Effect {
 	static {
 		Skript.registerEffect(EffSprinting.class,
 			"make %players% (start sprinting|sprint)",
-			"make %players% (stop sprinting|not sprint)");
+			"force %players% to (start sprinting|sprint)",
+			"make %players% (stop sprinting|not sprint)",
+			"force %players% to (stop sprinting|not sprint)");
 	}
 
 	private Expression<Player> players;
@@ -35,7 +37,7 @@ public class EffSprinting extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		players = (Expression<Player>) exprs[0];
-		sprint = matchedPattern == 0;
+		sprint = matchedPattern <= 1;
 		return true;
 	}
 

@@ -9,10 +9,10 @@ import org.bukkit.entity.Camel;
 import org.bukkit.entity.LivingEntity;
 
 @Name("Camel Is Dashing")
-@Description("Checks whether a camel is sprinting.")
+@Description("Checks whether a camel is dashing.")
 @Examples({
-	"if last spawned camel is not dashing:",
-		"\tmake last spawned camel start dashing"
+	"if last spawned camel is dashing:",
+		"\tkill last spawned camel"
 })
 @Since("INSERT VERSION")
 public class CondIsDashing extends PropertyCondition<LivingEntity> {
