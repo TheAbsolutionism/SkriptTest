@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class EvtSystemTime extends SkriptEvent {
+public class EvtRealTime extends SkriptEvent {
 
-	public static class SystemTimeEvent extends Event {
+	public static class RealTimeEvent extends Event {
 		@Override
 		public @NotNull HandlerList getHandlers() {
 			throw new IllegalStateException();
@@ -26,15 +26,15 @@ public class EvtSystemTime extends SkriptEvent {
 	private static final Timer timer;
 
 	static {
-		Skript.registerEvent("System Time", EvtSystemTime.class, SystemTimeEvent.class,
-			"(system|real) time (of|at) %times%")
-				.description("Called when the local time of the system reaches the provided time.")
+		Skript.registerEvent("System Time", EvtRealTime.class, RealTimeEvent.class,
+			"at %times% [in] real time")
+				.description("Called when the local time of the system the server is running on reaches the provided real-life time.")
 				.examples(
-					"on system time of 14:20:",
-					"on real time at 2:30am:",
-					"on system time at 6:10 pm:",
-					"on real time of 5:00 am and 5:00 pm:",
-					"on system time of 5:00 and 17:00:"
+					"at 14:20 in real time:",
+					"at 2:30am real time:",
+					"at 6:10 pm in real time:",
+					"at 5:00 am and 5:00 pm in real time:",
+					"at 5:00 and 17:00 in real time:"
 				)
 				.since("INSERT VERSION");
 
@@ -43,7 +43,7 @@ public class EvtSystemTime extends SkriptEvent {
 
 	private Literal<Time> times;
 	private boolean unloaded = false;
-	private final List<SystemTimeInfo> infoList = new ArrayList<>();
+	private final List<RealTimeInfo> infoList = new ArrayList<>();
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
@@ -67,7 +67,7 @@ public class EvtSystemTime extends SkriptEvent {
 			while (expectedCalendar.before(currentCalendar)) {
 				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
-			SystemTimeInfo info = new SystemTimeInfo(time, expectedCalendar.getTimeInMillis());
+			RealTimeInfo info = new RealTimeInfo(time, expectedCalendar.getTimeInMillis());
 			infoList.add(info);
 			createNewTask(info);
 		}
@@ -77,7 +77,7 @@ public class EvtSystemTime extends SkriptEvent {
 	@Override
 	public void unload() {
 		unloaded = true;
-		for (SystemTimeInfo info : infoList) {
+		for (RealTimeInfo info : infoList) {
 			if (info.task != null)
 				info.task.cancel();
 		}
@@ -96,11 +96,11 @@ public class EvtSystemTime extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "system time of " + times.toString(event, debug);
+		return "at " + times.toString(event, debug) + " in real time";
 	}
 
 	private void execute() {
-		SystemTimeEvent event = new SystemTimeEvent();
+		RealTimeEvent event = new RealTimeEvent();
 		SkriptEventHandler.logEventStart(event);
 		SkriptEventHandler.logTriggerStart(trigger);
 		trigger.execute(event);
@@ -108,7 +108,7 @@ public class EvtSystemTime extends SkriptEvent {
 		SkriptEventHandler.logEventEnd();
 	}
 
-	private void preExecute(SystemTimeInfo info) {
+	private void preExecute(RealTimeInfo info) {
 		// Safety check, ensure this 'EvtServerTime' was not unloaded
 		if (unloaded)
 			return;
@@ -120,7 +120,7 @@ public class EvtSystemTime extends SkriptEvent {
 		execute();
 	}
 
-	private void createNewTask(SystemTimeInfo info) {
+	private void createNewTask(RealTimeInfo info) {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
@@ -131,12 +131,12 @@ public class EvtSystemTime extends SkriptEvent {
 		timer.schedule(task, new Date(info.executionTime));
 	}
 
-	private static class SystemTimeInfo {
+	private static class RealTimeInfo {
 		private long executionTime;
 		private final Time time;
 		private TimerTask task;
 
-		public SystemTimeInfo(Time time, long executionTime) {
+		public RealTimeInfo(Time time, long executionTime) {
 			this.time = time;
 			this.executionTime = executionTime;
 		}
