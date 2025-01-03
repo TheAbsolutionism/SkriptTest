@@ -14,7 +14,16 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Sprinting")
-@Description("Make a player start or stop sprinting.")
+@Description({
+	"Make a player start or stop sprinting.",
+	"If the player is not moving when this effect is used, they will be put in sprint mode for a tick and then stops (Causes FOV change). "
+		+ "Using it a second time, without the player manually sprinting in between, causes the player to stay in sprint mode, with some quirks.",
+	" - Particles may not be produced under the player's feet.",
+	" - The player will not exit the sprinting state if they stop moving.",
+	" - Restrictions like low hunger will not prevent the player from sprinting",
+	" - The player pressing shift will stop them sprinting, and pressing sprint will re-assert normal sprinting behavior",
+	"Using this effect two or more consecutive times on a stationary player produces undefined behavior and should not be relied on."
+})
 @Examples({
 	"make player start sprinting",
 	"force player to start sprinting"
