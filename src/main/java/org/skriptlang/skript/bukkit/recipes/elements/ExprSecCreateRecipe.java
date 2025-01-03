@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.recipes.elements;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.recipes.CreateRecipeEvent;
 import org.skriptlang.skript.bukkit.recipes.MutableRecipe;
 import org.skriptlang.skript.bukkit.recipes.RecipeUtils.RecipeType;
+import org.skriptlang.skript.log.runtime.SyntaxRuntimeErrorProducer;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,7 +81,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		"\tset the recipe result to netherite helmet"
 })
 @Since("INSERT VERSION")
-public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
+public class ExprSecCreateRecipe extends SectionExpression<Recipe> implements SyntaxRuntimeErrorProducer {
 
 	private static final boolean SUPPORT_SMITHING = !Skript.isRunningMinecraft(1, 20, 0);
 
@@ -92,6 +94,8 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 	private RecipeType providedType;
 	private Expression<String> providedName;
 	private Trigger trigger;
+	private Node node;
+	private String rawExpr;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int pattern, Kleenean isDelayed, ParseResult result, @Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems) {
@@ -121,6 +125,8 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 			Skript.error("Delays cannot be used within a 'create recipe' section.");
 			return false;
 		}
+		this.node = getParser().getNode();
+		rawExpr = result.expr;
 		return true;
 	}
 
@@ -128,12 +134,12 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 	protected Recipe @Nullable [] get(Event event) {
 		String name = providedName.getSingle(event);
 		if (name == null || name.isEmpty()) {
-			Skript.error("The id for a recipe must not be null nor empty.");
+			error("The id for a recipe must not be null nor empty.");
 			return null;
 		}
 		NamespacedKey key = NamespacedKey.fromString(name, Skript.getInstance());
 		if (key == null) {
-			Skript.error("The provided id is invalid.");
+			error("The provided id is invalid.");
 			return null;
 		}
 		CreateRecipeEvent recipeEvent = providedType.createRecipeEvent(key);
@@ -149,7 +155,7 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 		Recipe recipe = recipeWrapper.create();
 		// If the recipe failed to build
 		if (recipe == null) {
-			Skript.error(recipeWrapper.getErrors().toString());
+			error(recipeWrapper.getErrors().toString());
 			return null;
 		}
 		return new Recipe[]{recipe};
@@ -163,6 +169,16 @@ public class ExprSecCreateRecipe extends SectionExpression<Recipe> {
 	@Override
 	public Class<Recipe> getReturnType() {
 		return Recipe.class;
+	}
+
+	@Override
+	public Node getNode() {
+		return node;
+	}
+
+	@Override
+	public @Nullable String toHighlight() {
+		return rawExpr;
 	}
 
 	@Override
