@@ -16,7 +16,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Wakeup And Sleep")
+@Name("Wake And Sleep")
 @Description({
 	"Make bats and foxes sleep or wake up.",
 	"Make villagers sleep by providing a location of a bed.",
@@ -36,9 +36,13 @@ public class EffWakeupSleep extends Effect {
 	static {
 		Skript.registerEffect(EffWakeupSleep.class,
 			"make %livingentities% (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
+			"force %livingentities% to (start sleeping|[go[ ]to sleep) [%-direction% %-location%]",
 			"make %players% (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
+			"force %players% to (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
 			"make %livingentities% (stop sleeping|wake[ ]up)",
-			"make %players% (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]");
+			"force %livingentities% to (stop sleeping|wake[ ]up)",
+			"make %players% (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]",
+			"force %players% to (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -51,7 +55,7 @@ public class EffWakeupSleep extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		sleep = matchedPattern == 0;
+		sleep = matchedPattern <= 3;
 		force = parseResult.hasTag("force");
 		setSpawn = !parseResult.hasTag("spawn");
 		if (sleep && exprs[1] != null) {
