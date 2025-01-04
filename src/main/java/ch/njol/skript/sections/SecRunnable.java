@@ -25,11 +25,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Name("Runnable")
 @Description({
-	"This section will wait the amount of time from the provided timespan to run the code within the section.",
-	"This will not halt the code after this section.",
-	"Any local variables defined before hand will be usable within the section, but will not replace local variables within the code outside this section.",
-	"Any local variables defined within this section will not be preset outside of this section.",
-	"Any local variables defined outside and after this section will not be accessible in this section."
+	"This section will run the code within after waiting the provided timespam.",
+	"This will not halt the script from the code after this section from being ran.",
+	"Any local variables defined before hand will be usable within the section, but any modifications done within the section do not precedent outside of the section.",
+	"Any local variables defined within this section will not be usable outside of the section.",
+	"Any local variables defined after this section will not be accessible in the section."
 })
 @Examples({
 	"set {_a} to 1",
@@ -42,7 +42,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 	"if {_a} = 2:",
 		"\t# This will fail because the code within the section does not change the local variables outside of it.",
 	"if {_b} is set:",
-		"\t# This will fail because local variables defined within the section is not accessible outside of it."
+		"\t# This will fail because local variables defined within the section is not accessible outside of it.",
+	"",
+	"after a second run:",
+		"\tbroadcast \"Bye\"",
+		"\t# This will be broadcasted second",
+	"broadcast \"Hi\"",
+	"# This will be broadcasted first"
 })
 @Since("INSERT VERSION")
 public class SecRunnable extends Section implements SyntaxRuntimeErrorProducer {
