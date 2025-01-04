@@ -1,0 +1,28 @@
+test "mounting vehicle":
+	spawn a villager at test-location:
+		set {_vehicle} to entity
+	spawn a cow, a pig and a sheep at test-location:
+		add entity to {_passengers::*}
+	make {_passengers::*} ride {_vehicle}
+	loop {_passengers::*}:
+		assert loop-value is riding with "Is Riding condition in general should pass"
+		assert loop-value is riding any entity with "Is Riding condition in general with any entity should pass"
+		assert loop-value is riding a villager with "Is Riding condition with entity data should pass"
+		assert loop-value is riding {_vehicle} with "Is Riding condition with entity should pass"
+		assert loop-value is not riding a zombie villager with "Is Riding condition with wrong entity data should fail"
+
+	make {_passengers::*} dismount
+
+	loop {_passengers::*}:
+		assert loop-value is not riding with "Is Riding condition in general should fail"
+		assert loop-value is not riding any entity with "Is Riding condition in general with any entity should fail"
+		assert loop-value is not riding a villager with "Is Riding condition with entity data should fail"
+		assert loop-value is not riding {_vehicle} with "Is Riding condition with entity should fail"
+
+	# Test exception on entity riding itself
+	make {_vehicle} ride {_vehicle}
+	assert {_vehicle} is not riding {_vehicle} with "Entity can not be riding itself"
+	assert passengers of {_vehicle} does not contain {_vehicle} with "Passengers of vehicle should not contain the vehicle itself"
+
+	clear entity within {_vehicle}
+	clear entities within {_passengers::*}
