@@ -2681,6 +2681,7 @@ types:
 	named: named thing¦s @a
 	numbered: numbered thing¦s @a
 	containing: container¦s @a
+	skriptrunnable: skript runnable¦s @a
 
 	# Hooks
 	money: money

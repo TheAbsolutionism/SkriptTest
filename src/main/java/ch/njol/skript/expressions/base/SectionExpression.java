@@ -160,7 +160,11 @@ public abstract class SectionExpression<Value> extends SimpleExpression<Value> {
 	 * @return False if an exception occurred while executing the section.
 	 */
 	protected boolean runSection(Event event) {
-		return this.section.runSection(event);
+		return runSection(event, null);
+	}
+
+	protected boolean runSection(Event event, @Nullable Object locals) {
+		return this.section.runSection(event, locals);
 	}
 
 }

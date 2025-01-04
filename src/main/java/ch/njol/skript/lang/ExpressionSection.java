@@ -2,6 +2,7 @@ package ch.njol.skript.lang;
 
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.expressions.base.SectionExpression;
+import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.ApiStatus;
@@ -67,8 +68,12 @@ public class ExpressionSection extends Section {
 		super.loadOptionalCode(sectionNode);
 	}
 
-	public boolean runSection(Event event) {
-		return TriggerItem.walk(this.first, event);
+	public boolean runSection(Event event, @Nullable Object locals) {
+		if (locals != null)
+			Variables.setLocalVariables(event, locals);
+		boolean status = TriggerItem.walk(this.first, event);
+		Variables.removeLocals(event);
+		return status;
 	}
 
 	@Override
