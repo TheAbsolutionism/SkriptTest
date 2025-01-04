@@ -36,7 +36,7 @@ public class EffWakeupSleep extends Effect {
 	static {
 		Skript.registerEffect(EffWakeupSleep.class,
 			"make %livingentities% (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
-			"force %livingentities% to (start sleeping|[go[ ]to sleep) [%-direction% %-location%]",
+			"force %livingentities% to (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
 			"make %players% (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
 			"force %players% to (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
 			"make %livingentities% (stop sleeping|wake[ ]up)",
