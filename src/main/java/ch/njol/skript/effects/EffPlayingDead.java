@@ -23,7 +23,9 @@ public class EffPlayingDead extends Effect {
 	static {
 		Skript.registerEffect(EffPlayingDead.class,
 			"make %livingentities% (start playing|play) dead",
-			"make %livingentities% (stop playing|not play) dead");
+			"force %livingentities% to (start playing|play) dead",
+			"make %livingentities% (stop playing|not play) dead",
+			"force %livingentities% to (stop playing|not play) dead");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -33,16 +35,15 @@ public class EffPlayingDead extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		playDead = matchedPattern == 0;
+		playDead = matchedPattern <= 1;
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
 		for (LivingEntity entity : entities.getArray(event)) {
-			if (!(entity instanceof Axolotl axolotl))
-				continue;
-			axolotl.setPlayingDead(playDead);
+			if (entity instanceof Axolotl axolotl)
+				axolotl.setPlayingDead(playDead);
 		}
 	}
 

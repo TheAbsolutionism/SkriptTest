@@ -8,24 +8,22 @@ import ch.njol.skript.doc.Since;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.LivingEntity;
 
-@Name("Axolotl Is Playing Dead")
+@Name("Is Playing Dead")
 @Description("Checks to see if an axolotl is playing dead.")
 @Examples({
 	"if last spawned axolotl is playing dead:",
 		"\tmake last spawned axolotl stop playing dead"
 })
 @Since("INSERT VERSION")
-public class CondPlayingDead extends PropertyCondition<LivingEntity> {
+public class CondIsPlayingDead extends PropertyCondition<LivingEntity> {
 
 	static {
-		PropertyCondition.register(CondPlayingDead.class, PropertyType.BE, "playing dead", "livingentities");
+		PropertyCondition.register(CondIsPlayingDead.class, PropertyType.BE, "playing dead", "livingentities");
 	}
 
 	@Override
 	public boolean check(LivingEntity entity) {
-		if (!(entity instanceof Axolotl axolotl))
-			return false;
-		return axolotl.isPlayingDead();
+		return (entity instanceof Axolotl axolotl) ? axolotl.isPlayingDead() : false;
 	}
 
 	@Override

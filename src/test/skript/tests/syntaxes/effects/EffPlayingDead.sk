@@ -1,9 +1,5 @@
 test "playing dead":
-	###
-		Combines:
-			EffPlayingDead
-			CondPlayingDead
-	###
+	# Combines: EffPlayingDead and CondPlayingDead
 	spawn an axolotl at test-location:
 		set {_entity} to entity
 	make {_entity} start playing dead
