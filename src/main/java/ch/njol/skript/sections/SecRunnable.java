@@ -90,11 +90,11 @@ public class SecRunnable extends Section implements SyntaxRuntimeErrorProducer {
 
 	@Override
 	protected @Nullable TriggerItem walk(Event event) {
-		Object locals = Variables.copyLocalVariables(event);
 		Timespan timespan = this.timespan.getSingle(event);
 		if (timespan == null) {
 			error("The provided timespan cannot be null.");
 		} else {
+			Object locals = Variables.copyLocalVariables(event);
 			long ticks = timespan.getAs(TimePeriod.TICK);
 			if (ticks == 0) {
 				warning("The provided timespan is equal to 0 seconds. Consider running the code directly rather than within this section.");
@@ -111,8 +111,7 @@ public class SecRunnable extends Section implements SyntaxRuntimeErrorProducer {
 	private void execute(Object locals) {
 		RunnableEvent runnableEvent = new RunnableEvent();
 		Variables.setLocalVariables(runnableEvent, locals);
-		TriggerItem.walk(trigger, runnableEvent);
-		Variables.removeLocals(runnableEvent);
+		trigger.execute(runnableEvent);
 	}
 
 	@Override
