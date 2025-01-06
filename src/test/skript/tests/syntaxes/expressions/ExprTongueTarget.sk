@@ -1,0 +1,10 @@
+test "tongue target":
+	spawn a frog at test-location:
+		set {_frog} to entity
+	spawn a bee at test-location:
+		set {_bee} to entity
+	set the tongue target of {_frog} to {_bee}
+	assert the tongue target of {_frog} is {_bee} with "Tongue target was not set"
+	clear the tongue target of {_frog}
+	assert the tongue target of {_frog} is not set with "Tongue target was not cleared"
+	clear entities within {_frog} and {_bee}
