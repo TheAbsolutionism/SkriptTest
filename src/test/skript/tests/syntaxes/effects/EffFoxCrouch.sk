@@ -1,0 +1,8 @@
+test "fox crouch":
+	spawn fox at test-location:
+		set {_entity} to entity
+	make {_entity} crouch
+	assert {_entity} is crouching with "Fox should be crouching"
+	make {_entity} not crouch
+	assert {_entity} is not crouching with "Fox should not be crouching"
+	clear entity within {_entity}

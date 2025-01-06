@@ -1,0 +1,8 @@
+test "wolf interest":
+	spawn a wolf at test-location:
+		set {_entity} to entity
+	make {_entity} interested
+	assert {_entity} is interested with "Wolf should be interested"
+	make {_entity} uninterested
+	assert {_entity} is not interested with "Wolf should not be interested"
+	clear entity within {_entity}

@@ -1,0 +1,8 @@
+test "fox defend":
+	spawn fox at test-location:
+		set {_entity} to entity
+	make {_entity} defend
+	assert {_entity} is defending with "Fox should be defending"
+	make {_entity} not defend
+	assert {_entity} is not defending with "Fox should not be defending"
+	clear entity within {_entity}

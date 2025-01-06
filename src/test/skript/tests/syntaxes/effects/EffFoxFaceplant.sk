@@ -1,0 +1,8 @@
+test "fox faceplant":
+	spawn fox at test-location:
+		set {_entity} to entity
+	make {_entity} faceplant
+	assert {_entity} is faceplanted with "Fox should be faceplanted"
+	make {_entity} not faceplant
+	assert {_entity} is not faceplanted with "Fox should not be faceplanted"
+	clear entity within {_entity}
