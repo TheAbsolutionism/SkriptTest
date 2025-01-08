@@ -1,0 +1,62 @@
+test "axolotl variant":
+	spawn an axolotl at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to blue axolotl variant
+	assert entity variant of {_entity} is blue axolotl variant with "Axolotl should be blue variant"
+	set entity variant of {_entity} to gold axolotl variant
+	assert entity variant of {_entity} is gold axolotl variant with "Axolotl should be gold variant"
+	clear entity within {_entity}
+
+test "cat type":
+	spawn a cat at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to calico cat type
+	assert entity variant of {_entity} is calico cat type with "Cat should be calico type"
+	set entity variant of {_entity} to red cat type
+	assert entity variant of {_entity} is red cat type with "Cat should be red type"
+	clear entity within {_entity}
+
+test "fox type":
+	spawn a fox at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to red fox type
+	assert entity variant of {_entity} is red fox type with "Fox should be calico type"
+	set entity variant of {_entity} to snow fox type
+	assert entity variant of {_entity} is snow fox type with "Fox should be red type"
+	clear entity within {_entity}
+
+test "frog variant":
+	spawn a frog at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to warm frog variant
+	assert entity variant of {_entity} is warm frog variant with "Frog should be warm variant"
+	set entity variant of {_entity} to cold frog variant
+	assert entity variant of {_entity} is cold frog variant with "Frog should be cold variant"
+	clear entity within {_entity}
+
+test "rabbit type":
+	spawn a rabbit at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to gold rabbit type
+	assert entity variant of {_entity} is gold rabbit type with "Rabbit should be gold type"
+	set entity variant of {_entity} to killer bunny rabbit type
+	assert entity variant of {_entity} is gold rabbit type with "Rabbit should be killer bunny type"
+	clear entity within {_entity}
+
+test "salmon variant" when running minecraft "1.21":
+	spawn a salmon at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to large salmon variant
+	assert entity variant of {_entity} is large salmon variant with "Salmon should be large variant"
+	set entity variant of {_entity} to small salmon variant
+	assert entity variant of {_entity} is small salmon variant with "Salmon should be small variant"
+	clear entity within {_entity}
+
+test "wolf variant" when running minecraft "1.20.6":
+	spawn a wolf at test-location:
+		set {_entity} to entity
+	set entity variant of {_entity} to chestnut wolf variant
+	assert entity variant of {_entity} is chestnut wolf variant with "Wolf should be chestnut variant"
+	set entity variant of {_entity} to rusty wolf variant
+	assert entity variant of {_entity} is rusty wolf variant with "Wolf should be rusty variant"
+	clear entity within {_entity}

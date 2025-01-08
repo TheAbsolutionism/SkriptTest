@@ -1590,6 +1590,44 @@ public class BukkitClasses {
 					.description("Teleport Flags are settings to retain during a teleport.")
 					.requiredPlugins("Paper 1.19+")
 					.since("2.10"));
+
+		Classes.registerClass(new EnumClassInfo<>(Axolotl.Variant.class, "axolotlvariant", "axolotl variants")
+			.user("axolotl ?variants?")
+			.name("Axolotl Variant")
+			.description("Represents a variant of an axolotl entity.")
+			.since("INSERT VERSION")
+		);
+
+		Classes.registerClass(new EnumClassInfo<>(Fox.Type.class, "foxtype", "fox types")
+			.user("fox ?types?")
+			.name("Fox Type")
+			.description("Represents a type of a fox entity.")
+			.since("INSERT VERSION")
+		);
+
+		Classes.registerClass(new RegistryClassInfo<>(Frog.Variant.class, Registry.FROG_VARIANT, "frogvariant", "frog variants")
+			.user("frog ?variants?")
+			.name("Frog Variant")
+			.description("Represents a variant of a frog entity.")
+			.since("INSERT VERSION")
+		);
+
+		Classes.registerClass(new EnumClassInfo<>(Rabbit.Type.class, "rabbittype", "rabbit types")
+			.user("rabbit ?types?")
+			.name("Rabbit Type")
+			.description("Represents a type of a rabbit entity.")
+			.since("INSERT VERSION")
+		);
+
+		if (Skript.classExists("org.bukkit.entity.Salmon.Variant")) {
+			Classes.registerClass(new EnumClassInfo<>(Salmon.Variant.class, "salmonvariant", "salmon variants")
+				.user("salmon ?variants?")
+				.name("Salmon Variant")
+				.description("Represents a variant of a salmon entity.")
+				.since("INSERT VERSION")
+			);
+		}
+
 	}
 
 }

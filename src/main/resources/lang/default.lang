@@ -1333,31 +1333,66 @@ heal reasons:
 	wither: withering, withered, wither potion, a wither effect, wither effect, wither
 	wither_spawn: wither spawning, wither spawn, wither summoning, a wither summoning, a wither spawn, a wither spawning
 
+# -- Axolotl Variants --
+axolotl variants:
+	blue: blue axolotl variant
+	cyan: cyan axolotl variant
+	gold: gold axolotl variant
+	lucy: lucy axolotl variant
+	wild: wild axolotl variant
+
 # -- Cat Types --
 cat types:
-	tabby: tabby
-	black: black
-	red: red
-	siamese: siamese
-	british_shorthair: british shorthair
-	calico: calico
-	persian: persian
-	ragdoll: ragdoll
-	white: white
-	jellie: jellie
-	all_black: all black
+	tabby: tabby, tabby cat type
+	black: black, black cat type
+	red: red, red cat type
+	siamese: siamese, siamese cat type
+	british_shorthair: british shorthair, british shorthair cat type
+	calico: calico, calico cat type
+	persian: persian, persian cat type
+	ragdoll: ragdoll, ragdoll cat type
+	white: white, white cat type
+	jellie: jellie, jellie cat type
+	all_black: all black, all black cat type
+
+# -- Fox Types --
+fox types:
+	red: red fox type
+	snow: snow fox type
+
+# -- Frog Types --
+frog variants:
+	cold: cold frog variant
+	temperate: temperate frog variant
+	warm: warm frog variant
+
+# -- Rabbit Types --
+rabbit types:
+	black: black rabbit type
+	black_and_white: black and white rabbit type
+	brown: brown rabbit type
+	gold: gold rabbit type
+	salt_and_pepper: salt and pepper rabbit type
+	the_killer_bunny: killer bunny rabbit type
+	white: white rabbit type
+
+# -- Salmon Variants --
+salmon variants:
+	large: large salmon variant
+	medium: medium salmon variant
+	small: small salmon variant
 
 # -- Wolf Variants --
 wolf variants:
-	ashen: ashen
-	black: black
-	chestnut: chestnut
-	pale: pale
-	rusty: rusty
-	snowy: snowy
-	spotted: spotted
-	striped: striped
-	woods: woods
+	ashen: ashen, ashen wolf variant
+	black: black, black wolf variant
+	chestnut: chestnut, chestnut wolf variant
+	pale: pale, pale wolf variant
+	rusty: rusty, rusty wolf variant
+	snowy: snowy, snowy wolf variant
+	spotted: spotted, spotted wolf variant
+	striped: striped, striped wolf variant
+	woods: woods, woods wolf variant
 
 # -- Damage Causes --
 damage causes:
@@ -2624,7 +2659,12 @@ types:
 	soundcategory: sound categor¦y¦ies @a
 	blockdata: block data¦s @a
 	healreason: heal reason¦s @a
+	axolotlvariant: axolotl variant¦s @a
 	cattype: cat type¦s @a
+	foxtype: fox type¦s @a
+	frogvariant: frog variant¦s @a
+	rabbittype: rabbit type¦s @a
+	salmonvariant: salmon variant¦s @a
 	wolfvariant: wolf variant¦s @a
 	gamerule: gamerule¦s @a
 	attributetype: attribute type¦s @a
