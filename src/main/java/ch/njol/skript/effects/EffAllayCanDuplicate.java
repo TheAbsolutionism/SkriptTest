@@ -30,7 +30,7 @@ public class EffAllayCanDuplicate extends Effect {
 		Skript.registerEffect(EffAllayCanDuplicate.class,
 			"allow %livingentities% to (duplicate|clone)",
 			"disallow %livingentities% to (duplicate|clone)",
-			"disallow %livingentities% from (duplicating|cloning)");
+			"(disallow|prevent) %livingentities% from (duplicating|cloning)");
 	}
 
 	private Expression<LivingEntity> entities;

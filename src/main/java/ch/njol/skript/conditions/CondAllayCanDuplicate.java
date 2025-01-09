@@ -23,9 +23,7 @@ public class CondAllayCanDuplicate extends PropertyCondition<LivingEntity> {
 
 	@Override
 	public boolean check(LivingEntity entity) {
-		if (!(entity instanceof Allay allay))
-			return false;
-		return allay.canDuplicate();
+		return entity instanceof Allay allay ? allay.canDuplicate() : false;
 	}
 
 	@Override

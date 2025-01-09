@@ -38,9 +38,9 @@ public class ExprDuplicateCooldown extends SimplePropertyExpression<LivingEntity
 
 	@Override
 	public @Nullable Timespan convert(LivingEntity entity) {
-		if (!(entity instanceof Allay allay))
-			return null;
-		return new Timespan(TimePeriod.TICK, allay.getDuplicationCooldown());
+		if (entity instanceof Allay allay)
+			return new Timespan(TimePeriod.TICK, allay.getDuplicationCooldown());
+		return null;
 	}
 
 	@Override
@@ -70,9 +70,8 @@ public class ExprDuplicateCooldown extends SimplePropertyExpression<LivingEntity
 			default -> throw new IllegalStateException("Unexpected value: " + mode);
 		};
 		for (LivingEntity entity : getExpr().getArray(event)) {
-			if (!(entity instanceof Allay allay))
-				continue;
-			consumer.accept(allay);
+			if (entity instanceof Allay allay)
+				consumer.accept(allay);
 		}
 	}
 

@@ -1,12 +1,5 @@
+# includes: ExprDuplicateCooldown, EffAllayDuplicate, EffAllayCanDuplicate, CondAllayCanDuplicate
 test "duplicate cooldown":
-	###
-		Combines:
-			ExprDuplicateCooldown
-			EffAllayDuplicate
-			EffAllayCanDuplicate
-			CondAllayCanDuplicate
-	###
-
 	spawn an allay at test-location:
 		set {_entity} to entity
 

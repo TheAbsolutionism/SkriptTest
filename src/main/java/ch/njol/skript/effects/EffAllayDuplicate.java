@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Make Allay Duplicate")
 @Description({
 	"Make an allay duplicate itself.",
-	"This effect will always make an allay duplicate regardless if the duplicate attribute is disabled."
+	"This effect will always make an allay duplicate irregardless of whether the duplicate attribute is disabled."
 })
 @Examples("make all allays duplicate")
 @Since("INSERT VERSION")

@@ -22,9 +22,7 @@ public class ExprAllayJukebox extends SimplePropertyExpression<LivingEntity, Loc
 
 	@Override
 	public @Nullable Location convert(LivingEntity entity) {
-		if (!(entity instanceof Allay allay))
-			return null;
-		return allay.getJukebox();
+		return entity instanceof Allay allay ? allay.getJukebox() : null;
 	}
 
 	@Override

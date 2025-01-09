@@ -57,7 +57,12 @@ public class EffAllayDancing extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		Location location = this.location == null ? null : this.location.getSingle(event);
+		Location location = null;
+		if (this.location != null) {
+			location = this.location.getSingle(event);
+			//if (location == null)
+				// Runtime warning;
+		}
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (!(entity instanceof Allay allay))
 				continue;
