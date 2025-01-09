@@ -11,7 +11,7 @@ import org.bukkit.entity.LivingEntity;
 @Description("Checks whether an entity is sleeping.")
 @Examples({
 	"if player is sleeping:",
-		"\tmake player wakeup without spawn location update",
+		"\tmake player wake up without spawn location update",
 	"",
 	"if last spawned fox is sleeping:",
 		"\tmake last spawned fox stop sleeping"

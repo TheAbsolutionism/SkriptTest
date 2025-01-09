@@ -28,21 +28,21 @@ import org.jetbrains.annotations.Nullable;
 	"make {_bat} stop sleeping",
 	"make {_villager} start sleeping at location(0, 0, 0)",
 	"make player go to sleep at location(0, 0, 0) with force",
-	"make player wakeup without spawn location update"
+	"make player wake up without spawn location update"
 })
 @Since("INSERT VERSION")
 public class EffWakeupSleep extends Effect {
 
 	static {
 		Skript.registerEffect(EffWakeupSleep.class,
-			"make %livingentities% (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
-			"force %livingentities% to (start sleeping|[go[ ]to] sleep) [%-direction% %-location%]",
-			"make %players% (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
-			"force %players% to (start sleeping|[go[ ]to] sleep) %direction% %location% [force:with force]",
-			"make %livingentities% (stop sleeping|wake[ ]up)",
-			"force %livingentities% to (stop sleeping|wake[ ]up)",
-			"make %players% (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]",
-			"force %players% to (stop sleeping|wake[ ]up) [spawn:without spawn [location] update]");
+			"make %livingentities% (start sleeping|[go to] sleep) [%-direction% %-location%]",
+			"force %livingentities% to (start sleeping|[go to] sleep) [%-direction% %-location%]",
+			"make %players% (start sleeping|[go to] sleep) %direction% %location% [force:with force]",
+			"force %players% to (start sleeping|[go to] sleep) %direction% %location% [force:with force]",
+			"make %livingentities% (stop sleeping|wake up)",
+			"force %livingentities% to (stop sleeping|wake up)",
+			"make %players% (stop sleeping|wake up) [spawn:without spawn [location] update]",
+			"force %players% to (stop sleeping|wake up) [spawn:without spawn [location] update]");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -72,7 +72,12 @@ public class EffWakeupSleep extends Effect {
 
 	@Override
 	protected void execute(Event event) {
-		Location location = this.location == null ? null : this.location.getSingle(event);
+		Location location = null;
+		if (this.location != null) {
+			location = this.location.getSingle(event);
+			//if (location == null)
+				// Runtime warning
+		}
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Bat bat) {
 				bat.setAwake(!sleep);
