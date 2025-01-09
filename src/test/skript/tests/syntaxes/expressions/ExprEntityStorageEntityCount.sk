@@ -10,7 +10,7 @@ test "entity block storage entities" when running minecraft "1.21":
 
 	clear all bees
 
-	set {_old} to block at test-block
+	set {_old} to block data of test-block
 	set block at test-block to beehive
 	set {_hive} to block at test-block
 
@@ -36,4 +36,4 @@ test "entity block storage entities" when running minecraft "1.21":
 	assert the stored entity count of {_hive} is 0 with "Stored entities should be empty after releasing"
 
 	clear all bees
-	set block at test-block to {_old}
+	set block data of test-block to {_old}

@@ -1,5 +1,5 @@
 test "beehive honey level":
-	set {_old} to block at test-block
+	set {_old} to block data of test-block
 	set block at test-block to beehive
 	set {_hive} to block at test-block
 	set the honey level of {_hive} to the max honey level of {_hive}
@@ -11,4 +11,4 @@ test "beehive honey level":
 	remove 9999 from the honey level of {_hive}
 	assert the honey level of {_hive} is 0 with "Honey level should be clamped to 0"
 
-	set block at test-block to {_old}
+	set block data of test-block to {_old}
