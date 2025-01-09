@@ -23,7 +23,7 @@ public class EvtRealTime extends SkriptEvent {
 	}
 
 	private static final long HOUR_24_MILLISECONDS = 1000 * 60 * 60 * 24;
-	private static final Timer timer;
+	private static final Timer TIMER;
 
 	static {
 		Skript.registerEvent("System Time", EvtRealTime.class, RealTimeEvent.class,
@@ -38,7 +38,7 @@ public class EvtRealTime extends SkriptEvent {
 				)
 				.since("INSERT VERSION");
 
-		timer = new Timer("EvtSystemTime-Tasks");
+		TIMER = new Timer("EvtSystemTime-Tasks");
 	}
 
 	private Literal<Time> times;
@@ -81,7 +81,7 @@ public class EvtRealTime extends SkriptEvent {
 			if (info.task != null)
 				info.task.cancel();
 		}
-		timer.purge();
+		TIMER.purge();
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class EvtRealTime extends SkriptEvent {
 			}
 		};
 		info.task = task;
-		timer.schedule(task, new Date(info.executionTime));
+		TIMER.schedule(task, new Date(info.executionTime));
 	}
 
 	private static class RealTimeInfo {
