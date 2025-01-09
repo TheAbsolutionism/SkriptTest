@@ -49,13 +49,17 @@ public class CondIsRiding extends Condition {
 
 	@Override
 	public boolean check(Event event) {
+		// Entities are riding in general
 		if (riding == null)
 			return riders.check(event, rider -> rider.getVehicle() != null, isNegated());
 		Object[] riding = this.riding.getArray(event);
+		// Entities are riding a specific type of entity or specific entity
 		return riders.check(event, rider -> {
 			Entity vehicle = rider.getVehicle();
+			// Entity is not riding anything
 			if (vehicle == null)
 				return false;
+			// An entity cannot be riding multiple entities/vehicles, will be treated as an 'or' list
 			return SimpleExpression.check(riding, object -> {
 				if (object instanceof EntityData<?> entityData) {
 					return entityData.isInstance(vehicle);
@@ -72,8 +76,7 @@ public class CondIsRiding extends Condition {
 		String property = "riding";
 		if (riding != null)
 			property += " " + riding.toString(event, debug);
-		return PropertyCondition.toString(this, PropertyType.BE, event, debug, riders,
-				property);
+		return PropertyCondition.toString(this, PropertyType.BE, event, debug, riders, property);
 	}
 	
 }

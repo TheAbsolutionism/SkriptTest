@@ -1,11 +1,6 @@
 package ch.njol.skript.effects;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
-
 import ch.njol.skript.Skript;
-import ch.njol.skript.bukkitutil.PassengerUtils;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -15,6 +10,9 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.Event;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Peter Güttinger
@@ -30,7 +28,7 @@ public class EffVehicle extends Effect {
 
 	static {
 		Skript.registerEffect(EffVehicle.class,
-				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %"+ (PassengerUtils.hasMultiplePassenger() ? "entities" : "entity") +"/entitydatas%",
+				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %entities/entitydatas%",
 				"(make|let|force) %entities% [to] (dismount|(dismount|leave) (from|of|) (any|the[ir]|his|her|) vehicle[s])",
 				"(eject|dismount) (any|the|) passenger[s] (of|from) %entities%");
 	}
@@ -43,8 +41,6 @@ public class EffVehicle extends Effect {
 		//noinspection unchecked
 		passengers = matchedPattern == 2 ? null : (Expression<Entity>) exprs[0];
 		vehicles = matchedPattern == 1 ? null : exprs[exprs.length - 1];
-		if (!PassengerUtils.hasMultiplePassenger() && passengers != null && vehicles != null && !passengers.isSingle() && vehicles.isSingle() && Entity.class.isAssignableFrom(vehicles.getReturnType()))
-			Skript.warning("An entity can only have one passenger");
 		return true;
 	}
 	
@@ -73,13 +69,12 @@ public class EffVehicle extends Effect {
 			return;
 		for (Object vehicle : vehiclesArray) {
 			if (vehicle instanceof Entity vehicleEntity) {
-				vehicleEntity.eject();
 				for (Entity passenger : passengersArray) {
 					assert passenger != null;
 					if (passenger == vehicleEntity)
 						continue;
 					passenger.leaveVehicle();
-					PassengerUtils.addPassenger((Entity)vehicle, passenger); //For 1.9 and lower, it will only set the last one.
+					vehicleEntity.addPassenger(passenger);
 				}
 			} else {
 				for (Entity passenger : passengersArray) {
@@ -87,7 +82,7 @@ public class EffVehicle extends Effect {
 					Entity entity = ((EntityData<?>) vehicle).spawn(passenger.getLocation());
 					if (entity == null)
 						return;
-					PassengerUtils.addPassenger(entity, passenger);
+					entity.addPassenger(passenger);
 				}
 			}
 		}
