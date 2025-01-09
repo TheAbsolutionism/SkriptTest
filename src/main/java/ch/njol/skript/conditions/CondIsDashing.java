@@ -9,7 +9,7 @@ import org.bukkit.entity.Camel;
 import org.bukkit.entity.LivingEntity;
 
 @Name("Camel Is Dashing")
-@Description("Checks whether a camel is dashing.")
+@Description("Checks whether a camel is currently using its dash ability.")
 @Examples({
 	"if last spawned camel is dashing:",
 		"\tkill last spawned camel"

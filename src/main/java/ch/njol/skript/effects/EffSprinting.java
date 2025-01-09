@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Sprinting")
 @Description({
 	"Make a player start or stop sprinting.",
-	"If the player is not moving when this effect is used, they will be put in sprint mode for a tick and then stops (Causes FOV change). "
+	"If the player is not moving when this effect is used, they will be put in sprint mode for a tick and then stopped (this causes the FOV to change). "
 		+ "Using it a second time, without the player manually sprinting in between, causes the player to stay in sprint mode, with some quirks.",
 	" - Particles may not be produced under the player's feet.",
 	" - The player will not exit the sprinting state if they stop moving.",
