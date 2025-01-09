@@ -20,8 +20,7 @@ import java.util.function.Consumer;
 	"The view distance of a player is the distance sent by the server to the player. "
 		+ "This has nothing to do with client side view distance settings.",
 	"View distance is capped between 2 to 32.",
-	"Requires Paper server to change the view distance for both worlds and players.",
-	"Due to unstable behavior on older versions, the changing of view distance for worlds is restricted to Paper 1.21+."
+	"Paper is required to change the view distance for both worlds and players."
 })
 @Examples({
 	"set view distance of player to 10",
@@ -65,32 +64,38 @@ public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> 
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		int provided = mode == ChangeMode.RESET ? Bukkit.getViewDistance() : delta == null ? 2 : (Integer) delta[0];
+		int value = 2;
+		if (mode == ChangeMode.RESET) {
+			value = Bukkit.getViewDistance();
+		} else if (delta != null) {
+			value = (int) delta[0];
+		}
+		int finalValue = value;
 		Consumer<Player> playerConsumer;
 		Consumer<World> worldConsumer;
 		switch (mode) {
 			case SET, DELETE, RESET -> {
-				playerConsumer = player -> player.setViewDistance(Math2.fit(2, provided, 32));
-				worldConsumer = world -> world.setViewDistance(Math2.fit(2, provided, 32));
+				playerConsumer = player -> player.setViewDistance(Math2.fit(2, finalValue, 32));
+				worldConsumer = world -> world.setViewDistance(Math2.fit(2, finalValue, 32));
 			}
 			case ADD -> {
 				playerConsumer = player -> {
 					int current = player.getViewDistance();
-					player.setViewDistance(Math2.fit(2, current + provided, 32));
+					player.setViewDistance(Math2.fit(2, current + finalValue, 32));
 				};
 				worldConsumer = world -> {
 					int current = world.getViewDistance();
-					world.setViewDistance(Math2.fit(2, current + provided, 32));
+					world.setViewDistance(Math2.fit(2, current + finalValue, 32));
 				};
 			}
 			case REMOVE -> {
 				playerConsumer = player -> {
 					int current = player.getViewDistance();
-					player.setViewDistance(Math2.fit(2, current - provided, 32));
+					player.setViewDistance(Math2.fit(2, current - finalValue, 32));
 				};
 				worldConsumer = world -> {
 					int current = world.getViewDistance();
-					world.setViewDistance(Math2.fit(2, current - provided, 32));
+					world.setViewDistance(Math2.fit(2, current - finalValue, 32));
 				};
 			}
 			default -> throw new IllegalStateException("Unexpected value: " + mode);
