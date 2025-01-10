@@ -156,6 +156,8 @@ public abstract class SectionExpression<Value> extends SimpleExpression<Value> {
 	 * {@link #loadCode(SectionNode)},
 	 * {@link #loadOptionalCode(SectionNode)},
 	 * or {@link #setTriggerItems(List)}.
+	 * This will effectively utilize the local variables that are provided by the {@code event}
+	 * allowing modification from within this section to be present outside of this section.
 	 * @param event The event to pass as context.
 	 * @return False if an exception occurred while executing the section.
 	 */
@@ -163,8 +165,20 @@ public abstract class SectionExpression<Value> extends SimpleExpression<Value> {
 		return runSection(event, null);
 	}
 
-	protected boolean runSection(Event event, @Nullable Object locals) {
-		return this.section.runSection(event, locals);
+	/**
+	 * Executes the code within the section associated with this expression.
+	 * Before calling this method, the section must have been loaded through:
+	 * {@link #loadCode(SectionNode)},
+	 * {@link #loadOptionalCode(SectionNode)},
+	 * or {@link #setTriggerItems(List)}.
+	 * Providing {@code localVariables} will treat the {@code event} to be different than the current event of the current trigger.
+	 * Allowing access to all local variables set before this method call and any modifications within to not take effect outside the event and section.
+	 * @param event The event to pass as context.
+	 * @param localVariables Local variables to be copied into the {@code event}
+	 * @return False if an exception occurred while executing the section.
+	 */
+	protected boolean runSection(Event event, @Nullable Object localVariables) {
+		return this.section.runSection(event, localVariables);
 	}
 
 }

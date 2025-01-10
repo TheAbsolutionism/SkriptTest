@@ -21,23 +21,37 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.util.Executable;
 
 @Name("Run (Experimental)")
-@Description("Executes a task (a function). Any returned result is discarded.")
-@Examples({
-		"set {_function} to the function named \"myFunction\"",
-		"run {_function}",
-		"run {_function} with arguments {_things::*}",
+@Description({
+	"Executes a function (any result from the function is discarded) or a runnable.",
+	"Executing a runnable will allow any local variables from the current code to be usable within the runnable. "
+		+ "Including any modifications to be present outside the runnable.",
+	"Executing a runnable with a delay (e.g. after 1 second) will behave as the following:",
+	" - Any local variables defined before the runnable is executed will be usable, but any changes within will not take affect outside the runnable.",
+	" - Any local variables defined within the runnable will not be usable outside of it.",
+	" - Any local variables defined after the runnable is executed will not be accessible within the runnable."
 })
-@Since("2.10")
+@Examples({
+	"set {_function} to the function named \"myFunction\"",
+	"run {_function}",
+	"run {_function} with arguments {_things::*}",
+	"",
+	"execute a new runnable:",
+		"\tbroadcast \"Hi!\"",
+	"set {_runnable} to a new runnable:",
+		"\tbroadcast \"Bye!\"",
+	"execute {_runnable}",
+	"run {_runnable} after 2 seconds",
+	"after 1 second execute {_runnable}"
+})
+@Since("2.10, INSERT VERSION (runnables)")
 @Keywords({"run", "execute", "reflection", "function"})
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class EffRun extends Effect {
 
 	static {
 		Skript.registerEffect(EffRun.class,
-				"(run|execute) %executable% [arguments:with arg[ument]s %-objects%] [after:after %-timespan%]",
-				"(run|execute) %skriptrunnable% [after:after %-timespan%]",
-				"after %timespan% (run|execute) %executable% [arguments:with arg[ument]s %-objects%]",
-				"after %timespan% (run|execute) %skriptrunnable%");
+				"(run|execute) %executable/skriptrunnable% [arguments:with arg[ument]s %-objects%] [after:after %-timespan%]",
+				"after %timespan% (run|execute) %executable/skriptrunnable% [arguments:with arg[ument]s %-objects%]");
 	}
 
 	// We don't bother with the generic type here because we have no way to verify it
@@ -50,35 +64,28 @@ public class EffRun extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int pattern, Kleenean isDelayed, ParseResult result) {
-		if (pattern >= 2) {
-			timespan = (Expression<Timespan>) exprs[0];
-			task = exprs[1];
-		} else {
+		if (pattern == 0) {
 			task = exprs[0];
 			if (result.hasTag("after"))
 				timespan = (Expression<Timespan>) exprs[2];
+		} else {
+			timespan = (Expression<Timespan>) exprs[0];
+			task = exprs[1];
 		}
 		hasArguments = result.hasTag("arguments");
-		if (Executable.class.isAssignableFrom(task.getReturnType())) {
-			if (hasArguments) {
-				Expression<?> args = pattern == 0 ? exprs[1] : exprs[2];
-				this.arguments = LiteralUtils.defendExpression(args);
-				Expression<?>[] arguments;
-				if (this.arguments instanceof ExpressionList<?>) {
-					arguments = ((ExpressionList<?>) this.arguments).getExpressions();
-				} else {
-					arguments = new Expression[]{this.arguments};
-				}
-				this.input = new DynamicFunctionReference.Input(arguments);
-				return LiteralUtils.canInitSafely(this.arguments);
+		if (hasArguments) {
+			Expression<?> args = pattern == 0 ? exprs[1] : exprs[2];
+			this.arguments = LiteralUtils.defendExpression(args);
+			Expression<?>[] arguments;
+			if (this.arguments instanceof ExpressionList<?> expressionList) {
+				arguments = expressionList.getExpressions();
 			} else {
-				this.input = new DynamicFunctionReference.Input();
+				arguments = new Expression[]{this.arguments};
 			}
-		} else if (SkriptRunnable.class.isAssignableFrom(task.getReturnType())) {
-			if (hasArguments) {
-				Skript.error("Cannot provide arguments when running a runnable. Can only be used for functions.");
-				return false;
-			}
+			this.input = new DynamicFunctionReference.Input(arguments);
+			return LiteralUtils.canInitSafely(this.arguments);
+		} else {
+			this.input = new DynamicFunctionReference.Input();
 		}
 		return true;
 	}
@@ -87,39 +94,44 @@ public class EffRun extends Effect {
 	protected void execute(Event event) {
 		Object object = task.getSingle(event);
 		Runnable toRun = null;
-		if (object == null) {
-			return;
-		} else if (object instanceof Executable executable) {
-			Object[] arguments;
-			if (task instanceof DynamicFunctionReference<?> reference) {
-				Expression<?> validated = reference.validate(input);
-				if (validated == null)
-					return;
-				arguments = validated.getArray(event);
-			} else if (hasArguments) {
-				arguments = this.arguments.getArray(event);
-			} else {
-				arguments = new Object[0];
-			}
-			toRun = () -> executable.execute(event, arguments);
-		} else if (object instanceof SkriptRunnable skriptRunnable) {
-			Object locals = Variables.copyLocalVariables(event);
-			SkriptRunnableEvent runnableEvent = new SkriptRunnableEvent();
-			toRun = () -> skriptRunnable.run(runnableEvent, locals);
-		}
-		if (toRun == null)
-			return;
 		long ticks = 0;
 		if (timespan != null) {
 			Timespan timespan = this.timespan.getSingle(event);
 			if (timespan != null)
 				ticks = timespan.getAs(TimePeriod.TICK);
 		}
-		if (ticks == 0) {
-			toRun.run();
-		} else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), toRun, ticks);
+		if (object == null) {
+			return;
+		} else if (object instanceof SkriptRunnable skriptRunnable) {
+			if (ticks == 0) {
+				skriptRunnable.run(event, null);
+				return;
+			}
+			Object locals = Variables.copyLocalVariables(event);
+			SkriptRunnableEvent runnableEvent = new SkriptRunnableEvent();
+			toRun = () -> skriptRunnable.run(runnableEvent, locals);
+		} else if (object instanceof Executable executable) {
+			Object[] arguments;
+			if (executable instanceof DynamicFunctionReference<?> reference) {
+				assert input != null;
+				Expression<?> validated = reference.validate(input);
+				if (validated == null)
+					return;
+				arguments = validated.getArray(event);
+			} else if (this.arguments != null) {
+				arguments = this.arguments.getArray(event);
+			} else {
+				arguments = new Object[0];
+			}
+			if (ticks == 0) {
+				executable.execute(event, arguments);
+				return;
+			}
+			toRun = () -> executable.execute(event, arguments);
 		}
+		if (toRun == null)
+			return;
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), toRun, ticks);
 	}
 
 	@Override

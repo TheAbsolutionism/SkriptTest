@@ -68,11 +68,15 @@ public class ExpressionSection extends Section {
 		super.loadOptionalCode(sectionNode);
 	}
 
-	public boolean runSection(Event event, @Nullable Object locals) {
-		if (locals != null)
-			Variables.setLocalVariables(event, locals);
-		boolean status = TriggerItem.walk(this.first, event);
-		Variables.removeLocals(event);
+	public boolean runSection(Event event, @Nullable Object localVariables) {
+		boolean status;
+		if (localVariables != null) {
+			Variables.setLocalVariables(event, localVariables);
+			status = TriggerItem.walk(this.first, event);
+			Variables.removeLocals(event);
+		} else {
+			status = TriggerItem.walk(this.first, event);
+		}
 		return status;
 	}
 
