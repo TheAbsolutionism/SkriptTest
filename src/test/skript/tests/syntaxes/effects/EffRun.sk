@@ -59,27 +59,27 @@ test "run external functions":
 	assert {ExprFunction} is true with "external local function didn't run"
 	delete {ExprFunction}
 
-test "run variable runnable":
+test "run variable runnable with delay":
 	set {_a} to 1
 	set {_runnable} to a new runnable:
-		assert {_a} is 1 with "Local variable 'a' should keep context from before the runnable section is instantiated"
-		assert {_b} is not set with "Local variable 'b' should not be present as it's created after the execution of this runnable"
+		assert {_a} is 1 with "Local variable 'a' should keep context from before the variable runnable section is instantiated"
+		assert {_b} is not set with "Local variable 'b' should not be present as it's created after the execution of this variable runnable"
 		add 1 to {_a}
-		assert {_a} is 2 with "Local variable 'a' should still be changeable"
+		assert {_a} is 2 with "Local variable 'a' should still be changeable within this variable runnable"
 		set {_c} to 4
 	execute {_runnable} after 1 tick
 	set {_b} to 3
-	assert {_a} is 1 with "Local variable 'a' should keep context from only this event and not be changed from within the runnable"
-	assert {_c} is not set with "Local variable 'c' should not be present as it's created within the runnable and should not be transferred outside of it"
+	assert {_a} is 1 with "Local variable 'a' should keep context from only this event and not be changed from within the variable runnable"
+	assert {_c} is not set with "Local variable 'c' should not be present as it's created within the variable runnable and should not be transferred outside of it"
 
-test "run section runnable:":
+test "run inlined runnable with delay":
 	set {_a} to 1
 	after 1 tick execute a new runnable:
-		assert {_a} is 1 with "Local variable 'a' should keep context from before the runnable section is instantiated"
-		assert {_b} is not set with "Local variable 'b' should not be present as it's created after the execution of this runnable"
+		assert {_a} is 1 with "Local variable 'a' should keep context from before the inlined runnable section is instantiated"
+		assert {_b} is not set with "Local variable 'b' should not be present as it's created after the execution of this inlined runnable"
 		add 1 to {_a}
-		assert {_a} is 2 with "Local variable 'a' should still be changeable"
+		assert {_a} is 2 with "Local variable 'a' should still be changeable with this inlined runnable"
 		set {_c} to 4
 	set {_b} to 3
-	assert {_a} is 1 with "Local variable 'a' should keep context from only this event and not be changed from within the runnable"
-	assert {_c} is not set with "Local variable 'c' should not be present as it's created within the runnable and should not be transferred outside of it"
+	assert {_a} is 1 with "Local variable 'a' should keep context from only this event and not be changed from within the inlined runnable"
+	assert {_c} is not set with "Local variable 'c' should not be present as it's created within the inlined runnable and should not be transferred outside of it"
