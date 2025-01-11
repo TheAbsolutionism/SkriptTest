@@ -4,3 +4,5 @@ plugins {
 }
 
 rootProject.name = 'Skript'
+include 'skript-parser'
+
