@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 	"reset the simulation distance of player",
 	"clear the simulation distance of world \"world\""
 })
-@RequiredPlugins("Paper (change players), Paper 1.21+ (change worlds)")
+@RequiredPlugins("Paper (change for players), Paper 1.21+ (change for worlds)")
 @Since("INSERT VERSION")
 public class ExprSimulationDistance extends SimplePropertyExpression<Object, Integer> {
 

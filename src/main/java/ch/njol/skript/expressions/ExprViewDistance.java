@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 	"reset the view distance of player",
 	"clear the view distance of world \"world\""
 })
-@RequiredPlugins("Paper (change players), Paper 1.21+ (change worlds)")
+@RequiredPlugins("Paper (change for players), Paper 1.21+ (change for worlds)")
 @Since("2.4, INSERT VERSION (worlds)")
 public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> {
 
