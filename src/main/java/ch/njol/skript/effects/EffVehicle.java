@@ -14,9 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Vehicle")
 @Description("Makes an entity ride another entity, e.g. a minecart, a saddled pig, an arrow, etc.")
 @Examples({

@@ -17,14 +17,11 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
-/**
- * @author Peter Güttinger
- */
 @Name("Is Riding")
 @Description("Tests whether an entity is riding any entity, a specific entity type, or a specific entity.")
 @Examples({
 	"if player is riding:",
-	"if player is riding any entity:",
+	"if player is riding an entity:",
 	"if player is riding a saddled pig:",
 	"if player is riding last spawned horse:"
 })
@@ -32,7 +29,7 @@ import ch.njol.util.Kleenean;
 public class CondIsRiding extends Condition {
 	
 	static {
-		PropertyCondition.register(CondIsRiding.class, "riding [any entity|%-entitydatas/entities%]", "entities");
+		PropertyCondition.register(CondIsRiding.class, "riding [%-entitydatas/entities%]", "entities");
 	}
 
 	private Expression<Entity> riders;
