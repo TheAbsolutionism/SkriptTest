@@ -4,8 +4,8 @@ test "brewing slots":
 
 	set the brewing first bottle slot of test-block to potion of water
 	assert the brewing first bottle slot of test-block is potion of water with "First Bottle Slot was not set"
-	set the brewing second bottle slot of test-block to empty bottle
-	assert the brewing second bottle slot of test-block is empty bottle with "Second Bottle Slot was not set"
+	set the brewing second bottle slot of test-block to glass bottle
+	assert the brewing second bottle slot of test-block is glass bottle with "Second Bottle Slot was not set"
 	set the brewing third bottle slot of test-block to speed potion
 	assert the brewing third bottle slot of test-block is speed potion with "Third Bottle Slot was not set"
 	set the brewing fuel slot of test-block to blaze powder
