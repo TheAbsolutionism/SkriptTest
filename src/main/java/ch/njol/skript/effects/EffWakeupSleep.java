@@ -1,6 +1,7 @@
 package ch.njol.skript.effects;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.config.Node;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -15,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.log.runtime.SyntaxRuntimeErrorProducer;
 
 @Name("Wake And Sleep")
 @Description({
@@ -31,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 	"make player wake up without spawn location update"
 })
 @Since("INSERT VERSION")
-public class EffWakeupSleep extends Effect {
+public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer {
 
 	static {
 		Skript.registerEffect(EffWakeupSleep.class,
@@ -50,6 +52,7 @@ public class EffWakeupSleep extends Effect {
 	private boolean sleep;
 	private boolean force;
 	private boolean setSpawn;
+	private Node node;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -67,6 +70,7 @@ public class EffWakeupSleep extends Effect {
 			Expression<Location> location = (Expression<Location>) exprs[2];
 			this.location = Direction.combine(direction, location);
 		}
+		node = getParser().getNode();
 		return true;
 	}
 
@@ -75,8 +79,8 @@ public class EffWakeupSleep extends Effect {
 		Location location = null;
 		if (this.location != null) {
 			location = this.location.getSingle(event);
-			//if (location == null)
-				// Runtime warning
+			if (location == null)
+				warning("The provided location is null, this effect will not work as intended for villagers and player.");
 		}
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Bat bat) {
@@ -97,6 +101,11 @@ public class EffWakeupSleep extends Effect {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Node getNode() {
+		return node;
 	}
 
 	@Override
