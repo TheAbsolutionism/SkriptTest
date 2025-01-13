@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 	"send \"You will stop burning in %fire time of player%\"",
 	"send the max burn time of target"
 })
-@Since("2.7, INSERT VERSION (maximum)")
+@Since("2.7, 2.10 (maximum)")
 public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 
 	static {
@@ -34,18 +34,16 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		max = (parseResult.hasTag("max"));
-		return true;
+		return super.init(expressions, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
-	@Nullable
-	public Timespan convert(Entity entity) {
+	public @Nullable Timespan convert(Entity entity) {
 		return new Timespan(TimePeriod.TICK, (max ? entity.getMaxFireTicks() : Math.max(entity.getFireTicks(), 0)));
 	}
 
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (max)
 			return null;
 		return switch (mode) {
@@ -77,7 +75,7 @@ public class ExprFireTicks extends SimplePropertyExpression<Entity, Timespan> {
 	}
 
 	@Override
-	public Class<? extends Timespan> getReturnType() {
+	public Class<Timespan> getReturnType() {
 		return Timespan.class;
 	}
 
