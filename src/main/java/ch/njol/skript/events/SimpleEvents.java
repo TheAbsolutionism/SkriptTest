@@ -767,7 +767,7 @@ public class SimpleEvents {
 			.description("Called when a brewing stand starts brewing.")
 			.examples(
 				"on brewing start:",
-				"set the brewing time to 1"
+					"\tset the brewing time to 1 second"
 			)
 			.since("INSERT VERSION");
 
