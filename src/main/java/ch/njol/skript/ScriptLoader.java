@@ -5,7 +5,10 @@ import ch.njol.skript.config.Node;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.config.SimpleNode;
 import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
-import ch.njol.skript.lang.*;
+import ch.njol.skript.lang.Section;
+import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Statement;
+import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.LogEntry;
@@ -22,10 +25,8 @@ import ch.njol.util.NonNullPair;
 import ch.njol.util.OpenCloseable;
 import ch.njol.util.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.lang.condition.Conditional;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.script.ScriptWarning;
 import org.skriptlang.skript.lang.structure.Structure;
@@ -1015,15 +1016,8 @@ public class ScriptLoader {
 					RetainingLogHandler afterParse = handler.backup();
 					handler.clear();
 					handler.printLog();
-					if (item != null && (Skript.debug() || subNode.debug())) {
+					if (item != null && (Skript.debug() || subNode.debug()))
 						Skript.debug(SkriptColor.replaceColorChar(parser.getIndentation() + item.toString(null, true)));
-						if (item instanceof MultilinedConditional multilinedConditional && multilinedConditional.isMultilined()) {
-							Conditional<Event> conditional = multilinedConditional.getConditional();
-							String[] conditions = conditional.toString(null, true).split("(&&|\\|\\|)");
-							for (String condition : conditions)
-								Skript.debug(SkriptColor.replaceColorChar(parser.getIndentation() + "    " + condition));
-						}
-					}
 					afterParse.printLog();
 				}
 

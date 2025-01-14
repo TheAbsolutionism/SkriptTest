@@ -15,6 +15,7 @@ import ch.njol.skript.lang.util.ContextlessEvent;
 import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.util.Patterns;
+import ch.njol.skript.util.SkriptColor;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
@@ -53,7 +54,7 @@ import java.util.List;
 	""
 })
 @Since("1.0")
-public class SecConditional extends Section implements MultilinedConditional {
+public class SecConditional extends Section {
 
 	private static final SkriptPattern THEN_PATTERN = PatternCompiler.compile("then [run]");
 	private static final Patterns<ConditionalType> CONDITIONAL_PATTERNS = new Patterns<>(new Object[][] {
@@ -203,6 +204,17 @@ public class SecConditional extends Section implements MultilinedConditional {
 			if (conditionals.isEmpty())
 				return false;
 
+			/*
+				This allows the embedded multilined conditions to be properly debugged.
+				Debugs are caught within the RetainingLogHandler in ScriptLoader#loadItems
+				Which will be printed after the debugged section (e.g 'if all')
+			 */
+			if ((Skript.debug() || sectionNode.debug()) && conditionals.size() > 1) {
+				String indentation = getParser().getIndentation() + "    ";
+				for (Conditional<?> condition : conditionals)
+					Skript.debug(indentation + SkriptColor.replaceColorChar(condition.toString(null, true)));
+			}
+
 			conditional = Conditional.compound(ifAny ? Operator.OR : Operator.AND, conditionals);
 		}
 
@@ -316,16 +328,6 @@ public class SecConditional extends Section implements MultilinedConditional {
 		while (next instanceof SecConditional nextSecCond && nextSecCond.type != ConditionalType.IF)
 			next = next.getActualNext();
 		return next;
-	}
-
-	@Override
-	public boolean isMultilined() {
-		return multiline && (type == ConditionalType.IF || type == ConditionalType.ELSE_IF);
-	}
-
-	@Override
-	public Conditional<Event> getConditional() {
-		return conditional;
 	}
 
 	@Override
