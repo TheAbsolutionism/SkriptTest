@@ -53,7 +53,7 @@ import java.util.List;
 	""
 })
 @Since("1.0")
-public class SecConditional extends Section {
+public class SecConditional extends Section implements MultilinedConditional {
 
 	private static final SkriptPattern THEN_PATTERN = PatternCompiler.compile("then [run]");
 	private static final Patterns<ConditionalType> CONDITIONAL_PATTERNS = new Patterns<>(new Object[][] {
@@ -316,6 +316,16 @@ public class SecConditional extends Section {
 		while (next instanceof SecConditional nextSecCond && nextSecCond.type != ConditionalType.IF)
 			next = next.getActualNext();
 		return next;
+	}
+
+	@Override
+	public boolean isMultilined() {
+		return multiline && (type == ConditionalType.IF || type == ConditionalType.ELSE_IF);
+	}
+
+	@Override
+	public Conditional<Event> getConditional() {
+		return conditional;
 	}
 
 	@Override
