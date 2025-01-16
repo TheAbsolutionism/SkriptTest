@@ -2555,6 +2555,16 @@ input keys:
 	sneak: sneak key, sneaking key
 	sprint: sprint key, sprinting key
 
+# -- Equipment Slots --
+equipment slots:
+	helmet: helmet slot, head slot
+	chestplate: chestplate slot, chest slot
+	leggings: leggings slot, legs slot
+	boots: feet slot, boots slot
+	tool: tool slot, hand slot, main hand slot
+	off_hand: off hand slot
+	body: body slot, body armor slot
+
 # -- Boolean --
 boolean:
 	true:
@@ -2682,6 +2692,7 @@ types:
 	numbered: numbered thing¦s @a
 	valued: valued thing¦s @a
 	containing: container¦s @a
+	equipmentslot: equipment slot¦s @an
 
 	# Hooks
 	money: money

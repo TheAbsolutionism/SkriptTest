@@ -21,6 +21,7 @@ import ch.njol.skript.localization.Noun;
 import ch.njol.skript.localization.RegexMessage;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.*;
+import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.skript.util.visual.VisualEffect;
 import ch.njol.skript.util.visual.VisualEffects;
@@ -916,6 +917,14 @@ public class SkriptClasses {
 				.examples("{a} contains {b}")
 				.since("2.10")
 		);
+
+		Classes.registerClass(new EnumClassInfo<>(EquipSlot.class, "equipmentslot", "equipment slots")
+			.user("equipment ?slots?")
+			.name("Equipment Slot")
+			.description("Represents an equipment slot of an entity.")
+			.since("INSERT VERSION")
+		);
+
 	}
 
 }
