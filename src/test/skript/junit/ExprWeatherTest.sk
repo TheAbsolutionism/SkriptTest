@@ -16,13 +16,11 @@ on load:
 on weather change to rainy:
 	junit test is {@test}
 	set weather of event-world to thunder
-	broadcast "Doing Rainy: %weather of event-world%"
 	if weather of event-world is thunder:
 		complete "rainy to thunder" for {@test}
 
 on weather change to thunder:
 	junit test is {@test}
 	set weather of event-world to sunny
-	broadcast "Doing Thunder: %weather of event-world%"
 	if weather of event-world is sunny:
 		complete "thunder to sunny" for {@test}
