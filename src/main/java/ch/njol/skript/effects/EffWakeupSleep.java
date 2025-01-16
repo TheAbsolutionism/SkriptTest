@@ -80,7 +80,7 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 		if (this.location != null) {
 			location = this.location.getSingle(event);
 			if (location == null)
-				warning("The provided location is null, this effect will not work as intended for villagers and player.");
+				warning("The provided location is not set. This effect will have no effect for villagers and players.");
 		}
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Bat bat) {
