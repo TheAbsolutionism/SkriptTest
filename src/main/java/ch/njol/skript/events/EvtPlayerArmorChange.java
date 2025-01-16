@@ -4,17 +4,20 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
 
 public class EvtPlayerArmorChange extends SkriptEvent {
 
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
 			Skript.registerEvent("Armor Change", EvtPlayerArmorChange.class, PlayerArmorChangeEvent.class,
-				"[player] armo[u]r change[d] [from %-equipmentslots%]")
+				"[player] armo[u]r change[d] [(from|at) %-equipmentslots%]")
 				.description("Called when armor pieces of a player are changed.")
 				.requiredPlugins("Paper")
 				.keywords("armor", "armour")
@@ -39,7 +42,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			slots = slotLiteral.getArray();
 			for (EquipSlot slot : slots) {
 				if (slot == EquipSlot.TOOL || slot == EquipSlot.OFF_HAND || slot == EquipSlot.BODY) {
-					Skript.error("You can not detect an armor change event for a '" + slot + "'.");
+					Skript.error("You can not detect an armor change event for a '" + slot.name().replace("_", " ").toLowerCase(Locale.ENGLISH) + "'.");
 					return false;
 				}
 			}
@@ -68,7 +71,11 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "player armor change" + (slotLiteral == null ? "" : " from " + slotLiteral.toString(event, debug));
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("player armor change");
+		if (slotLiteral != null)
+			builder.append("from", slotLiteral);
+		return builder.toString();
 	}
 
 }

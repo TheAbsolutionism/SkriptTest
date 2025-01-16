@@ -40,6 +40,10 @@ public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements 
 		return true;
 	}
 
+	@Override
+	public Class<? extends Event>[] supportedEvents() {
+		return CollectionUtils.array(PlayerArmorChangeEvent.class);
+	}
 
 	@Override
 	protected ItemStack @Nullable [] get(Event event) {
@@ -65,11 +69,6 @@ public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements 
 		if (oldArmor)
 			return "the old armor item";
 		return "the new armor item";
-	}
-
-	@Override
-	public Class<? extends Event>[] supportedEvents() {
-		return CollectionUtils.array(PlayerArmorChangeEvent.class);
 	}
 
 }

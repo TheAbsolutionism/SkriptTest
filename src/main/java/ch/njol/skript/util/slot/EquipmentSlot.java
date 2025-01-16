@@ -227,7 +227,7 @@ public class EquipmentSlot extends SlotWithIndex {
 		return slotIndex != -1 ? slotIndex : slot.slotNumber;
 	}
 
-	public static EquipSlot bukkitToSkript(org.bukkit.inventory.EquipmentSlot bukkitSlot) {
+	public static EquipSlot fromBukkit(org.bukkit.inventory.EquipmentSlot bukkitSlot) {
 		return switch (bukkitSlot) {
 			case HEAD -> EquipSlot.HELMET;
 			case CHEST -> EquipSlot.CHESTPLATE;
