@@ -3,7 +3,6 @@ package ch.njol.skript.expressions;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.effects.Delay;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
@@ -13,6 +12,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -37,8 +37,10 @@ public class ExprWeather extends PropertyExpression<Object, WeatherType> {
 
 	static {
 		Skript.registerExpression(ExprWeather.class, WeatherType.class, ExpressionType.PROPERTY,
-			"[the] [custom|client] weather [(in|of) %worlds/players%]",
-			"%worlds/players%'[s] [custom|client] weather");
+				"[the] weather [(in|of) %players/worlds%]",
+				"[the] (custom|client) weather [of %players%]",
+				"%players/worlds%'[s] weather",
+				"%players%'[s] (custom|client) weather");
 	}
 
 	@Override
@@ -54,8 +56,10 @@ public class ExprWeather extends PropertyExpression<Object, WeatherType> {
 			if (object instanceof Player player) {
 				return WeatherType.fromPlayer(player);
 			} else if (object instanceof World world) {
-				if (eventWorld != null && world.equals(eventWorld) && getTime() >= 0 && !Delay.isDelayed(event))
-					return WeatherType.fromEvent((WeatherEvent) event);
+				if (eventWorld != null && world.equals(eventWorld) && getTime() >= 0) {
+					if (!(event instanceof Cancellable cancellable) || !cancellable.isCancelled())
+						return WeatherType.fromEvent((WeatherEvent) event);
+				}
 				return WeatherType.fromWorld(world);
 			}
 			return null;
@@ -83,15 +87,21 @@ public class ExprWeather extends PropertyExpression<Object, WeatherType> {
 					player.resetPlayerWeather();
 				}
 			} else if (object instanceof World world) {
-				if (eventWorld != null && world.equals(eventWorld) && getTime() >= 0 && !Delay.isDelayed(event)) {
+				if (eventWorld != null && world.equals(eventWorld) && getTime() >= 0) {
 					if (event instanceof WeatherChangeEvent weatherChangeEvent) {
-						if (weatherChangeEvent.toWeatherState() && worldWeather == WeatherType.CLEAR)
+						if (weatherChangeEvent.toWeatherState() && worldWeather == WeatherType.CLEAR) {
 							weatherChangeEvent.setCancelled(true);
+						} else if (!weatherChangeEvent.toWeatherState() && worldWeather == WeatherType.RAIN) {
+							eventWorld.setStorm(true);
+						}
 						if (eventWorld.isThundering() != (worldWeather == WeatherType.THUNDER))
 							eventWorld.setThundering(worldWeather == WeatherType.THUNDER);
 					} else if (event instanceof ThunderChangeEvent thunderChangeEvent) {
-						if (thunderChangeEvent.toThunderState() && worldWeather != WeatherType.THUNDER)
+						if (thunderChangeEvent.toThunderState() && worldWeather != WeatherType.THUNDER) {
 							thunderChangeEvent.setCancelled(true);
+						} else if (!thunderChangeEvent.toThunderState() && worldWeather == WeatherType.THUNDER) {
+							eventWorld.setThundering(true);
+						}
 						if (eventWorld.hasStorm() == (worldWeather == WeatherType.CLEAR))
 							eventWorld.setStorm(worldWeather != WeatherType.CLEAR);
 					}
@@ -109,7 +119,7 @@ public class ExprWeather extends PropertyExpression<Object, WeatherType> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "the weather of " + getExpr().toString(event, debug);
+		return "weather of " + getExpr().toString(event, debug);
 	}
 
 	@Override
