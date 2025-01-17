@@ -49,9 +49,7 @@ public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements 
 	protected ItemStack @Nullable [] get(Event event) {
 		if (!(event instanceof PlayerArmorChangeEvent changeEvent))
 			return null;
-		if (oldArmor)
-			return new ItemStack[]{changeEvent.getOldItem()};
-		return new ItemStack[]{changeEvent.getNewItem()};
+		return new ItemStack[]{oldArmor ? changeEvent.getOldItem() : changeEvent.getNewItem()};
 	}
 
 	@Override
@@ -66,9 +64,7 @@ public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements 
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		if (oldArmor)
-			return "the old armor item";
-		return "the new armor item";
+		return (oldArmor ? "old" : "new") + " armor item";
 	}
 
 }

@@ -5,12 +5,11 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 public class EvtPlayerArmorChange extends SkriptEvent {
 
@@ -42,7 +41,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			slots = slotLiteral.getArray();
 			for (EquipSlot slot : slots) {
 				if (slot == EquipSlot.TOOL || slot == EquipSlot.OFF_HAND || slot == EquipSlot.BODY) {
-					Skript.error("You can not detect an armor change event for a '" + slot.name().replace("_", " ").toLowerCase(Locale.ENGLISH) + "'.");
+					Skript.error("You can not detect an armor change event for a '" + Classes.toString(slot) + "'.");
 					return false;
 				}
 			}
