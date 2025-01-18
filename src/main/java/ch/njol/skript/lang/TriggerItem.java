@@ -294,7 +294,7 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Check if the following {@link Node} , directly after {@code sectionNode} exists and passes {@code checker}
+	 * Check if the following {@link Node} , directly after {@code sectionNode} exists and passes {@code checker}.
 	 * @param sectionNode The {@link SectionNode} of the current element
 	 * @param parser A {@link ParserInstance}
 	 * @param checker The {@link Checker} to check the {@link Node}
@@ -322,24 +322,37 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Parse a multiline condition to ensure the conditions are valid
-	 * Returns null if any of the conditions fail to parse
-	 * @param sectionNode The {@link SectionNode} of the current element and houses the conditions
-	 * @param parser A {@link ParserInstance}
-	 * @param sectionType String displaying the section type to be used within {@link Skript#error(String)} if conditions fail to parse
-	 * @return {@link List} of the successfully parsed {@link Conditional<Event>}
+	 * Parse a multiline condition to ensure the conditions are valid.
+	 * Returns null if any of the conditions fail to parse or there is not a minimum of two conditions.
+	 * @param sectionNode The {@link SectionNode} of the current element and houses the conditions.
+	 * @param parser A {@link ParserInstance}.
+	 * @param sectionType String displaying the section type to be used within {@link Skript#error(String)} if conditions fail to parse.
+	 * @return {@link List} of the successfully parsed {@link Conditional<Event>}.
 	 */
-	public static @Nullable List<Conditional<Event>> parseMultiline(SectionNode sectionNode, ParserInstance parser, String sectionType)  {
+	public static @Nullable List<Conditional<Event>> parseMultiline(SectionNode sectionNode, ParserInstance parser, String sectionType) {
+		return parseMultiline(sectionNode, parser, sectionType, 2);
+	}
+
+	/**
+	 * Parse a multiline condition to ensure the conditions are valid.
+	 * Returns null if any of the conditions fail to parse or the number of conditions does not meet the requirement of {@code minimum}.
+	 * @param sectionNode The {@link SectionNode} of the current element that contains the conditions.
+	 * @param parser A {@link ParserInstance}.
+	 * @param sectionType String displaying the section type to be used within {@link Skript#error(String)} if conditions fail to parse.
+	 * @param minimum Minimum number of conditions that need to be present.
+	 * @return {@link List} of the successfully parsed {@link Conditional<Event>}.
+	 */
+	public static @Nullable List<Conditional<Event>> parseMultiline(SectionNode sectionNode, ParserInstance parser, String sectionType, int minimum)  {
 		List<Conditional<Event>> conditionals = new ArrayList<>();
 		int nodeCount = Iterables.size(sectionNode);
 		// we have to get the size of the iterator here as SectionNode#size includes empty/void nodes
-		if (nodeCount < 2) {
-			Skript.error(sectionType + " sections must contain atleast two conditions.");
+		if (nodeCount < minimum) {
+			Skript.error(sectionType + " sections must contain atleast " + minimum + " condition(s).");
 			return null;
 		}
 		for (Node childNode : sectionNode) {
 			if (childNode instanceof SectionNode) {
-				Skript.error(sectionType + " section may not contain other sections.");
+				Skript.error(sectionType + " sections may not contain other sections.");
 				return null;
 			}
 			String childKey = childNode.getKey();
