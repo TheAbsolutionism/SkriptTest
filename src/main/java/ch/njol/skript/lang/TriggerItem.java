@@ -7,7 +7,6 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.util.SkriptColor;
-import ch.njol.util.Checker;
 import ch.njol.util.StringUtils;
 import com.google.common.collect.Iterables;
 import org.bukkit.event.Event;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Represents a trigger item, i.e. a trigger section, a condition or an effect.
@@ -198,32 +198,32 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}
-	 * Returns null if the first element is not instance of {@code tClass}
-	 * Returns null if the first element does not pass {@code checker}
-	 * @param tClass The class of the expected element
-	 * @param triggerItems The trigger items to look through
-	 * @param checker The {@link Checker} to return the element if it passes or if null
-	 * @return The eexpected element
+	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}.
+	 * Returns null if the first element is not instance of {@code tClass}.
+	 * Returns null if the first element does not pass {@code checker}.
+	 * @param tClass The class of the expected element.
+	 * @param triggerItems The trigger items to look through.
+	 * @param checker The {@link Predicate} to return the element if it passes or if null.
+	 * @return The expected element.
 	 * @param <T>
 	 */
-	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, Checker<T> checker) {
-		return getPrecedingElement(tClass, triggerItems, checker, o -> !checker.check(o));
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, Predicate<T> checker) {
+		return getPrecedingElement(tClass, triggerItems, checker, o -> !checker.test(o));
 	}
 
 	/**
-	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}
-	 * Returns null if the first element is not instance of {@code tClass}
-	 * Returns expected element if {@code checker} is null, or it passes
-	 * Returns null if {@code stopper} is set and passes
-	 * @param tClass The class of the expected element
-	 * @param triggerItems The trigger items to look through
-	 * @param checker The {@link Checker} to return the element if it passes or if null
-	 * @param stopper The {@link Checker} to return null if the element passes
+	 * Get the first preceding element if it's instance of {@code tClass} and passes {@code checker}.
+	 * Returns null if the first element is not instance of {@code tClass}.
+	 * Returns expected element if {@code checker} is null, or it passes.
+	 * Returns null if {@code stopper} is set and passes.
+	 * @param tClass The class of the expected element.
+	 * @param triggerItems The trigger items to look through.
+	 * @param checker The {@link Predicate} to return the element if it passes or if null.
+	 * @param stopper The {@link Predicate} to return null if the element passes.
 	 * @return The expected element
 	 * @param <T>
 	 */
-	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker, @Nullable Checker<T> stopper) {
+	public static <T extends SyntaxElement> @Nullable T getPrecedingElement(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Predicate<T> checker, @Nullable Predicate<T> stopper) {
 		// loop through the triggerItems in reverse order so that we find the most recent items first
 		for (int i = triggerItems.size() - 1; i >= 0; i--) {
 			TriggerItem triggerItem = triggerItems.get(i);
@@ -231,19 +231,19 @@ public abstract class TriggerItem implements Debuggable {
 				return null;
 			//noinspection unchecked
 			T element = (T) triggerItem;
-			if (stopper != null && stopper.check(element))
+			if (stopper != null && stopper.test(element))
 				return null;
-			if (checker == null || checker.check(element))
+			if (checker == null || checker.test(element))
 				return element;
 		}
 		return null;
 	}
 
 	/**
-	 * Gets all consecutive preceding elements that are instance of {@code tClass}
-	 * @param tclass The class of the expected elements
-	 * @param triggerItems The trigger items to look through
-	 * @return List of expected elements
+	 * Gets all consecutive preceding elements that are instance of {@code tClass}.
+	 * @param tclass The class of the expected elements.
+	 * @param triggerItems The trigger items to look through.
+	 * @return {@link List} of expected elements.
 	 * @param <T>
 	 */
 	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tclass, List<TriggerItem> triggerItems) {
@@ -251,15 +251,15 @@ public abstract class TriggerItem implements Debuggable {
 	}
 
 	/**
-	 * Gets all consecutive preceding elements that are instance of {@code tClass} and pass {@code checker}
-	 * If an element fails {@code checker} , the elements that have already passed are returned
-	 * @param tClass The class of the expected elements
-	 * @param triggerItems The trigger items to look through
-	 * @param checker The {@link Checker} to check the elements
-	 * @return List of expected elements
+	 * Gets all consecutive preceding elements that are instance of {@code tClass} and pass {@code checker}.
+	 * If an element fails {@code checker} , the elements that have already passed are returned.
+	 * @param tClass The class of the expected elements.
+	 * @param triggerItems The trigger items to look through.
+	 * @param checker The {@link Predicate} to check the elements.
+	 * @return {@link List} of expected elements.
 	 * @param <T>
 	 */
-	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Checker<T> checker)  {
+	public static <T extends SyntaxElement> List<T> getPrecedingElements(Class<T> tClass, List<TriggerItem> triggerItems, @Nullable Predicate<T> checker)  {
 		List<T> elementList = new ArrayList<>();
 		// loop through the triggerItems in reverse order so that we find the most recent items first
 		for (int i = triggerItems.size() - 1; i >= 0; i--) {
@@ -268,7 +268,7 @@ public abstract class TriggerItem implements Debuggable {
 				break;
 			//noinspection unchecked
 			T element = (T) triggerItem;
-			if (checker != null && !checker.check(element))
+			if (checker != null && !checker.test(element))
 				break;
 			elementList.add(element);
 		}
@@ -297,10 +297,10 @@ public abstract class TriggerItem implements Debuggable {
 	 * Check if the following {@link Node} , directly after {@code sectionNode} exists and passes {@code checker}.
 	 * @param sectionNode The {@link SectionNode} of the current element
 	 * @param parser A {@link ParserInstance}
-	 * @param checker The {@link Checker} to check the {@link Node}
+	 * @param checker The {@link Predicate} to check the {@link Node}
 	 * @return true if the following {@link Node} passes {@code checker}
 	 */
-	public static boolean checkFollowingElement(SectionNode sectionNode, ParserInstance parser, Checker<Node> checker) {
+	public static boolean checkFollowingElement(SectionNode sectionNode, ParserInstance parser, Predicate<Node> checker) {
 		// iterating over the parent node causes the current node to change, so we need to store it to reset it later
 		Node originalNode = parser.getNode();
 		SectionNode parentNode = sectionNode.getParent();
@@ -318,7 +318,7 @@ public abstract class TriggerItem implements Debuggable {
 		parser.setNode(originalNode);
 		if (nextNode == null)
 			return false;
-		return checker.check(nextNode);
+		return checker.test(nextNode);
 	}
 
 	/**
