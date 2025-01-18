@@ -2683,6 +2683,10 @@ types:
 	valued: valued thing¦s @a
 	containing: container¦s @a
 
+	messagebuilder: message builder¦s @a
+	linebuilder: line builder¦s @a
+	alignedtext: aligned text¦s @an
+
 	# Hooks
 	money: money
 	region: region¦s
