@@ -8,6 +8,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
@@ -41,6 +42,7 @@ public class ExprSecMessageBuilder extends SectionExpression<MessageBuilder> {
 
 	static {
 		Skript.registerExpression(ExprSecMessageBuilder.class, MessageBuilder.class, ExpressionType.SIMPLE, "a new message builder [with:with a max pixel length of %-integer%]");
+		EventValues.registerEventValue(MessageBuilderEvent.class, MessageBuilder.class, MessageBuilderEvent::getMessageBuilder);
 	}
 
 	private Trigger trigger;

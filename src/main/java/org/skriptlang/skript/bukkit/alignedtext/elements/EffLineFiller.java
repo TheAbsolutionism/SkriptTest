@@ -17,7 +17,7 @@ public class EffLineFiller extends Effect implements EventRestrictedSyntax, Synt
 
 	static {
 		Skript.registerEffect(EffLineFiller.class,
-			"(set|make) [the] filler char[acter] to %string%");
+			"(set|make) [the] [line] filler char[acter] to %string%");
 	}
 
 	private Expression<String> string;

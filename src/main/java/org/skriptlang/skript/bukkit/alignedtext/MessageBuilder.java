@@ -26,4 +26,38 @@ public class MessageBuilder {
 		lines.put(line, lineBuilder);
 	}
 
+	public String build() {
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i <= highestLine; i++) {
+			LineBuilder lineBuilder = lines.get(i);
+			if (lineBuilder == null) {
+				String empty = populateString("");
+				result.append(empty);
+			} else {
+				String line = lineBuilder.build(pixelLength);
+				result.append(line);
+			}
+			if (i < highestLine)
+				result.append("\n");
+		}
+		return result.toString();
+	}
+
+	public String populateString(String base) {
+		StringBuilder result = new StringBuilder();
+		int length = pixelLength;
+		int charLength = PixelUtils.getLength(' ');
+		int total = 0;
+		length -= 1;
+		total += 1;
+		total += Math.floorDiv(length, charLength + 1);
+		for (int i = 0; i < total; i++)
+			result.append(" ");
+		return result.toString();
+	}
+
+	@Override
+	public String toString() {
+		return build();
+	}
 }

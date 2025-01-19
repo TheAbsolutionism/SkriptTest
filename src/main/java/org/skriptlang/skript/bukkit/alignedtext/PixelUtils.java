@@ -13,9 +13,9 @@ public class PixelUtils {
 	private static final String NORMAL_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
 		+ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		+ "1234567890"
-		+ "~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
+		+ "~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ";
 
-	private static final Font FONT = Font.getFont("Arial");
+	private static final Font FONT = Font.getFont("Ariel");
 
 	private static final Map<Character, Integer> loggedCharacters = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class PixelUtils {
 	public static int getLength(Character c) {
 		if (loggedCharacters.containsKey(c))
 			return loggedCharacters.get(c);
-		if (FONT.canDisplay(c)) {
+		if (FONT != null && FONT.canDisplay(c)) {
 			Rectangle2D rectangle2D = FONT.getStringBounds(
 				c.toString(),
 				new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT)
@@ -37,7 +37,7 @@ public class PixelUtils {
 			loggedCharacters.put(c, length);
 			return length;
 		}
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("Could not get pixel length of '" + c + "'");
 	}
 
 	public static int getLength(String string) {

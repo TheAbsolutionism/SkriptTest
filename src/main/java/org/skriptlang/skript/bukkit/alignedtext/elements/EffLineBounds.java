@@ -18,8 +18,8 @@ public class EffLineBounds extends Effect implements EventRestrictedSyntax, Synt
 
 	static {
 		Skript.registerEffect(EffLineBounds.class,
-			"(set|make) [the] line left bound character to %string%",
-			"(set|make) [the] line right bound character to %string%");
+			"(set|make) [the] [line] left bound character to %string%",
+			"(set|make) [the] [line] right bound character to %string%");
 	}
 
 	private Expression<String> string;

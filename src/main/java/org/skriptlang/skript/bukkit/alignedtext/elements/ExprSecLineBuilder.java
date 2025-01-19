@@ -5,6 +5,7 @@ import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -41,6 +42,7 @@ public class ExprSecLineBuilder extends SectionExpression<LineBuilder> implement
 
 	static {
 		Skript.registerExpression(ExprSecLineBuilder.class, LineBuilder.class, ExpressionType.SIMPLE, "a new line builder");
+		EventValues.registerEventValue(LineBuilderEvent.class, LineBuilder.class, LineBuilderEvent::getLineBuilder);
 	}
 
 	private Trigger trigger;
