@@ -160,21 +160,21 @@ public class EquipmentSlot extends SlotWithIndex {
 		this(entityEquipment, skriptSlot, false);
 	}
 
-	public EquipmentSlot(EntityEquipment equipment, org.bukkit.inventory.EquipmentSlot skriptSlot, boolean slotToString) {
+	public EquipmentSlot(EntityEquipment equipment, org.bukkit.inventory.EquipmentSlot bukkitSlot, boolean slotToString) {
 		this.entityEquipment = equipment;
 		int slotIndex = -1;
-		if (skriptSlot == org.bukkit.inventory.EquipmentSlot.HAND) {
+		if (bukkitSlot == org.bukkit.inventory.EquipmentSlot.HAND) {
 			Entity holder = equipment.getHolder();
 			if (holder instanceof Player player)
 				slotIndex = player.getInventory().getHeldItemSlot();
 		}
 		this.slotIndex = slotIndex;
-		this.bukkitSlot = skriptSlot;
+		this.bukkitSlot = bukkitSlot;
 		this.slotToString = slotToString;
 	}
 
-	public EquipmentSlot(EntityEquipment equipment, org.bukkit.inventory.EquipmentSlot skriptSlot) {
-		this(equipment, skriptSlot, false);
+	public EquipmentSlot(EntityEquipment equipment, org.bukkit.inventory.EquipmentSlot bukkitSlot) {
+		this(equipment, bukkitSlot, false);
 	}
 	
 	@SuppressWarnings("null")
