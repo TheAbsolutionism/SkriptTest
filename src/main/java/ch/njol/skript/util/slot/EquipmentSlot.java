@@ -10,7 +10,9 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Represents equipment slot of an entity.
@@ -126,8 +128,18 @@ public class EquipmentSlot extends SlotWithIndex {
 		
 	}
 	
-	private static final EquipSlot[] values = EquipSlot.values();
-	private static final org.bukkit.inventory.EquipmentSlot[] EQUIPMENT_VALUES = org.bukkit.inventory.EquipmentSlot.values();
+	private static final EquipSlot[] SKRIPT_VALUES = EquipSlot.values();
+	private static final org.bukkit.inventory.EquipmentSlot[] BUKKIT_VALUES = org.bukkit.inventory.EquipmentSlot.values();
+
+	private static final Map<org.bukkit.inventory.EquipmentSlot, Integer> bukkitSlotIndex = new HashMap<>();
+
+	static {
+		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.FEET, 36);
+		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.LEGS, 37);
+		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.CHEST, 38);
+		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.HEAD, 39);
+		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.OFF_HAND, 40);
+	}
 	
 	private final EntityEquipment entityEquipment;
 	private EquipSlot skriptSlot;
@@ -184,7 +196,7 @@ public class EquipmentSlot extends SlotWithIndex {
 		 *  So this math trick gets us the EquipSlot from inventory slot index
 		 * slotToString: Referring to numeric slot id, right?
 		 */
-		this(holder.getEquipment(), EQUIPMENT_VALUES[41 - index], true);
+		this(holder.getEquipment(), BUKKIT_VALUES[41 - index], true);
 	}
 
 	@Override
@@ -220,14 +232,18 @@ public class EquipmentSlot extends SlotWithIndex {
 	}
 	
 	/**
-	 * Gets underlying armor slot enum.
-	 * @return Armor slot.
+	 * @deprecated Use {@link EquipmentSlot#EquipmentSlot(EntityEquipment, org.bukkit.inventory.EquipmentSlot)} and {@link #getEquipmentSlot()}
 	 */
+	@Deprecated
 	public EquipSlot getEquipSlot() {
 		return skriptSlot;
 	}
 
-	public org.bukkit.inventory.EquipmentSlot getBukkitSlot() {
+	/**
+	 * Get the corresponding {@link org.bukkit.inventory.EquipmentSlot}
+	 * @return
+	 */
+	public org.bukkit.inventory.EquipmentSlot getEquipmentSlot() {
 		return bukkitSlot;
 	}
 
@@ -238,9 +254,10 @@ public class EquipmentSlot extends SlotWithIndex {
 			return slotIndex;
 		} else if (skriptSlot != null) {
 			return skriptSlot.slotNumber;
-		} else {
-			return bukkitSlot.ordinal() + 36;
+		} else if (bukkitSlotIndex.containsKey(bukkitSlot)) {
+			return bukkitSlotIndex.get(bukkitSlot);
 		}
+		return -1;
 	}
 
 	@Override
