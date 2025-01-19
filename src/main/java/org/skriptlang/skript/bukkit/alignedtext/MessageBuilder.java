@@ -20,6 +20,10 @@ public class MessageBuilder {
 		return (List<LineBuilder>) lines.values();
 	}
 
+	public void setPixelLength(int pixelLength) {
+		this.pixelLength = pixelLength;
+	}
+
 	public void setLine(int line, LineBuilder lineBuilder) {
 		if (line > highestLine)
 			highestLine = line;
@@ -60,4 +64,5 @@ public class MessageBuilder {
 	public String toString() {
 		return build();
 	}
+
 }

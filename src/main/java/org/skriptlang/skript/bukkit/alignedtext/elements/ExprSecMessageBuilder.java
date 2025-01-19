@@ -46,6 +46,7 @@ public class ExprSecMessageBuilder extends SectionExpression<MessageBuilder> {
 	}
 
 	private Trigger trigger;
+	private @Nullable Expression<Integer> integer;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int pattern, Kleenean isDelayed, ParseResult result, @Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems) {
@@ -60,12 +61,21 @@ public class ExprSecMessageBuilder extends SectionExpression<MessageBuilder> {
 			Skript.error("Delays cannot be used within a 'message builder' section.");
 			return false;
 		}
+		if (exprs[0] != null)
+			//noinspection unchecked
+			integer = (Expression<Integer>) exprs[0];
 		return true;
 	}
 
 	@Override
 	protected MessageBuilder @Nullable [] get(Event event) {
 		MessageBuilder messageBuilder = new MessageBuilder();
+		if (integer != null) {
+			Integer maxPixels = integer.getSingle(event);
+			if (maxPixels != null && maxPixels > 0) {
+				messageBuilder.setPixelLength(maxPixels);
+			}
+		}
 		MessageBuilderEvent messageBuilderEvent = new MessageBuilderEvent(messageBuilder);
 		Variables.withLocalVariables(event, messageBuilderEvent, () -> TriggerItem.walk(trigger, messageBuilderEvent));
 		return new MessageBuilder[]{messageBuilderEvent.getMessageBuilder()};
