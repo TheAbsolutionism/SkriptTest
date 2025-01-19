@@ -15,7 +15,7 @@ public class PixelUtils {
 		+ "1234567890"
 		+ "~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ";
 
-	private static final Font FONT = Font.getFont("Ariel");
+	private static final Font FONT = new Font("Arial", Font.PLAIN, 4);
 
 	private static final Map<Character, Integer> loggedCharacters = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class PixelUtils {
 	public static int getLength(Character c) {
 		if (loggedCharacters.containsKey(c))
 			return loggedCharacters.get(c);
-		if (FONT != null && FONT.canDisplay(c)) {
+		if (FONT.canDisplay(c)) {
 			Rectangle2D rectangle2D = FONT.getStringBounds(
 				c.toString(),
 				new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT)

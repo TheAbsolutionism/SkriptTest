@@ -1,8 +1,8 @@
 package org.skriptlang.skript.bukkit.alignedtext.elements;
 
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.alignedtext.PixelUtils;
 
 public class ExprPixelLength extends SimplePropertyExpression<String, Integer> {
 
@@ -12,7 +12,7 @@ public class ExprPixelLength extends SimplePropertyExpression<String, Integer> {
 
 	@Override
 	public @Nullable Integer convert(String string) {
-		return MinecraftFont.Font.getWidth(string);
+		return PixelUtils.getLength(string);
 	}
 
 	@Override
