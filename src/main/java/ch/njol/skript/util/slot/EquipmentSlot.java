@@ -239,7 +239,7 @@ public class EquipmentSlot extends SlotWithIndex {
 		} else if (skriptSlot != null) {
 			return skriptSlot.slotNumber;
 		} else {
-			return bukkitSlot.ordinal() + 41;
+			return bukkitSlot.ordinal() + 36;
 		}
 	}
 
