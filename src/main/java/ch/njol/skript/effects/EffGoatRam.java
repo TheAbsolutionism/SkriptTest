@@ -12,7 +12,10 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Make Goat Ram")
-@Description("Make a goat ram an entity.")
+@Description({
+	"Make a goat ram an entity.",
+	"Ramming does have a cooldown and currently no way to change it."
+})
 @Examples("make all goats ram player")
 @RequiredPlugins("Paper")
 @Since("INSERT VERSION")
