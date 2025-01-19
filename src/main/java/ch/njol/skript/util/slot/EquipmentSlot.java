@@ -131,14 +131,14 @@ public class EquipmentSlot extends SlotWithIndex {
 	private static final EquipSlot[] SKRIPT_VALUES = EquipSlot.values();
 	private static final org.bukkit.inventory.EquipmentSlot[] BUKKIT_VALUES = org.bukkit.inventory.EquipmentSlot.values();
 
-	private static final Map<org.bukkit.inventory.EquipmentSlot, Integer> bukkitSlotIndex = new HashMap<>();
+	private static final Map<org.bukkit.inventory.EquipmentSlot, Integer> BUKKIT_SLOT_INDICES = new HashMap<>();
 
 	static {
-		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.FEET, 36);
-		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.LEGS, 37);
-		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.CHEST, 38);
-		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.HEAD, 39);
-		bukkitSlotIndex.put(org.bukkit.inventory.EquipmentSlot.OFF_HAND, 40);
+		BUKKIT_SLOT_INDICES.put(org.bukkit.inventory.EquipmentSlot.FEET, 36);
+		BUKKIT_SLOT_INDICES.put(org.bukkit.inventory.EquipmentSlot.LEGS, 37);
+		BUKKIT_SLOT_INDICES.put(org.bukkit.inventory.EquipmentSlot.CHEST, 38);
+		BUKKIT_SLOT_INDICES.put(org.bukkit.inventory.EquipmentSlot.HEAD, 39);
+		BUKKIT_SLOT_INDICES.put(org.bukkit.inventory.EquipmentSlot.OFF_HAND, 40);
 	}
 	
 	private final EntityEquipment entityEquipment;
@@ -254,8 +254,8 @@ public class EquipmentSlot extends SlotWithIndex {
 			return slotIndex;
 		} else if (skriptSlot != null) {
 			return skriptSlot.slotNumber;
-		} else if (bukkitSlotIndex.containsKey(bukkitSlot)) {
-			return bukkitSlotIndex.get(bukkitSlot);
+		} else if (BUKKIT_SLOT_INDICES.containsKey(bukkitSlot)) {
+			return BUKKIT_SLOT_INDICES.get(bukkitSlot);
 		}
 		return -1;
 	}
