@@ -630,8 +630,7 @@ public final class BukkitEventValues {
 			if (equipment == null || hand == null)
 				return null;
 			return new ch.njol.skript.util.slot.EquipmentSlot(equipment,
-				(hand == EquipmentSlot.HAND) ? ch.njol.skript.util.slot.EquipmentSlot.EquipSlot.TOOL
-					: ch.njol.skript.util.slot.EquipmentSlot.EquipSlot.OFF_HAND);
+				(hand == EquipmentSlot.HAND) ? EquipmentSlot.HAND : EquipmentSlot.OFF_HAND);
 		});
 
 		// PlayerItemHeldEvent
