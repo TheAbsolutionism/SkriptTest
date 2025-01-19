@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.alignedtext;
 
+import ch.njol.skript.util.chat.ChatMessages;
 import org.bukkit.map.MinecraftFont;
 
 import java.awt.*;
@@ -15,7 +16,7 @@ public class PixelUtils {
 		+ "1234567890"
 		+ "~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ";
 
-	private static final Font FONT = new Font("Arial", Font.PLAIN, 4);
+	private static final Font FONT = new Font("Arial", Font.PLAIN, 11);
 
 	private static final Map<Character, Integer> loggedCharacters = new HashMap<>();
 
@@ -42,7 +43,8 @@ public class PixelUtils {
 
 	public static int getLength(String string) {
 		int totalLength = -1;
-		for (Character c : string.toCharArray())
+		String uncolored = ChatMessages.stripStyles(string);
+		for (Character c : uncolored.toCharArray())
 			totalLength += getLength(c) + 1;
 		return totalLength;
 	}

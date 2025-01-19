@@ -6,6 +6,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -41,11 +42,16 @@ public class EffLineFiller extends Effect implements EventRestrictedSyntax, Synt
 		if (!(event instanceof LineBuilderEvent lineBuilderEvent))
 			return;
 		String string = this.string.getSingle(event);
-		if (string == null || string.length() > 1) {
-			error("The filler character of a line can only be 1 character.");
+		if (string == null || string.isEmpty()) {
+			error("The filler character cannot be null nor empty.");
 			return;
 		}
-		lineBuilderEvent.getLineBuilder().setFillerCharacter(string.charAt(0));
+		String uncolored = ChatMessages.stripStyles(string);
+		if (uncolored.length() > 1) {
+			error("The filler character can only be one character.");
+			return;
+		}
+		lineBuilderEvent.getLineBuilder().setFillerCharacter(string);
 	}
 
 	@Override

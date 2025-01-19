@@ -17,11 +17,11 @@ public class LineBuilder {
 	public LineBuilder() {}
 
 	private int line;
-	private Character fillerCharacter = ' ';
+	private String fillerCharacter = " ";
 	private int fillerLength = 3;
-	private Character leftBound = null;
+	private String leftBound = null;
 	private int leftLength = 0;
-	private Character rightBound = null;
+	private String rightBound = null;
 	private int rightLength = 0;
 
 	public List<AlignedText> getAlignedTexts() {
@@ -48,29 +48,29 @@ public class LineBuilder {
 		this.line = line;
 	}
 
-	public Character getFillerCharacter() {
+	public String getFillerCharacter() {
 		return fillerCharacter;
 	}
 
-	public void setFillerCharacter(Character fillerCharacter) {
+	public void setFillerCharacter(String fillerCharacter) {
 		this.fillerCharacter = fillerCharacter;
 		this.fillerLength = PixelUtils.getLength(fillerCharacter);
 	}
 
-	public Character getLeftBound() {
+	public String getLeftBound() {
 		return leftBound;
 	}
 
-	public void setLeftBound(Character leftBound) {
+	public void setLeftBound(String leftBound) {
 		this.leftBound = leftBound;
 		this.leftLength = PixelUtils.getLength(leftBound);
 	}
 
-	public Character getRightBound() {
+	public String getRightBound() {
 		return rightBound;
 	}
 
-	public void setRightBound(Character rightBound) {
+	public void setRightBound(String rightBound) {
 		this.rightBound = rightBound;
 		this.rightLength = PixelUtils.getLength(rightBound);
 	}

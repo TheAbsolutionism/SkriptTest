@@ -6,6 +6,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -45,16 +46,21 @@ public class EffLineBounds extends Effect implements EventRestrictedSyntax, Synt
 		if (!(event instanceof LineBuilderEvent lineBuilderEvent))
 			return;
 		String string = this.string.getSingle(event);
-		if (string == null || string.length() > 1) {
-			error("The line bound character can only be 1 character.");
+		if (string == null || string.isEmpty()) {
+			error("The line bound character cannot be null nor empty.");
+			return;
+		}
+		String uncolored = ChatMessages.stripStyles(string);
+		if (uncolored.length() > 1) {
+			error("The line bound character can only be one character.");
 			return;
 		}
 		LineBuilder lineBuilder = lineBuilderEvent.getLineBuilder();
 		Character character = string.charAt(0);
 		if (isLeft) {
-			lineBuilder.setLeftBound(character);
+			lineBuilder.setLeftBound(string);
 		} else {
-			lineBuilder.setRightBound(character);
+			lineBuilder.setRightBound(string);
 		}
 	}
 
