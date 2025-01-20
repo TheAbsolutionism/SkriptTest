@@ -1,8 +1,9 @@
-package org.skriptlang.skript.api;
+package org.skriptlang.skript.api.util;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.api.script.ScriptSource;
 
 /**
  * Represents a diagnostic message produced by a software entity in the Skript specification.

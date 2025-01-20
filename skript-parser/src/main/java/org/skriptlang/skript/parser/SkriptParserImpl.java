@@ -6,8 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.skriptlang.skript.api.*;
+import org.skriptlang.skript.api.nodes.SectionNode;
+import org.skriptlang.skript.api.nodes.SyntaxNode;
+import org.skriptlang.skript.api.nodes.SyntaxNodeType;
+import org.skriptlang.skript.api.script.ScriptSource;
+import org.skriptlang.skript.api.util.ResultWithDiagnostics;
+import org.skriptlang.skript.api.util.ScriptDiagnostic;
+import org.skriptlang.skript.parser.tokens.Token;
+import org.skriptlang.skript.parser.tokens.TokenType;
+import org.skriptlang.skript.parser.tokens.Tokenizer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +28,7 @@ import java.util.List;
 public final class SkriptParserImpl implements SkriptParser {
 	private final LockAccess lockAccess;
 
-	private final List<SkriptNodeType> nodeTypes = new LinkedList<>();
+	private final List<SyntaxNodeType> nodeTypes = new LinkedList<>();
 
 	/**
 	 * The tokenized syntaxes that have been generated from the node types.
@@ -34,7 +42,7 @@ public final class SkriptParserImpl implements SkriptParser {
 	}
 
 	@Override
-	public void submitNode(@NotNull SkriptNodeType nodeType) {
+	public void submitNode(@NotNull SyntaxNodeType nodeType) {
 		Preconditions.checkNotNull(nodeType, "nodeType cannot be null");
 
 		if (lockAccess.isLocked()) {
@@ -54,7 +62,7 @@ public final class SkriptParserImpl implements SkriptParser {
 
 	@Contract(pure = true)
 	@Override
-	public @NotNull @UnmodifiableView List<SkriptNodeType> getNodeTypes() {
+	public @NotNull @UnmodifiableView List<SyntaxNodeType> getNodeTypes() {
 		return Collections.unmodifiableList(nodeTypes);
 	}
 
@@ -120,7 +128,7 @@ public final class SkriptParserImpl implements SkriptParser {
 			return null;
 		}
 
-		var indent = firstNewline.match().substring(firstNewline.match().lastIndexOf('\n')).length();
+		var indent = firstNewline.asString().substring(firstNewline.asString().lastIndexOf('\n')).length();
 		// TODO: Validate indents follow a consistent pattern
 		if (indent <= prevIndent) {
 			diagnostics.add(ScriptDiagnostic.error(source, "Expected indent at start of section", firstNewline.start()));
@@ -135,6 +143,8 @@ public final class SkriptParserImpl implements SkriptParser {
 			}
 			index += next.length();
 		}
+
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	private @Nullable SyntaxNode parseNode(
@@ -145,7 +155,7 @@ public final class SkriptParserImpl implements SkriptParser {
 		int prevIndent,
 		@NotNull List<SyntaxNode> children
 	) {
-
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 
@@ -175,7 +185,7 @@ public final class SkriptParserImpl implements SkriptParser {
 					}
 				};
 
-				var tokens = Tokenizer.tokenizeSyntax(source);
+				var tokens = Tokenizer.tokenizeSyntax(source, nodeType);
 
 				if (!tokens.isSuccess()) {
 					var diagnostics = new LinkedList<>(tokens.getDiagnostics());
@@ -183,9 +193,8 @@ public final class SkriptParserImpl implements SkriptParser {
 					return ResultWithDiagnostics.failure(diagnostics);
 				}
 
-				list.add(new TokenizedSyntax(nodeType, tokens.get()));
+				list.addAll(tokens.get());
 			}
-
 		}
 
 		tokenizedSyntaxes = Collections.unmodifiableList(list);

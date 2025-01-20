@@ -1,4 +1,4 @@
-package org.skriptlang.skript.api;
+package org.skriptlang.skript.api.nodes;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import java.util.List;
  * Represents a type of node in the Skript syntax tree.
  * The node type stores information about a node's syntaxes.
  */
-public interface SkriptNodeType {
+public interface SyntaxNodeType {
 
 	/**
 	 * Gets the syntaxes that should result in a node of this type.

@@ -1,4 +1,4 @@
-package org.skriptlang.skript.api;
+package org.skriptlang.skript.api.util;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

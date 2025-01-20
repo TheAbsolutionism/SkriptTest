@@ -2,7 +2,9 @@ package org.skriptlang.skript.parser;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
-import org.skriptlang.skript.api.SkriptNodeType;
+import org.skriptlang.skript.api.nodes.SyntaxNodeType;
+import org.skriptlang.skript.parser.tokens.Token;
+import org.skriptlang.skript.parser.tokens.TokenType;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,12 +16,11 @@ import java.util.List;
  * @param tokens   The tokens that make up this syntax.
  *                 This will be matched against tokenized scripts to determine if this syntax is present.
  */
-public record TokenizedSyntax(@NotNull SkriptNodeType nodeType, @NotNull List<Token> tokens) {
+public record TokenizedSyntax(@NotNull SyntaxNodeType nodeType, @NotNull List<Token> tokens) {
 
-	public TokenizedSyntax(@NotNull SkriptNodeType nodeType, @NotNull List<Token> tokens) {
+	public TokenizedSyntax(@NotNull SyntaxNodeType nodeType, @NotNull List<Token> tokens) {
 		Preconditions.checkNotNull(nodeType);
 		Preconditions.checkNotNull(tokens);
-		Preconditions.checkArgument(!tokens.isEmpty(), "tokens cannot be empty");
 
 		this.nodeType = nodeType;
 		this.tokens = Collections.unmodifiableList(tokens);
@@ -34,10 +35,10 @@ public record TokenizedSyntax(@NotNull SkriptNodeType nodeType, @NotNull List<To
 			Token scriptToken = scriptTokens.get(scriptIndex);
 
 			if (syntaxToken.type() == TokenType.SYNTAX) {
-				// a special case that can match with multiple tokens
+				// a special case that can value with multiple tokens
 
 				if (i == tokens.size() - 1) {
-					// if this is the last token, it can match
+					// if this is the last token, it can value
 					return true;
 				}
 
@@ -58,7 +59,7 @@ public record TokenizedSyntax(@NotNull SkriptNodeType nodeType, @NotNull List<To
 				}
 
 				if (nextSyntaxToken.type() == TokenType.SYNTAX) {
-					// all next tokens were also syntax, so we can match the rest of the script
+					// all next tokens were also syntax, so we can value the rest of the script
 					return true;
 				}
 
@@ -77,12 +78,12 @@ public record TokenizedSyntax(@NotNull SkriptNodeType nodeType, @NotNull List<To
 			}
 
 			if (!syntaxToken.equals(scriptToken)) {
-				// the next syntax cannot match with the next token in the script.
+				// the next syntax cannot value with the next token in the script.
 				// mismatch
 				return false;
 			}
 
-			// successful match
+			// successful value
 			scriptIndex++;
 		}
 

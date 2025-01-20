@@ -1,4 +1,4 @@
-package org.skriptlang.skript.api;
+package org.skriptlang.skript.api.util;
 
 /**
  * Represents the severity of a diagnostic message.

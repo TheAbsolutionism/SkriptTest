@@ -1,4 +1,4 @@
-package org.skriptlang.skript.api;
+package org.skriptlang.skript.api.script;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
