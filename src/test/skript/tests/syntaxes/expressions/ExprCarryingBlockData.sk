@@ -1,0 +1,10 @@
+test "enderman carrying block":
+	spawn an enderman at test-location:
+		set {_entity} to entity
+	set the carrying block data of {_entity} to an oak log
+	assert the carrying block data of {_entity} is an oak log with "Enderman should be carrying an oak log"
+	set the carrying block data of {_entity} to campfire[lit=true]
+	assert the carrying block data of {_entity} is campfire[lit=true] with "Enderman should be carrying a lit campfire"
+	clear the carrying block data of {_entity}
+	assert the carrying block data of {_entity} is not set with "Enderman should not be carrying anything"
+	clear entity within {_entity}
