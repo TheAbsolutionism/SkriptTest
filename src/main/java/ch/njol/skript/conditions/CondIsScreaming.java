@@ -16,7 +16,7 @@ import org.bukkit.entity.LivingEntity;
 	"if {_enderman} is screaming:",
 		"\tforce {_enderman} to stop screaming"
 })
-@RequiredPlugins("Paper (enderman)")
+@RequiredPlugins("Paper (endermen)")
 @Since("INSERT VERSION")
 public class CondIsScreaming extends PropertyCondition<LivingEntity> {
 

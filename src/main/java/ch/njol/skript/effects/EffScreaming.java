@@ -16,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
 @Description("Make a goat or enderman (Paper) start or stop screaming.")
 @Examples({
 	"make last spawned goat start screaming",
-	"force last spawned goat to not scream",
+	"force last spawned goat to stop screaming",
 	"",
 	"make {_enderman} scream",
 	"force {_enderman} to stop screaming"
 })
-@RequiredPlugins("Paper (enderman)")
+@RequiredPlugins("Paper (endermen)")
 @Since("INSERT VERSION")
 public class EffScreaming extends Effect {
 
@@ -31,8 +31,8 @@ public class EffScreaming extends Effect {
 		Skript.registerEffect(EffScreaming.class,
 			"make %livingentities% (start screaming|scream)",
 			"force %livingentities% to (start screaming|scream)",
-			"make %livingentities% (stop screaming|not scream)",
-			"force %livingentities% to (stop screaming|not scream)");
+			"make %livingentities% stop screaming",
+			"force %livingentities% to stop screaming");
 	}
 
 	private Expression<LivingEntity> entities;

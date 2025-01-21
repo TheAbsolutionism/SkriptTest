@@ -31,12 +31,8 @@ public class EffGoatHorns extends Effect {
 
 	static {
 		Skript.registerEffect(EffGoatHorns.class,
-			"make %livingentities% [:not] have [a] left horn",
-			"force %livingentities% to [:not] have [a] left horn",
-			"make %livingentities% [:not] have [a] right horn",
-			"force %livingentities% to [:not] have [a] right horn",
-			"make %livingentities% [:not] have both horns",
-			"force %livingentities% to [:not] have both horns");
+			"make %livingentities% [:not] have ([a] left horn|right:[a] right horn|both:both horns)",
+			"force %livingentities% to [:not] have ([a] left horn|right:[a] right horn|both:both horns)");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -45,10 +41,10 @@ public class EffGoatHorns extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (matchedPattern >= 4) {
-			goatHorn = GoatHorn.BOTH;
-		} else if (matchedPattern >= 2) {
+		if (parseResult.hasTag("right")) {
 			goatHorn = GoatHorn.RIGHT;
+		} else if (parseResult.hasTag("both")) {
+			goatHorn = GoatHorn.BOTH;
 		}
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
@@ -76,8 +72,8 @@ public class EffGoatHorns extends Effect {
 			builder.append("not");
 		builder.append("have");
 		builder.append(switch (goatHorn) {
-			case LEFT -> "left horn";
-			case RIGHT -> "right horn";
+			case LEFT -> "a left horn";
+			case RIGHT -> "a right horn";
 			case BOTH -> "both horns";
 		});
 		return builder.toString();

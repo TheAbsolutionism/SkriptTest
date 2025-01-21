@@ -30,23 +30,23 @@ public class CondGoatHorns extends Condition {
 
 	static {
 		Skript.registerCondition(CondGoatHorns.class,
-			"%livingentities% (has|[does] have) [a] left horn",
-			"%livingentities% (has|[does] have) [a] right horn",
-			"%livingentities% (has|[does] have) both horns",
-			"%livingentities% (does not|doesn't) have [a] left horn",
-			"%livingentities% (does not|doesn't) have [a] right horn",
-			"%livingentities% (does not|doesn't) have both horns");
+			"%livingentities% (has|have) ([a] left horn|right:[a] right horn|both:both horns)",
+			"%livingentities% (does not|doesn't) have ([a] left horn|right:[a] right horn|both:both horns)");
 	}
 
 	private Expression<LivingEntity> entities;
-	private GoatHorn goatHorn;
+	private GoatHorn goatHorn = GoatHorn.LEFT;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		goatHorn = GoatHorn.values()[matchedPattern / 3];
-		setNegated(matchedPattern >= 3);
+		if (parseResult.hasTag("right")) {
+			goatHorn = GoatHorn.RIGHT;
+		} else if (parseResult.hasTag("both")) {
+			goatHorn = GoatHorn.BOTH;
+		}
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -76,8 +76,8 @@ public class CondGoatHorns extends Condition {
 			builder.append("have");
 		}
 		builder.append(switch (goatHorn) {
-			case LEFT -> "left horn";
-			case RIGHT -> "right horn";
+			case LEFT -> "a left horn";
+			case RIGHT -> "a right horn";
 			case BOTH -> "both horns";
 		});
 		return builder.toString();
