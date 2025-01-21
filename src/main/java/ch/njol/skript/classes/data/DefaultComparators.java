@@ -221,14 +221,6 @@ public class DefaultComparators {
 			}
 		});
 
-		// BlockData - ItemType
-		Comparators.registerComparator(BlockData.class, ItemType.class, (blockData, itemType) -> {
-			if (!itemType.getMaterial().isBlock())
-				return Relation.NOT_EQUAL;
-			BlockData itemBlock = itemType.getMaterial().createBlockData();
-			return Relation.get(blockData.matches(itemBlock));
-		});
-
 		// ItemType - ItemType
 		Comparators.registerComparator(ItemType.class, ItemType.class, new Comparator<ItemType, ItemType>() {
 			@Override

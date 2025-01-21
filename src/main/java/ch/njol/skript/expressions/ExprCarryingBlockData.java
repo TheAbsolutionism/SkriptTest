@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,19 +21,21 @@ import org.jetbrains.annotations.Nullable;
 @Name("Enderman Carrying BlockData")
 @Description({
 	"The block data an enderman is carrying.",
-	"Custom attributes such as NBT or names do not transfer over."
+	"Custom attributes such as NBT or names do not transfer over.",
+	"Blocks, blockdatas and items are acceptable objects to change the carrying block."
 })
 @Examples({
 	"broadcast the carrying blockdata of last spawned enderman",
-	"set the carried block data of last spawned enderman to an oak log",
+	"set the carried block of last spawned enderman to an oak log",
 	"set the carrying block data of {_enderman} to oak stairs[facing=north]",
+	"set the carried blockdata of {_enderman} to {_item}",
 	"clear the carried blockdata of {_enderman}"
 })
 @Since("INSERT VERSION")
 public class ExprCarryingBlockData extends SimplePropertyExpression<LivingEntity, BlockData> {
 
 	static {
-		register(ExprCarryingBlockData.class, BlockData.class, "carr(ied|ying) block[ ]data", "livingentities");
+		register(ExprCarryingBlockData.class, BlockData.class, "carr(ied|ying) block[[ ]data]", "livingentities");
 	}
 
 	@Override
@@ -47,7 +48,7 @@ public class ExprCarryingBlockData extends SimplePropertyExpression<LivingEntity
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(Block.class, BlockData.class, ItemStack.class, ItemType.class, Slot.class);
+			return CollectionUtils.array(Block.class, BlockData.class, ItemType.class);
 		return null;
 	}
 

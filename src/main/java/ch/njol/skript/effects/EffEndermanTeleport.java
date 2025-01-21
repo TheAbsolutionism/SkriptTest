@@ -5,6 +5,7 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
@@ -67,9 +68,14 @@ public class EffEndermanTeleport extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		if (target == null)
-			return "make " + entities.toString(event, debug) + " randomly teleport";
-		return "make " + entities.toString(event, debug) + " teleport towards " + target.toString(event, debug);
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+		builder.append("make", entities);
+		if (target == null) {
+			builder.append("randomly teleport");
+		} else {
+			builder.append("teleport towards", target);
+		}
+		return builder.toString();
 	}
 
 }
