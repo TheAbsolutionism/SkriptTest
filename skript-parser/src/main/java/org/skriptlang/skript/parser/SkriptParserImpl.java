@@ -38,8 +38,6 @@ public final class SkriptParserImpl implements SkriptParser {
 		Preconditions.checkNotNull(lockAccess, "lockAccess cannot be null");
 		Preconditions.checkArgument(!lockAccess.isLocked(), "lockAccess must not be locked on construction of parser");
 		this.lockAccess = lockAccess;
-
-		submitNode(new SectionNodeType());
 	}
 
 	@Override
@@ -173,7 +171,7 @@ public final class SkriptParserImpl implements SkriptParser {
 			statements.add(next);
 		} while (whitespace.asString().substring(whitespace.asString().lastIndexOf('\n') + 1).length() == currentIndent);
 
-		return new SectionNodeImpl(statements);
+		return new SectionNode(statements, index - start);
 	}
 
 	/**
@@ -219,8 +217,11 @@ public final class SkriptParserImpl implements SkriptParser {
 			.toList();
 
 		if (candidates.isEmpty()) {
-
+			diagnostics.add(ScriptDiagnostic.error(source, "No statement matched", tokens.get(index).start()));
+			return null;
 		}
+
+		return null;
 	}
 
 

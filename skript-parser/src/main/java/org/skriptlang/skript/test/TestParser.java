@@ -26,7 +26,7 @@ public class TestParser {
 			public StructureNode create(List<SyntaxNode> children) {
 				SectionNode section = (SectionNode) children.getFirst();
 
-				return new StructureNode(section) {
+				return new StructureNode() {
 
 
 					@Override
@@ -46,6 +46,11 @@ public class TestParser {
 			@Override
 			public List<String> getSyntaxes() {
 				return List.of("this is a [conflicting] test syntax");
+			}
+
+			@Override
+			public EffectNode create(List<SyntaxNode> children) {
+				throw new UnsupportedOperationException("TODO");
 			}
 		});
 

@@ -12,11 +12,21 @@ import java.util.List;
  * (see {@link org.jetbrains.annotations.ApiStatus.NonExtendable NonExtendable}).
  */
 @ApiStatus.NonExtendable
-public interface SectionNode extends SyntaxNode {
+public final class SectionNode implements SyntaxNode {
+	private final List<StatementNode> children;
+	private final int fullLength;
 
-	/**
-	 * Gets the children of this section.
-	 */
-	List<StatementNode> children();
+	public SectionNode(List<StatementNode> children, int fullLength) {
+		this.children = children;
+		this.fullLength = fullLength;
+	}
 
+	public List<StatementNode> children() {
+		return children;
+	}
+
+	@Override
+	public int length() {
+		return fullLength;
+	}
 }
