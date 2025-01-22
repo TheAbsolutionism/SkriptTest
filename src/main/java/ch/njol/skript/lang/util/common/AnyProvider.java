@@ -1,8 +1,9 @@
 package ch.njol.skript.lang.util.common;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import org.jetbrains.annotations.Nullable;
 import ch.njol.skript.lang.Expression;
+import org.bukkit.event.Event;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,13 @@ import java.util.List;
 public interface AnyProvider {
 
 	/**
-	 * Checks to see if the object can be changed.
-	 * This is checked within {@link ch.njol.skript.lang.Expression#acceptChange(ChangeMode)}.
+	 * Used within {@link Expression#acceptChange(ChangeMode)} to check if the object can be changed.
+	 *
+	 * If the {@link Expression} within {@link Expression#acceptChange(ChangeMode)} is single and the return type of the
+	 * expression is of this class, returning false will cause a parse error.
+	 *
+	 * If the {@link Expression} is not single, will check if any of the objects are instance of this class and add the supplied data
+	 * from the methods {@link AnyProvider#getAcceptedClasses()} and {@link AnyProvider#getAcceptedModes()} if this method returns true.
 	 *
 	 * Due to already existing support change methods, ex: {@link AnyNamed#supportsNameChange()}
 	 * to prevent already breaking changes, this method will stay separated.
@@ -45,30 +51,42 @@ public interface AnyProvider {
 	}
 
 	/**
-	 * Provide classes users can use when setting the value of through {@link Expression#acceptChange(ChangeMode)}.
-	 * If the expression is single and the return type of the expression is of the class, will only accept classes provided from this method.
-	 * If the expression is not single, the provided classes from this method will be combined with the default classes from
-	 * the {@link Expression#acceptChange(ChangeMode)} and provided classes from other {@link AnyProvider}s.
-	 * @return A {@link List} of accepted classes that can be accepted allowing use of {@link AnyProvider#change(Object[], ChangeMode)}.
+	 * Supply classes the object can be changed to, to {@link Expression#acceptChange(ChangeMode)}.
+	 *
+	 * If the {@link Expression} within {@link Expression#acceptChange(ChangeMode)} is single and the return type of the
+	 * expression is of this class, {@link Expression#acceptChange(ChangeMode)} will only accept classes supplied from this method,
+	 * thus causing a parse error.
+	 *
+	 * If the {@link Expression} is not single, will check if any of the objects are instance of this class and add the supplied classes
+	 * from this method to a total available list.
+	 *
+	 * @return A {@link List} of accepted classes that can be accepted within {@link Expression#acceptChange(ChangeMode)} and can be further used
+	 * within {@link AnyProvider#change(Event, Object[], ChangeMode)}.
 	 */
 	default @Nullable List<Class<?>> getAcceptedClasses() {
 		return new ArrayList<>();
 	}
 
 	/**
-	 * Provide {@link ChangeMode}s users can use when changing the value of this object through {@link Expression#acceptChange(ChangeMode)}.
-	 * If the expression is single and the return type of the expression is of the class, will only accept modes provided from this method.
-	 * If the expression is not single, the provided modes from this method will be combined with the default modes from
-	 * the {@link Expression#acceptChange(ChangeMode)} and provided modes from other {@link AnyProvider}s.
-	 * @return A {@link List} of accepted modes that can be accepted allowing use of {@link AnyProvider#change(Object[], ChangeMode)}.
+	 * Supply {@link ChangeMode}s the object can be used with, to {@link Expression#acceptChange(ChangeMode)}.
+	 *
+	 * If the {@link Expression} within {@link Expression#acceptChange(ChangeMode)} is single and the return type of the
+	 * expression is of this class, {@link Expression#acceptChange(ChangeMode)} will only accept change modes supplied from this method,
+	 * thus causing a parse error.
+	 *
+	 * If the {@link Expression} is not single, will check if any of the objects are instance of this class and add the supplied change modes
+	 * from this method to a total available list.
+	 *
+	 * @return A {@link List} of accepted change modes that can be accepted within {@link Expression#acceptChange(ChangeMode)} and can be further used
+	 * within {@link AnyProvider#change(Event, Object[], ChangeMode)}.
 	 */
 	default @Nullable List<ChangeMode> getAcceptedModes() {
 		return new ArrayList<>();
 	}
 
 	/**
-	 * Checks to see if the method {@link AnyProvider#change(Object[], ChangeMode)} is overridden and available.
-	 * @return True if the method {@link AnyProvider#change(Object[], ChangeMode)} is overridden.
+	 * Checks to see if the method {@link AnyProvider#change(Event, Object[], ChangeMode)} is overridden and available.
+	 * @return True if the method {@link AnyProvider#change(Event, Object[], ChangeMode)} is overridden.
 	 */
 	default boolean hasCustomChanger() {
 		return false;
@@ -76,10 +94,11 @@ public interface AnyProvider {
 
 	/**
 	 * Custom changer to be used when changing the value of an object from an expression.
+	 * @param event The {@link Event} of the current event the object is being changed in.
 	 * @param delta The raw objects provided by the user
 	 * @param mode The {@link ChangeMode} that was used
 	 */
-	default void change(Object @Nullable [] delta, ChangeMode mode) {
+	default void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		throw new UnsupportedOperationException();
 	}
 

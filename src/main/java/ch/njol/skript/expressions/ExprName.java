@@ -13,8 +13,8 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.function.DynamicFunctionReference;
 import ch.njol.skript.lang.util.common.AnyNamed;
-import ch.njol.skript.lang.util.common.AnyRegistry;
-import ch.njol.skript.lang.util.common.AnyRegistry.AnyRegistryData;
+import ch.njol.skript.lang.util.common.AnyProviderRegistry;
+import ch.njol.skript.lang.util.common.AnyProviderRegistry.AnyProviderRegistryData;
 import ch.njol.skript.registrations.Feature;
 import ch.njol.skript.util.chat.BungeeConverter;
 import ch.njol.skript.util.chat.ChatMessages;
@@ -160,26 +160,21 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	}
 
 	@Override
-	@Nullable
-	public Class<?>[] acceptChange(ChangeMode mode) {
-		AnyRegistryData anyRegistryData = AnyRegistry.checkRestrictions(AnyNamed.class, getExpr().isSingle(), getExpr().getReturnType());
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
+		AnyProviderRegistryData anyProviderRegistryData = AnyProviderRegistry.checkRestrictions(AnyNamed.class, getExpr());
+		if (anyProviderRegistryData == null)
+			return null;
+
 		List<Class<?>> allClasses = new ArrayList<>();
 		allClasses.add(String.class);
-		if (anyRegistryData == null) {
-			Skript.error("AHHHHHH");
-			return null;
-		}
-
-		List<Class<?>> acceptedClasses = anyRegistryData.getAcceptedClasses();
-		List<ChangeMode> acceptedModes = anyRegistryData.getAcceptedModes();
+		List<Class<?>> acceptedClasses = anyProviderRegistryData.getAcceptedClasses();
+		List<ChangeMode> acceptedModes = anyProviderRegistryData.getAcceptedModes();
 		if (acceptedClasses != null)
 			allClasses.addAll(acceptedClasses);
-		if (anyRegistryData.isRestricted()) {
+		if (anyProviderRegistryData.isRestricted()) {
 			if (acceptedModes != null && !acceptedModes.isEmpty() && !acceptedModes.contains(mode)) {
-				Skript.error("NO MODES");
 				return null;
 			}
-			Skript.adminBroadcast("Returning restricted");
 			return allClasses.toArray(new Class[0]);
 		}
 
@@ -207,7 +202,6 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 	@Override
 	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
 		String name = delta != null ? (String) delta[0] : null;
-		Skript.adminBroadcast("At ExprName Change | " + name);
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof Player player) {
 				switch (mark) {
@@ -225,11 +219,9 @@ public class ExprName extends SimplePropertyExpression<Object, String> {
 				if (object instanceof LivingEntity living)
 					living.setRemoveWhenFarAway(name == null);
 			} else if (object instanceof AnyNamed named) {
-				Skript.adminBroadcast("Is AnyNamed");
 				if (named.supportsNameChange()) {
 					if (named.hasCustomChanger()) {
-						Skript.adminBroadcast("Calling Any Change");
-						named.change(delta, mode);
+						named.change(event, delta, mode);
 					} else {
 						named.setName(name);
 					}

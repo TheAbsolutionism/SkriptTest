@@ -4,7 +4,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.util.common.AnyNamed;
-import ch.njol.skript.lang.util.common.AnyRegistry;
+import ch.njol.skript.lang.util.common.AnyProviderRegistry;
 import ch.njol.skript.registrations.Classes;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.UnknownNullability;
 public class NamedTest implements AnyNamed {
 
 	static {
-		AnyRegistry.register(AnyNamed.class, NamedTest.class, new NamedTest());
+		AnyProviderRegistry.register(AnyNamed.class, NamedTest.class, new NamedTest());
 		Classes.registerClass(new ClassInfo<>(NamedTest.class, "namedtest")
 			.user("named ?tests?")
 		);
