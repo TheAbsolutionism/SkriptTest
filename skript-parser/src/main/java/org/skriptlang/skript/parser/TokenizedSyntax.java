@@ -3,6 +3,7 @@ package org.skriptlang.skript.parser;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.api.nodes.SyntaxNodeType;
+import org.skriptlang.skript.parser.pattern.SyntaxPatternElement;
 import org.skriptlang.skript.parser.tokens.Token;
 import org.skriptlang.skript.parser.tokens.TokenType;
 
@@ -16,9 +17,9 @@ import java.util.List;
  * @param tokens   The tokens that make up this syntax.
  *                 This will be matched against tokenized scripts to determine if this syntax is present.
  */
-public record TokenizedSyntax(@NotNull SyntaxNodeType nodeType, @NotNull List<Token> tokens) {
+public record TokenizedSyntax(@NotNull SyntaxNodeType<?> nodeType, @NotNull List<Token> tokens) {
 
-	public TokenizedSyntax(@NotNull SyntaxNodeType nodeType, @NotNull List<Token> tokens) {
+	public TokenizedSyntax(@NotNull SyntaxNodeType<?> nodeType, @NotNull List<Token> tokens) {
 		Preconditions.checkNotNull(nodeType);
 		Preconditions.checkNotNull(tokens);
 
@@ -26,68 +27,78 @@ public record TokenizedSyntax(@NotNull SyntaxNodeType nodeType, @NotNull List<To
 		this.tokens = Collections.unmodifiableList(tokens);
 	}
 
+	/**
+	 * Returns whether this tokenized syntax could match against the given script tokens.
+	 * @param scriptTokens The script tokens to match against.
+	 */
 	public boolean canMatch(@NotNull List<Token> scriptTokens) {
-		if (scriptTokens.size() < tokens.size()) return false;
-
+		int syntaxIndex = 0;
 		int scriptIndex = 0;
-		for (int i = 0; i < tokens.size(); i++) {
-			Token syntaxToken = tokens.get(i);
+
+		while (scriptIndex < scriptTokens.size()) {
+			if (syntaxIndex == tokens.size()) {
+				// Too many script tokens
+				return false;
+			}
+			Token syntaxToken = tokens.get(syntaxIndex);
 			Token scriptToken = scriptTokens.get(scriptIndex);
 
-			if (syntaxToken.type() == TokenType.SYNTAX) {
-				// a special case that can value with multiple tokens
-
-				if (i == tokens.size() - 1) {
-					// if this is the last token, it can value
-					return true;
-				}
-
-				if (i == tokens.size() - 1) {
-					// there are more tokens in the syntax, but we have reached the end of the script.
+			if (syntaxToken.type() != TokenType.SYNTAX) {
+				if (!syntaxToken.matches(scriptToken)) {
+					// Mismatched token types
 					return false;
 				}
 
-				// the syntax token must consume at least one token
-				scriptToken = scriptTokens.get(scriptIndex + 1);
-
-				// we need to locate the next token that isn't a syntax
-				// so we can figure out how many tokens to skip in the script
-				int searchIndex = i + 1;
-				Token nextSyntaxToken = tokens.get(searchIndex);
-				while (nextSyntaxToken.type() == TokenType.SYNTAX && searchIndex < tokens.size() - 1) {
-					nextSyntaxToken = tokens.get(++searchIndex);
-				}
-
-				if (nextSyntaxToken.type() == TokenType.SYNTAX) {
-					// all next tokens were also syntax, so we can value the rest of the script
-					return true;
-				}
-
-				// we have found a non-syntax token, so we need to skip tokens in the script
-				// until we find a token that matches the next syntax token
-				while (scriptToken.type() != nextSyntaxToken.type() && scriptIndex < scriptTokens.size() - 1) {
-					scriptToken = scriptTokens.get(++scriptIndex);
-				}
-
-				if (scriptToken.type() != nextSyntaxToken.type()) {
-					// we have reached the end of the script without finding the next syntax token
-					return false;
-				}
-
+				syntaxIndex++;
+				scriptIndex++;
 				continue;
 			}
 
-			if (!syntaxToken.equals(scriptToken)) {
-				// the next syntax cannot value with the next token in the script.
-				// mismatch
+			SyntaxPatternElement element = (SyntaxPatternElement) syntaxToken.value();
+			if (element.getSyntaxType().equals("token")) {
+				// special case for token syntax
+
+				TokenType target = TokenType.fromName(element.getInputs().getFirst().type());
+
+				if (scriptToken.type() != target) {
+					// Mismatched token types
+					return false;
+				}
+
+				syntaxIndex++;
+				scriptIndex++;
+				continue;
+			}
+
+			// Syntax token which can match many
+			if (syntaxIndex == tokens.size() - 1) {
+				// Last token in syntax, so it can match anything left
+				return true;
+			}
+
+			if (scriptIndex == scriptTokens.size() - 1) {
+				// Last token in script, so it can't match anything left
 				return false;
 			}
 
-			// successful value
-			scriptIndex++;
+			int nextSyntaxIndex = syntaxIndex + 1;
+			while (nextSyntaxIndex < tokens.size() && tokens.get(nextSyntaxIndex).type() == TokenType.SYNTAX) {
+				nextSyntaxIndex++;
+			}
+			// checking if there isn't enough tokens left in the script to fill the syntax tokens that were skipped
+			if (scriptIndex + nextSyntaxIndex - syntaxIndex > scriptTokens.size()) {
+				// Not enough tokens left in script
+				return false;
+			}
+
+			scriptIndex += nextSyntaxIndex - syntaxIndex;
+			syntaxIndex = nextSyntaxIndex;
 		}
 
-		// all tokens matched
-		return true;
+		if (tokens.subList(syntaxIndex, tokens.size()).stream().allMatch(token -> token.type() == TokenType.SYNTAX)) {
+			// All remaining tokens are syntax tokens
+			return true;
+		}
+		return syntaxIndex != tokens.size() - 1;
 	}
 }

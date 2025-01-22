@@ -29,7 +29,15 @@ public record ScriptDiagnostic(
 
 	@Override
 	public @NotNull String toString() {
-		return source.name() + " " + severity + ": " + message;
+		StringBuilder builder = new StringBuilder(source().name());
+		if (line() > 0) {
+			builder.append(":").append(line());
+			if (column() > 0) {
+				builder.append(":").append(column());
+			}
+		}
+		builder.append(" ").append(severity()).append(": ").append(message());
+		return builder.toString();
 	}
 
 	@Contract("_, _, _, _ -> new")

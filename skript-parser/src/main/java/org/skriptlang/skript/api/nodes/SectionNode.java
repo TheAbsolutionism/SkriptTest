@@ -17,6 +17,6 @@ public interface SectionNode extends SyntaxNode {
 	/**
 	 * Gets the children of this section.
 	 */
-	List<SyntaxNode> getChildren();
+	List<StatementNode> children();
 
 }

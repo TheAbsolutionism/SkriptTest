@@ -57,4 +57,8 @@ public record Token(
 		return value().toString();
 	}
 
+	public boolean matches(@NotNull Token other) {
+		return type == other.type() && value.equals(other.value());
+	}
+
 }

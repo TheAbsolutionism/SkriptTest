@@ -1,9 +1,9 @@
 package org.skriptlang.skript.test;
 
 import org.skriptlang.skript.api.*;
-import org.skriptlang.skript.api.nodes.SyntaxNode;
-import org.skriptlang.skript.api.nodes.SyntaxNodeType;
+import org.skriptlang.skript.api.nodes.*;
 import org.skriptlang.skript.api.script.StringScriptSource;
+import org.skriptlang.skript.api.util.ExecuteResult;
 import org.skriptlang.skript.api.util.ResultWithDiagnostics;
 import org.skriptlang.skript.api.util.ScriptDiagnostic;
 import org.skriptlang.skript.parser.LockAccess;
@@ -16,15 +16,36 @@ public class TestParser {
 		LockAccess lockAccess = new LockAccess();
 		SkriptParser parser = new SkriptParserImpl(lockAccess);
 
-		parser.submitNode(new SyntaxNodeType() {
+		parser.submitNode(new StructureNodeType<>() {
 			@Override
 			public List<String> getSyntaxes() {
-				return List.of("this is a test syntax [test [test2]] b <expr> a");
+				return List.of("on script load:<section>");
 			}
 
 			@Override
-			public Class<?> getReturnType() {
-				return Object.class;
+			public StructureNode create(List<SyntaxNode> children) {
+				SectionNode section = (SectionNode) children.getFirst();
+
+				return new StructureNode(section) {
+
+
+					@Override
+					public ExecuteResult execute() {
+						return ExecuteResult.success();
+					}
+
+					@Override
+					public int length() {
+						return 0;
+					}
+				};
+			}
+		});
+
+		parser.submitNode(new EffectNodeType<>() {
+			@Override
+			public List<String> getSyntaxes() {
+				return List.of("this is a [conflicting] test syntax");
 			}
 		});
 
@@ -32,7 +53,10 @@ public class TestParser {
 
 		ResultWithDiagnostics<SyntaxNode> result = parser.parse(new StringScriptSource(
 			"test.sk",
-			"this is a test syntax"
+			"""
+				on script load:
+					this is a test syntax
+				"""
 		));
 
 		if (result.isSuccess()) {

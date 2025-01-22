@@ -152,6 +152,19 @@ public class Tokenizer {
 
 		Token closeArrowOrDelimiter = tokens.get(1);
 		if (closeArrowOrDelimiter.asOperator() == Operator.DOUBLE_COLON) {
+
+			if (syntaxTypeToken.asString().equals("token")) {
+				Token tokenTypeToken = tokens.get(2);
+				if (tokenTypeToken.type() != TokenType.IDENTIFIER) {
+					throw new IllegalArgumentException("Expected identifier");
+				}
+				Token closeDelimiter = tokens.get(3);
+				if (closeDelimiter.asOperator() != Operator.GREATER_THAN) {
+					throw new IllegalArgumentException("Expected closing arrow");
+				}
+				return new SyntaxPatternElement(syntaxTypeToken.asString(), List.of(), tokenTypeToken.asString());
+			}
+
 			// inputs or return type are present
 
 			List<SyntaxPatternElement.Input> inputs = new LinkedList<>();
@@ -302,17 +315,11 @@ public class Tokenizer {
 					case OPEN_PARENTHESIS, OPEN_BRACKET, PIPE -> {
 						return i;
 					}
-					default -> {
-						return -1;
-					}
 				}
 			} else if (token.type() == TokenType.OPERATOR) {
 				switch (Objects.requireNonNull(token.asOperator())) {
 					case LESS_THAN -> {
 						return i;
-					}
-					default -> {
-						return -1;
 					}
 				}
 			}

@@ -6,9 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.skriptlang.skript.api.*;
-import org.skriptlang.skript.api.nodes.SectionNode;
-import org.skriptlang.skript.api.nodes.SyntaxNode;
-import org.skriptlang.skript.api.nodes.SyntaxNodeType;
+import org.skriptlang.skript.api.nodes.*;
 import org.skriptlang.skript.api.script.ScriptSource;
 import org.skriptlang.skript.api.util.ResultWithDiagnostics;
 import org.skriptlang.skript.api.util.ScriptDiagnostic;
@@ -28,7 +26,7 @@ import java.util.List;
 public final class SkriptParserImpl implements SkriptParser {
 	private final LockAccess lockAccess;
 
-	private final List<SyntaxNodeType> nodeTypes = new LinkedList<>();
+	private final List<SyntaxNodeType<?>> nodeTypes = new LinkedList<>();
 
 	/**
 	 * The tokenized syntaxes that have been generated from the node types.
@@ -38,11 +36,14 @@ public final class SkriptParserImpl implements SkriptParser {
 
 	public SkriptParserImpl(@NotNull LockAccess lockAccess) {
 		Preconditions.checkNotNull(lockAccess, "lockAccess cannot be null");
+		Preconditions.checkArgument(!lockAccess.isLocked(), "lockAccess must not be locked on construction of parser");
 		this.lockAccess = lockAccess;
+
+		submitNode(new SectionNodeType());
 	}
 
 	@Override
-	public void submitNode(@NotNull SyntaxNodeType nodeType) {
+	public void submitNode(@NotNull SyntaxNodeType<?> nodeType) {
 		Preconditions.checkNotNull(nodeType, "nodeType cannot be null");
 
 		if (lockAccess.isLocked()) {
@@ -62,7 +63,7 @@ public final class SkriptParserImpl implements SkriptParser {
 
 	@Contract(pure = true)
 	@Override
-	public @NotNull @UnmodifiableView List<SyntaxNodeType> getNodeTypes() {
+	public @NotNull @UnmodifiableView List<SyntaxNodeType<?>> getNodeTypes() {
 		return Collections.unmodifiableList(nodeTypes);
 	}
 
@@ -91,7 +92,7 @@ public final class SkriptParserImpl implements SkriptParser {
 
 		var tokens = tokenizeResult.get();
 
-		var fileNode = parseSection(source, diagnostics, tokens, 0, 0);
+		var fileNode = parseSection(source, diagnostics, tokens, 0, 0, 0);
 
 		if (fileNode == null) {
 			diagnostics.add(ScriptDiagnostic.error(source, "Script could not be parsed"));
@@ -103,59 +104,123 @@ public final class SkriptParserImpl implements SkriptParser {
 
 	/**
 	 * Parses a section.
-	 * @param source The source of the script
-	 * @param diagnostics The diagnostics list to add to
-	 * @param tokens The tokens to parse
-	 * @param start The index to start parsing at
-	 * @param prevIndent The previous indent level
-	 * @return The parsed section
+	 * @param source The source of the script.
+	 * @param diagnostics The diagnostics list to add to.
+	 * @param tokens The tokens to parse.
+	 * @param start The index to start parsing at.
+	 * @param prevIndent The previous indent level (in spaces or tabs).
+	 * @param depth The depth of the section. 0 is root. This is used with prevIndent to validate indentation increased properly.
+	 * @return The parsed section, or null if failed.
 	 */
 	private @Nullable SectionNode parseSection(
 		ScriptSource source,
 		List<ScriptDiagnostic> diagnostics,
 		List<Token> tokens,
 		int start,
-		int prevIndent
+		int prevIndent,
+		int depth
 	) {
 		// at head, we are just after a colon
 
-		var children = new LinkedList<SyntaxNode>();
-		var index = start;
+		int index = start;
+		int currentIndent = 0;
 
-		Token firstNewline = tokens.get(index);
-		if (firstNewline.type() != TokenType.WHITESPACE) {
-			diagnostics.add(ScriptDiagnostic.error(source, "Expected newline at start of section", firstNewline.start()));
-			return null;
+		// if this section isn't the root of the file, it must start with certain whitespace rules
+		if (depth != 0) {
+			Token mustBeWhitespace = tokens.get(index);
+
+			// validate there is whitespace
+			if (mustBeWhitespace.type() != TokenType.WHITESPACE) {
+				diagnostics.add(ScriptDiagnostic.error(source, "Expected whitespace", mustBeWhitespace.start()));
+				return null;
+			}
+
+			// validate the whitespace is newline
+			if (!mustBeWhitespace.asString().contains("\n")) {
+				diagnostics.add(ScriptDiagnostic.error(source, "Expected newline", mustBeWhitespace.start()));
+				return null;
+			}
+
+			// find whitespace length
+			currentIndent = mustBeWhitespace.asString().length() - mustBeWhitespace.asString().lastIndexOf('\n') - 1;
+
+			// validate the whitespace follows the inferred indentation in this stack
+			int prevInterval = depth > 1 ? prevIndent / (depth - 1) : prevIndent;
+			if (prevInterval != 0 && currentIndent % prevInterval != 0) {
+				diagnostics.add(ScriptDiagnostic.error(source, "Indentation must be a multiple of " + prevInterval, mustBeWhitespace.start()));
+				return null;
+			}
+
+			index++;
 		}
 
-		var indent = firstNewline.asString().substring(firstNewline.asString().lastIndexOf('\n')).length();
-		// TODO: Validate indents follow a consistent pattern
-		if (indent <= prevIndent) {
-			diagnostics.add(ScriptDiagnostic.error(source, "Expected indent at start of section", firstNewline.start()));
-			return null;
-		}
+		List<StatementNode> statements = new LinkedList<>();
 
-		while (index < tokens.size()) {
-			var next = parseNode(source, diagnostics, tokens, index, prevIndent, children);
-
+		Token whitespace;
+		do {
+			StatementNode next = parseStatement(source, diagnostics, tokens, index, depth == 0 ? StructureNodeType.class : EffectNodeType.class);
 			if (next == null) {
-				break;
+				diagnostics.add(ScriptDiagnostic.info(source, "Fail occurred in section depth " + depth, tokens.get(index).start()));
+				return null;
 			}
 			index += next.length();
-		}
+			whitespace = tokens.get(index);
+			if (whitespace.type() != TokenType.WHITESPACE || !whitespace.asString().contains("\n")) {
+				diagnostics.add(ScriptDiagnostic.error(source, "Expected newline after effect", tokens.get(index).start()));
+				return null;
+			}
+			index++;
+			statements.add(next);
+		} while (whitespace.asString().substring(whitespace.asString().lastIndexOf('\n') + 1).length() == currentIndent);
 
-		throw new UnsupportedOperationException("Not implemented");
+		return new SectionNodeImpl(statements);
 	}
 
-	private @Nullable SyntaxNode parseNode(
-		@NotNull ScriptSource source,
-		@NotNull List<ScriptDiagnostic> diagnostics,
-		@NotNull List<Token> tokens,
+	/**
+	 * Parses an effect. Only effects which consume an entire line will be allowed to succeed.
+	 * @param source The source of the script.
+	 * @param diagnostics The diagnostics list to add to.
+	 * @param tokens The tokens to parse.
+	 * @param start The index to start parsing at.
+	 * @param superType The super type to bound candidates to.
+	 * @return The parsed effect, or null if failed.
+	 */
+	private @Nullable StatementNode parseStatement(
+		ScriptSource source,
+		List<ScriptDiagnostic> diagnostics,
+		List<Token> tokens,
 		int start,
-		int prevIndent,
-		@NotNull List<SyntaxNode> children
+		Class<?> superType
 	) {
-		throw new UnsupportedOperationException("Not implemented");
+		int index = start;
+		int end = tokens.stream()
+			.map(token -> token.type() == TokenType.WHITESPACE && token.asString().contains("\n"))
+			.toList()
+			.indexOf(true);
+
+		// edge case: this is the last line of the script, and there is no newline. therefore, the effect goes to the end.
+		if (end == -1) end = tokens.size();
+
+		List<Token> effectTokens = tokens.subList(index, end);
+		// This edge case shouldn't even occur
+		// because the tokenizer does not output duplicate newline-containing whitespace tokens
+		if (effectTokens.isEmpty()) {
+			diagnostics.add(ScriptDiagnostic.error(source, "Expected effect", tokens.get(index).start()));
+			return null;
+		}
+
+		// computeTokenizedSyntaxes ensures tokenizedSyntaxes is not null
+		// that being said, the only way to get into this method is ultimately via parse,
+		// but break-in access to the method may fail here.
+		assert tokenizedSyntaxes != null;
+		var candidates = tokenizedSyntaxes.stream()
+			.filter(tokenizedSyntax -> superType.isInstance(tokenizedSyntax.nodeType()))
+			.filter(tokenizedSyntax -> tokenizedSyntax.canMatch(effectTokens))
+			.toList();
+
+		if (candidates.isEmpty()) {
+
+		}
 	}
 
 
@@ -171,6 +236,7 @@ public final class SkriptParserImpl implements SkriptParser {
 		for (var nodeType : nodeTypes) {
 
 			var syntaxes = nodeType.getSyntaxes();
+			if (syntaxes == null) continue;
 			for (var syntax : syntaxes) {
 
 				var source = new ScriptSource() {

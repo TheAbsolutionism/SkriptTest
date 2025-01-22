@@ -24,12 +24,12 @@ public interface SkriptParser {
 	 * Once a node is submitted, the parser will be capable of parsing that node type.
 	 * @param nodeType The node type to submit
 	 */
-	void submitNode(SyntaxNodeType nodeType);
+	void submitNode(SyntaxNodeType<?> nodeType);
 
 	/**
 	 * Gets an <b>immutable</b> view of all node types that have been submitted to the parser.
 	 */
-	List<SyntaxNodeType> getNodeTypes();
+	List<SyntaxNodeType<?>> getNodeTypes();
 
 	ResultWithDiagnostics<SyntaxNode> parse(ScriptSource source);
 }
