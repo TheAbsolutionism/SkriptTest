@@ -2689,3 +2689,5 @@ types:
 
 	# Other
 	quaternion: quaternion¦s @a
+
+	namedtest: named test¦s @a
