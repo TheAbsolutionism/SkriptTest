@@ -94,6 +94,7 @@ public interface AnyProvider {
 
 	/**
 	 * Custom changer to be used when changing the value of an object from an expression.
+	 * This method should be very strict in how it changes the object.
 	 * @param event The {@link Event} of the current event the object is being changed in.
 	 * @param delta The raw objects provided by the user
 	 * @param mode The {@link ChangeMode} that was used

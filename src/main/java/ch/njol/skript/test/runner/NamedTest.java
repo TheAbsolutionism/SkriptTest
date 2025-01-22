@@ -6,6 +6,7 @@ import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.lang.util.common.AnyNamed;
 import ch.njol.skript.lang.util.common.AnyProviderRegistry;
 import ch.njol.skript.registrations.Classes;
+import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -42,7 +43,7 @@ public class NamedTest implements AnyNamed {
 	}
 
 	@Override
-	public void change(Object @Nullable [] delta, ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		Skript.adminBroadcast("Change Called: " + delta[0] + " | " + mode);
 	}
 
