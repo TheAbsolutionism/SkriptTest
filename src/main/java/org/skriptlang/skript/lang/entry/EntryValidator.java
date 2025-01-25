@@ -85,8 +85,8 @@ public class EntryValidator {
 			while (iterator.hasNext()) {
 				EntryData<?> data = iterator.next();
 				if (data.canCreateWith(node)) { // Determine if it's a match
-					if (data instanceof EntryValidatorBuilder subValidator) {
-						if (!subValidator.validate((SectionNode) node)) {
+					if (data instanceof SubContainerEntryData subContainer) {
+						if (!subContainer.validate((SectionNode) node)) {
 							ok = false;
 							continue;
 						}
@@ -124,20 +124,14 @@ public class EntryValidator {
 	 * A utility builder for creating an entry validator that can be used to parse and validate a {@link SectionNode}.
 	 * @see EntryValidator#builder()
 	 */
-	public static class EntryValidatorBuilder extends EntryData<EntryContainer> {
+	public static class EntryValidatorBuilder {
 
 		/**
 		 * The default separator used for all {@link KeyValueEntryData}.
 		 */
 		public static final String DEFAULT_ENTRY_SEPARATOR = ": ";
 
-		private EntryValidatorBuilder() {
-			super("", null, false);
-		}
-
-		public EntryValidatorBuilder(String key, boolean optional) {
-			super(key, null, optional);
-		}
+		private EntryValidatorBuilder() { }
 
 		private final List<EntryData<?>> entryData = new ArrayList<>();
 		private String entrySeparator = DEFAULT_ENTRY_SEPARATOR;
@@ -235,8 +229,6 @@ public class EntryValidator {
 		 * @return The builder instance.
 		 */
 		public EntryValidatorBuilder addEntryData(EntryData<?> entryData) {
-			if (entryData == this)
-				throw new IllegalArgumentException("Cannot add EntryValidatorBuilder to itself.");
 			this.entryData.add(entryData);
 			return this;
 		}
@@ -250,31 +242,12 @@ public class EntryValidator {
 			);
 		}
 
-		private EntryContainer entryContainer = null;
+	}
 
-		private boolean validate(SectionNode sectionNode) {
-			EntryValidator validator = new EntryValidator(
-				entryData, unexpectedNodeTester, unexpectedEntryMessage, missingRequiredEntryMessage
-			);
-			EntryContainer container = validator.validate(sectionNode);
-			entryContainer = container;
-			return container != null;
-		}
+	public static class SubContainerBuilder extends EntryValidatorBuilder {
 
-		@Override
-		public @Nullable EntryContainer getValue(Node node) {
-			return entryContainer;
-		}
-
-		@Override
-		public boolean canCreateWith(Node node) {
-			if (!(node instanceof SectionNode))
-				return false;
-			String key = node.getKey();
-			if (key == null)
-				return false;
-			key = ScriptLoader.replaceOptions(key);
-			return getKey().equalsIgnoreCase(key);
+		public SubContainerBuilder() {
+			super();
 		}
 
 	}
