@@ -86,10 +86,10 @@ public class EntryValidator {
 				EntryData<?> data = iterator.next();
 				if (data.canCreateWith(node)) { // Determine if it's a match
 					if (data instanceof EntryValidatorBuilder subValidator) {
-						Skript.adminBroadcast("Testing: " + data.getKey());
-						if (!subValidator.validate((SectionNode) node))
+						if (!subValidator.validate((SectionNode) node)) {
+							ok = false;
 							continue;
-						Skript.adminBroadcast("Passed: " + data.getKey());
+						}
 					}
 					handledNodes.put(data.getKey(), node); // This is a known node, mark it as such
 					iterator.remove();
@@ -268,7 +268,7 @@ public class EntryValidator {
 
 		@Override
 		public boolean canCreateWith(Node node) {
-			if (!(node instanceof SectionNode sectionNode))
+			if (!(node instanceof SectionNode))
 				return false;
 			String key = node.getKey();
 			if (key == null)
