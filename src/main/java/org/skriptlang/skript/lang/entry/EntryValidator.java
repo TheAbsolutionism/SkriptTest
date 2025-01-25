@@ -38,8 +38,7 @@ public class EntryValidator {
 
 	private final List<EntryData<?>> entryData;
 
-	@Nullable
-	private final Predicate<Node> unexpectedNodeTester;
+	private final @Nullable Predicate<Node> unexpectedNodeTester;
 
 	private final Function<String, String> unexpectedEntryMessage, missingRequiredEntryMessage;
 
@@ -71,8 +70,7 @@ public class EntryValidator {
 	 *         The returned map uses the matched entry data's key as a key and uses a pair containing the entry data and matching node
 	 *         Will return null if the provided node couldn't be validated.
 	 */
-	@Nullable
-	public EntryContainer validate(SectionNode sectionNode) {
+	public @Nullable EntryContainer validate(SectionNode sectionNode) {
 		List<EntryData<?>> entries = new ArrayList<>(entryData);
 		Map<String, Node> handledNodes = new HashMap<>();
 		List<Node> unhandledNodes = new ArrayList<>();
@@ -87,6 +85,12 @@ public class EntryValidator {
 			while (iterator.hasNext()) {
 				EntryData<?> data = iterator.next();
 				if (data.canCreateWith(node)) { // Determine if it's a match
+					if (data instanceof EntryValidatorBuilder subValidator) {
+						Skript.adminBroadcast("Testing: " + data.getKey());
+						if (!subValidator.validate((SectionNode) node))
+							continue;
+						Skript.adminBroadcast("Passed: " + data.getKey());
+					}
 					handledNodes.put(data.getKey(), node); // This is a known node, mark it as such
 					iterator.remove();
 					continue nodeLoop;
@@ -120,23 +124,27 @@ public class EntryValidator {
 	 * A utility builder for creating an entry validator that can be used to parse and validate a {@link SectionNode}.
 	 * @see EntryValidator#builder()
 	 */
-	public static class EntryValidatorBuilder {
+	public static class EntryValidatorBuilder extends EntryData<EntryContainer> {
 
 		/**
 		 * The default separator used for all {@link KeyValueEntryData}.
 		 */
 		public static final String DEFAULT_ENTRY_SEPARATOR = ": ";
 
-		private EntryValidatorBuilder() { }
+		private EntryValidatorBuilder() {
+			super("", null, false);
+		}
+
+		public EntryValidatorBuilder(String key, boolean optional) {
+			super(key, null, optional);
+		}
 
 		private final List<EntryData<?>> entryData = new ArrayList<>();
 		private String entrySeparator = DEFAULT_ENTRY_SEPARATOR;
 
-		@Nullable
-		private Predicate<Node> unexpectedNodeTester;
+		private @Nullable Predicate<Node> unexpectedNodeTester;
 
-		@Nullable
-		private Function<String, String> unexpectedEntryMessage, missingRequiredEntryMessage;
+		private @Nullable Function<String, String> unexpectedEntryMessage, missingRequiredEntryMessage;
 
 		/**
 		 * Updates the separator to be used when creating KeyValue entries. Please note
@@ -227,6 +235,8 @@ public class EntryValidator {
 		 * @return The builder instance.
 		 */
 		public EntryValidatorBuilder addEntryData(EntryData<?> entryData) {
+			if (entryData == this)
+				throw new IllegalArgumentException("Cannot add EntryValidatorBuilder to itself.");
 			this.entryData.add(entryData);
 			return this;
 		}
@@ -238,6 +248,33 @@ public class EntryValidator {
 			return new EntryValidator(
 				entryData, unexpectedNodeTester, unexpectedEntryMessage, missingRequiredEntryMessage
 			);
+		}
+
+		private EntryContainer entryContainer = null;
+
+		private boolean validate(SectionNode sectionNode) {
+			EntryValidator validator = new EntryValidator(
+				entryData, unexpectedNodeTester, unexpectedEntryMessage, missingRequiredEntryMessage
+			);
+			EntryContainer container = validator.validate(sectionNode);
+			entryContainer = container;
+			return container != null;
+		}
+
+		@Override
+		public @Nullable EntryContainer getValue(Node node) {
+			return entryContainer;
+		}
+
+		@Override
+		public boolean canCreateWith(Node node) {
+			if (!(node instanceof SectionNode sectionNode))
+				return false;
+			String key = node.getKey();
+			if (key == null)
+				return false;
+			key = ScriptLoader.replaceOptions(key);
+			return getKey().equalsIgnoreCase(key);
 		}
 
 	}
