@@ -13,7 +13,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Make Entity Scream")
-@Description("Make a goat or enderman (Paper) start or stop screaming.")
+@Description("Make a goat or enderman start or stop screaming.")
 @Examples({
 	"make last spawned goat start screaming",
 	"force last spawned goat to stop screaming",

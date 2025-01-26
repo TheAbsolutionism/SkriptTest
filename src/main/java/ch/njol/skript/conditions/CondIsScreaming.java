@@ -8,7 +8,7 @@ import org.bukkit.entity.Goat;
 import org.bukkit.entity.LivingEntity;
 
 @Name("Is Screaming")
-@Description("Check if a goat or enderman (Paper) is or is not screaming.")
+@Description("Check whether a goat or enderman is screaming.")
 @Examples({
 	"if last spawned goat is not screaming:",
 		"\tmake last spawned goat scream",
