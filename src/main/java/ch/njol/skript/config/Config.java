@@ -223,6 +223,7 @@ public class Config implements Comparable<Config>, Validated, NodeNavigator, Any
 		if (nodesToUpdate.isEmpty())
 			return false;
 
+		int pushed = 0;
 		for (Node node : nodesToUpdate) {
 			/*
 			 prevents nodes that are already in the config from being added again
@@ -271,8 +272,9 @@ public class Config implements Comparable<Config>, Validated, NodeNavigator, Any
 			if (existing != null) {
 				// there's already something at the node we want to add the new node
 
-				Skript.debug("Adding node %s to %s at index %s", node, parent, index);
-				parent.add(index, node);
+				Skript.debug("Adding node %s to %s at index %s", node, parent, index + pushed);
+				parent.add(index + pushed, node);
+				pushed++;
 			} else {
 				// there's nothing at the index we want to add the new node
 
