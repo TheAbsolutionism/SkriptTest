@@ -16,15 +16,17 @@ import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.registrations.EventValues.EventContext;
+import ch.njol.skript.registrations.EventValues.EventValueContext;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
-import org.skriptlang.skript.registration.SyntaxInfo;
-import org.skriptlang.skript.registration.SyntaxRegistry;
-import org.skriptlang.skript.util.Priority;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
+import org.skriptlang.skript.util.Priority;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -75,9 +77,9 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	@ApiStatus.Experimental
 	public static <E extends EventValueExpression<T>, T> SyntaxInfo.Expression<E, T> register(SyntaxRegistry registry, Class<E> expressionClass, Class<T> returnType, String pattern) {
 		SyntaxInfo.Expression<E, T> info = SyntaxInfo.Expression.builder(expressionClass, returnType)
-				.priority(DEFAULT_PRIORITY)
-				.addPattern("[the] " + pattern)
-				.build();
+			.priority(DEFAULT_PRIORITY)
+			.addPattern("[the] " + pattern)
+			.build();
 		registry.register(SyntaxRegistry.EXPRESSION, info);
 		return info;
 	}
@@ -103,9 +105,14 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	private Changer<? super T> changer;
 	private final boolean single;
 	private final boolean exact;
+	private final boolean original;
 
 	public EventValueExpression(Class<? extends T> type) {
 		this(type, null);
+	}
+
+	public EventValueExpression(boolean original, Class<? extends T> type) {
+		this(original, type, null);
 	}
 
 	/**
@@ -122,11 +129,20 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		this(type, changer, false);
 	}
 
+	public EventValueExpression(boolean original, Class<? extends T> type, @Nullable Changer<? super T> changer) {
+		this(original, type, changer, false);
+	}
+
 	public EventValueExpression(Class<? extends T> type, @Nullable Changer<? super T> changer, boolean exact) {
+		this(false, type, changer, exact);
+	}
+
+	public EventValueExpression(boolean original, Class<? extends T> type, @Nullable Changer<? super T> changer, boolean exact) {
 		assert type != null;
 		this.type = type;
 		this.exact = exact;
 		this.changer = changer;
+		this.original = original;
 		single = !type.isArray();
 		componentType = single ? type : type.getComponentType();
 	}
@@ -156,7 +172,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 				if (EventValues.hasMultipleConverters(event, type, getTime()) == Kleenean.TRUE) {
 					Noun typeName = Classes.getExactClassInfo(componentType).getName();
 					log.printError("There are multiple " + typeName.toString(true) + " in " + Utils.a(getParser().getCurrentEventName()) + " event. " +
-							"You must define which " + typeName + " to use.");
+						"You must define which " + typeName + " to use.");
 					return false;
 				}
 				Converter<?, ? extends T> converter;
@@ -182,9 +198,8 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	}
 
 	@Override
-	@Nullable
 	@SuppressWarnings("unchecked")
-	protected T[] get(Event event) {
+	protected T @Nullable [] get(Event event) {
 		T value = getValue(event);
 		if (value == null)
 			return (T[]) Array.newInstance(componentType, 0);
@@ -219,17 +234,29 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 		return null;
 	}
 
+	private <E extends Event, V> T getValue(EventContext<E, V> eventContext) {
+		//noinspection unchecked
+		EventValueContext<E, V> valueContext = eventContext.getEventValueContext((Class<V>) type);
+		if (valueContext == null || !valueContext.isSingleConverter())
+			return null;
+		if (original)
+			//noinspection unchecked
+			return (T) valueContext.getOriginalValue();
+		//noinspection unchecked
+		return (T) valueContext.getCurrentValue();
+
+	}
+
 	@Override
-	@Nullable
-	@SuppressWarnings("unchecked")
-	public Class<?>[] acceptChange(ChangeMode mode) {
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (changer == null)
+			//noinspection unchecked
 			changer = (Changer<? super T>) Classes.getSuperClassInfo(componentType).getChanger();
 		return changer == null ? null : changer.acceptChange(mode);
 	}
 
 	@Override
-	public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		if (changer == null)
 			throw new SkriptAPIException("The changer cannot be null");
 		ChangerUtils.change(changer, getArray(event), delta, mode);
