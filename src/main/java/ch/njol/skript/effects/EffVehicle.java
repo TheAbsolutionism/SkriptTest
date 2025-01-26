@@ -25,7 +25,7 @@ public class EffVehicle extends Effect {
 
 	static {
 		Skript.registerEffect(EffVehicle.class,
-				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %entities/entitydatas%",
+				"(make|let|force) %entities% [to] (ride|mount) [(in|on)] %entity/entitydata%",
 				"(make|let|force) %entities% [to] (dismount|(dismount|leave) (from|of|) (any|the[ir]|his|her|) vehicle[s])",
 				"(eject|dismount) (any|the|) passenger[s] (of|from) %entities%");
 	}
@@ -52,35 +52,30 @@ public class EffVehicle extends Effect {
 		}
 		// matchedPattern = 2
 		if (passengers == null) {
-			assert vehicles != null;
 			for (Object vehicle : vehicles.getArray(event))
 				((Entity) vehicle).eject();
 			return;
 		}
 		// matchedPattern = 0
-		Object[] vehiclesArray = vehicles.getArray(event);
-		if (vehiclesArray.length == 0)
-			return;
 		Entity[] passengersArray = passengers.getArray(event);
 		if (passengersArray.length == 0)
 			return;
-		for (Object vehicle : vehiclesArray) {
-			if (vehicle instanceof Entity vehicleEntity) {
-				for (Entity passenger : passengersArray) {
-					assert passenger != null;
-					if (passenger == vehicleEntity)
-						continue;
-					passenger.leaveVehicle();
-					vehicleEntity.addPassenger(passenger);
-				}
-			} else {
-				for (Entity passenger : passengersArray) {
-					assert passenger != null : passengers;
-					Entity entity = ((EntityData<?>) vehicle).spawn(passenger.getLocation());
-					if (entity == null)
-						return;
-					entity.addPassenger(passenger);
-				}
+		Object vehicleObject = vehicles.getSingle(event);
+		if (vehicleObject instanceof Entity vehicleEntity) {
+			for (Entity passenger : passengersArray) {
+				assert passenger != null;
+				if (passenger == vehicleEntity)
+					continue;
+				passenger.leaveVehicle();
+				vehicleEntity.addPassenger(passenger);
+			}
+		} else if (vehicleObject instanceof EntityData<?> vehicleData) {
+			for (Entity passenger : passengersArray) {
+				assert passenger != null;
+				Entity vehicleEntity = vehicleData.spawn(passenger.getLocation());
+				if (vehicleEntity == null)
+					return;
+				vehicleEntity.addPassenger(passenger);
 			}
 		}
 	}
@@ -92,7 +87,6 @@ public class EffVehicle extends Effect {
 			return "make " + passengers.toString(event, debug) + " dismount";
 		}
 		if (passengers == null) {
-			assert vehicles != null;
 			return "eject passenger" + (vehicles.isSingle() ? "" : "s") + " of " + vehicles.toString(event, debug);
 		}
 		return "make " + passengers.toString(event, debug) + " ride " + vehicles.toString(event, debug);
