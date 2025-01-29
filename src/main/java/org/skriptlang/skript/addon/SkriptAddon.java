@@ -89,10 +89,10 @@ public interface SkriptAddon extends ViewProvider<SkriptAddon> {
 	 */
 	default void loadModules(AddonModule... modules) {
 		for (AddonModule module : modules) {
-			module.init(this);
-		}
-		for (AddonModule module : modules) {
-			module.load(this);
+			if (module.canLoad(this)) {
+				module.init(this);
+				module.load(this);
+			}
 		}
 	}
 
