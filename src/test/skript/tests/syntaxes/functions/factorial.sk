@@ -1,0 +1,7 @@
+test "factorial function":
+	assert factorial(0) = 1 with "factorial of 0 should be 1"
+	assert factorial(1) = 1 with "factorial of 1 should be 1"
+	assert factorial(2) = 2 with "factorial of 2 should be 2"
+	assert factorial(3) = 6 with "factorial of 3 should be 6"
+	assert factorial(4) = 24 with "factorial of 4 should be 24"
+	assert factorial(5) = 120 with "factorial of 5 should be 120"

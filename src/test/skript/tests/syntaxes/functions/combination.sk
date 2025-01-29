@@ -1,0 +1,3 @@
+test "combination function":
+	assert combination(10, 8) = 45 with "combination of 10 with a set of 8 should be 45"
+	assert combination(5, 3) = 10 with "combination of 5 with a set of 3 should be 10"

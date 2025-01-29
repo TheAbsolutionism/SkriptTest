@@ -3,11 +3,7 @@ package ch.njol.skript.classes.data;
 import ch.njol.skript.Skript;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.function.FunctionEvent;
-import ch.njol.skript.lang.function.Functions;
-import ch.njol.skript.lang.function.JavaFunction;
-import ch.njol.skript.lang.function.Parameter;
-import ch.njol.skript.lang.function.SimpleJavaFunction;
+import ch.njol.skript.lang.function.*;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.DefaultClasses;
@@ -31,11 +27,8 @@ import org.joml.Vector3f;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class DefaultFunctions {
 
@@ -711,6 +704,159 @@ public class DefaultFunctions {
 						"\t\tset {_money} to formatNumber({money::%sender's uuid%})",
 						"\t\tsend \"Your balance: %{_money}%\" to sender")
 			.since("2.10");
+
+		Functions.registerFunction(new SimpleJavaFunction<Number>("mean", new Parameter[]{
+			new Parameter<>("numbers", DefaultClasses.NUMBER, false, null)
+		}, DefaultClasses.NUMBER, true) {
+			@Override
+			public Number @Nullable [] executeSimple(Object[][] params) {
+				double total = 0;
+				for (Object object : params[0]) {
+					Number number = (Number) object;
+					total += number.doubleValue();
+				}
+				total /= params[0].length;
+				return new Number[]{total};
+			}
+		})
+			.description("Get the average of a list of numbers.")
+			.examples(
+				"mean(1, 2, 3) = 2",
+				"mean(0, 5, 10) = 5",
+				"mean(13, 97, 376, 709) = 298.75"
+			)
+			.since("INSERT VERSION");
+
+		Functions.registerFunction(new SimpleJavaFunction<Number>("median", new Parameter[]{
+			new Parameter<>("numbers", DefaultClasses.NUMBER, false, null)
+		}, DefaultClasses.NUMBER, true) {
+			@Override
+			public Number @Nullable [] executeSimple(Object[][] params) {
+				Number[] sorted = Arrays.stream(params[0])
+					.filter(object -> object instanceof Number)
+					.map(object -> (Number) object)
+					.sorted(((o1, o2) -> {
+						Double n1 = o1.doubleValue();
+						Double n2 = o2.doubleValue();
+						return n1.compareTo(n2);
+					}))
+					.toArray(Number[]::new);
+				int size = sorted.length;
+				if (size % 2 == 1)
+					return new Number[]{sorted[Math2.ceil(size /2)]};
+				int half = size / 2;
+				double first = (sorted[half - 1]).doubleValue();
+				double second = (sorted[half]).doubleValue();
+				double median = (first+second)/2;
+				return new Number[]{median};
+			}
+		})
+			.description("Get the middle value of a sorted list of numbers. If the list has an even number of values, the median is the average of the two middle numbers.")
+			.examples(
+				"median(1, 2, 3, 4, 5) = 3",
+				"median(1, 2, 3, 4, 5, 6) = 3.5",
+				"median(0, 123, 456, 789) = 289.5"
+			)
+			.since("INSERT VERSION");
+
+		Functions.registerFunction(new SimpleJavaFunction<>("factorial", new Parameter[]{
+			new Parameter<>("number", DefaultClasses.NUMBER, true, null)
+		}, DefaultClasses.NUMBER, true) {
+			@Override
+			public Number @Nullable [] executeSimple(Object[][] params) {
+				Number number = (Number) params[0][0];
+				Long total = Math2.factorial(number.longValue());
+				if (total == null)
+					return null;
+				return new Number[]{total};
+			}
+		})
+			.description()
+			.examples()
+			.since("INSERT VERSION");
+
+		Functions.registerFunction(new SimpleJavaFunction<Number>("root", new Parameter[]{
+			new Parameter<>("root", DefaultClasses.NUMBER, true, null),
+			new Parameter<>("number", DefaultClasses.NUMBER, true, null)
+		}, DefaultClasses.NUMBER, true) {
+			@Override
+			public Number @Nullable [] executeSimple(Object[][] params) {
+				Number root = (Number) params[0][0];
+				if (root.intValue() == 0)
+					return null;
+				Number number = (Number) params[1][0];
+				return new Number[]{Math.pow(number.doubleValue(), (1 / root.doubleValue()))};
+			}
+		})
+			.description("Get the result of the 'number' being rooted to the power of 'root'")
+			.examples(
+				"root(2, 4) = 2 # same as sqrt(4)",
+				"root(4, 16) = 2",
+				"root(-4, 16) = 0.5"
+			)
+			.since("INSERT VERSION");
+
+		Functions.registerFunction(new SimpleJavaFunction<Number>("permutation", new Parameter[]{
+			new Parameter<>("total", DefaultClasses.NUMBER, true, null),
+			new Parameter<>("set", DefaultClasses.NUMBER, true, null)
+		}, DefaultClasses.NUMBER, true) {
+			@Override
+			public Number @Nullable [] executeSimple(Object[][] params) {
+				Number total = (Number) params[0][0];
+				Number set = (Number) params[1][0];
+				long denominator = total.longValue() - set.longValue();
+				Long totalF = Math2.factorial(total.longValue());
+				Long denominatorF = Math2.factorial(denominator);
+				if (totalF == null || denominatorF == null)
+					return null;
+				Skript.adminBroadcast("Num: " + totalF);
+				Skript.adminBroadcast("Den: " + denominatorF);
+				double result = totalF.doubleValue()/denominatorF.doubleValue();
+				return new Number[]{result};
+			}
+		})
+			.description(
+				"Get the number of possible ordered arrangements from numbers 1 to the provided 'total' within a 'set' size.",
+				"For example,  A permutation of 3 with a set size of 1 returns 3: (1), (2), (3)",
+				"A permutation of 3 with a set size of 2 returns 6: (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)"
+			)
+			.examples(
+				"permutation(10, 2) = 90",
+				"permutation(10, 4) = 5040",
+				"permutation(size of {some list::*}, 2)"
+			)
+			.since("INSERT VERSION");
+
+		Functions.registerFunction(new SimpleJavaFunction<Number>("combination", new Parameter[]{
+				new Parameter<>("total", DefaultClasses.NUMBER, true, null),
+				new Parameter<>("set", DefaultClasses.NUMBER, true, null)
+			}, DefaultClasses.NUMBER, true) {
+				@Override
+				public Number @Nullable [] executeSimple(Object[][] params) {
+					Number total = (Number) params[0][0];
+					Number set = (Number) params[1][0];
+					long denominator = total.longValue() - set.longValue();
+					Long totalF = Math2.factorial(total.longValue());
+					Long setF = Math2.factorial(set.longValue());
+					Long denominatorF = Math2.factorial(denominator);
+					if (totalF == null || setF == null || denominatorF == null)
+						return null;
+					double result = totalF.doubleValue()/(denominatorF.doubleValue() * setF.doubleValue());
+					return new Number[]{result};
+				}
+			})
+			.description(
+				"Get the number of unique unordered arrangements from numbers 1 to the provided 'total' within a 'set' size.",
+				"For example, A combination of 3 with a set size of 1 returns 3: (1), (2), (3)",
+				"A combination of 3 with a set size of 2 returns 3: (1, 2), (1, 3), (2, 3)"
+			)
+			.examples(
+				"combination(10, 8) = 45",
+				"combination(5, 3) = 10",
+				"combination(size of {some list::*}, 2)"
+			)
+			.since("INSERT VERSION");
+
 	}
 
 }

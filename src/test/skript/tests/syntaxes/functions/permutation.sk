@@ -1,0 +1,3 @@
+test "permutation function":
+	assert permutation(10, 2) = 90 with "permutation of 10 with a set of 8 should be 90"
+	assert permutation(10, 4) = 5040 with "permutation of 10 with a set of 4 should be 5040"
