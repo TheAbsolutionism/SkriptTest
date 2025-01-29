@@ -8,7 +8,7 @@ test "permutation function":
 	assert permutation(500, 10) = 891997464644302400000000000 with "permutation of 500 with a set of 10 failed"
 	assert permutation(500, 100) = 19054359613385316000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 with "permutation of 500 with a set of 100 failed"
 
-	assert permutation(500, 500) = Infinity with "permutation of 500 with a set of 500 failed"
+	assert permutation(500, 500) = infinity value with "permutation of 500 with a set of 500 failed"
 
 	assert permutation(10, 11) is not set with "permutation with a size greater than options should be null"
 	assert permutation(10, -1) is not set with "permutation with a size less than 0 should be null"
