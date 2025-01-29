@@ -719,7 +719,7 @@ public class DefaultFunctions {
 				return new Number[]{total};
 			}
 		})
-			.description("Get the average of a list of numbers.")
+			.description("Get the mean (average) of a list of numbers.")
 			.examples(
 				"mean(1, 2, 3) = 2",
 				"mean(0, 5, 10) = 5",
@@ -751,7 +751,10 @@ public class DefaultFunctions {
 				return new Number[]{median};
 			}
 		})
-			.description("Get the middle value of a sorted list of numbers. If the list has an even number of values, the median is the average of the two middle numbers.")
+			.description(
+				"Get the middle value of a sorted list of numbers. "
+				+ "If the list has an even number of values, the median is the average of the two middle numbers."
+			)
 			.examples(
 				"median(1, 2, 3, 4, 5) = 3",
 				"median(1, 2, 3, 4, 5, 6) = 3.5",
@@ -764,31 +767,61 @@ public class DefaultFunctions {
 		}, DefaultClasses.NUMBER, true) {
 			@Override
 			public Number @Nullable [] executeSimple(Object[][] params) {
-				Number number = (Number) params[0][0];
-				Long total = Math2.factorial(number.longValue());
-				if (total == null)
-					return null;
-				return new Number[]{total};
+				Double number = ((Number) params[0][0]).doubleValue();
+				boolean negative = false;
+				if (number < -170) {
+					return new Number[]{Double.NEGATIVE_INFINITY};
+				} else if (number < 0) {
+					negative = true;
+					number = Math.abs(number);
+				} else if (number <= 1) { // 0 and 1
+					return new Number[]{1};
+				} else if (number > 170) {
+					return new Number[]{Double.POSITIVE_INFINITY};
+				}
+				Double result = 1d;
+				for (double i = number; i > 1; i--) {
+					if (result.isInfinite() || result.isNaN())
+						break;
+					result *= i;
+				}
+				if (negative)
+					result *= -1d;
+				return new Number[]{result};
 			}
 		})
-			.description()
-			.examples()
+			.description(
+				"Get the factorial of a number. "
+				+ "Getting the factorial of any number above 20 goes into the Double range leading to floating points. "
+				+ "Any number after 170 will always return Infinity."
+			)
+			.examples(
+				"factorial(0) = 1",
+				"factorial(3) = 3*2*1 = 6",
+				"factorial(5) = 5*4*3*2*1 = 120",
+				"factorial(171) = Infinity"
+			)
 			.since("INSERT VERSION");
 
 		Functions.registerFunction(new SimpleJavaFunction<Number>("root", new Parameter[]{
-			new Parameter<>("root", DefaultClasses.NUMBER, true, null),
+			new Parameter<>("n", DefaultClasses.NUMBER, true, null),
 			new Parameter<>("number", DefaultClasses.NUMBER, true, null)
 		}, DefaultClasses.NUMBER, true) {
 			@Override
 			public Number @Nullable [] executeSimple(Object[][] params) {
-				Number root = (Number) params[0][0];
-				if (root.intValue() == 0)
+				Double n = ((Number) params[0][0]).doubleValue();
+				Double number = ((Number) params[1][0]).doubleValue();
+				if (n == 0) {
 					return null;
-				Number number = (Number) params[1][0];
-				return new Number[]{Math.pow(number.doubleValue(), (1 / root.doubleValue()))};
+				} else if (n == 1) {
+					return new Number[]{number};
+				} else if (n == 2) {
+					return new Number[]{Math.sqrt(number)};
+				}
+				return new Number[]{Math.pow(number, (1 / n))};
 			}
 		})
-			.description("Get the result of the 'number' being rooted to the power of 'root'")
+			.description("Calculates the <i>n</i>th root of a number.")
 			.examples(
 				"root(2, 4) = 2 # same as sqrt(4)",
 				"root(4, 16) = 2",
@@ -797,28 +830,33 @@ public class DefaultFunctions {
 			.since("INSERT VERSION");
 
 		Functions.registerFunction(new SimpleJavaFunction<Number>("permutation", new Parameter[]{
-			new Parameter<>("total", DefaultClasses.NUMBER, true, null),
-			new Parameter<>("set", DefaultClasses.NUMBER, true, null)
+			new Parameter<>("options", DefaultClasses.NUMBER, true, null),
+			new Parameter<>("size", DefaultClasses.NUMBER, true, null)
 		}, DefaultClasses.NUMBER, true) {
 			@Override
 			public Number @Nullable [] executeSimple(Object[][] params) {
-				Number total = (Number) params[0][0];
-				Number set = (Number) params[1][0];
-				long denominator = total.longValue() - set.longValue();
-				Long totalF = Math2.factorial(total.longValue());
-				Long denominatorF = Math2.factorial(denominator);
-				if (totalF == null || denominatorF == null)
+				Double options = ((Number) params[0][0]).doubleValue();
+				Double size = ((Number) params[1][0]).doubleValue();
+				if (size > options || size < 0) {
 					return null;
-				Skript.adminBroadcast("Num: " + totalF);
-				Skript.adminBroadcast("Den: " + denominatorF);
-				double result = totalF.doubleValue()/denominatorF.doubleValue();
+				} else if (size.equals(0d)) {
+					return new Number[]{1};
+				} else if (size.equals(1d)) {
+					return new Number[]{options};
+				}
+				Double result = 1d;
+				for (double i = options; i > options - size; i--) {
+					if (result.isInfinite() || result.isNaN())
+						break;
+					result *= i;
+				}
 				return new Number[]{result};
 			}
 		})
 			.description(
-				"Get the number of possible ordered arrangements from numbers 1 to the provided 'total' within a 'set' size.",
-				"For example,  A permutation of 3 with a set size of 1 returns 3: (1), (2), (3)",
-				"A permutation of 3 with a set size of 2 returns 6: (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)"
+				"Get the number of possible ordered arrangements from 1 to 'options' with each arrangement having a size equal to 'size'",
+				"For example, a permutation with 3 options and an arrangement size of 1, returns 3: (1), (2), (3)",
+				"A permutation with 3 options and an arrangement size of 2 returns 6: (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)"
 			)
 			.examples(
 				"permutation(10, 2) = 90",
@@ -828,27 +866,39 @@ public class DefaultFunctions {
 			.since("INSERT VERSION");
 
 		Functions.registerFunction(new SimpleJavaFunction<Number>("combination", new Parameter[]{
-				new Parameter<>("total", DefaultClasses.NUMBER, true, null),
-				new Parameter<>("set", DefaultClasses.NUMBER, true, null)
+				new Parameter<>("options", DefaultClasses.NUMBER, true, null),
+				new Parameter<>("size", DefaultClasses.NUMBER, true, null)
 			}, DefaultClasses.NUMBER, true) {
 				@Override
 				public Number @Nullable [] executeSimple(Object[][] params) {
-					Number total = (Number) params[0][0];
-					Number set = (Number) params[1][0];
-					long denominator = total.longValue() - set.longValue();
-					Long totalF = Math2.factorial(total.longValue());
-					Long setF = Math2.factorial(set.longValue());
-					Long denominatorF = Math2.factorial(denominator);
-					if (totalF == null || setF == null || denominatorF == null)
+					Double options = ((Number) params[0][0]).doubleValue();
+					Double size = ((Number) params[1][0]).doubleValue();
+					if (size > options || size < 0) {
 						return null;
-					double result = totalF.doubleValue()/(denominatorF.doubleValue() * setF.doubleValue());
-					return new Number[]{result};
+					} else if (size.equals(0d)) {
+						return new Number[]{1};
+					} else if (size.equals(1d)) {
+						return new Number[]{options};
+					}
+					Double top = 1d;
+					for (double i = options; i > options - size; i--) {
+						if (top.isInfinite() || top.isNaN())
+							return new Number[]{top};
+						top *= i;
+					}
+					Double bottom = size;
+					for (double i = size - 1; i > 1; i--) {
+						if (bottom.isInfinite() || bottom.isNaN())
+							break;
+						bottom *= i;
+					}
+					return new Number[]{top/bottom};
 				}
 			})
 			.description(
-				"Get the number of unique unordered arrangements from numbers 1 to the provided 'total' within a 'set' size.",
-				"For example, A combination of 3 with a set size of 1 returns 3: (1), (2), (3)",
-				"A combination of 3 with a set size of 2 returns 3: (1, 2), (1, 3), (2, 3)"
+				"Get the number of possible sets from 1 to 'options' with each set having a size equal to 'size'",
+				"For example, a combination with 3 options and a set size of 1, returns 3: (1), (2), (3)",
+				"A combination of 3 options with a set size of 2 returns 3: (1, 2), (1, 3), (2, 3)"
 			)
 			.examples(
 				"combination(10, 8) = 45",

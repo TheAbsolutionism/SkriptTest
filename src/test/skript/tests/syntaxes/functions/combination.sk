@@ -1,3 +1,13 @@
 test "combination function":
-	assert combination(10, 8) = 45 with "combination of 10 with a set of 8 should be 45"
-	assert combination(5, 3) = 10 with "combination of 5 with a set of 3 should be 10"
+	assert combination(5, 3) = 10 with "combination of 5 with a set of 3 failed"
+	assert combination(10, 2) = 45 with "combination of 10 with a set of 2 failed"
+	assert combination(10, 4) = 210 with "combination of 10 with a set of 4 failed"
+	assert combination(100, 5) = 75287520 with "combination of 100 with a set of 5 failed"
+	assert combination(150, 10) = 1169554298222310 with "combination of 150 with a set of 10 failed"
+	assert combination(500, 10) = 245810588801891070000 with "combination of 500 with a set of 10 failed"
+	assert combination(500, 100) = 204169423593847550000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 with "combination of 500 with a set of 100 failed"
+
+	assert combination(500, 500) = Infinity with "combination of 500 with a set of 500 failed"
+
+	assert combination(10, 11) is not set with "combination with a size greater than options should be null"
+	assert combination(10, -1) is not set with "combination with a size less than 0 should be null"

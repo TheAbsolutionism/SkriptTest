@@ -2,7 +2,6 @@ package ch.njol.util;
 
 import ch.njol.skript.Skript;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * This class is not to be used by addons. In the future methods may
@@ -159,18 +158,6 @@ public final class Math2 {
 			// If either x or y is negative return the min value, otherwise return the max value
 			return x < 0 == y < 0 ? Long.MAX_VALUE : Long.MIN_VALUE;
 		return result;
-	}
-
-	public static @Nullable Long factorial(long x) {
-		if (x < 0) {
-			return null;
-		} else if (x <= 1) {
-			return 1L;
-		}
-		long total = x;
-		for (long i = x - 1; i > 1; i--)
-			total *= i;
-		return total;
 	}
 
 }
