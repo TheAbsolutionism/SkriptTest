@@ -8,6 +8,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import org.skriptlang.skript.util.Registry;
 import org.skriptlang.skript.util.ViewProvider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -88,11 +90,15 @@ public interface SkriptAddon extends ViewProvider<SkriptAddon> {
 	 * @param modules The modules to load.
 	 */
 	default void loadModules(AddonModule... modules) {
-		for (AddonModule module : modules) {
-			if (module.canLoad(this)) {
-				module.init(this);
-				module.load(this);
-			}
+		List<AddonModule> filtered = Arrays.stream(modules)
+			.filter(addonModule -> addonModule.canLoad(this))
+			.toList();
+
+		for (AddonModule module : filtered) {
+			module.init(this);
+		}
+		for (AddonModule module : filtered) {
+			module.load(this);
 		}
 	}
 
