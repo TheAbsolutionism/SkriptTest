@@ -41,7 +41,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			slots = slotLiteral.getArray();
 			for (EquipSlot slot : slots) {
 				if (slot == EquipSlot.TOOL || slot == EquipSlot.OFF_HAND || slot == EquipSlot.BODY) {
-					Skript.error("You can not detect an armor change event for a '" + Classes.toString(slot) + "'.");
+					Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
 					return false;
 				}
 			}
