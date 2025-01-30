@@ -1,15 +1,13 @@
 package ch.njol.skript.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.util.Kleenean;
+import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.entity.LivingEntity;
@@ -18,44 +16,40 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-@Name("No Damage Ticks")
-@Description("The number of ticks that an entity is invulnerable to damage for.")
+@Name("No Damage Timespan")
+@Description("The amount of time an entity is invulnerable to any damage.")
 @Examples({
 	"on damage:",
-		"\tset victim's invulnerability ticks to 20 #Victim will not take damage for the next second"
+		"\tset victim's invulnerability time to 20 ticks #Victim will not take damage for the next second",
+	"",
+	"if the no damage timespan of {_entity} is 0 seconds:",
+		"\tset the invincibility time span of {_entity} to 1 minute"
 })
-@Since("2.5, INSERT VERSION (deprecated)")
-@Deprecated
-public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Long> {
-	
+@Since("INSERT VERSION")
+public class ExprNoDamageTimespan extends SimplePropertyExpression<LivingEntity, Timespan> {
+
 	static {
-		registerDefault(ExprNoDamageTicks.class, Long.class,"(invulnerability|invincibility|no damage) tick[s]", "livingentities");
+		registerDefault(ExprNoDamageTimespan.class, Timespan.class, "(invulnerability|invincibility|no damage) time[[ ]span]", "livingentities");
 	}
 
 	@Override
-	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		Skript.warning("This expression is marked for removal. Please use 'ExprNoDamageTimespan' instead.");
-		return super.init(expressions, matchedPattern, isDelayed, parseResult);
+	public Timespan convert(LivingEntity entity) {
+		return new Timespan(TimePeriod.TICK, entity.getNoDamageTicks());
 	}
 
-	@Override
-	public Long convert(LivingEntity entity) {
-        return (long) entity.getNoDamageTicks();
-	}
-	
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, RESET, ADD, REMOVE -> CollectionUtils.array(Number.class);
+			case SET, DELETE, RESET, ADD, REMOVE -> CollectionUtils.array(Timespan.class);
 			default -> null;
 		};
 	}
-	
+
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedTicks = 0;
-		if (delta != null && delta[0] instanceof Number number)
-			providedTicks = number.intValue();
+		if (delta != null && delta[0] instanceof Timespan timespan)
+			providedTicks = (int) timespan.getAs(TimePeriod.TICK);
 		int finalTicks = providedTicks;
 		Consumer<LivingEntity> consumer = switch (mode) {
 			case SET, DELETE, RESET -> entity -> entity.setNoDamageTicks(finalTicks);
@@ -76,15 +70,15 @@ public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Lo
 			consumer.accept(entity);
 		}
 	}
-	
+
 	@Override
 	protected String getPropertyName() {
-		return "no damage ticks";
+		return "no damage timespan";
 	}
-	
+
 	@Override
-	public Class<Long> getReturnType() {
-		return Long.class;
+	public Class<Timespan> getReturnType() {
+		return Timespan.class;
 	}
-	
+
 }
