@@ -33,8 +33,8 @@ import java.util.function.Consumer;
 public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Object> {
 	
 	static {
-		register(ExprNoDamageTicks.class, Object.class,"(invulnerability|invincibility|no damage) tick[s]", "livingentities");
-		register(ExprNoDamageTicks.class, Object.class, "(timespan:(invulnerability|invincibility|no damage) time[[ ]span])", "livingentities");
+		registerDefault(ExprNoDamageTicks.class, Object.class,"(invulnerability|invincibility|no damage) tick[s]", "livingentities");
+		registerDefault(ExprNoDamageTicks.class, Object.class, "(timespan:(invulnerability|invincibility|no damage) time[[ ]span])", "livingentities");
 	}
 
 	private boolean timespan;
