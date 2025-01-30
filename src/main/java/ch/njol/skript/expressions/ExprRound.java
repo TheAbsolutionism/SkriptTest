@@ -25,24 +25,37 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.0")
 public class ExprRound extends PropertyExpression<Number, Long> {
 
-	static {
-		Skript.registerExpression(ExprRound.class, Long.class, ExpressionType.PROPERTY,
-				"(a|the|) (round[ed] down|floored) %numbers%",
-				"%numbers% (round[ed] down|floored)",
-				"(a|the|) round[ed] %numbers%",
-				"%numbers% round[ed]",
-				"(a|the|) (round[ed] up|ceiled) %numbers%",
-				"%numbers% (round[ed] up|ceiled)"
-			);
+	private enum RoundType {
+		FLOOR("(round[ed] down|floored)"),
+		ROUND("round[ed]"),
+		CEIL("(round[ed] up|ceiled)");
+
+		private final String pattern;
+
+		RoundType(String pattern) {
+			this.pattern = pattern;
+		}
 	}
-	
-	private int action;
+
+	private static final RoundType[] ROUND_TYPES = RoundType.values();
+
+	static {
+		String[] patterns = new String[ROUND_TYPES.length];
+		for (RoundType roundType : ROUND_TYPES) {
+			patterns[2 * roundType.ordinal()] = "[a|the] " + roundType.pattern + " %numbers%";
+			patterns[(2 * roundType.ordinal()) + 1] = "%numbers% " + roundType.pattern;
+		}
+
+		Skript.registerExpression(ExprRound.class, Long.class, ExpressionType.PROPERTY, patterns);
+	}
+
+	private RoundType roundType;
 
 	@Override
 	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
 		//noinspection unchecked
 		setExpr((Expression<? extends Number>) exprs[0]);
-		action = matchedPattern / 2;
+		roundType = ROUND_TYPES[matchedPattern/2];
 		return true;
 	}
 	
@@ -55,13 +68,11 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 				return long1;
 			}
 
-			if (action == 0) {
-				return Math2.floor(number.doubleValue());
-			} else if (action == 1) {
-				return Math2.round(number.doubleValue());
-			} else {
-				return Math2.ceil(number.doubleValue());
-			}
+			return switch (roundType) {
+				case FLOOR -> Math2.floor(number.doubleValue());
+				case ROUND -> Math2.round(number.doubleValue());
+				case CEIL -> Math2.ceil(number.doubleValue());
+			};
 		});
 	}
 	
@@ -73,13 +84,11 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		if (action == 0) {
-			builder.append("floor");
-		} else if (action == 1) {
-			builder.append("round");
-		} else {
-			builder.append("ceil");
-		}
+		builder.append(switch (roundType) {
+			case FLOOR -> "floored";
+			case ROUND -> "rounded";
+			case CEIL -> "ceiled";
+		});
 		builder.append(getExpr());
 		return builder.toString();
 	}
