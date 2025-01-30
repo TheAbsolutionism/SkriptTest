@@ -40,7 +40,7 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 	private static final RoundType[] ROUND_TYPES = RoundType.values();
 
 	static {
-		String[] patterns = new String[ROUND_TYPES.length];
+		String[] patterns = new String[ROUND_TYPES.length * 2];
 		for (RoundType roundType : ROUND_TYPES) {
 			patterns[2 * roundType.ordinal()] = "[a|the] " + roundType.pattern + " %numbers%";
 			patterns[(2 * roundType.ordinal()) + 1] = "%numbers% " + roundType.pattern;
