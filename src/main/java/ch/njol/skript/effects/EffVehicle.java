@@ -75,6 +75,7 @@ public class EffVehicle extends Effect {
 				Entity vehicleEntity = vehicleData.spawn(passenger.getLocation());
 				if (vehicleEntity == null)
 					return;
+				passenger.leaveVehicle();
 				vehicleEntity.addPassenger(passenger);
 			}
 		}
