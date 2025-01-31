@@ -16,8 +16,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 @Name("No Damage Ticks")
 @Description("The number of ticks that an entity is invulnerable to damage for.")
 @Examples({
@@ -40,7 +38,7 @@ public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Lo
 
 	@Override
 	public Long convert(LivingEntity entity) {
-        return (long) entity.getNoDamageTicks();
+		return (long) entity.getNoDamageTicks();
 	}
 	
 	@Override
@@ -56,24 +54,20 @@ public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Lo
 		int providedTicks = 0;
 		if (delta != null && delta[0] instanceof Number number)
 			providedTicks = number.intValue();
-		int finalTicks = providedTicks;
-		Consumer<LivingEntity> consumer = switch (mode) {
-			case SET, DELETE, RESET -> entity -> entity.setNoDamageTicks(finalTicks);
-			case ADD -> entity -> {
-				int current = entity.getNoDamageTicks();
-				int value = Math2.fit(0, current + finalTicks, Integer.MAX_VALUE);
-				entity.setNoDamageTicks(value);
-			};
-			case REMOVE -> entity -> {
-				int current = entity.getNoDamageTicks();
-				int value = Math2.fit(0, current - finalTicks, Integer.MAX_VALUE);
-				entity.setNoDamageTicks(value);
-			};
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		};
-
 		for (LivingEntity entity : getExpr().getArray(event)) {
-			consumer.accept(entity);
+			switch (mode) {
+				case SET, DELETE, RESET -> entity.setNoDamageTicks(providedTicks);
+				case ADD -> {
+					int current = entity.getNoDamageTicks();
+					int value = Math2.fit(0, current + providedTicks, Integer.MAX_VALUE);
+					entity.setNoDamageTicks(value);
+				}
+				case REMOVE -> {
+					int current = entity.getNoDamageTicks();
+					int value = Math2.fit(0, current - providedTicks, Integer.MAX_VALUE);
+					entity.setNoDamageTicks(value);
+				}
+			}
 		}
 	}
 	
