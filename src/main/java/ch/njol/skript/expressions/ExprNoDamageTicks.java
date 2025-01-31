@@ -34,7 +34,7 @@ public class ExprNoDamageTicks extends SimplePropertyExpression<LivingEntity, Lo
 
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		Skript.warning("This expression is marked for removal. Please use 'ExprNoDamageTimespan' instead.");
+		Skript.warning("This expression is deprecated. Please use 'invulnerability time' instead of 'invulnerability ticks'.");
 		return super.init(expressions, matchedPattern, isDelayed, parseResult);
 	}
 

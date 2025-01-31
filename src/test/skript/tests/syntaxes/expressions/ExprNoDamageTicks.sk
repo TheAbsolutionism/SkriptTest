@@ -18,7 +18,7 @@ test "no damage ticks":
 	assert {_entity}'s invulnerability ticks is 0 with "no damage ticks delete failed"
 	clear entity within {_entity}
 
-test "no damage timespan":
+test "no damage time":
 	spawn zombie at test-location:
 		set {_entity} to entity
 	assert {_entity}'s invulnerability timespan is 0 seconds with "entity spawned with no damage timespan"

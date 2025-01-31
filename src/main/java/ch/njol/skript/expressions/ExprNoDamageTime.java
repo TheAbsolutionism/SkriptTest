@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-@Name("No Damage Timespan")
+@Name("No Damage Time")
 @Description("The amount of time an entity is invulnerable to any damage.")
 @Examples({
 	"on damage:",
@@ -26,10 +26,10 @@ import java.util.function.Consumer;
 		"\tset the invincibility time span of {_entity} to 1 minute"
 })
 @Since("INSERT VERSION")
-public class ExprNoDamageTimespan extends SimplePropertyExpression<LivingEntity, Timespan> {
+public class ExprNoDamageTime extends SimplePropertyExpression<LivingEntity, Timespan> {
 
 	static {
-		registerDefault(ExprNoDamageTimespan.class, Timespan.class, "(invulnerability|invincibility|no damage) time[[ ]span]", "livingentities");
+		registerDefault(ExprNoDamageTime.class, Timespan.class, "(invulnerability|invincibility|no damage) time[[ ]span]", "livingentities");
 	}
 
 	@Override
@@ -72,13 +72,13 @@ public class ExprNoDamageTimespan extends SimplePropertyExpression<LivingEntity,
 	}
 
 	@Override
-	protected String getPropertyName() {
-		return "no damage timespan";
+	public Class<Timespan> getReturnType() {
+		return Timespan.class;
 	}
 
 	@Override
-	public Class<Timespan> getReturnType() {
-		return Timespan.class;
+	protected String getPropertyName() {
+		return "no damage timespan";
 	}
 
 }
