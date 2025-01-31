@@ -34,9 +34,10 @@ public interface AddonModule {
 	void load(SkriptAddon addon);
 
 	/**
-	 * Allow addons to specify loading conditions
+	 * Allow addons to specify loading conditions.
+	 *
 	 * @param addon The addon this module belongs to.
-	 * @return True, if it can load
+	 * @return Whether this module can load.
 	 */
 	default boolean canLoad(SkriptAddon addon) {
 		return true;
