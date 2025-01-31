@@ -18,20 +18,20 @@ test "except entities":
 	add {_zombie} to {_exclude::*}
 
 	assert size of all zombies except {_zombie} is 4 with "Failed to exclude zombie"
-	assert size of all entities except {_exclude::*} is 4 with "Failed to exclude list"
+	assert size of all entities except {_exclude::*} is 4 with "Failed to exclude list (zombie)"
 
 	spawn 5 skeletons at test-location
 	set {_skeleton} to last spawned skeleton
 	add {_skeleton} to {_exclude::*}
 
 	assert size of all skeletons excluding {_skeleton} is 4 with "Failed to exclude skeleton"
-	assert size of all entities excluding {_exclude::*} is 8 with "Failed to exclude list"
+	assert size of all entities excluding {_exclude::*} is 8 with "Failed to exclude list (zombie, skeleton)"
 
 	spawn 5 villagers at test-location
 	set {_villager} to last spawned villager
 	add {_villager} to {_exclude::*}
 
 	assert size of all villagers not including {_villager} is 4 with "Failed to exclude villager"
-	assert size of all entities not including {_exclude::*} is 12 with "Failed to exclude list"
+	assert size of all entities not including {_exclude::*} is 12 with "Failed to exclude list (zombie, skeleton, villager)"
 
 	clear all entities
