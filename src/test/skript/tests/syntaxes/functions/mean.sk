@@ -4,3 +4,6 @@ test "mean function":
 	loop 10 times:
 		add (10 * loop-iteration) to {_ints::*}
 	assert mean({_ints::*}) = 55 with "mean should be 55"
+
+	assert mean(0, 1, 2, infinity value) is not set with "mean should return null when providing infinity"
+	assert mean(0, 1, 2, nan value) is not set with "mean should return null when providing nan"

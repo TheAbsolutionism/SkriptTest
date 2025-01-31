@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DefaultFunctions {
 
@@ -713,6 +714,10 @@ public class DefaultFunctions {
 				double total = 0;
 				for (Object object : params[0]) {
 					Number number = (Number) object;
+					if (number instanceof Double doubleNumber && (doubleNumber.isInfinite() || doubleNumber.isNaN())) {
+						Skript.error("You cannot get the mean of a set of number that includes 'infinity' or 'nan'.");
+						return null;
+					}
 					total += number.doubleValue();
 				}
 				total /= params[0].length;
@@ -732,8 +737,17 @@ public class DefaultFunctions {
 		}, DefaultClasses.NUMBER, true) {
 			@Override
 			public Number @Nullable [] executeSimple(Object[][] params) {
+				AtomicBoolean invalid = new AtomicBoolean(false);
 				Number[] sorted = Arrays.stream(params[0])
-					.filter(object -> object instanceof Number)
+					.filter(object -> {
+						if (!(object instanceof Number number))
+							return false;
+						if (number instanceof Double doubleNumber && (doubleNumber.isInfinite() || doubleNumber.isNaN())) {
+							invalid.set(true);
+							return false;
+						}
+						return true;
+					})
 					.map(object -> (Number) object)
 					.sorted(((o1, o2) -> {
 						Double n1 = o1.doubleValue();
@@ -741,6 +755,10 @@ public class DefaultFunctions {
 						return n1.compareTo(n2);
 					}))
 					.toArray(Number[]::new);
+				if (invalid.get()) {
+					Skript.error("You cannot get the median of a set of numbers that includes 'infinity' or 'nan'.");
+					return null;
+				}
 				int size = sorted.length;
 				if (size % 2 == 1)
 					return new Number[]{sorted[Math2.ceil(size /2)]};
@@ -825,7 +843,7 @@ public class DefaultFunctions {
 			.examples(
 				"root(2, 4) = 2 # same as sqrt(4)",
 				"root(4, 16) = 2",
-				"root(-4, 16) = 0.5"
+				"root(-4, 16) = 0.5 # same as 16^(-1/4)"
 			)
 			.since("INSERT VERSION");
 
