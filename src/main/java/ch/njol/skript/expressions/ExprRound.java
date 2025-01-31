@@ -52,7 +52,7 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 	private RoundType roundType;
 
 	@Override
-	public boolean init(final Expression<?>[] exprs, final int matchedPattern, final Kleenean isDelayed, final ParseResult parseResult) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		setExpr((Expression<? extends Number>) exprs[0]);
 		roundType = ROUND_TYPES[matchedPattern/2];
