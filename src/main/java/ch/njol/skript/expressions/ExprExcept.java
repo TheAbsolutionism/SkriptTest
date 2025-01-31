@@ -13,6 +13,8 @@ import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.comparator.Comparators;
+import org.skriptlang.skript.lang.comparator.Relation;
 
 @Name("Except")
 @Description("Filter a list by providing objects to be excluded.")
@@ -28,7 +30,7 @@ public class ExprExcept extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprExcept.class, Object.class, ExpressionType.COMBINED,
-			"%objects% (except|excluding|not including) %objects%");
+			"%~objects% (except|excluding|not including) %objects%");
 	}
 
 	private Expression<?> source;
@@ -37,26 +39,24 @@ public class ExprExcept extends SimpleExpression<Object> {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		source = LiteralUtils.defendExpression(exprs[0]);
-		if (source.isSingle() || !LiteralUtils.canInitSafely(source))
+		if (source.isSingle()) {
+			Skript.error("Must provide a list containing more than one object to exclude objects from.");
 			return false;
-
+		}
 		exclude = LiteralUtils.defendExpression(exprs[1]);
-		if (!LiteralUtils.canInitSafely(exclude))
-			return false;
-
-		return true;
+		return LiteralUtils.canInitSafely(source, exclude);
 	}
 
 	@Override
 	protected Object @Nullable [] get(Event event) {
 		Object[] exclude = this.exclude.getArray(event);
-		if (exclude == null || exclude.length == 0)
+		if (exclude.length == 0)
 			return source.getArray(event);
 
 		return source.stream(event)
 			.filter(sourceObject -> {
 				for (Object excludeObject : exclude)
-					if (sourceObject.equals(excludeObject))
+					if (sourceObject.equals(excludeObject) || Comparators.compare(sourceObject, excludeObject) == Relation.EQUAL)
 						return false;
 				return true;
 			})
