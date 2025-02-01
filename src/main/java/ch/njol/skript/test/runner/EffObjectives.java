@@ -1,15 +1,5 @@
 package ch.njol.skript.test.runner;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Name;
@@ -18,6 +8,14 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import org.bukkit.event.Event;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Name("Objectives")
 @Description("An effect to setup required objectives for JUnit tests to complete.")
@@ -27,8 +25,8 @@ public class EffObjectives extends Effect  {
 	static {
 		if (TestMode.ENABLED)
 			Skript.registerEffect(EffObjectives.class,
-					"ensure [[junit] test] %string% completes [(objective|trigger)[s]] %strings%",
-					"complete [(objective|trigger)[s]] %strings% (for|on) [[junit] test] %string%"
+					"ensure [:simple] [[junit] test] %string% completes [(objective|trigger)[s]] %strings%",
+					"complete [(objective|trigger)[s]] %strings% (for|on) [:simple] [[junit] test] %string%"
 			);
 	}
 
@@ -37,6 +35,7 @@ public class EffObjectives extends Effect  {
 
 	private Expression<String> junit, objectives;
 	private boolean setup;
+	private boolean simple;
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -44,6 +43,7 @@ public class EffObjectives extends Effect  {
 		objectives = (Expression<String>) exprs[matchedPattern ^ 1];
 		junit = (Expression<String>) exprs[matchedPattern];
 		setup = matchedPattern == 0;
+		simple = parseResult.hasTag("simple");
 		return true;
 	}
 
@@ -53,6 +53,8 @@ public class EffObjectives extends Effect  {
 		assert junit != null;
 		String[] objectives = this.objectives.getArray(event);
 		assert objectives.length > 0;
+		if (simple)
+			junit = "SimpleJUnits." + junit;
 		if (setup) {
 			requirements.putAll(junit, Lists.newArrayList(objectives));
 		} else {
