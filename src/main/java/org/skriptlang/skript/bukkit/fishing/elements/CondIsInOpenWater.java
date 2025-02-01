@@ -21,7 +21,7 @@ import org.bukkit.entity.FishHook;
 public class CondIsInOpenWater extends PropertyCondition<Entity> {
 	
 	static {
-		register(CondIsInOpenWater.class, PropertyType.BE,
+		register(CondIsInOpenWater.class,
 			"in open water[s]", "entities");
 	}
 

@@ -1,14 +1,8 @@
 package ch.njol.skript.conditions;
 
-import org.bukkit.entity.LivingEntity;
-
-import ch.njol.skript.Skript;
 import ch.njol.skript.conditions.base.PropertyCondition;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
+import org.bukkit.entity.LivingEntity;
 
 @Name("Is Swimming")
 @Description("Checks whether a living entity is swimming.")
@@ -18,13 +12,12 @@ import ch.njol.skript.doc.Since;
 public class CondIsSwimming extends PropertyCondition<LivingEntity> {
 	
 	static {
-		if (Skript.methodExists(LivingEntity.class, "isSwimming"))
-			register(CondIsSwimming.class, "swimming", "livingentities");
+		register(CondIsSwimming.class, "swimming", "livingentities");
 	}
 	
 	@Override
-	public boolean check(final LivingEntity e) {
-		return e.isSwimming();
+	public boolean check(LivingEntity entity) {
+		return entity.isSwimming();
 	}
 	
 	@Override
