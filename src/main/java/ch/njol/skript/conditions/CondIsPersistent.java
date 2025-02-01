@@ -22,7 +22,7 @@ import org.bukkit.entity.Entity;
 @Examples({
 	"on spawn:",
 		"\tif event-entity is persistent:",
-			"\t\tmake event-entity persistent"
+			"\t\tmake event-entity not persistent"
 })
 @Since("INSERT VERSION")
 public class CondIsPersistent extends PropertyCondition<Object> {
