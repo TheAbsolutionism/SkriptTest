@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 	"command /kickcheater <cheater: player>:",
 		"\tpermission: op",
 		"\ttrigger:",
-			"\t\tmake {_cheater} non persistent",
+			"\t\tmake {_cheater} not persistent",
 			"\t\tkick {_cheater}"
 })
 @Since("INSERT VERSION")

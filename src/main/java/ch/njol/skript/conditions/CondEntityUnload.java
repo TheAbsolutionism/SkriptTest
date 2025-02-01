@@ -8,7 +8,11 @@ import ch.njol.skript.doc.Since;
 import org.bukkit.entity.LivingEntity;
 
 @Name("Can Despawn")
-@Description("Check if an entity can despawn when the chunk they're located at is unloaded.")
+@Description({
+	"Check if an entity can despawn when the chunk they're located at is unloaded.",
+	"More information on what and when entities despawn can be found at "
+		+ "<a href=\"https://minecraft.wiki/w/Mob_spawning#Despawning\">reference</a>."
+})
 @Examples({
 	"if last spawned entity can despawn on chunk unload:",
 		"\tmake last spawned entity not despawn on chunk unload"
