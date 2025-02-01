@@ -1,6 +1,8 @@
-test "simple junits" when running JUnit:
-	ensure simple "SimpleJUnits" completes "simple junit event"
+options:
+	test: "SimpleJUnits"
 
-on simple junit of "SimpleJUnits":
-	broadcast "simple junit event called"
-	complete "simple junit event" for simple "SimpleJUnits"
+test {@test} when running JUnit:
+	ensure simple {@test} completes "simple junit event"
+
+on simple junit of {@test}:
+	complete "simple junit event" for simple {@test}
