@@ -1,0 +1,10 @@
+options:
+	backslashtest: \"options backslash\"
+
+test "escaping quotes":
+	broadcast "test string"
+	broadcast """test doubled"""
+	broadcast "\"test backslashes\""
+	broadcast """d""o""u""b""l""e""d"" ""p""e""r"""
+	broadcast "\"b\"a\"c\"k\"s\"l\"a\"s\"h\" \"p\"e\"r\""
+	broadcast "{@backslashtest}"
