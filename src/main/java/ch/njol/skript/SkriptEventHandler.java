@@ -392,7 +392,6 @@ public final class SkriptEventHandler {
 
 	@Nullable
 	private static Method getHandlerListMethod_i(Class<? extends Event> eventClass) {
-		Method superMethod = null;
 		try {
 			return eventClass.getDeclaredMethod("getHandlerList");
 		} catch (NoSuchMethodException e) {
@@ -401,15 +400,10 @@ public final class SkriptEventHandler {
 				&& !eventClass.getSuperclass().equals(Event.class)
 				&& Event.class.isAssignableFrom(eventClass.getSuperclass())
 			) {
-				superMethod = getHandlerListMethod(eventClass.getSuperclass().asSubclass(Event.class));
+				return getHandlerListMethod(eventClass.getSuperclass().asSubclass(Event.class));
+			} else {
+				return null;
 			}
-		}
-		if (superMethod != null)
-			return superMethod;
-		try {
-			return eventClass.getDeclaredMethod("getHandlers");
-		} catch (NoSuchMethodException e) {
-			return null;
 		}
 	}
 
