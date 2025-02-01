@@ -1134,6 +1134,8 @@ public class SkriptParser {
 				i++;
 			} else if (character == '%') {
 				inExpression = !inExpression;
+			} else if (character == '\\' && !inExpression && string.charAt(i + 1) == '"') {
+				i++;
 			}
 		}
 		return -1;

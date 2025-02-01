@@ -150,13 +150,19 @@ public class VariableString implements Expression<String> {
 			boolean expression = false;
 			for (int i = 0; i < original.length(); i++) {
 				char c = original.charAt(i);
+				if (!expression && c == '\\' && original.charAt(i + 1) == '"') {
+					i++;
+					c = original.charAt(i);
+				}
+
 				stringBuilder.append(c);
 
 				if (c == '%')
 					expression = !expression;
 
-				if (!expression && c == '"')
+				if (!expression && c == '"' && i + 1 < original.length() && original.charAt(i + 1) == '"') {
 					i++;
+				}
 			}
 			original = stringBuilder.toString();
 		}
@@ -273,18 +279,21 @@ public class VariableString implements Expression<String> {
 		boolean percentage = false;
 		if (withQuotes)
 			string = string.substring(1, string.length() - 1);
-		for (char character : string.toCharArray()) {
+		for (int i = 0; i < string.length(); i++) {
+			char character = string.charAt(i);
 			if (percentage) {
 				if (character == '%')
 					percentage = false;
 				continue;
 			}
-			if (quote && character != '"')
+			if (quote && character != '"') {
 				return false;
-			if (character == '"') {
+			} else if (character == '"') {
 				quote = !quote;
 			} else if (character == '%') {
 				percentage = true;
+			} else if (character == '\\' && string.charAt(i + 1) == '"') {
+				i++;
 			}
 		}
 		return !quote;
