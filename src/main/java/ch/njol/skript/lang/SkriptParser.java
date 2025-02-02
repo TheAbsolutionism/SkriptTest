@@ -27,6 +27,7 @@ import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.patterns.TypePatternElement;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.registrations.Feature;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
@@ -246,6 +247,14 @@ public class SkriptParser {
 									String events = StringUtils.join(iterator, ", ", " or ");
 
 									Skript.error("'" + parseResult.expr + "' can only be used in " + events);
+									continue;
+								}
+							}
+							if (element instanceof ExperimentRestrictedSyntax experimentRestrictedSyntax) {
+								Feature feature = experimentRestrictedSyntax.requiredExperiment();
+								if (!getParser().hasExperiment(feature)) {
+									Skript.error("This syntax element is experimental. To enable this experiment, add "
+										+ "'using " + feature.codeName() + "' in this script outside all other code.");
 									continue;
 								}
 							}
