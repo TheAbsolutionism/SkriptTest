@@ -31,7 +31,6 @@ import org.skriptlang.skript.util.Priority;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * A useful class for creating default expressions. It simply returns the event value of the given type.
@@ -170,7 +169,10 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 					continue;
 				}
 				if (EventValues.hasMultipleConverters(event, type, getTime()) == Kleenean.TRUE) {
-					Noun typeName = Classes.getExactClassInfo(componentType).getName();
+					ClassInfo<?> classInfo = Classes.getExactClassInfo(componentType);
+					if (classInfo == null)
+						throw new IllegalStateException("No classinfo for: " + componentType);
+					Noun typeName = classInfo.getName();
 					log.printError("There are multiple " + typeName.toString(true) + " in " + Utils.a(getParser().getCurrentEventName()) + " event. " +
 						"You must define which " + typeName + " to use.");
 					return false;
@@ -215,36 +217,15 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	}
 
 	@Nullable
-	@SuppressWarnings("unchecked")
 	private <E extends Event> T getValue(E event) {
-		if (converters.containsKey(event.getClass())) {
-			final Converter<? super E, ? extends T> g = (Converter<? super E, ? extends T>) converters.get(event.getClass());
-			return g == null ? null : g.convert(event);
-		}
-
-		for (final Entry<Class<? extends Event>, Converter<?, ? extends T>> p : converters.entrySet()) {
-			if (p.getKey().isAssignableFrom(event.getClass())) {
-				converters.put(event.getClass(), p.getValue());
-				return p.getValue() == null ? null : ((Converter<? super E, ? extends T>) p.getValue()).convert(event);
-			}
-		}
-
-		converters.put(event.getClass(), null);
-
-		return null;
-	}
-
-	private <E extends Event, V> T getValue(EventContext<E, V> eventContext) {
+		EventContext<E, T> eventContext = EventValues.getEventContext(event, getTime());
 		//noinspection unchecked
-		EventValueContext<E, V> valueContext = eventContext.getEventValueContext((Class<V>) type);
+		EventValueContext<E, T> valueContext = eventContext.getEventValueContext((Class<T>) type);
 		if (valueContext == null || !valueContext.isSingleConverter())
 			return null;
 		if (original)
-			//noinspection unchecked
-			return (T) valueContext.getOriginalValue();
-		//noinspection unchecked
-		return (T) valueContext.getCurrentValue();
-
+			return valueContext.getOriginalValue();
+		return valueContext.getCurrentValue();
 	}
 
 	@Override

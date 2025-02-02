@@ -141,6 +141,19 @@ public class EventValues<E extends Event, T> {
 	}
 
 	/**
+	 * Get all template {@link EventContext}s provided by {@code eventClass} in all time states.
+	 * @param eventClass The class of the event
+	 * @return An {@link Arrays} of all template {@link EventContext}s
+	 */
+	public static <E extends Event, T> List<EventContext<E, T>> getEventContexts(Class<E> eventClass) {
+		List<EventContext<E, T>> eventContexts = new ArrayList<>();
+		eventContexts.add(getEventContext(eventClass, -1));
+		eventContexts.add(getEventContext(eventClass, 0));
+		eventContexts.add(getEventContext(eventClass, 1));
+		return eventContexts;
+	}
+
+	/**
 	 * Get a built {@link EventContext} provided by {@code event} in the present time state.
 	 * @param event An event
 	 * @return The built {@link EventContext}
@@ -155,12 +168,25 @@ public class EventValues<E extends Event, T> {
 	 * @param time The value of TIME_PAST if this is the value before the event, TIME_FUTURE if after, and TIME_NOW if it's the default or this value doesn't have distinct states.
 	 *             <b>Always register a default state!</b> You can leave out one of the other states instead, e.g. only register a default and a past state. The future state will
 	 *             default to the default state in this case.
-	 * @return The builded {@link EventContext}
+	 * @return The built {@link EventContext}
 	 */
 	public static <E extends Event, T> @NotNull EventContext<E, T> getEventContext(E event, int time) {
 		//noinspection unchecked
 		EventContext<E, T> eventContext = (EventContext<E, T>) getEventContext(event.getClass(), time);
 		return eventContext.buildContext(event);
+	}
+
+	/**
+	 * Get all {@link EventContext} provided by {@code eventCLass} in all time states
+	 * @param event An event
+	 * @return An {@link Arrays} of all built {@link EventContext}s
+	 */
+	public static <E extends Event, T> List<EventContext<E, T>> getEventContexts(E event) {
+		List<EventContext<E, T>> builtContexts = new ArrayList<>();
+		builtContexts.add(getEventContext(event, TIME_PAST));
+		builtContexts.add(getEventContext(event, TIME_NOW));
+		builtContexts.add(getEventContext(event, TIME_FUTURE));
+		return builtContexts;
 	}
 
 	/**
@@ -193,7 +219,7 @@ public class EventValues<E extends Event, T> {
 	 * @return true or false if the event and type have multiple {@link Converter}s.
 	 */
 	public static <E extends Event, T> Kleenean hasMultipleConverters(Class<E> eventClass, Class<T> valueClass, int time) {
-		List<Converter<? super E, ? extends T>> converters = getEventValueConverters(eventClass, valueClass, time, true);
+		List<Converter<? super E, ? extends T>> converters = getEventValueConverters(eventClass, valueClass, time, true, false);
 		if (converters == null)
 			return Kleenean.UNKNOWN;
 		return Kleenean.get(converters.size() > 1);
@@ -215,11 +241,30 @@ public class EventValues<E extends Event, T> {
 		Class<T> valueClass,
 		int time
 	) {
-		EventContext<E, T> eventContext = getEventContext(eventClass, time);
-		EventValueContext<E, T> valueContext = eventContext.getEventValueContext(valueClass);
-		if (valueContext == null || !valueContext.isSingleConverter())
-			return null;
-		return valueContext.getConverter();
+		EventContext<E, T> thisEventContext = getEventContext(eventClass, time);
+		EventValueContext<E, T> thisValueContext = thisEventContext.getEventValueContext(valueClass);
+		if (thisValueContext != null) {
+			if (!thisValueContext.checkExcluded(eventClass) || !thisValueContext.isSingleConverter())
+				return null;
+			return thisValueContext.getConverter();
+		}
+		Map<Class<? extends Event>, EventContext<? extends Event, ?>> eventContextMap = getEventContextMap(time);
+		Collection<EventContext<? extends Event, ?>> mapValues = eventContextMap.values();
+		for (EventContext<? extends Event, ?> eventContext : mapValues) {
+			for (EventValueContext<? extends Event, ?> valueContext : eventContext.getEventValueContexts()) {
+				if (!valueClass.equals(valueContext.getValueClass()))
+					continue;
+				if (!valueContext.checkExcluded(eventClass))
+					return null;
+				if (eventContext.getEventClass().isAssignableFrom(eventClass) && valueContext.isSingleConverter()) {
+					//noinspection unchecked
+					Converter<? super E, ? extends T> converter = (Converter<? super E, ? extends T>) valueContext.getConverter();
+					cacheEventValues(thisEventContext, valueClass, List.of(converter));
+					return converter;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -249,7 +294,7 @@ public class EventValues<E extends Event, T> {
 		int time,
 		boolean allowDefault
 	) {
-		@Nullable List<Converter<? super E, ? extends T>> converters = getEventValueConverters(eventClass, valueClass, time, allowDefault);
+		List<Converter<? super E, ? extends T>> converters = getEventValueConverters(eventClass, valueClass, time, allowDefault);
 		if (converters == null || converters.isEmpty())
 			return null;
 		return converters.get(0);
@@ -264,7 +309,7 @@ public class EventValues<E extends Event, T> {
 		return getEventValueConverters(eventClass, valueClass, time, allowDefault, true);
 	}
 
-	public static @Nullable <E extends Event, T> List<Converter<? super E, ? extends T>> getEventValueConverters(
+	private static @Nullable <E extends Event, T> List<Converter<? super E, ? extends T>> getEventValueConverters(
 		Class<E> eventClass,
 		Class<T> valueClass,
 		int time,
@@ -279,10 +324,7 @@ public class EventValues<E extends Event, T> {
 		EventValueContext<E, T> thisValueContext = thisEventContext.getEventValueContext(valueClass);
 		if (thisValueContext != null) {
 			return thisValueContext.getConverters();
-		} else if (thisEventContext.hasCached(valueClass)) {
-			return null;
 		}
-		thisEventContext.setCached(valueClass);
 
 		Map<Class<? extends Event>, EventContext<? extends Event, ?>> eventContextMap = getEventContextMap(time);
 		List<Converter<? super E, ? extends T>> converters = new ArrayList<>();
@@ -301,7 +343,7 @@ public class EventValues<E extends Event, T> {
 					return null;
 				if (eventContext.getEventClass().isAssignableFrom(eventClass)) {
 					//noinspection unchecked
-					converters.add((Converter<E, T>) valueContext.getConverter());
+					converters.add((Converter<? super E, ? extends T>) valueContext.getConverter());
 					continue;
 				}
 				if (!eventClass.isAssignableFrom(eventContext.getEventClass()))
@@ -383,8 +425,12 @@ public class EventValues<E extends Event, T> {
 			return cacheEventValues(thisEventContext, valueClass, converters);;
 
 		// 6. Start from 1. with the timestate of present, if allowed and the timestate wasn't already present.
-		if (allowDefault && time != 0)
-			return getEventValueConverters(eventClass, valueClass, 0, allowDefault, allowConvert);
+		if (allowDefault && time != TIME_NOW)
+			return cacheEventValues(
+				thisEventContext,
+				valueClass,
+				getEventValueConverters(eventClass, valueClass, TIME_NOW, allowDefault, allowConvert)
+			);
 		return null;
 	}
 
@@ -448,7 +494,7 @@ public class EventValues<E extends Event, T> {
 		private E event;
 		private final Class<E> eventClass;
 		private final List<EventValueContext<E, T>> valueContexts = new ArrayList<>();
-		private final List<Class<T>> cached = new ArrayList<>();
+		private final Map<Event, EventContext<E, T>> activeContexts = new HashMap<>();
 
 		public EventContext(Class<E> eventClass) {
 			this.eventClass = eventClass;
@@ -467,6 +513,9 @@ public class EventValues<E extends Event, T> {
 		 */
 		public EventContext<E, T> buildContext(Event event) {
 			assert eventClass.equals(event.getClass());
+			if (activeContexts.containsKey(event)) {
+				return activeContexts.get(event);
+			}
 			//noinspection unchecked
 			EventContext<E, T> newEventContext = new EventContext<E, T>((E) event, eventClass);
 			for (EventValueContext<E, T> valueContext : valueContexts) {
@@ -474,7 +523,17 @@ public class EventValues<E extends Event, T> {
 				EventValueContext<E, T> newValueContext = valueContext.buildContext((E) event);
 				newEventContext.addEventValueContext(newValueContext);
 			}
+			activeContexts.put(event, newEventContext);
 			return newEventContext;
+		}
+
+		/**
+		 * Mark this {@link EventContext} as inactive and unable to be accessed.
+		 * Should only be used by {@link ch.njol.skript.SkriptEventHandler}.
+		 */
+		public void offload() {
+			assert event != null;
+			activeContexts.remove(event);
 		}
 
 		public @Nullable E getEvent() {
@@ -508,23 +567,6 @@ public class EventValues<E extends Event, T> {
 
 		private void addEventValueContext(EventValueContext<E, T> valueContext) {
 			valueContexts.add(valueContext);
-		}
-
-		/**
-		 * Mark the class of an event-value of this {@link EventContext} as have been cached once.
-		 * @param valueClass The class of an event value
-		 */
-		private void setCached(Class<T> valueClass) {
-			cached.add(valueClass);
-		}
-
-		/**
-		 * Check if the class of an event-value has already been cached in this {@link EventContext}.
-		 * @param valueClass The class of an event value
-		 * @return True if cached
-		 */
-		private boolean hasCached(Class<T> valueClass) {
-			return cached.contains(valueClass);
 		}
 
 		/**
@@ -613,9 +655,7 @@ public class EventValues<E extends Event, T> {
 		private final List<Converter<? super E, ? extends T>> converters;
 		private final @Nullable String excludeMessage;
 		private final @Nullable Class<? extends E>[] excludedEvents;
-
 		private T originalValue;
-		private T currentValue;
 
 		public EventValueContext(
 			Class<E> eventClass,
@@ -663,10 +703,8 @@ public class EventValues<E extends Event, T> {
 			this.converters = converters;
 			this.excludeMessage = excludeMessage;
 			this.excludedEvents = excludedEvents;
-			if (isSingleConverter()) {
+			if (isSingleConverter())
 				originalValue = converters.get(0).convert(event);
-				currentValue = originalValue;
-			}
 		}
 
 		/**
@@ -744,13 +782,12 @@ public class EventValues<E extends Event, T> {
 		 * Can either be the same as {@link #getOriginalValue()} or different if changed through Skript.
 		 * @return
 		 */
-		public T getCurrentValue() {
-			return currentValue;
+		public @Nullable T getCurrentValue() {
+			if (isSingleConverter())
+				return converters.get(0).convert(event);
+			return null;
 		}
 
-		public void setEventValue(T newValue) {
-			currentValue = newValue;
-		}
 
 		/**
 		 * Check to see if the provided {@code checkClass} is excluded from this {@link EventValueContext}
