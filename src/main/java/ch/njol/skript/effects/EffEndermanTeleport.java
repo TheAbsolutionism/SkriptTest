@@ -34,8 +34,8 @@ public class EffEndermanTeleport extends Effect {
 			Skript.registerEffect(EffEndermanTeleport.class,
 				"make %livingentities% (randomly teleport|teleport randomly)",
 				"force %livingentities% to (randomly teleport|teleport randomly)",
-				"make %livingentities% teleport towards %entity%",
-				"force %livingentities% to teleport towards %entity%");
+				"make %livingentities% teleport [randomly] towards %entity%",
+				"force %livingentities% to teleport [randomly] towards %entity%");
 	}
 
 	private Expression<LivingEntity> entities;
