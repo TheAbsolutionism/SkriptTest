@@ -6,7 +6,7 @@ import ch.njol.util.Kleenean;
 /**
  * A syntax element that requires an experimental feature to be enabled.
  */
-public interface ExperimentRestrictedSyntax {
+public interface ExperimentalSyntax extends SyntaxElement {
 
 	/**
 	 * Returns the experiment {@link Feature} required for this syntax to be used.

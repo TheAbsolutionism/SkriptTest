@@ -5,7 +5,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.ExperimentRestrictedSyntax;
+import ch.njol.skript.lang.ExperimentalSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -44,7 +44,7 @@ import java.util.Iterator;
 		broadcast the first 2 elements of {queue} # removes 'hello', 'world'"""
 })
 @Since("2.10 (experimental)")
-public class ExprQueue extends SimpleExpression<SkriptQueue> implements ExperimentRestrictedSyntax {
+public class ExprQueue extends SimpleExpression<SkriptQueue> implements ExperimentalSyntax {
 
 	static {
 		Skript.registerExpression(ExprQueue.class, SkriptQueue.class, ExpressionType.COMBINED,

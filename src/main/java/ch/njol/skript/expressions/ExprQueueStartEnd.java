@@ -6,7 +6,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.ExperimentRestrictedSyntax;
+import ch.njol.skript.lang.ExperimentalSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.Feature;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 	broadcast the first element of {queue} # hello
 	# queue is now empty""")
 @Since("2.10 (experimental)")
-public class ExprQueueStartEnd extends SimplePropertyExpression<SkriptQueue, Object> implements ExperimentRestrictedSyntax {
+public class ExprQueueStartEnd extends SimplePropertyExpression<SkriptQueue, Object> implements ExperimentalSyntax {
 
 	static {
 		register(ExprQueueStartEnd.class, Object.class, "(:start|end)", "queue");

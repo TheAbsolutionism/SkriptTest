@@ -8,7 +8,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.lang.ExperimentRestrictedSyntax;
+import ch.njol.skript.lang.ExperimentalSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
@@ -50,7 +50,7 @@ import java.util.Map;
 	"\tbroadcast \"%{_index}% = %{_value}%\"",
 })
 @Since("2.10")
-public class SecFor extends SecLoop implements ExperimentRestrictedSyntax {
+public class SecFor extends SecLoop implements ExperimentalSyntax {
 
 	static {
 		Skript.registerSection(SecFor.class,

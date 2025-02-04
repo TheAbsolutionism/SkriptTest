@@ -4,7 +4,7 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.lang.ExperimentRestrictedSyntax;
+import ch.njol.skript.lang.ExperimentalSyntax;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.function.FunctionEvent;
@@ -28,7 +28,7 @@ import org.skriptlang.skript.lang.structure.Structure;
 		# this is never run"""
 })
 @Since("2.10")
-public class StructExample extends Structure implements ExperimentRestrictedSyntax {
+public class StructExample extends Structure implements ExperimentalSyntax {
 
 	public static final Priority PRIORITY = new Priority(550);
 

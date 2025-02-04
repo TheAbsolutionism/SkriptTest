@@ -250,11 +250,11 @@ public class SkriptParser {
 									continue;
 								}
 							}
-							if (element instanceof ExperimentRestrictedSyntax experimentRestrictedSyntax) {
-								Feature feature = experimentRestrictedSyntax.requiredExperiment();
+							if (element instanceof ExperimentalSyntax experimentalSyntax) {
+								Feature feature = experimentalSyntax.requiredExperiment();
 								if (!getParser().hasExperiment(feature)) {
 									Skript.error("This syntax element is experimental. To enable this experiment, add "
-										+ "'using " + feature.codeName() + "' in this script outside all other code.");
+										+ "'using " + feature.codeName() + "' at the top of this file.");
 									continue;
 								}
 							}
