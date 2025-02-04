@@ -629,8 +629,9 @@ public final class BukkitEventValues {
 			EntityEquipment equipment = event.getEntity().getEquipment();
 			if (equipment == null || hand == null)
 				return null;
-			return new ch.njol.skript.util.slot.EquipmentSlot(equipment,
-				(hand == EquipmentSlot.HAND) ? EquipmentSlot.HAND : EquipmentSlot.OFF_HAND);
+			if (hand == EquipmentSlot.HAND)
+				return new ch.njol.skript.util.slot.EquipmentSlot(equipment, EquipmentSlot.HAND);
+			return new ch.njol.skript.util.slot.EquipmentSlot(equipment, EquipmentSlot.OFF_HAND);
 		});
 
 		// PlayerItemHeldEvent
