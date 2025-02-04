@@ -59,9 +59,9 @@ public class EvtRealTime extends SkriptEvent {
 		for (Time time : times.getArray()) {
 			Calendar expectedCalendar = Calendar.getInstance();
 			expectedCalendar.setTimeZone(TimeZone.getDefault());
-			expectedCalendar.set(Calendar.MINUTE, time.getMinute());
-			expectedCalendar.set(Calendar.SECOND, 0);
 			expectedCalendar.set(Calendar.MILLISECOND, 0);
+			expectedCalendar.set(Calendar.SECOND, 0);
+			expectedCalendar.set(Calendar.MINUTE, time.getMinute());
 			expectedCalendar.set(Calendar.HOUR_OF_DAY, time.getHour());
 			// Ensure the execution time is in the future and not the past
 			while (expectedCalendar.before(currentCalendar)) {
@@ -89,16 +89,6 @@ public class EvtRealTime extends SkriptEvent {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean isEventPrioritySupported() {
-		return false;
-	}
-
-	@Override
-	public String toString(@Nullable Event event, boolean debug) {
-		return "at " + times.toString(event, debug) + " in real time";
-	}
-
 	private void execute() {
 		RealTimeEvent event = new RealTimeEvent();
 		SkriptEventHandler.logEventStart(event);
@@ -109,7 +99,7 @@ public class EvtRealTime extends SkriptEvent {
 	}
 
 	private void preExecute(RealTimeInfo info) {
-		// Safety check, ensure this 'EvtServerTime' was not unloaded
+		// Safety check, ensure this 'EvtRealTime' was not unloaded
 		if (unloaded)
 			return;
 		// Bump the next execution time by the appropriate amount
@@ -129,6 +119,16 @@ public class EvtRealTime extends SkriptEvent {
 		};
 		info.task = task;
 		TIMER.schedule(task, new Date(info.executionTime));
+	}
+
+	@Override
+	public boolean isEventPrioritySupported() {
+		return false;
+	}
+
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return "at " + times.toString(event, debug) + " in real time";
 	}
 
 	private static class RealTimeInfo {

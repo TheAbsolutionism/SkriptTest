@@ -28,25 +28,21 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	private final static int HOUR_ZERO = 6 * TICKS_PER_HOUR;
 	
 	private final int time;
-	private int hour;
-	private int minute;
-	private TimeFormat timeFormat;
+	private final TimeFormat timeFormat;
 
 	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile("\\d?\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
 
 	public Time() {
-		time = 0;
+		this(0);
 	}
 
 	public Time(int time) {
-		this.time = time;
+		this(time, TimeFormat.TWENTY_FOUR_HOURS);
 	}
 	
-	public Time(int time, int hour, int minute, TimeFormat timeFormat) {
+	public Time(int time, TimeFormat timeFormat) {
 		this.time = Math2.mod(time, TICKS_PER_DAY);
-		this.hour = hour;
-		this.minute = minute;
 		this.timeFormat = timeFormat;
 	}
 	
@@ -65,14 +61,19 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	}
 
 	public int getHour() {
+        int hour = (int) Math2.floor((double) (time + HOUR_ZERO) / TICKS_PER_HOUR);
+		if (hour > 24)
+			hour -= 24;
 		return hour;
 	}
 
 	public int getMinute() {
-		return minute;
+		int hour = getHour();
+		int remain = (time + HOUR_ZERO) - (hour * TICKS_PER_HOUR);
+        return (int) Math2.round(remain / TICKS_PER_MINUTE);
 	}
 
-	public TimeFormat getTimeState() {
+	public TimeFormat getTimeFormat() {
 		return timeFormat;
 	}
 
@@ -121,7 +122,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 				Skript.error("" + m_error_60_minutes);
 				return null;
 			}
-			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, TimeFormat.TWENTY_FOUR_HOURS);
+			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), TimeFormat.TWENTY_FOUR_HOURS);
 		} else {
 			final Matcher m = DAY_TIME_PATTERN.matcher(s);
 			if (m.matches()) {
@@ -139,12 +140,12 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 					Skript.error("" + m_error_60_minutes);
 					return null;
 				}
-				TimeFormat state = TimeFormat.AM;
+				TimeFormat format = TimeFormat.AM;
 				if (m.group(4).equalsIgnoreCase("pm")) {
 					hours += 12;
-					state = TimeFormat.PM;
+					format = TimeFormat.PM;
 				}
-				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), hours, minutes, state);
+				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), format);
 			}
 		}
 		return null;
