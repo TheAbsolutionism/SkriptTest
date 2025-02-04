@@ -105,11 +105,14 @@ public class CondIsWithin extends Condition {
 						BoundingBox entityBox = entity.getBoundingBox();
 						return entityBox.contains(location.toVector());
 					} else if (object instanceof Block block) {
+						// getCollisionShape().getBoundingBoxes() returns a list of bounding boxes relative to the blocks' position,
+						// so we need to subtract the block position from each location.
 						for (BoundingBox blockBox : block.getCollisionShape().getBoundingBoxes()) {
 							Vector blockVector = block.getLocation().toVector();
 							if (!blockBox.contains(location.toVector().subtract(blockVector)))
 								return false;
 						}
+						// if this location is within the block, return true
 						return true;
 					} else if (object instanceof Chunk chunk) {
 						return location.getChunk().equals(chunk);
