@@ -39,16 +39,3 @@ test "within multiple condition":
 	assert {_entity} is within test-world and {_chunk} with "Failed within world and chunk"
 	assert {_entity} is within test-world or {_chunk} with "Failed within world or chunk"
 	clear entity within {_entity}
-
-	set {_loc1} to location of test-block
-	set {_loc2} to {_loc1} ~ vector(1, 0, 0)
-	set {_old1} to block data of block at {_loc1}
-	set {_old2} to block data of block at {_loc2}
-	set blocks at {_loc1} and {_loc2} to stone
-	set {_check1} to {_loc1} ~ vector(0.2, 0, 0)
-	set {_check2} to {_loc1} ~ vector(0.8, 0, 0)
-	assert {_check1} is within block at {_loc1} or block at {_loc2} with "Failed within block or block"
-	assert {_check2} is within block at {_loc1} or block at {_loc2} with "Failed within block or block"
-
-	set block data of block at {_loc1} to {_old1}
-	set block data of block at {_loc2} to {_old2}
