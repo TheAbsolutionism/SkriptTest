@@ -15,8 +15,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 @Name("Allay Duplication Cooldown")
 @Description({
 	"The cooldown time until an allay can duplicate again naturally.",
@@ -54,24 +52,24 @@ public class ExprDuplicateCooldown extends SimplePropertyExpression<LivingEntity
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		long ticks = delta == null ? 0 : ((Timespan) delta[0]).getAs(TimePeriod.TICK);
-		Consumer<Allay> consumer = switch (mode) {
-			case SET, DELETE -> allay -> allay.setDuplicationCooldown(ticks);
-			case ADD -> allay -> {
-				long current = allay.getDuplicationCooldown();
-				long value = Math2.fit(0, current + ticks, Long.MAX_VALUE);
-				allay.setDuplicationCooldown(value);
-			};
-			case REMOVE -> allay -> {
-				long current = allay.getDuplicationCooldown();
-				long value = Math2.fit(0, current - ticks, Long.MAX_VALUE);
-				allay.setDuplicationCooldown(value);
-			};
-			case RESET -> Allay::resetDuplicationCooldown;
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		};
+		ticks = Math2.fit(0, ticks, Long.MAX_VALUE);
 		for (LivingEntity entity : getExpr().getArray(event)) {
-			if (entity instanceof Allay allay)
-				consumer.accept(allay);
+			if (!(entity instanceof Allay allay))
+				continue;
+			switch (mode) {
+				case SET, DELETE -> allay.setDuplicationCooldown(ticks);
+				case ADD -> {
+					long current = allay.getDuplicationCooldown();
+					long value = Math2.fit(0, current + ticks, Long.MAX_VALUE);
+					allay.setDuplicationCooldown(value);
+				}
+				case REMOVE -> {
+					long current = allay.getDuplicationCooldown();
+					long value = Math2.fit(0, current - ticks, Long.MAX_VALUE);
+					allay.setDuplicationCooldown(value);
+				}
+				case RESET -> allay.resetDuplicationCooldown();
+			}
 		}
 	}
 

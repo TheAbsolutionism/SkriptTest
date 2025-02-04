@@ -32,7 +32,7 @@ public class EffAllayDancing extends Effect {
 
 	static {
 		Skript.registerEffect(EffAllayDancing.class,
-			"make %livingentities% (start dancing|dance) [from %-direction% %-location%]",
+			"make %livingentities% (start dancing|dance) [%-direction% %-location%]",
 			"make %livingentities% (stop dancing|not dance)");
 	}
 
@@ -47,10 +47,7 @@ public class EffAllayDancing extends Effect {
 		start = matchedPattern == 0;
 		if (start && exprs[1] != null) {
 			//noinspection unchecked
-			Expression<Direction> direction = (Expression<Direction>) exprs[1];
-			//noinspection unchecked
-			Expression<Location> location = (Expression<Location>) exprs[2];
-			this.location = Direction.combine(direction, location);
+			location = Direction.combine((Expression<Direction>) exprs[1], (Expression<Location>) exprs[2]);
 		}
 		return true;
 	}
@@ -60,8 +57,6 @@ public class EffAllayDancing extends Effect {
 		Location location = null;
 		if (this.location != null) {
 			location = this.location.getSingle(event);
-			//if (location == null)
-				// Runtime warning;
 		}
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (!(entity instanceof Allay allay))
@@ -89,7 +84,7 @@ public class EffAllayDancing extends Effect {
 		}
 		builder.append("dancing");
 		if (location != null)
-			builder.append("from", location);
+			builder.append(location);
 		return builder.toString();
 	}
 

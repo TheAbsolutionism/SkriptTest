@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 })
 @Examples({
 	"allow all allays to duplicate",
-	"disallow all allays to duplicate"
+	"prevent all allays from duplicating"
 })
 @Since("INSERT VERSION")
 public class EffAllayCanDuplicate extends Effect {
@@ -29,8 +29,7 @@ public class EffAllayCanDuplicate extends Effect {
 	static {
 		Skript.registerEffect(EffAllayCanDuplicate.class,
 			"allow %livingentities% to (duplicate|clone)",
-			"disallow %livingentities% to (duplicate|clone)",
-			"(disallow|prevent) %livingentities% from (duplicating|cloning)");
+			"prevent %livingentities% from (duplicating|cloning)");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -54,7 +53,9 @@ public class EffAllayCanDuplicate extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (duplicate ? "allow " : "disallow ") + entities.toString(event, debug) + " to duplicate";
+		if (duplicate)
+			return "allow " + entities.toString(event, debug) + " to duplicate";
+		return "prevent " + entities.toString(event, debug) + " from duplicating";
 	}
 
 }
