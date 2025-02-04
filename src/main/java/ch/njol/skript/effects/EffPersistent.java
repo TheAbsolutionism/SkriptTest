@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Leaves;
@@ -20,20 +19,21 @@ import org.jetbrains.annotations.Nullable;
 @Description({
 	"Make entities, players, or leaves be persistent.",
 	"Persistence of entities is whether they are retained through server restarts.",
-	"Persistence of leaves is whether they should decay.",
+	"Persistence of leaves is whether they should decay when not connected to a log block within 6 meters.",
 	"Persistence of players is if the player's playerdata should be saved when they leave the server. "
-		+ "Players persistence is reset back to 'true' when they join the server.",
-	"Any entity riding an entity that is not persistent, will make the rider not persistent.",
+		+ "Players' persistence is reset back to 'true' when they join the server.",
+	"Passengers inherit the persistence of their vehicle, meaning a persistent zombie put on a "
+		+ "non-persistent chicken will become non-persistent. This does not apply to players.",
 	"By default, all entities are persistent."
 })
 @Examples({
-	"make all entities not persistent",
+	"prevent all entities from persisting",
 	"force {_leaves} to persist",
 	"",
 	"command /kickcheater <cheater: player>:",
 		"\tpermission: op",
 		"\ttrigger:",
-			"\t\tmake {_cheater} not persistent",
+			"\t\tprevent {_cheater} from persisting",
 			"\t\tkick {_cheater}"
 })
 @Since("INSERT VERSION")
@@ -41,8 +41,9 @@ public class EffPersistent extends Effect {
 
 	static {
 		Skript.registerEffect(EffPersistent.class,
-			"make %entities/blocks% [:not] persist[ent]",
-			"force %entities/blocks% to [:not] persist");
+			"make %entities/blocks% persist[ent]",
+			"force %entities/blocks% to persist",
+			"prevent %entities/blocks% from persisting");
 	}
 
 	private Expression<?> source;
@@ -51,7 +52,7 @@ public class EffPersistent extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		source = exprs[0];
-		persist = !parseResult.hasTag("not");
+		persist = matchedPattern != 2;
 		return true;
 	}
 
@@ -69,12 +70,9 @@ public class EffPersistent extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("make", source);
-		if (!persist)
-			builder.append("not");
-		builder.append("persistent");
-		return builder.toString();
+		if (persist)
+			return "make " + source.toString(event, debug) + " persistent";
+		return "prevent " + source.toString(event, debug) + " from persisting";
 	}
 
 }

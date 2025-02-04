@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
@@ -29,8 +28,9 @@ public class EffEntityUnload extends Effect {
 
 	static {
 		Skript.registerEffect(EffEntityUnload.class,
-			"make %livingentities% [:not] despawn[able] (on chunk unload|when far away)",
-			"force %livingentities% to [:not] despawn (on chunk unload|when far away)");
+			"make %livingentities% despawn[able] (on chunk unload|when far away)",
+			"force %livingentities% to despawn (on chunk unload|when far away)",
+			"prevent %livingentities% from despawning [on chunk unload|when far away]");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -40,7 +40,7 @@ public class EffEntityUnload extends Effect {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		despawn = !parseResult.hasTag("not");
+		despawn = matchedPattern != 2;
 		return true;
 	}
 
@@ -53,13 +53,9 @@ public class EffEntityUnload extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("make", entities);
-		if (!despawn)
-			builder.append("not");
-		builder.append("despawn on chunk unload");
-		return builder.toString();
+		if (despawn)
+			return "make " + entities.toString(event, debug) + " despawn on chunk unload";
+		return "prevent " + entities.toString(event, debug) + " from despawning on chunk unload";
 	}
-
 
 }

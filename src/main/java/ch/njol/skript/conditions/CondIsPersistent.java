@@ -13,10 +13,11 @@ import org.bukkit.entity.Entity;
 @Description({
 	"Whether entities, players, or leaves are persistent.",
 	"Persistence of entities is whether they are retained through server restarts.",
-	"Persistence of leaves is whether they should decay.",
+	"Persistence of leaves is whether they should decay when not connected to a log block within 6 meters.",
 	"Persistence of players is if the player's playerdata should be saved when they leave the server. "
-		+ "Players persistence is reset back to 'true' when they join the server.",
-	"Any entity riding an entity that is not persistent, will make the rider not persistent.",
+		+ "Players' persistence is reset back to 'true' when they join the server.",
+	"Passengers inherit the persistence of their vehicle, meaning a persistent zombie put on a "
+		+ "non-persistent chicken will become non-persistent. This does not apply to players.",
 	"By default, all entities are persistent."
 })
 @Examples({
