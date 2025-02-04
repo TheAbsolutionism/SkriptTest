@@ -6,9 +6,9 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.Nullable;
 
 public class EvtPlayerArmorChange extends SkriptEvent {
@@ -30,17 +30,17 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 		}
 	}
 
-	private @Nullable Literal<EquipSlot> slotLiteral;
-	private @Nullable EquipSlot[] slots = null;
+	private @Nullable Literal<EquipmentSlot> slotLiteral;
+	private @Nullable EquipmentSlot[] slots = null;
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
 		if (args[0] != null) {
 			//noinspection unchecked
-			slotLiteral = (Literal<EquipSlot>) args[0];
+			slotLiteral = (Literal<EquipmentSlot>) args[0];
 			slots = slotLiteral.getArray();
-			for (EquipSlot slot : slots) {
-				if (slot == EquipSlot.TOOL || slot == EquipSlot.OFF_HAND || slot == EquipSlot.BODY) {
+			for (EquipmentSlot slot : slots) {
+				if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || slot == EquipmentSlot.BODY) {
 					Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
 					return false;
 				}
@@ -55,13 +55,13 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			return false;
 		if (slots == null || slots.length == 0)
 			return true;
-		EquipSlot changedSlot = switch (changeEvent.getSlotType()) {
-			case HEAD -> EquipSlot.HELMET;
-			case CHEST -> EquipSlot.CHESTPLATE;
-			case LEGS -> EquipSlot.LEGGINGS;
-			case FEET -> EquipSlot.BOOTS;
+		EquipmentSlot changedSlot = switch (changeEvent.getSlotType()) {
+			case HEAD -> EquipmentSlot.HEAD;
+			case CHEST -> EquipmentSlot.CHEST;
+			case LEGS -> EquipmentSlot.LEGS;
+			case FEET -> EquipmentSlot.FEET;
 		};
-		for (EquipSlot slot : slots) {
+		for (EquipmentSlot slot : slots) {
 			if (slot == changedSlot)
 				return true;
 		}
