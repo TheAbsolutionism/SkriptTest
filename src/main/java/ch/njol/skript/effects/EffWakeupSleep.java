@@ -22,7 +22,9 @@ import org.skriptlang.skript.log.runtime.SyntaxRuntimeErrorProducer;
 @Description({
 	"Make bats and foxes sleep or wake up.",
 	"Make villagers sleep by providing a location of a bed.",
-	"Make players sleep by providing a location of a bed and 'with force' to bypass nearby monsters.",
+	"Make players sleep by providing a location of a bed. "
+		+ "Using 'with force' will bypass \"nearby monsters\" and the max distance, making players go to sleep if the bed "
+		+ "is far away or in another world.",
 	"Using 'without spawn location update' will make players wake up without setting their spawn location to the bed."
 })
 @Examples({
@@ -39,12 +41,12 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 		Skript.registerEffect(EffWakeupSleep.class,
 			"make %livingentities% (start sleeping|[go to] sleep) [%-direction% %-location%]",
 			"force %livingentities% to (start sleeping|[go to] sleep) [%-direction% %-location%]",
-			"make %players% (start sleeping|[go to] sleep) %direction% %location% [force:with force]",
-			"force %players% to (start sleeping|[go to] sleep) %direction% %location% [force:with force]",
+			"make %players% (start sleeping|[go to] sleep) %direction% %location% (force:with force)",
+			"force %players% to (start sleeping|[go to] sleep) %direction% %location% (force:with force)",
 			"make %livingentities% (stop sleeping|wake up)",
 			"force %livingentities% to (stop sleeping|wake up)",
-			"make %players% (stop sleeping|wake up) [spawn:without spawn [location] update]",
-			"force %players% to (stop sleeping|wake up) [spawn:without spawn [location] update]");
+			"make %players% (stop sleeping|wake up) (spawn:without spawn [location] update)",
+			"force %players% to (stop sleeping|wake up) (spawn:without spawn [location] update)");
 	}
 
 	private Expression<LivingEntity> entities;
@@ -65,10 +67,7 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 			if (exprs[2] == null)
 				return false;
 			//noinspection unchecked
-			Expression<Direction> direction = (Expression<Direction>) exprs[1];
-			//noinspection unchecked
-			Expression<Location> location = (Expression<Location>) exprs[2];
-			this.location = Direction.combine(direction, location);
+			this.location = Direction.combine((Expression<Direction>) exprs[1], (Expression<Location>) exprs[2]);
 		}
 		node = getParser().getNode();
 		return true;
@@ -77,26 +76,38 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 	@Override
 	protected void execute(Event event) {
 		Location location = null;
-		if (this.location != null) {
+		if (this.location != null)
 			location = this.location.getSingle(event);
-			if (location == null)
-				warning("The provided location is not set. This effect will have no effect for villagers and players.");
-		}
+		boolean warned = false;
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Bat bat) {
 				bat.setAwake(!sleep);
 			} else if (entity instanceof Villager villager) {
+				if (sleep && location == null) {
+					if (!warned) {
+						warned = true;
+						warning("The provided location is not set. This effect will have no effect for villagers and players.");
+					}
+					continue;
+				}
 				if (!sleep) {
 					villager.wakeup();
-				} else if (location != null) {
+				} else {
 					villager.sleep(location);
 				}
 			} else if (entity instanceof Fox fox) {
 				fox.setSleeping(sleep);
 			} else if (entity instanceof HumanEntity humanEntity) {
+				if (sleep && location == null) {
+					if (!warned) {
+						warned = true;
+						warning("The provided location is not set. This effect will have no effect for villagers and players.");
+					}
+					continue;
+				}
 				if (!sleep) {
 					humanEntity.wakeup(setSpawn);
-				} else if (location != null) {
+				} else {
 					humanEntity.sleep(location, force);
 				}
 			}
