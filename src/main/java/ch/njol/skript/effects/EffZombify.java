@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Kleenean;
@@ -18,15 +19,27 @@ import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Function;
+
 @Name("Zombify Villager")
 @Description({
 	"Turn a villager into a zombie villager. Cure a zombie villager immediately or after specified amount of time.",
-	"This effect removes the old entity and creates a new entity. Using a variable with an entity stored in it, will not change the variable to the new entity."
+	"This effect removes the old entity and creates a new entity.",
+	"Zombifying a villager stored in a variable will update the variable to the new zombie villager.",
+	"Curing a zombie villager does not update the variable."
 })
 @Examples({
+	"zombify last spawned villager",
+	"",
+	"set {_villager} to last spawned villager",
 	"zombify {_villager}",
-	"if {_villager} is a villager:",
-		"\t# This will pass because '{_villager}' does not change to the zombie villager",
+	"if {_villager} is a zombie villager:",
+		"\t# This will pass because '{_villager}' gets changed to the new zombie villager",
+	"",
+	"set {_villager} to last spawned villager",
+	"zombify last spawned villager",
+	"if {_villager} is a zombie villager:",
+		"\t# This will fail because the variable was not provided when zombifying",
 	"",
 	"unzombify {_zombieVillager}",
 	"unzombify {_zombieVillager} after 2 seconds"
@@ -64,11 +77,24 @@ public class EffZombify extends Effect {
 			if (timespan != null)
 				ticks = (int) timespan.getAs(TimePeriod.TICK);
 		}
-		for (LivingEntity entity : entities.getAll(event)) {
-			if (zombify && entity instanceof Villager villager) {
-				villager.zombify();
-			} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
-				zombieVillager.setConversionTime(ticks);
+		int finalTicks = ticks;
+		if (entities instanceof Variable<LivingEntity> variable) {
+			Function<LivingEntity, LivingEntity> changeFunction = entity -> {
+				if (zombify && entity instanceof Villager villager) {
+					return villager.zombify();
+				} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
+					zombieVillager.setConversionTime(finalTicks);
+				}
+				return entity;
+			};
+			variable.changeInPlace(event, changeFunction);
+		} else {
+			for (LivingEntity entity : entities.getAll(event)) {
+				if (zombify && entity instanceof Villager villager) {
+					villager.zombify();
+				} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
+					zombieVillager.setConversionTime(finalTicks);
+				}
 			}
 		}
 	}

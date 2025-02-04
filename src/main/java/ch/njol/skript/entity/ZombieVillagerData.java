@@ -18,8 +18,9 @@ public class ZombieVillagerData extends EntityData<ZombieVillager> {
 
 	static {
 		EntityData.register(ZombieVillagerData.class, "zombie villager", ZombieVillager.class, 0,
-			"zombie villager", "zombie normal", "zombie armorer", "zombie butcher", "zombie cartographer", "zombie cleric", "zombie farmer", "zombie fisherman",
-			"zombie fletcher", "zombie leatherworker", "zombie librarian", "zombie mason", "zombie nitwit", "zombie shepherd", "zombie toolsmith", "zombie weaponsmith");
+			"zombie villager", "zombie normal", "zombie armorer", "zombie butcher", "zombie cartographer",
+			"zombie cleric", "zombie farmer", "zombie fisherman", "zombie fletcher", "zombie leatherworker",
+			"zombie librarian", "zombie mason", "zombie nitwit", "zombie shepherd", "zombie toolsmith", "zombie weaponsmith");
 		professions = Arrays.asList(Profession.NONE, Profession.ARMORER, Profession.BUTCHER, Profession.CARTOGRAPHER,
 			Profession.CLERIC, Profession.FARMER, Profession.FISHERMAN, Profession.FLETCHER, Profession.LEATHERWORKER,
 			Profession.LIBRARIAN, Profession.MASON, Profession.NITWIT, Profession.SHEPHERD, Profession.TOOLSMITH,
