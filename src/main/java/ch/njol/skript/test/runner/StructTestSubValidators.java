@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
 import org.skriptlang.skript.lang.entry.EntryValidator.SubContainerBuilder;
-import org.skriptlang.skript.lang.entry.SubContainerEntryData;
+import org.skriptlang.skript.lang.entry.ContainerEntryData;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
 
@@ -24,13 +24,13 @@ public class StructTestSubValidators extends Structure {
 		if (TestMode.ENABLED)
 			Skript.registerStructure(StructTestSubValidators.class,
 				EntryValidator.builder()
-					.addEntryData(new SubContainerEntryData("sub validator 1", false,
+					.addEntryData(new ContainerEntryData("sub validator 1", false,
 						new SubContainerBuilder()
 							.addSection("sub section", false)
 					))
-					.addEntryData(new SubContainerEntryData("sub validator 2", false,
+					.addEntryData(new ContainerEntryData("sub validator 2", false,
 						new SubContainerBuilder()
-							.addEntryData(new SubContainerEntryData("sub sub validator", false,
+							.addEntryData(new ContainerEntryData("sub sub validator", false,
 								new SubContainerBuilder()
 									.addSection("sub sub section", false)
 							))

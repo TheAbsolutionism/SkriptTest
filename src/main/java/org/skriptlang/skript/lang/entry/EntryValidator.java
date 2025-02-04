@@ -85,12 +85,6 @@ public class EntryValidator {
 			while (iterator.hasNext()) {
 				EntryData<?> data = iterator.next();
 				if (data.canCreateWith(node)) { // Determine if it's a match
-					if (data instanceof SubContainerEntryData subContainer) {
-						if (!subContainer.validate((SectionNode) node)) {
-							ok = false;
-							continue;
-						}
-					}
 					handledNodes.put(data.getKey(), node); // This is a known node, mark it as such
 					iterator.remove();
 					continue nodeLoop;
