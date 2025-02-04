@@ -1,0 +1,30 @@
+options:
+	test: "org.skriptlang.skript.test.tests.syntaxes.events.EffGoatHornsTest"
+
+test {@test} when running JUnit:
+	ensure {@test} completes "Finished"
+
+on world load:
+	junit test is {@test}
+	broadcast "Called"
+	spawn a goat at test-location:
+		set {_entity} to entity
+	regrow both horns of {_entity}
+	remove the left horn of {_entity}
+	wait a tick
+	assert {_entity} does not have a left horn with "Goat should not have a left horn"
+	assert {_entity} has a right horn with "Goat should still have a right horn"
+	remove the right horn of {_entity}
+	wait a tick
+	assert {_entity} does not have both horns with "Goat should not have both horns"
+	replace the left horn of {_entity}
+	wait a tick
+	assert {_entity} has a left horn with "Goat should have a left horn"
+	assert {_entity} does not have a right horn with "Goat should still not have a right horn"
+	assert {_entity} has any horn with "Goat should have any horn"
+	regrow both horns of {_entity}
+	wait a tick
+	assert {_entity} has both horns with "Goat should have both horns"
+	clear entity within {_entity}
+	complete objective "Finished" for {@test}
+	broadcast "Done???"

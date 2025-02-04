@@ -15,29 +15,31 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Make Goat Have Horns")
+@Name("Goat Horns")
 @Description("Make a goat have or not have a left, right, or both horns.")
 @Examples({
-	"make last spawned goat not have both horns",
-	"force {_goat} to have a left horn",
-	"make all goats have a right horn"
+	"remove the left horn of last spawned goat",
+	"regrow {_goat}'s horns",
+	"remove both horns of all goats"
 })
 @Since("INSERT VERSION")
 public class EffGoatHorns extends Effect {
 
 	public enum GoatHorn {
-		LEFT, RIGHT, BOTH
+		LEFT, RIGHT, BOTH, ANY
 	}
 
 	static {
 		Skript.registerEffect(EffGoatHorns.class,
-			"make %livingentities% [:not] have ([a] left horn|right:[a] right horn|both:both horns)",
-			"force %livingentities% to [:not] have ([a] left horn|right:[a] right horn|both:both horns)");
+			"remove [the] (left horn|right:right horn|both:both horns) of %livingentities%",
+			"remove %livingentities%'[s] (left horn|right:right horn|both:horns)",
+			"(regrow|replace) [the] (left horn|right:right horn|both:both horns) of %livingentities%",
+			"(regrow|replace) %livingentities%'[s] (left horn|right:right horn|both:horns)");
 	}
 
 	private Expression<LivingEntity> entities;
 	private GoatHorn goatHorn = GoatHorn.LEFT;
-	private boolean have;
+	private boolean remove;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -48,7 +50,7 @@ public class EffGoatHorns extends Effect {
 		}
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		have = !parseResult.hasTag("not");
+		remove = matchedPattern <= 1;
 		return true;
 	}
 
@@ -57,9 +59,9 @@ public class EffGoatHorns extends Effect {
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Goat goat) {
 				if (goatHorn != GoatHorn.RIGHT)
-					goat.setLeftHorn(have);
+					goat.setLeftHorn(remove);
 				if (goatHorn != GoatHorn.LEFT)
-					goat.setRightHorn(have);
+					goat.setRightHorn(remove);
 			}
 		}
 	}
@@ -67,15 +69,18 @@ public class EffGoatHorns extends Effect {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("make", entities);
-		if (!have)
-			builder.append("not");
-		builder.append("have");
+		if (remove) {
+			builder.append("remove");
+		} else {
+			builder.append("regrow");
+		}
 		builder.append(switch (goatHorn) {
-			case LEFT -> "a left horn";
-			case RIGHT -> "a right horn";
+			case LEFT -> "the left horn";
+			case RIGHT -> "the right horn";
 			case BOTH -> "both horns";
+			case ANY -> "any horn";
 		});
+		builder.append("of", entities);
 		return builder.toString();
 	}
 

@@ -30,18 +30,20 @@ public class CondGoatHorns extends Condition {
 
 	static {
 		Skript.registerCondition(CondGoatHorns.class,
-			"%livingentities% (has|have) ([a] left horn|right:[a] right horn|both:both horns)",
-			"%livingentities% (does not|doesn't) have ([a] left horn|right:[a] right horn|both:both horns)");
+			"%livingentities% (has|have) ((any|a) horn|left:[a] left horn|right:[a] right horn|both:both horns)",
+			"%livingentities% (does not|doesn't) have ((any|a) horn|left:[a] left horn|right:[a] right horn|both:both horns)");
 	}
 
 	private Expression<LivingEntity> entities;
-	private GoatHorn goatHorn = GoatHorn.LEFT;
+	private GoatHorn goatHorn = GoatHorn.ANY;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		entities = (Expression<LivingEntity>) exprs[0];
-		if (parseResult.hasTag("right")) {
+		if (parseResult.hasTag("left")) {
+			goatHorn = GoatHorn.LEFT;
+		} else if (parseResult.hasTag("right")) {
 			goatHorn = GoatHorn.RIGHT;
 		} else if (parseResult.hasTag("both")) {
 			goatHorn = GoatHorn.BOTH;
@@ -55,12 +57,17 @@ public class CondGoatHorns extends Condition {
 		return entities.check(event, entity -> {
 			if (!(entity instanceof Goat goat))
 				return false;
-			boolean hasHorns = true;
-			if (goatHorn != GoatHorn.RIGHT)
-				hasHorns = goat.hasLeftHorn();
-			if (goatHorn != GoatHorn.LEFT)
-				hasHorns &= goat.hasRightHorn();
-			return hasHorns;
+			boolean leftHorn = goat.hasLeftHorn();
+			boolean rightHorn = goat.hasRightHorn();
+			if (goatHorn == GoatHorn.ANY) {
+				return leftHorn || rightHorn;
+			} else if (goatHorn == GoatHorn.BOTH) {
+				return leftHorn && rightHorn;
+			} else if (goatHorn == GoatHorn.LEFT) {
+				return leftHorn;
+			} else {
+				return rightHorn;
+			}
 		}, isNegated());
 	}
 
@@ -79,6 +86,7 @@ public class CondGoatHorns extends Condition {
 			case LEFT -> "a left horn";
 			case RIGHT -> "a right horn";
 			case BOTH -> "both horns";
+			case ANY -> "any horn";
 		});
 		return builder.toString();
 	}
