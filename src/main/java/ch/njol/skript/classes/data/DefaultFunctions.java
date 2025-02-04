@@ -714,17 +714,18 @@ public class DefaultFunctions {
 				double total = 0;
 				for (Object object : params[0]) {
 					Number number = (Number) object;
-					if (number instanceof Double doubleNumber && (doubleNumber.isInfinite() || doubleNumber.isNaN())) {
-						Skript.error("You cannot get the mean of a set of number that includes 'infinity' or 'nan'.");
+					if (number instanceof Double doubleNumber && (doubleNumber.isInfinite() || doubleNumber.isNaN()))
 						return null;
-					}
 					total += number.doubleValue();
 				}
 				total /= params[0].length;
 				return new Number[]{total};
 			}
 		})
-			.description("Get the mean (average) of a list of numbers.")
+			.description(
+				"Get the mean (average) of a list of numbers.",
+				"You cannot get the mean of a set of numbers that includes infinity or NaN."
+			)
 			.examples(
 				"mean(1, 2, 3) = 2",
 				"mean(0, 5, 10) = 5",
@@ -755,10 +756,8 @@ public class DefaultFunctions {
 						return n1.compareTo(n2);
 					}))
 					.toArray(Number[]::new);
-				if (invalid.get()) {
-					Skript.error("You cannot get the median of a set of numbers that includes 'infinity' or 'nan'.");
+				if (invalid.get())
 					return null;
-				}
 				int size = sorted.length;
 				if (size % 2 == 1)
 					return new Number[]{sorted[Math2.ceil(size /2)]};
@@ -771,7 +770,8 @@ public class DefaultFunctions {
 		})
 			.description(
 				"Get the middle value of a sorted list of numbers. "
-				+ "If the list has an even number of values, the median is the average of the two middle numbers."
+				+ "If the list has an even number of values, the median is the average of the two middle numbers.",
+				"You cannot get the median of a set of numbers that includes infinity or NaN."
 			)
 			.examples(
 				"median(1, 2, 3, 4, 5) = 3",
@@ -809,9 +809,10 @@ public class DefaultFunctions {
 			}
 		})
 			.description(
-				"Get the factorial of a number. "
-				+ "Getting the factorial of any number above 20 goes into the Double range leading to floating points. "
-				+ "Any number after 170 will always return Infinity."
+				"Get the factorial of a number. ",
+				"Getting the factorial of any number above 20 goes into the Double range leading to floating points.",
+				"Any number after 170 will always return Infinity.",
+				"Should not be used to calculate permutations or combinations manually."
 			)
 			.examples(
 				"factorial(0) = 1",
