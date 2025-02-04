@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.util.Patterns;
 import ch.njol.util.Kleenean;
 import ch.njol.util.Math2;
 import org.bukkit.event.Event;
@@ -26,27 +27,20 @@ import org.jetbrains.annotations.Nullable;
 public class ExprRound extends PropertyExpression<Number, Long> {
 
 	private enum RoundType {
-		FLOOR("(round[ed] down|floored)"),
-		ROUND("round[ed]"),
-		CEIL("(round[ed] up|ceiled)");
-
-		private final String pattern;
-
-		RoundType(String pattern) {
-			this.pattern = pattern;
-		}
+		FLOOR, ROUND, CEIL
 	}
 
-	private static final RoundType[] ROUND_TYPES = RoundType.values();
+	private final static Patterns<RoundType> patterns = new Patterns<>(new Object[][]{
+		{"[a|the] (round[ed] down|floored) %numbers%", RoundType.FLOOR},
+		{"%numbers% (round[ed] down|floored)", RoundType.FLOOR},
+		{"[a|the] round[ed] %numbers%", RoundType.ROUND},
+		{"%numbers% round[ed]", RoundType.ROUND},
+		{"[a|the] (round[ed] up|ceiled) %numbers%", RoundType.CEIL},
+		{"%numbers% (round[ed] up|ceiled)", RoundType.CEIL}
+	});
 
 	static {
-		String[] patterns = new String[ROUND_TYPES.length * 2];
-		for (RoundType roundType : ROUND_TYPES) {
-			patterns[2 * roundType.ordinal()] = "[a|the] " + roundType.pattern + " %numbers%";
-			patterns[(2 * roundType.ordinal()) + 1] = "%numbers% " + roundType.pattern;
-		}
-
-		Skript.registerExpression(ExprRound.class, Long.class, ExpressionType.PROPERTY, patterns);
+		Skript.registerExpression(ExprRound.class, Long.class, ExpressionType.PROPERTY, patterns.getPatterns());
 	}
 
 	private RoundType roundType;
@@ -55,7 +49,7 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		setExpr((Expression<? extends Number>) exprs[0]);
-		roundType = ROUND_TYPES[matchedPattern/2];
+		roundType = patterns.getInfo(matchedPattern);
 		return true;
 	}
 	
