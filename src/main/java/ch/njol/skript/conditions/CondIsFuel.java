@@ -20,7 +20,6 @@ import ch.njol.skript.doc.Since;
 			"\t\tcancel event"
 })
 @Since("2.5.1")
-@RequiredPlugins("Minecraft 1.11.2+")
 public class CondIsFuel extends PropertyCondition<ItemType> {
 	
 	static {

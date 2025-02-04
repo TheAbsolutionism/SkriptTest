@@ -13,7 +13,6 @@ import ch.njol.skript.doc.*;
 			"\t\tsend \"You cannot break interactable blocks!\""
 })
 @Since("2.5.2")
-@RequiredPlugins("Minecraft 1.13+")
 public class CondIsInteractable extends PropertyCondition<ItemType> {
 	
 	static {

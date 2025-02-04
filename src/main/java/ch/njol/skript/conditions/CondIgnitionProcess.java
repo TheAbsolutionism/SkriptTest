@@ -22,7 +22,7 @@ import ch.njol.util.Kleenean;
 		"\t\tsend \"RUN!!!\" to the loop-player"
 })
 @Since("2.5")
-@RequiredPlugins("Paper 1.13 or newer")
+@RequiredPlugins("Paper")
 public class CondIgnitionProcess extends PropertyCondition<LivingEntity> {
 
 	static {

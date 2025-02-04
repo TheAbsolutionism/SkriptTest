@@ -13,7 +13,6 @@ import org.bukkit.block.Block;
 })
 @Examples("if player's targeted block is passable")
 @Since("2.5.1")
-@RequiredPlugins("Minecraft 1.13.2+")
 public class CondIsPassable extends PropertyCondition<Block> {
 	
 	static {

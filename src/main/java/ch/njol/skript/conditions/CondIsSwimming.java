@@ -7,7 +7,6 @@ import org.bukkit.entity.LivingEntity;
 @Name("Is Swimming")
 @Description("Checks whether a living entity is swimming.")
 @Examples("player is swimming")
-@RequiredPlugins("1.13 or newer")
 @Since("2.3")
 public class CondIsSwimming extends PropertyCondition<LivingEntity> {
 	
