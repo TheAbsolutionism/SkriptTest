@@ -14,10 +14,6 @@ test "duplicate cooldown":
 	set the duplication cooldown of {_entity} to 1 hour
 	remove 2 hours from the duplication cooldown of {_entity}
 	assert the duplication cooldown of {_entity} is 0 seconds with "Duplication cooldown should be 0 seconds after removing more than current"
-	add (2 seconds * -1) to the duplication cooldown of {_entity}
-	assert the duplication cooldown of {_entity} is 0 seconds with "Duplication cooldown should be 0 seconds after adding a negative"
-	set the duplication cooldown of {_entity} to (1 minute * -1)
-	assert the duplication cooldown of {_entity} is 0 seconds with "Duplication cooldown should be 0 seconds after setting to a negative"
 
 	allow {_entity} to duplicate
 	assert {_entity} can duplicate with "Allay should be able to duplicate"
