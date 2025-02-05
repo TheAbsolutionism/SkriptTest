@@ -23,8 +23,9 @@ import org.skriptlang.skript.log.runtime.SyntaxRuntimeErrorProducer;
 	"Make bats and foxes sleep or wake up.",
 	"Make villagers sleep by providing a location of a bed.",
 	"Make players sleep by providing a location of a bed. "
-		+ "Using 'with force' will bypass \"nearby monsters\" and the max distance, making players go to sleep if the bed "
-		+ "is far away or in another world.",
+		+ "Using 'with force' will bypass \"nearby monsters\" ,the max distance, allowing players to sleep even if the bed "
+		+ "is far away, and lets players sleep in the nether and end. "
+		+ "Does not work if the location of the bed is not in the world the player is currently in.",
 	"Using 'without spawn location update' will make players wake up without setting their spawn location to the bed."
 })
 @Examples({
@@ -78,16 +79,13 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 		Location location = null;
 		if (this.location != null)
 			location = this.location.getSingle(event);
-		boolean warned = false;
+		boolean failed = false;
 		for (LivingEntity entity : entities.getArray(event)) {
 			if (entity instanceof Bat bat) {
 				bat.setAwake(!sleep);
 			} else if (entity instanceof Villager villager) {
 				if (sleep && location == null) {
-					if (!warned) {
-						warned = true;
-						warning("The provided location is not set. This effect will have no effect for villagers and players.");
-					}
+					failed = true;
 					continue;
 				}
 				if (!sleep) {
@@ -99,10 +97,7 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 				fox.setSleeping(sleep);
 			} else if (entity instanceof HumanEntity humanEntity) {
 				if (sleep && location == null) {
-					if (!warned) {
-						warned = true;
-						warning("The provided location is not set. This effect will have no effect for villagers and players.");
-					}
+					failed = true;
 					continue;
 				}
 				if (!sleep) {
@@ -112,6 +107,8 @@ public class EffWakeupSleep extends Effect implements SyntaxRuntimeErrorProducer
 				}
 			}
 		}
+		if (failed)
+			warning("The provided location is not set. This effect will have no effect for villagers and players.");
 	}
 
 	@Override
