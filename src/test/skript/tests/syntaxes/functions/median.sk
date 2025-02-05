@@ -5,5 +5,5 @@ test "median function":
 		add (10 * loop-iteration) to {_ints::*}
 	assert median({_ints::*}) = 55 with "median should be 55"
 
-	assert median(0, 1, 2, infinity value) is not set with "median should return null when providing infinity"
+	assert median(0, 1, 2, infinity value) is 1.5 with "median should return 1.5 even when providing infinity"
 	assert median(0, 1, 2, nan value) is not set with "median should return null when providing nan"
