@@ -10,7 +10,6 @@ import ch.njol.skript.events.bukkit.SkriptStopEvent;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.*;
-import ch.njol.skript.util.slot.EquipmentSlot.EquipSlot;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import com.destroystokyo.paper.event.block.AnvilDamagedEvent;
@@ -570,12 +569,12 @@ public final class BukkitEventValues {
 		EventValues.registerEventValue(PlayerRiptideEvent.class, ItemStack.class, PlayerRiptideEvent::getItem);
 		//PlayerArmorChangeEvent
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
-			EventValues.registerEventValue(PlayerArmorChangeEvent.class, EquipSlot.class,
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, EquipmentSlot.class,
 				event -> switch (event.getSlotType()) {
-					case HEAD -> EquipSlot.HELMET;
-					case CHEST -> EquipSlot.CHESTPLATE;
-					case LEGS -> EquipSlot.LEGGINGS;
-					case FEET -> EquipSlot.BOOTS;
+					case HEAD -> EquipmentSlot.HEAD;
+					case CHEST -> EquipmentSlot.CHEST;
+					case LEGS -> EquipmentSlot.LEGS;
+					case FEET -> EquipmentSlot.FEET;
 			});
 		}
 		//PlayerInventorySlotChangeEvent
