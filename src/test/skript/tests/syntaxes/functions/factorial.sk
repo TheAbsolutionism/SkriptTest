@@ -9,7 +9,7 @@ test "factorial function":
 	assert factorial(100) = 93326215443944180000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 with "factorial of 100 failed"
 
 	assert factorial(500) = infinity value with "factorial of 500 failed"
-	assert factorial(-500) = (-1 * infinity value) with "factorial of -500 failed"
+	assert factorial(-500) = (-infinity value) with "factorial of -500 failed"
 
 	assert factorial(-1) = -1 with "factorial of -1 failed"
 	assert factorial(-2) = -2 with "factorial of -2 failed"

@@ -1,7 +1,10 @@
 package ch.njol.util;
 
 import ch.njol.skript.Skript;
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.Arrays;
 
 /**
  * This class is not to be used by addons. In the future methods may
