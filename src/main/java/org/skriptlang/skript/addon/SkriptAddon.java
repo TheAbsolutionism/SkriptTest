@@ -87,7 +87,7 @@ public interface SkriptAddon extends ViewProvider<SkriptAddon> {
 	/**
 	 * A helper method for loading addon modules.
 	 * Modules will be loaded as described by {@link AddonModule}.
-	 * An {@link AddonModule} will not load if its {@link AddonModule#canLoad(SkriptAddon)} method returns false.
+	 * An {@link AddonModule} will not load if {@link AddonModule#canLoad(SkriptAddon)} returns false.
 	 * @param modules The modules to load.
 	 */
 	default void loadModules(AddonModule... modules) {
