@@ -35,8 +35,8 @@ public class ExprRound extends PropertyExpression<Number, Long> {
 		{"%numbers% (round[ed] down|floored)", RoundType.FLOOR},
 		{"[a|the] round[ed] %numbers%", RoundType.ROUND},
 		{"%numbers% round[ed]", RoundType.ROUND},
-		{"[a|the] (round[ed] up|ceiled) %numbers%", RoundType.CEIL},
-		{"%numbers% (round[ed] up|ceiled)", RoundType.CEIL}
+		{"[a|the] (round[ed] up|ceil[ing]ed) %numbers%", RoundType.CEIL},
+		{"%numbers% (round[ed] up|ceil[ing]ed)", RoundType.CEIL}
 	});
 
 	static {
