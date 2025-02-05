@@ -109,11 +109,11 @@ public class CondIsWithin extends Condition {
 						// so we need to subtract the block position from each location.
 						for (BoundingBox blockBox : block.getCollisionShape().getBoundingBoxes()) {
 							Vector blockVector = block.getLocation().toVector();
-							if (!blockBox.contains(location.toVector().subtract(blockVector)))
-								return false;
+							if (blockBox.contains(location.toVector().subtract(blockVector)))
+								return true;
 						}
-						// if this location is within the block, return true
-						return true;
+						// if this location is not within the block, return false
+						return false;
 					} else if (object instanceof Chunk chunk) {
 						return location.getChunk().equals(chunk);
 					} else if (object instanceof World world) {
