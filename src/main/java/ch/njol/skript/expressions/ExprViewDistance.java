@@ -17,9 +17,9 @@ import java.util.function.Consumer;
 @Name("View Distance")
 @Description({
 	"The view distance of a world or a player.",
-	"The view distance of a player is the distance sent by the server to the player. "
+	"The view distance of a player is the distance in chunks sent by the server to the player. "
 		+ "This has nothing to do with client side view distance settings.",
-	"View distance is capped between 2 to 32.",
+	"View distance is capped between 2 to 32 chunks.",
 	"Paper is required to change the view distance for both worlds and players."
 })
 @Examples({
@@ -70,36 +70,8 @@ public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> 
 		} else if (delta != null) {
 			value = (int) delta[0];
 		}
-		int finalValue = value;
-		Consumer<Player> playerConsumer;
-		Consumer<World> worldConsumer;
-		switch (mode) {
-			case SET, DELETE, RESET -> {
-				playerConsumer = player -> player.setViewDistance(Math2.fit(2, finalValue, 32));
-				worldConsumer = world -> world.setViewDistance(Math2.fit(2, finalValue, 32));
-			}
-			case ADD -> {
-				playerConsumer = player -> {
-					int current = player.getViewDistance();
-					player.setViewDistance(Math2.fit(2, current + finalValue, 32));
-				};
-				worldConsumer = world -> {
-					int current = world.getViewDistance();
-					world.setViewDistance(Math2.fit(2, current + finalValue, 32));
-				};
-			}
-			case REMOVE -> {
-				playerConsumer = player -> {
-					int current = player.getViewDistance();
-					player.setViewDistance(Math2.fit(2, current - finalValue, 32));
-				};
-				worldConsumer = world -> {
-					int current = world.getViewDistance();
-					world.setViewDistance(Math2.fit(2, current - finalValue, 32));
-				};
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		}
+		Consumer<Player> playerConsumer = getPlayerConsumer(mode, value);
+		Consumer<World> worldConsumer = getWorldConsumer(mode, value);
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof Player player) {
 				playerConsumer.accept(player);
@@ -107,6 +79,36 @@ public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> 
 				worldConsumer.accept(world);
 			}
 		}
+	}
+
+	public Consumer<Player> getPlayerConsumer(ChangeMode mode, int value) {
+		return switch (mode) {
+			case SET, DELETE, RESET -> player -> player.setViewDistance(Math2.fit(2, value, 32));
+			case ADD -> player -> {
+				int current = player.getViewDistance();
+				player.setViewDistance(Math2.fit(2, current + value, 32));
+			};
+			case REMOVE -> player -> {
+				int current = player.getViewDistance();
+				player.setViewDistance(Math2.fit(2, current - value, 32));
+			};
+			default -> null;
+		};
+	}
+
+	public Consumer<World> getWorldConsumer(ChangeMode mode, int value) {
+		return switch (mode) {
+			case SET, DELETE, RESET -> world -> world.setViewDistance(Math2.fit(2, value, 32));
+			case ADD -> world -> {
+				int current = world.getViewDistance();
+				world.setViewDistance(Math2.fit(2, current + value, 32));
+			};
+			case REMOVE -> world -> {
+				int current = world.getViewDistance();
+				world.setViewDistance(Math2.fit(2, current - value, 32));
+			};
+			default -> null;
+		};
 	}
 
 	@Override

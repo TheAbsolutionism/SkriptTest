@@ -17,9 +17,9 @@ import java.util.function.Consumer;
 @Name("Simulation Distance")
 @Description({
 	"The simulation distance of a world or a player.",
-	"Simulation distance is the minimum distance for entities to tick.",
+	"Simulation distance is the minimum distance in chunks for entities to tick.",
 	"Simulation distance is capped to the current view distance of the world or player.",
-	"The view distance is capped between 2 and 32.",
+	"The view distance is capped between 2 and 32 chunks.",
 	"Paper is required to change the simulation distance for both worlds and players."
 })
 @Examples({
@@ -40,7 +40,7 @@ public class ExprSimulationDistance extends SimplePropertyExpression<Object, Int
 		String property = "worlds";
 		if (SUPPORTS_PLAYER)
 			property = "worlds/players";
-		register(ExprSimulationDistance.class, Integer.class, "simulation distance", property);
+		register(ExprSimulationDistance.class, Integer.class, "simulation distance[s]", property);
 	}
 
 	@Override
@@ -74,36 +74,8 @@ public class ExprSimulationDistance extends SimplePropertyExpression<Object, Int
 		} else if (delta != null) {
 			value = (int) delta[0];
 		}
-		int finalValue = value;
-		Consumer<Player> playerConsumer;
-		Consumer<World> worldConsumer;
-		switch (mode) {
-			case SET, DELETE, RESET -> {
-				playerConsumer = player -> player.setSimulationDistance(Math2.fit(2, finalValue, 32));
-				worldConsumer = world -> world.setSimulationDistance(Math2.fit(2, finalValue, 32));
-			}
-			case ADD -> {
-				playerConsumer = player -> {
-					int current = player.getSimulationDistance();
-					player.setSimulationDistance(Math2.fit(2, current + finalValue, 32));
-				};
-				worldConsumer = world -> {
-					int current = world.getSimulationDistance();
-					world.setSimulationDistance(Math2.fit(2, current + finalValue, 32));
-				};
-			}
-			case REMOVE -> {
-				playerConsumer = player -> {
-					int current = player.getSimulationDistance();
-					player.setSimulationDistance(Math2.fit(2, current - finalValue, 32));
-				};
-				worldConsumer = world -> {
-					int current = world.getSimulationDistance();
-					world.setSimulationDistance(Math2.fit(2, current - finalValue, 32));
-				};
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		}
+		Consumer<Player> playerConsumer = getPlayerConsumer(mode, value);
+		Consumer<World> worldConsumer = getWorldConsumer(mode, value);
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof Player player) {
 				playerConsumer.accept(player);
@@ -111,6 +83,36 @@ public class ExprSimulationDistance extends SimplePropertyExpression<Object, Int
 				worldConsumer.accept(world);
 			}
 		}
+	}
+
+	public Consumer<Player> getPlayerConsumer(ChangeMode mode, int value) {
+		return switch (mode) {
+			case SET, DELETE, RESET -> player -> player.setSimulationDistance(Math2.fit(2, value, 32));
+			case ADD -> player -> {
+				int current = player.getViewDistance();
+				player.setSimulationDistance(Math2.fit(2, current + value, 32));
+			};
+			case REMOVE -> player -> {
+				int current = player.getViewDistance();
+				player.setSimulationDistance(Math2.fit(2, current - value, 32));
+			};
+			default -> null;
+		};
+	}
+
+	public Consumer<World> getWorldConsumer(ChangeMode mode, int value) {
+		return switch (mode) {
+			case SET, DELETE, RESET -> world -> world.setSimulationDistance(Math2.fit(2, value, 32));
+			case ADD -> world -> {
+				int current = world.getViewDistance();
+				world.setSimulationDistance(Math2.fit(2, current + value, 32));
+			};
+			case REMOVE -> world -> {
+				int current = world.getViewDistance();
+				world.setSimulationDistance(Math2.fit(2, current - value, 32));
+			};
+			default -> null;
+		};
 	}
 
 	@Override
