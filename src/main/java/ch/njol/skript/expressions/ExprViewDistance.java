@@ -84,12 +84,12 @@ public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> 
 
 	private void changeViewDistance(ChangeMode mode, int value, Supplier<Integer> getter, Consumer<Integer> setter) {
 		setter.accept(Math2.fit(2,
-			switch (mode) {
-				case SET, DELETE, RESET -> value;
-				case ADD, REMOVE -> getter.get() + value;
-				default -> throw new IllegalArgumentException("Unexpected mode: " + mode);
-			},
-			32));
+				switch (mode) {
+					case SET, DELETE, RESET -> value;
+					case ADD, REMOVE -> getter.get() + value;
+					default -> throw new IllegalArgumentException("Unexpected mode: " + mode);
+				},
+				32));
 	}
 
 	@Override
