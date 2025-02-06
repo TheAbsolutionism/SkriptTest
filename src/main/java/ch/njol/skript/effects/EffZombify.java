@@ -1,6 +1,8 @@
 package ch.njol.skript.effects;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.classes.Changer.ChangerUtils;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -9,10 +11,10 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
-import ch.njol.skript.lang.Variable;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Kleenean;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.ZombieVillager;
@@ -78,7 +80,7 @@ public class EffZombify extends Effect {
 				ticks = (int) timespan.getAs(TimePeriod.TICK);
 		}
 		int finalTicks = ticks;
-		if (entities instanceof Variable<LivingEntity> variable) {
+		if (ChangerUtils.acceptsChange(entities, ChangeMode.SET, Entity.class, LivingEntity.class)) {
 			Function<LivingEntity, LivingEntity> changeFunction = entity -> {
 				if (zombify && entity instanceof Villager villager) {
 					return villager.zombify();
@@ -87,7 +89,7 @@ public class EffZombify extends Effect {
 				}
 				return entity;
 			};
-			variable.changeInPlace(event, changeFunction);
+			entities.changeInPlace(event, changeFunction);
 		} else {
 			for (LivingEntity entity : entities.getAll(event)) {
 				if (zombify && entity instanceof Villager villager) {
