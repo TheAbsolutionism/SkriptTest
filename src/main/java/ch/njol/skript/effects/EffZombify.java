@@ -14,7 +14,6 @@ import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Kleenean;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.ZombieVillager;
@@ -58,6 +57,7 @@ public class EffZombify extends Effect {
 	private Expression<LivingEntity> entities;
 	private @Nullable Expression<Timespan> timespan;
 	private boolean zombify;
+	private boolean changeInPlace = false;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -68,6 +68,8 @@ public class EffZombify extends Effect {
 			//noinspection unchecked
 			timespan = (Expression<Timespan>) exprs[1];
 		}
+		if (ChangerUtils.acceptsChange(entities, ChangeMode.SET, LivingEntity.class))
+			changeInPlace = true;
 		return true;
 	}
 
@@ -80,7 +82,7 @@ public class EffZombify extends Effect {
 				ticks = (int) timespan.getAs(TimePeriod.TICK);
 		}
 		int finalTicks = ticks;
-		if (ChangerUtils.acceptsChange(entities, ChangeMode.SET, Entity.class, LivingEntity.class)) {
+		if (changeInPlace) {
 			Function<LivingEntity, LivingEntity> changeFunction = entity -> {
 				if (zombify && entity instanceof Villager villager) {
 					return villager.zombify();
