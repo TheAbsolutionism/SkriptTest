@@ -27,7 +27,6 @@ import ch.njol.skript.patterns.PatternCompiler;
 import ch.njol.skript.patterns.SkriptPattern;
 import ch.njol.skript.patterns.TypePatternElement;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.registrations.Feature;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import ch.njol.util.NonNullPair;
@@ -251,12 +250,8 @@ public class SkriptParser {
 								}
 							}
 							if (element instanceof ExperimentalSyntax experimentalSyntax) {
-								Feature feature = experimentalSyntax.requiredExperiment();
-								if (!getParser().hasExperiment(feature)) {
-									Skript.error("This syntax element is experimental. To enable this experiment, add "
-										+ "'using " + feature.codeName() + "' at the top of this file.");
+								if (!experimentalSyntax.isSatisfiedBy(getParser().getExperiments()))
 									continue;
-								}
 							}
 
 							boolean success = element.init(parseResult.exprs, patternIndex, getParser().getHasDelayBefore(), parseResult);

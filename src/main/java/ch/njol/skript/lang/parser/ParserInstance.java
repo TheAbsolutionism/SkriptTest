@@ -10,6 +10,7 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.TriggerSection;
 import ch.njol.skript.log.HandlerList;
+import ch.njol.skript.registrations.Feature;
 import ch.njol.skript.structures.StructOptions.OptionsData;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
@@ -520,6 +521,14 @@ public final class ParserInstance implements Experimented {
 		if (set == null)
 			return new ExperimentSet();
 		return new ExperimentSet(set);
+	}
+
+	public Feature[] getExperiments() {
+		Script script = this.getCurrentScript();
+		ExperimentSet set = script.getData(ExperimentSet.class);
+		if (set == null)
+			return new Feature[0];
+		return set.getExperiments();
 	}
 
 	// ParserInstance Data API
