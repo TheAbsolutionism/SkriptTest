@@ -791,7 +791,6 @@ public class DefaultFunctions {
 			@Override
 			public Number @Nullable [] executeSimple(Object[][] params) {
 				Double number = ((Number) params[0][0]).doubleValue();
-				boolean negative = false;
 				if (number < 0) {
 					return null;
 				} else if (number <= 1) { // 0 and 1
