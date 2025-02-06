@@ -459,7 +459,7 @@ on player change beacon effect:
 	set {_values::*} to event-player and event-block
 
 on player xp cooldown change:
-	set {_values::*} to event-player, event-xp cooldown change reason, past event-timespan and event-timespan
+	set {_values::*} to event-player, event-experience cooldown change reason, past event-timespan and event-timespan
 
 on vehicle move:
 	#set {_values::*} to event-vehicle, past event-location and event-location
@@ -468,3 +468,20 @@ on vehicle move:
 on elytra boost:
 	set {_values::*} to event-player, event-item and event-entity
 
+on breed:
+	set {_values::*} to event-entity and event-item
+
+on fish caught:
+	set {_values::*} to event-player
+
+on smelt:
+	set {_values::*} to event-block
+
+on fuel burn:
+	set {_values::*} to event-block
+
+on furnace extract:
+	set {_values::*} to event-block, event-player and event-items
+
+on smelt start:
+	set {_values::*} to event-block
