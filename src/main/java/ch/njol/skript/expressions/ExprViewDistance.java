@@ -13,6 +13,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Name("View Distance")
 @Description({
@@ -69,46 +70,26 @@ public class ExprViewDistance extends SimplePropertyExpression<Object, Integer> 
 			value = Bukkit.getViewDistance();
 		} else if (delta != null) {
 			value = (int) delta[0];
+			if (mode == ChangeMode.REMOVE)
+				value = -value;
 		}
-		Consumer<Player> playerConsumer = getPlayerConsumer(mode, value);
-		Consumer<World> worldConsumer = getWorldConsumer(mode, value);
 		for (Object object : getExpr().getArray(event)) {
 			if (object instanceof Player player) {
-				playerConsumer.accept(player);
+				changeViewDistance(mode, value, player::getViewDistance, player::setViewDistance);
 			} else if (RUNNING_1_21 && object instanceof World world) {
-				worldConsumer.accept(world);
+				changeViewDistance(mode, value, world::getViewDistance, world::setViewDistance);
 			}
 		}
 	}
 
-	public Consumer<Player> getPlayerConsumer(ChangeMode mode, int value) {
-		return switch (mode) {
-			case SET, DELETE, RESET -> player -> player.setViewDistance(Math2.fit(2, value, 32));
-			case ADD -> player -> {
-				int current = player.getViewDistance();
-				player.setViewDistance(Math2.fit(2, current + value, 32));
-			};
-			case REMOVE -> player -> {
-				int current = player.getViewDistance();
-				player.setViewDistance(Math2.fit(2, current - value, 32));
-			};
-			default -> null;
-		};
-	}
-
-	public Consumer<World> getWorldConsumer(ChangeMode mode, int value) {
-		return switch (mode) {
-			case SET, DELETE, RESET -> world -> world.setViewDistance(Math2.fit(2, value, 32));
-			case ADD -> world -> {
-				int current = world.getViewDistance();
-				world.setViewDistance(Math2.fit(2, current + value, 32));
-			};
-			case REMOVE -> world -> {
-				int current = world.getViewDistance();
-				world.setViewDistance(Math2.fit(2, current - value, 32));
-			};
-			default -> null;
-		};
+	private void changeViewDistance(ChangeMode mode, int value, Supplier<Integer> getter, Consumer<Integer> setter) {
+		setter.accept(Math2.fit(2,
+			switch (mode) {
+				case SET, DELETE, RESET -> value;
+				case ADD, REMOVE -> getter.get() + value;
+				default -> throw new IllegalArgumentException("Unexpected mode: " + mode);
+			},
+			32));
 	}
 
 	@Override
