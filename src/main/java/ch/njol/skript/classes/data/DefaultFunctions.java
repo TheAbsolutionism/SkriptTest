@@ -792,11 +792,8 @@ public class DefaultFunctions {
 			public Number @Nullable [] executeSimple(Object[][] params) {
 				Double number = ((Number) params[0][0]).doubleValue();
 				boolean negative = false;
-				if (number < -170) {
-					return new Number[]{Double.NEGATIVE_INFINITY};
-				} else if (number < 0) {
-					negative = true;
-					number = Math.abs(number);
+				if (number < 0) {
+					return null;
 				} else if (number <= 1) { // 0 and 1
 					return new Number[]{1};
 				} else if (number > 170) {
