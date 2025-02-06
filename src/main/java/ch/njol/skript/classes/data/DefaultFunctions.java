@@ -805,8 +805,6 @@ public class DefaultFunctions {
 						break;
 					result *= i;
 				}
-				if (negative)
-					result *= -1d;
 				return new Number[]{result};
 			}
 		})
