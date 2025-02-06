@@ -43,7 +43,7 @@ public class EvtRealTime extends SkriptEvent {
 
 	private Literal<Time> times;
 	private boolean unloaded = false;
-	private final List<RealTimeInfo> infoList = new ArrayList<>();
+	private final List<TimerTask> timerTasks = new ArrayList<>();
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
@@ -67,9 +67,14 @@ public class EvtRealTime extends SkriptEvent {
 			while (expectedCalendar.before(currentCalendar)) {
 				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
-			RealTimeInfo info = new RealTimeInfo(expectedCalendar.getTimeInMillis());
-			infoList.add(info);
-			createNewTask(info);
+			TimerTask task = new TimerTask() {
+				@Override
+				public void run() {
+					preExecute();
+				}
+			};
+			timerTasks.add(task);
+			TIMER.scheduleAtFixedRate(task, new Date(expectedCalendar.getTimeInMillis()), HOUR_24_MILLISECONDS);
 		}
 		return true;
 	}
@@ -77,10 +82,8 @@ public class EvtRealTime extends SkriptEvent {
 	@Override
 	public void unload() {
 		unloaded = true;
-		for (RealTimeInfo info : infoList) {
-			if (info.task != null)
-				info.task.cancel();
-		}
+		for (TimerTask task : timerTasks)
+			task.cancel();
 		TIMER.purge();
 	}
 
@@ -98,27 +101,12 @@ public class EvtRealTime extends SkriptEvent {
 		SkriptEventHandler.logEventEnd();
 	}
 
-	private void preExecute(RealTimeInfo info) {
+	private void preExecute() {
 		// Safety check, ensure this 'EvtRealTime' was not unloaded
 		if (unloaded)
 			return;
-		// Bump the next execution time by the appropriate amount
-		info.executionTime += HOUR_24_MILLISECONDS;
-		// Reschedule task for new executionTime
-		createNewTask(info);
 		// Activate trigger
 		execute();
-	}
-
-	private void createNewTask(RealTimeInfo info) {
-		TimerTask task = new TimerTask() {
-			@Override
-			public void run() {
-				preExecute(info);
-			}
-		};
-		info.task = task;
-		TIMER.schedule(task, new Date(info.executionTime));
 	}
 
 	@Override
@@ -129,16 +117,6 @@ public class EvtRealTime extends SkriptEvent {
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		return "at " + times.toString(event, debug) + " in real time";
-	}
-
-	private static class RealTimeInfo {
-		private long executionTime;
-		private TimerTask task;
-
-		public RealTimeInfo(long executionTime) {
-			this.executionTime = executionTime;
-		}
-
 	}
 
 }

@@ -7,7 +7,6 @@ import ch.njol.yggdrasil.YggdrasilSerializable;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.util.Cyclical;
 
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,7 +135,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(time);
+		return time;
 	}
 	
 	@Override
