@@ -1,6 +1,7 @@
 package ch.njol.skript.registrations;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.effects.EffTest;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
@@ -198,6 +199,7 @@ public class EventValues {
 	public static <E extends Event, T> Converter<? super E, ? extends T> getExactEventValueConverter(
 		Class<E> event, Class<T> c, int time
 	) {
+		debug(event, c, "#getExact: Checking exact value");
 		List<EventValueInfo<?, ?>> eventValues = getEventValuesList(time);
 		// First check for exact classes matching the parameters.
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
@@ -205,10 +207,13 @@ public class EventValues {
 				continue;
 			if (!checkExcludes(eventValueInfo, event))
 				return null;
-			if (eventValueInfo.event.isAssignableFrom(event))
+			if (eventValueInfo.event.isAssignableFrom(event)) {
+				debug(event, c, "#getExact: Found exact");
 				//noinspection unchecked
 				return (Converter<? super E, ? extends T>) eventValueInfo.converter;
+			}
 		}
+		debug(event, c,  "#getExact: No exact value");
 		return null;
 	}
 
@@ -293,9 +298,11 @@ public class EventValues {
 		List<EventValueInfo<?, ?>> eventValues = getEventValuesList(time);
 		List<Converter<? super E, ? extends T>> list = new ArrayList<>();
 		// First check for exact classes matching the parameters.
+		debug(event, type, "#getConverters: Checking exact");
 		Converter<? super E, ? extends T> exact = getExactEventValueConverter(event, type, time);
 		if (exact != null) {
 			list.add(exact);
+			debug(event, type, "#getConverters: Returning exact");
 			return list;
 		}
 		// Second check for assignable subclasses.
@@ -305,17 +312,20 @@ public class EventValues {
 			if (!checkExcludes(eventValueInfo, event))
 				return null;
 			if (eventValueInfo.event.isAssignableFrom(event)) {
+				debug(event, type, "#getConverters: Adding Super - " + eventValueInfo.event + " - " + eventValueInfo.c);
 				list.add((Converter<? super E, ? extends T>) eventValueInfo.converter);
 				continue;
 			}
 			if (!event.isAssignableFrom(eventValueInfo.event))
 				continue;
+			debug(event, type, "#getConverters: Adding Sub - " + eventValueInfo.event + " - " + eventValueInfo.c);
 			list.add(e -> {
 				if (!eventValueInfo.event.isInstance(e))
 					return null;
 				return ((Converter<? super E, ? extends T>) eventValueInfo.converter).convert(e);
 			});
 		}
+		debug(event, type, "#getConverters: After #2");
 		if (!list.isEmpty())
 			return list;
 		if (!allowConverting)
@@ -331,7 +341,7 @@ public class EventValues {
 
 			if (!checkExcludes(eventValueInfo, event))
 				return null;
-
+			debug(event, type, "#getConverters: Adding #3 - " + eventValueInfo.event + " - " + eventValueInfo.c);
 			list.add(e -> {
 				if (checkInstanceOf && !eventValueInfo.event.isInstance(e))
 					return null;
@@ -341,6 +351,7 @@ public class EventValues {
 				return null;
 			});
 		}
+		debug(event, type, "#getConverters: After #3");
 		if (!list.isEmpty())
 			return list;
 		// Fourth check will attempt to convert the event value to the requesting type.
@@ -356,9 +367,11 @@ public class EventValues {
 
 			if (!checkExcludes(eventValueInfo, event))
 				return null;
+			debug(event, type, "#getConverters: Adding #4 - " + eventValueInfo.event + " - " + eventValueInfo.c);
 			list.add(converter);
 			continue;
 		}
+		debug(event, type, "#getConverters: After #4");
 		if (!list.isEmpty())
 			return list;
 		// This loop will attempt to look for converters assignable to the class of the provided event.
@@ -374,15 +387,25 @@ public class EventValues {
 
 			if (!checkExcludes(eventValueInfo, event))
 				return null;
+			debug(event, type, "#getConverters: Adding #5 - " + eventValueInfo.event + " - " + eventValueInfo.c);
 			list.add(converter);
 			continue;
 		}
+		debug(event, type, "#getConverters: After #5");
 		if (!list.isEmpty())
 			return list;
 		// If the check should try again matching event values with a 0 time (most event values).
-		if (allowDefault && time != 0)
+		if (allowDefault && time != 0) {
+			debug(event, type, "#getConverters: Checking present state");
 			return getEventValueConverters(event, type, 0, false);
+		}
+		debug(event, type, "#getConverters: Returning null");
 		return null;
+	}
+
+	public static void debug(Class<?> eventClass, Class<?> valueClass, String message) {
+		if (eventClass.equals(EffTest.eventClass) && valueClass.equals(EffTest.valueClass))
+			Skript.adminBroadcast(message);
 	}
 
 	/**
