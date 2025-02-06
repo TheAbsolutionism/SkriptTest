@@ -715,7 +715,7 @@ public class DefaultFunctions {
 				int length = params[0].length;
 				for (int i = 0; i < length; i++) {
 					Number number = (Number) params[0][i];
-					if (number instanceof Double doubleNumber && (doubleNumber.isInfinite() || doubleNumber.isNaN()))
+					if (Double.isInfinite(number.doubleValue()) || Double.isNaN(number.doubleValue()))
 						return null;
 					if (total.isInfinite() || total.isNaN())
 						return null;
@@ -746,7 +746,7 @@ public class DefaultFunctions {
 					.filter(object -> {
 						if (!(object instanceof Number number))
 							return false;
-						if (number instanceof Double doubleNumber && doubleNumber.isNaN()) {
+						if (Double.isNaN(number.doubleValue())) {
 							invalid.set(true);
 							return false;
 						}
