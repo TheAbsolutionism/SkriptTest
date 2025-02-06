@@ -9,10 +9,9 @@ import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.entry.ContainerEntryData;
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
-import org.skriptlang.skript.lang.entry.EntryValidator.SubContainerBuilder;
-import org.skriptlang.skript.lang.entry.ContainerEntryData;
 import org.skriptlang.skript.lang.script.Script;
 import org.skriptlang.skript.lang.structure.Structure;
 
@@ -25,13 +24,13 @@ public class StructTestSubValidators extends Structure {
 			Skript.registerStructure(StructTestSubValidators.class,
 				EntryValidator.builder()
 					.addEntryData(new ContainerEntryData("sub validator 1", false,
-						new SubContainerBuilder()
+						EntryValidator.builder()
 							.addSection("sub section", false)
 					))
 					.addEntryData(new ContainerEntryData("sub validator 2", false,
-						new SubContainerBuilder()
+						EntryValidator.builder()
 							.addEntryData(new ContainerEntryData("sub sub validator", false,
-								new SubContainerBuilder()
+								EntryValidator.builder()
 									.addSection("sub sub section", false)
 							))
 					))

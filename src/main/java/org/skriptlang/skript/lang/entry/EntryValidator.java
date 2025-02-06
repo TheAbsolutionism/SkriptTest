@@ -238,12 +238,4 @@ public class EntryValidator {
 
 	}
 
-	public static class SubContainerBuilder extends EntryValidatorBuilder {
-
-		public SubContainerBuilder() {
-			super();
-		}
-
-	}
-
 }
