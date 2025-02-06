@@ -67,7 +67,7 @@ public class EvtRealTime extends SkriptEvent {
 			while (expectedCalendar.before(currentCalendar)) {
 				expectedCalendar.add(Calendar.HOUR_OF_DAY, 24);
 			}
-			RealTimeInfo info = new RealTimeInfo(time, expectedCalendar.getTimeInMillis());
+			RealTimeInfo info = new RealTimeInfo(expectedCalendar.getTimeInMillis());
 			infoList.add(info);
 			createNewTask(info);
 		}
@@ -133,11 +133,9 @@ public class EvtRealTime extends SkriptEvent {
 
 	private static class RealTimeInfo {
 		private long executionTime;
-		private final Time time;
 		private TimerTask task;
 
-		public RealTimeInfo(Time time, long executionTime) {
-			this.time = time;
+		public RealTimeInfo(long executionTime) {
 			this.executionTime = executionTime;
 		}
 

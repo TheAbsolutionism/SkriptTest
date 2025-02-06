@@ -15,10 +15,6 @@ import java.util.regex.Pattern;
  * @author Peter Güttinger
  */
 public class Time implements YggdrasilSerializable, Cyclical<Integer> {
-	
-	public enum TimeFormat {
-		AM, PM, TWENTY_FOUR_HOURS
-	}
 
 	private final static int TICKS_PER_HOUR = 1000, TICKS_PER_DAY = 24 * TICKS_PER_HOUR;
 	private final static double TICKS_PER_MINUTE = 1000. / 60;
@@ -28,7 +24,6 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	private final static int HOUR_ZERO = 6 * TICKS_PER_HOUR;
 	
 	private final int time;
-	private final TimeFormat timeFormat;
 
 	private static final Pattern DAY_TIME_PATTERN = Pattern.compile("(\\d?\\d)(:(\\d\\d))? ?(am|pm)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile("\\d?\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
@@ -36,14 +31,9 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	public Time() {
 		this(0);
 	}
-
-	public Time(int time) {
-		this(time, TimeFormat.TWENTY_FOUR_HOURS);
-	}
 	
-	public Time(int time, TimeFormat timeFormat) {
+	public Time(int time) {
 		this.time = Math2.mod(time, TICKS_PER_DAY);
-		this.timeFormat = timeFormat;
 	}
 	
 	/**
@@ -61,29 +51,25 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	}
 
 	public int getHour() {
-        int hour = (int) Math2.floor((double) (time + HOUR_ZERO) / TICKS_PER_HOUR);
-		if (hour > 24)
+		int thisTime = time;
+		if (time < 0)
+			thisTime = Math.abs(time);
+		int hour = (thisTime + HOUR_ZERO) / TICKS_PER_HOUR;
+		if (hour >= 24)
 			hour -= 24;
 		return hour;
 	}
 
 	public int getMinute() {
-		int hour = getHour();
-		int remain = (time + HOUR_ZERO) - (hour * TICKS_PER_HOUR);
-        return (int) Math2.round(remain / TICKS_PER_MINUTE);
-	}
-
-	public TimeFormat getTimeFormat() {
-		return timeFormat;
+		return (int) Math2.round(((time + HOUR_ZERO) % TICKS_PER_HOUR) / TICKS_PER_MINUTE);
 	}
 
 	@Override
 	public String toString() {
-		String string = toString(time);
-		return string + ((timeFormat == null || timeFormat == TimeFormat.TWENTY_FOUR_HOURS ? "" : timeFormat.name().replace('_', ' ')));
+		return toString(time);
 	}
 	
-	public static String toString(final int ticks) {
+	public static String toString(int ticks) {
 		assert 0 <= ticks && ticks < TICKS_PER_DAY;
 		final int t = (ticks + HOUR_ZERO) % TICKS_PER_DAY;
 		int hours = t / TICKS_PER_HOUR;
@@ -122,7 +108,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 				Skript.error("" + m_error_60_minutes);
 				return null;
 			}
-			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), TimeFormat.TWENTY_FOUR_HOURS);
+			return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE));
 		} else {
 			final Matcher m = DAY_TIME_PATTERN.matcher(s);
 			if (m.matches()) {
@@ -140,12 +126,9 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 					Skript.error("" + m_error_60_minutes);
 					return null;
 				}
-				TimeFormat format = TimeFormat.AM;
-				if (m.group(4).equalsIgnoreCase("pm")) {
+				if (m.group(4).equalsIgnoreCase("pm"))
 					hours += 12;
-					format = TimeFormat.PM;
-				}
-				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE), format);
+				return new Time((int) Math.round(hours * TICKS_PER_HOUR - HOUR_ZERO + minutes * TICKS_PER_MINUTE));
 			}
 		}
 		return null;
@@ -153,7 +136,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(time, timeFormat);
+		return Objects.hash(time);
 	}
 	
 	@Override
@@ -164,7 +147,7 @@ public class Time implements YggdrasilSerializable, Cyclical<Integer> {
 			return false;
 		if (!(obj instanceof Time other))
 			return false;
-		return time == other.time && timeFormat == other.timeFormat;
+		return time == other.time;
 	}
 	
 	@Override
