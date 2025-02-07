@@ -1,8 +1,8 @@
 package ch.njol.skript.registrations;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.effects.EffTest;
 import ch.njol.skript.expressions.base.EventValueExpression;
+import ch.njol.skript.test.runner.EffDebugEventValues;
 import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.ImmutableList;
@@ -404,8 +404,7 @@ public class EventValues {
 	}
 
 	public static void debug(Class<?> eventClass, Class<?> valueClass, String message) {
-		if (eventClass.equals(EffTest.eventClass) && valueClass.equals(EffTest.valueClass))
-			Skript.adminBroadcast(message);
+		EffDebugEventValues.debug(eventClass, valueClass, message);
 	}
 
 	/**

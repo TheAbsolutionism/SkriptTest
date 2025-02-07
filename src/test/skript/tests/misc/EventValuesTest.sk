@@ -97,10 +97,16 @@ on craft:
 	set {_values::*} to event-string and event-item
 
 on entity pickup:
-	set {_values::*} to event-entity, event-item and event-itemtype
+	add event-entity to {_values::*}
+	add event-dropped item to {_values::*}
+	add event-itemtype to {_values::*}
+	#set {_values::*} to event-entity, event-dropped item and event-itemtype
 
 on player pickup:
-	set {_values::*} to event-player, event-item and event-itemtype
+	add event-player to {_values::*}
+	add event-dropped item to {_values::*}
+	add event-itemtype to {_values::*}
+	#set {_values::*} to event-player, event-dropped item and event-itemtype
 
 on consume:
 	set {_values::*} to event-player and event-item
@@ -112,7 +118,7 @@ on item despawn:
 	set {_values::*} to event-dropped item and event-item
 
 on item merge:
-	set {_values::*} to event-dropped item and event-item #and future event-dropped item
+	set {_values::*} to event-dropped item and event-item and future event-dropped item
 
 on inventory item move:
 	set {_values::*} to event-inventory, future event-inventory, event-block, event-item and future event-block
