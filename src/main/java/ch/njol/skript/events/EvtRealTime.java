@@ -70,7 +70,7 @@ public class EvtRealTime extends SkriptEvent {
 			TimerTask task = new TimerTask() {
 				@Override
 				public void run() {
-					preExecute();
+					execute();
 				}
 			};
 			timerTasks.add(task);
@@ -93,20 +93,15 @@ public class EvtRealTime extends SkriptEvent {
 	}
 
 	private void execute() {
+		// Ensure this element wasn't unloaded
+		if (unloaded)
+			return;
 		RealTimeEvent event = new RealTimeEvent();
 		SkriptEventHandler.logEventStart(event);
 		SkriptEventHandler.logTriggerStart(trigger);
 		trigger.execute(event);
 		SkriptEventHandler.logTriggerEnd(trigger);
 		SkriptEventHandler.logEventEnd();
-	}
-
-	private void preExecute() {
-		// Safety check, ensure this 'EvtRealTime' was not unloaded
-		if (unloaded)
-			return;
-		// Activate trigger
-		execute();
 	}
 
 	@Override
