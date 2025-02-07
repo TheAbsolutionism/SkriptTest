@@ -82,23 +82,19 @@ public class EffZombify extends Effect {
 				ticks = (int) timespan.getAs(TimePeriod.TICK);
 		}
 		int finalTicks = ticks;
+		Function<LivingEntity, LivingEntity> changeFunction = entity -> {
+			if (zombify && entity instanceof Villager villager) {
+				return villager.zombify();
+			} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
+				zombieVillager.setConversionTime(finalTicks);
+			}
+			return entity;
+		};
 		if (changeInPlace) {
-			Function<LivingEntity, LivingEntity> changeFunction = entity -> {
-				if (zombify && entity instanceof Villager villager) {
-					return villager.zombify();
-				} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
-					zombieVillager.setConversionTime(finalTicks);
-				}
-				return entity;
-			};
 			entities.changeInPlace(event, changeFunction);
 		} else {
 			for (LivingEntity entity : entities.getAll(event)) {
-				if (zombify && entity instanceof Villager villager) {
-					villager.zombify();
-				} else if (!zombify && entity instanceof ZombieVillager zombieVillager) {
-					zombieVillager.setConversionTime(finalTicks);
-				}
+				changeFunction.apply(entity);
 			}
 		}
 	}
