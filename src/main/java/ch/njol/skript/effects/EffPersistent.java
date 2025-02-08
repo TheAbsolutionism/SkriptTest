@@ -52,7 +52,11 @@ public class EffPersistent extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		source = exprs[0];
-		persist = matchedPattern == 2 || parseResult.hasTag("not");
+		if (matchedPattern < 2) {
+			persist = !parseResult.hasTag("not");
+		} else {
+			persist = false;
+		}
 		return true;
 	}
 
