@@ -41,8 +41,8 @@ public class EffPersistent extends Effect {
 
 	static {
 		Skript.registerEffect(EffPersistent.class,
-			"make %entities/blocks% persist[ent]",
-			"force %entities/blocks% to persist",
+			"make %entities/blocks% [:not] persist[ent]",
+			"force %entities/blocks% to [:not] persist",
 			"prevent %entities/blocks% from persisting");
 	}
 
@@ -52,7 +52,7 @@ public class EffPersistent extends Effect {
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		source = exprs[0];
-		persist = matchedPattern != 2;
+		persist = matchedPattern == 2 || parseResult.hasTag("not");
 		return true;
 	}
 
