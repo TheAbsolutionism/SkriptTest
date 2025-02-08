@@ -31,7 +31,7 @@ public class CondGoatHorns extends Condition {
 	static {
 		Skript.registerCondition(CondGoatHorns.class,
 			"%livingentities% (has|have) ((any|a) horn|left:[a] left horn|right:[a] right horn|both:both horns)",
-			"%livingentities% (does not|doesn't) have ((any|a) horn|left:[a] left horn|right:[a] right horn|both:both horns)");
+			"%livingentities% (do not|don't|does not|doesn't) have ((any|a) horn|left:[a] left horn|right:[a] right horn|both:both horns)");
 	}
 
 	private Expression<LivingEntity> entities;
