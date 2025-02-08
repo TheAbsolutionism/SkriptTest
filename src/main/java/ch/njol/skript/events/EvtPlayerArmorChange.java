@@ -11,7 +11,11 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletionException;
+
 public class EvtPlayerArmorChange extends SkriptEvent {
+
+	private static boolean BODY_SLOT_EXISTS;
 
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
@@ -27,6 +31,12 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 						"\tbroadcast the new armor item"
 				)
 				.since("2.5, INSERT VERSION (equipment slots)");
+
+			EquipmentSlot bodySlot = null;
+			try {
+				bodySlot = EquipmentSlot.valueOf("BODY");
+			} catch (IllegalArgumentException | NoSuchFieldError | CompletionException ignored) {};
+			BODY_SLOT_EXISTS = bodySlot != null;
 		}
 	}
 
@@ -40,7 +50,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			slotLiteral = (Literal<EquipmentSlot>) args[0];
 			slots = slotLiteral.getArray();
 			for (EquipmentSlot slot : slots) {
-				if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || slot == EquipmentSlot.BODY) {
+				if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || (BODY_SLOT_EXISTS && slot == EquipmentSlot.BODY)) {
 					Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
 					return false;
 				}
