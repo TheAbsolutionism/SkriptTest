@@ -719,7 +719,7 @@ public class DefaultFunctions {
 						return null;
 					if (total.isInfinite() || total.isNaN())
 						return null;
-					total += (number.doubleValue() - total) / (i + 1);
+					total += number.doubleValue() / length;
 				}
 				return new Number[]{total};
 			}
