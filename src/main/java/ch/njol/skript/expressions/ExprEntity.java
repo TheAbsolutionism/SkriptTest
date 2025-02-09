@@ -108,7 +108,12 @@ public class ExprEntity extends SimpleExpression<Entity> {
 		}
 		return super.getConvertedExpression(to);
 	}
-	
+
+	@Override
+	public boolean setTime(int time) {
+		return entity.setTime(time);
+	}
+
 	@Override
 	public String toString(final @Nullable Event e, final boolean debug) {
 		return "the " + type;

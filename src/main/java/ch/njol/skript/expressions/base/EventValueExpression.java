@@ -16,6 +16,7 @@ import ch.njol.skript.log.ParseLogHandler;
 import ch.njol.skript.log.SkriptLogger;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.test.runner.EffDebugEventValues;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -155,6 +156,7 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 				}
 				if (EventValues.hasMultipleConverters(event, type, getTime()) == Kleenean.TRUE) {
 					Noun typeName = Classes.getExactClassInfo(componentType).getName();
+					EffDebugEventValues.debug("#init: Multiple - " + event + " - " + type + " - " + componentType);
 					log.printError("There are multiple " + typeName.toString(true) + " in " + Utils.a(getParser().getCurrentEventName()) + " event. " +
 							"You must define which " + typeName + " to use.");
 					return false;

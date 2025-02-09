@@ -6,9 +6,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.util.Kleenean;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class EffDebugEventValues extends Effect {
@@ -22,8 +22,8 @@ public class EffDebugEventValues extends Effect {
 		return true;
 	}
 
-	public static Class<? extends Event> eventClass = EntitySpawnEvent.class;
-	public static Class<?> valueClass = Zombie.class;
+	public static Class<? extends Event> eventClass = PlayerPickupItemEvent.class;
+	public static Class<?> valueClass = Entity.class;
 
 	@Override
 	protected void execute(Event event) {
@@ -31,9 +31,15 @@ public class EffDebugEventValues extends Effect {
 		Skript.adminBroadcast("Has Multiple: " + EventValues.hasMultipleConverters(eventClass, valueClass, 0));
 	}
 
+	public static void debug(String message) {
+		if (!TestMode.ENABLED)
+			return;
+		Skript.adminBroadcast(message);
+	}
+
 	public static void debug(Class<?> checkEvent, Class<?> checkValue, String message) {
 		if (checkEvent.equals(eventClass) && checkValue.equals(valueClass))
-			Skript.adminBroadcast(message);
+			debug(message);
 	}
 
 	@Override
