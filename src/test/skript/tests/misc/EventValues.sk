@@ -97,16 +97,10 @@ on craft:
 	set {_values::*} to event-string and event-item
 
 on entity pickup:
-	add event-entity to {_values::*}
-	add event-dropped item to {_values::*}
-	add event-itemtype to {_values::*}
-	#set {_values::*} to event-entity, event-dropped item and event-itemtype
+	set {_values::*} to event-entity, event-dropped item and event-itemtype
 
 on player pickup:
-	add event-player to {_values::*}
-	add event-dropped item to {_values::*}
-	add event-itemtype to {_values::*}
-	#set {_values::*} to event-player, event-dropped item and event-itemtype
+	set {_values::*} to event-player, event-dropped item and event-itemtype
 
 on consume:
 	set {_values::*} to event-player and event-item
@@ -136,7 +130,7 @@ on player unleash:
 	set {_values::*} to event-player and event-unleash reason
 
 on level change:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on entity move:
 	set {_values::*} to event-entity
@@ -145,10 +139,10 @@ on step on dirt:
 	set {_values::*} to event-player, event-block, past event-location, event-location, past event-chunk and event-chunk
 
 on send command list:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on resource pack response:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on load:
 	set {_values::*} to event-sender
@@ -163,7 +157,7 @@ on skript unload:
 	set {_values::*} to event-sender
 
 on start spectating:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on entity teleport:
 	set {_values::*} to event-entity, past event-location and event-location
@@ -283,13 +277,13 @@ on tool change:
 	set {_values::*} to event-player, past event-slot and event-slot
 
 on join:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on connect:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on kick:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on entity portal:
 	set {_values::*} to event-entity, past event-location and event-location
@@ -301,13 +295,13 @@ on leave:
 	set {_values::*} to event-player and event-quit reason
 
 on respawn:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on toggle sneak:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on toggle sprint:
-	set {_values::*} to event-player
+	set {_values::*} to event-player and event-entity
 
 on portal create:
 	set {_values::*} to event-world, event-blocks and event-entity

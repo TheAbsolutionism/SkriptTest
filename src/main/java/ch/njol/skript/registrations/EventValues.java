@@ -290,13 +290,13 @@ public class EventValues {
 	@Nullable
 	@SuppressWarnings("unchecked")
 	private static <T, E extends Event> List<Converter<? super E, ? extends T>> getEventValueConverters(
-		Class<E> event, Class<T> valueClass, int time,
+		Class<E> eventClass, Class<T> valueClass, int time,
 		boolean allowDefault, boolean allowConverting
 	) {
 		List<EventValueInfo<?, ?>> eventValues = getEventValuesList(time);
 		List<Converter<? super E, ? extends T>> list = new ArrayList<>();
 		// First check for exact classes matching the parameters.
-		Converter<? super E, ? extends T> exact = getExactEventValueConverter(event, valueClass, time);
+		Converter<? super E, ? extends T> exact = getExactEventValueConverter(eventClass, valueClass, time);
 		if (exact != null) {
 			list.add(exact);
 			return list;
@@ -306,14 +306,14 @@ public class EventValues {
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
 			if (!valueClass.isAssignableFrom(eventValueInfo.valueClass))
 				continue;
-			if (!checkExcludes(eventValueInfo, event))
+			if (!checkExcludes(eventValueInfo, eventClass))
 				return null;
-			if (eventValueInfo.eventClass.isAssignableFrom(event)) {
+			if (eventValueInfo.eventClass.isAssignableFrom(eventClass)) {
 				list.add((Converter<? super E, ? extends T>) eventValueInfo.converter);
 				infoConverterMap.put(eventValueInfo, (Converter<? super E, ? extends T>) eventValueInfo.converter);
 				continue;
 			}
-			if (!event.isAssignableFrom(eventValueInfo.eventClass))
+			if (!eventClass.isAssignableFrom(eventValueInfo.eventClass))
 				continue;
 			Converter<? super E, ? extends T> converter = e -> {
 				if (!eventValueInfo.eventClass.isInstance(e))
@@ -324,7 +324,7 @@ public class EventValues {
 			infoConverterMap.put(eventValueInfo, converter);
 		}
 		if (!list.isEmpty())
-			return delegateConverters(event, valueClass, infoConverterMap, list);
+			return delegateConverters(eventClass, valueClass, infoConverterMap, list);
 		if (!allowConverting)
 			return null;
 		// Most checks have returned before this below is called, but Skript will attempt to convert or find an alternative.
@@ -332,11 +332,11 @@ public class EventValues {
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
 			if (!eventValueInfo.valueClass.isAssignableFrom(valueClass))
 				continue;
-			boolean checkInstanceOf = !eventValueInfo.eventClass.isAssignableFrom(event);
-			if (checkInstanceOf && !event.isAssignableFrom(eventValueInfo.eventClass))
+			boolean checkInstanceOf = !eventValueInfo.eventClass.isAssignableFrom(eventClass);
+			if (checkInstanceOf && !eventClass.isAssignableFrom(eventValueInfo.eventClass))
 				continue;
 
-			if (!checkExcludes(eventValueInfo, event))
+			if (!checkExcludes(eventValueInfo, eventClass))
 				return null;
 
 			Converter<? super E, ? extends T> converter = e -> {
@@ -351,11 +351,11 @@ public class EventValues {
 			infoConverterMap.put(eventValueInfo, converter);
 		}
 		if (!list.isEmpty())
-			return delegateConverters(event, valueClass, infoConverterMap, list);
+			return delegateConverters(eventClass, valueClass, infoConverterMap, list);
 		// Fourth check will attempt to convert the eventClass value to the requesting type.
 		// This first for loop will check that the events are exact. See issue #5016
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
-			if (!event.equals(eventValueInfo.eventClass))
+			if (!eventClass.equals(eventValueInfo.eventClass))
 				continue;
 
 			Converter<? super E, ? extends T> converter = (Converter<? super E, ? extends T>)
@@ -363,7 +363,7 @@ public class EventValues {
 			if (converter == null)
 				continue;
 
-			if (!checkExcludes(eventValueInfo, event))
+			if (!checkExcludes(eventValueInfo, eventClass))
 				return null;
 			list.add(converter);
 			continue;
@@ -373,7 +373,7 @@ public class EventValues {
 		// This loop will attempt to look for converters assignable to the class of the provided eventClass.
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
 			// The requesting eventClass must be assignable to the eventClass value's eventClass. Otherwise it'll throw an error.
-			if (!event.isAssignableFrom(eventValueInfo.eventClass))
+			if (!eventClass.isAssignableFrom(eventValueInfo.eventClass))
 				continue;
 
 			Converter<? super E, ? extends T> converter = (Converter<? super E, ? extends T>)
@@ -381,7 +381,7 @@ public class EventValues {
 			if (converter == null)
 				continue;
 
-			if (!checkExcludes(eventValueInfo, event))
+			if (!checkExcludes(eventValueInfo, eventClass))
 				return null;
 			list.add(converter);
 			continue;
@@ -390,7 +390,7 @@ public class EventValues {
 			return list;
 		// If the check should try again matching eventClass values with a 0 time (most eventClass values).
 		if (allowDefault && time != 0)
-			return getEventValueConverters(event, valueClass, 0, false);
+			return getEventValueConverters(eventClass, valueClass, 0, false);
 		return null;
 	}
 
@@ -405,18 +405,18 @@ public class EventValues {
 	private static <E extends Event, T> List<Converter<? super E, ? extends T>> delegateConverters(
 		Class<E> eventClass,
 		Class<T> valueClass,
-		Map<EventValueInfo<?, ?>, Converter<? super E, ? extends T>> converterMap,
+		Map<EventValueInfo<?, ?>, Converter<? super E, ? extends T>> infoConverterMap,
 		List<Converter<? super E, ? extends T>> converters
 	) {
 		if (converters.size() == 1)
 			return converters;
 		ClassInfo<T> valueClassInfo = Classes.getExactClassInfo(valueClass);
 		List<Converter<? super E, ? extends T>> delegated = new ArrayList<>();
-		for (EventValueInfo<?, ?> eventValueInfo : converterMap.keySet()) {
+		for (EventValueInfo<?, ?> eventValueInfo : infoConverterMap.keySet()) {
 			ClassInfo<?> thisClassInfo = Classes.getExactClassInfo(eventValueInfo.valueClass);
 			if (thisClassInfo != null && !thisClassInfo.equals(valueClassInfo))
 				continue;
-			delegated.add(converterMap.get(eventValueInfo));
+			delegated.add(infoConverterMap.get(eventValueInfo));
 		}
 		if (delegated.isEmpty())
 			return converters;
