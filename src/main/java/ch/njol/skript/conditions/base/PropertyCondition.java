@@ -7,15 +7,17 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Predicate;
-import org.jetbrains.annotations.ApiStatus;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 import org.skriptlang.skript.util.Priority;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -104,19 +106,41 @@ public abstract class PropertyCondition<T> extends Condition implements Predicat
 	 */
 	@ApiStatus.Experimental
 	public static <E extends Condition> SyntaxInfo<E> register(SyntaxRegistry registry, Class<E> condition, PropertyType propertyType, String property, String type) {
-		if (type.contains("%"))
-			throw new SkriptAPIException("The type argument must not contain any '%'s");
 		SyntaxInfo.Builder<?, E> builder = SyntaxInfo.builder(condition).priority(DEFAULT_PRIORITY);
-		switch (propertyType) {
-			case BE -> builder.addPatterns("%" + type + "% (is|are) " + property,
-					"%" + type + "% (isn't|is not|aren't|are not) " + property);
-			case CAN -> builder.addPatterns("%" + type + "% can " + property,
-					"%" + type + "% (can't|cannot|can not) " + property);
-			case HAVE -> builder.addPatterns("%" + type + "% (has|have) " + property,
-					"%" + type + "% (doesn't|does not|do not|don't) have " + property);
-			case WILL -> builder.addPatterns("%" + type + "% will " + property,
-					"%" + type + "% (will (not|neither)|won't) " + property);
-		}
+		builder.addPatterns(getPatterns(propertyType, property, type));
+		SyntaxInfo<E> info = builder.build();
+		registry.register(SyntaxRegistry.CONDITION, info);
+		return info;
+	}
+
+	/**
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param condition The class to register
+	 * @param propertyPairs The {@link PropertyPair} containing {@link PropertyType} and {@code property}
+	 * @param type Must be plural, for example <i>players</i> in <i>players can fly</i>
+	 * @param <E> The Condition type.
+	 * @return The registered {@link SyntaxInfo}.
+	 */
+	@Experimental
+	public static <E extends Condition> SyntaxInfo<E> register(SyntaxRegistry registry, Class<E> condition, PropertyPair[] propertyPairs, String type) {
+		SyntaxInfo.Builder<?, E> builder = SyntaxInfo.builder(condition).priority(DEFAULT_PRIORITY);
+		builder.addPatterns(getPatterns(propertyPairs, type));
+		SyntaxInfo<E> info = builder.build();
+		registry.register(SyntaxRegistry.CONDITION, info);
+		return info;
+	}
+
+	/**
+	 * @param registry The SyntaxRegistry to register with.
+	 * @param condition The class to register
+	 * @param propertyTriples The {@link PropertyTriple}s containing {@link PropertyTriple}, {@code property}, and {@code type}
+	 * @param <E> The Condition type.
+	 * @return The registered {@link SyntaxInfo}.
+	 */
+	@Experimental
+	public static <E extends Condition> SyntaxInfo<E> register(SyntaxRegistry registry, Class<E> condition, PropertyTriple[] propertyTriples) {
+		SyntaxInfo.Builder<?, E> builder = SyntaxInfo.builder(condition).priority(DEFAULT_PRIORITY);
+		builder.addPatterns(getPatterns(propertyTriples));
 		SyntaxInfo<E> info = builder.build();
 		registry.register(SyntaxRegistry.CONDITION, info);
 		return info;
@@ -144,6 +168,41 @@ public abstract class PropertyCondition<T> extends Condition implements Predicat
 	public static void register(Class<? extends Condition> condition, PropertyType propertyType, String property, String type) {
 		Skript.registerCondition(condition, ConditionType.PROPERTY,
 				getPatterns(propertyType, property, type));
+	}
+
+	/**
+	 * Registers a new property condition.
+	 *
+	 * @param condition The class to register
+	 * @param propertyPairs The {@link PropertyPair}s containing {@link PropertyType} and {@code property}
+	 * @param type must be plural, for example <i>players</i> in <i>players can fly</i>
+	 */
+	public static void register(Class<? extends Condition> condition, PropertyPair[] propertyPairs, String type) {
+		Skript.registerCondition(condition, ConditionType.PROPERTY, getPatterns(propertyPairs, type));
+	}
+
+	/**
+	 * Registers a new property condition.
+	 *
+	 * @param condition The class to register
+	 * @param propertyTriples The {@link PropertyTriple}s containing {@link PropertyType}, {@code property}, and {@code type}
+	 */
+	public static void register(Class<? extends Condition> condition, PropertyTriple[] propertyTriples) {
+		Skript.registerCondition(condition, ConditionType.PROPERTY, getPatterns(propertyTriples));
+	}
+
+	public static String[] getPatterns(PropertyPair[] propertyPairs, String type) {
+		List<String> patterns = new ArrayList<>();
+		for (PropertyPair propertyPair : propertyPairs)
+			patterns.addAll(Arrays.stream(getPatterns(propertyPair.propertyType, propertyPair.property, type)).toList());
+		return patterns.toArray(String[]::new);
+	}
+
+	public static String[] getPatterns(PropertyTriple[] propertyTriples) {
+		List<String> patterns = new ArrayList<>();
+		for (PropertyTriple propertyTriple : propertyTriples)
+			patterns.addAll(Arrays.stream(getPatterns(propertyTriple.propertyType, propertyTriple.property, propertyTriple.type)).toList());
+		return patterns.toArray(String[]::new);
 	}
 
 	/**
@@ -184,7 +243,7 @@ public abstract class PropertyCondition<T> extends Condition implements Predicat
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
 		expr = (Expression<? extends T>) expressions[0];
-		setNegated(matchedPattern == 1);
+		setNegated(matchedPattern % 2 == 1);
 		return true;
 	}
 
@@ -255,5 +314,8 @@ public abstract class PropertyCondition<T> extends Condition implements Predicat
 	public @NotNull Predicate<T> or(@NotNull Predicate<? super T> other) {
 		throw new UnsupportedOperationException("Combining property conditions is undefined behaviour");
 	}
+
+	public record PropertyPair(@NotNull PropertyType propertyType, @NotNull String property) {};
+	public record PropertyTriple(@NotNull PropertyType propertyType, @NotNull String property, @NotNull String type) {}
 
 }

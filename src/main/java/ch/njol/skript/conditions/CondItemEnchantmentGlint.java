@@ -29,8 +29,10 @@ public class CondItemEnchantmentGlint extends PropertyCondition<ItemType> {
 
 	static {
 		if (Skript.methodExists(ItemMeta.class, "getEnchantmentGlintOverride")) {
-			register(CondItemEnchantmentGlint.class, PropertyType.HAVE, "enchantment glint overrid(den|e)", "itemtypes");
-			register(CondItemEnchantmentGlint.class, PropertyType.BE, "forced to [:not] glint", "itemtypes");
+			register(CondItemEnchantmentGlint.class, new PropertyPair[]{
+				new PropertyPair(PropertyType.HAVE, "enchantment glint overrid(den|e)"),
+				new PropertyPair(PropertyType.BE, "forced to [:not] glint")
+			}, "itemtypes");
 		}
 	}
 
