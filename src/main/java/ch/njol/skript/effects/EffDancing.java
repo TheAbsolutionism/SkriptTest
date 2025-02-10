@@ -20,9 +20,10 @@ import org.jetbrains.annotations.Nullable;
 @Name("Dance")
 @Description({
 	"Make an allay or piglin start or stop dancing.",
-	"Providing a location for allays, checks to see if the the block at the location is a jukebox and playing music. "
-		+ "Not providing a location, the allay will dance forever.",
-	"Providing a timespan for piglins, makes them dance for that period of time."
+	"Providing a location only applies to allays. They will check to see if the the block at the location is a jukebox and playing music. "
+		+ "If it isn't, they will stop dancing. If no location is provided, the allay will dance indefinitely.",
+	"Providing a timespan only applies for piglins. It determines the length of time they will dance for. "
+		+ "If no timespan is provided, they will dance indefinitely."
 })
 @Examples({
 	"if last spawned allay is not dancing:",
@@ -41,7 +42,7 @@ public class EffDancing extends Effect {
 
 	static {
 		Skript.registerEffect(EffDancing.class,
-			"make %livingentities% (start dancing|dance) [%-direction% %-location%] [for:for %-timespan%]",
+			"make %livingentities% (start dancing|dance) [%-direction% %-location%] [timespan:for %-timespan%]",
 			"make %livingentities% (stop dancing|not dance)");
 	}
 
@@ -59,7 +60,7 @@ public class EffDancing extends Effect {
 			//noinspection unchecked
 			location = Direction.combine((Expression<Direction>) exprs[1], (Expression<Location>) exprs[2]);
 		}
-		if (parseResult.hasTag("for")) {
+		if (parseResult.hasTag("timespan")) {
 			//noinspection unchecked
 			timespan = (Expression<Timespan>) exprs[3];
 		}
