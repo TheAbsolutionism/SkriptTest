@@ -21,17 +21,17 @@ public class EventValues {
 	private EventValues() {}
 
 	/**
-	 * The past value of an eventClass value. Represented by "past" or "former".
+	 * The past value of an event value. Represented by "past" or "former".
 	 */
 	public static final int TIME_PAST = -1;
 
 	/**
-	 * The current time of an eventClass value.
+	 * The current time of an event value.
 	 */
 	public static final int TIME_NOW = 0;
 
 	/**
-	 * The future time of an eventClass value.
+	 * The future time of an event value.
 	 */
 	public static final int TIME_FUTURE = 1;
 
@@ -41,9 +41,9 @@ public class EventValues {
 
 	/**
 	 * Get Event Values list for the specified time
-	 * @param time The time of the eventClass values. One of
+	 * @param time The time of the event values. One of
 	 * {@link EventValues#TIME_PAST}, {@link EventValues#TIME_NOW} or {@link EventValues#TIME_FUTURE}.
-	 * @return An immutable copy of the eventClass values list for the specified time
+	 * @return An immutable copy of the event values list for the specified time
 	 */
 	public static List<EventValueInfo<?, ?>> getEventValuesListForTime(int time) {
 		return ImmutableList.copyOf(getEventValuesList(time));
@@ -60,7 +60,7 @@ public class EventValues {
 	}
 
 	/**
-	 * Registers an eventClass value, specified by the provided {@link Converter}, with excluded events.
+	 * Registers an event value, specified by the provided {@link Converter}, with excluded events.
 	 * Uses the default time, {@link #TIME_NOW}.
 	 *
 	 * @see #registerEventValue(Class, Class, Converter, int)
@@ -73,10 +73,10 @@ public class EventValues {
 	}
 
 	/**
-	 * Registers an eventClass value.
+	 * Registers an event value.
 	 *
-	 * @param eventClass the eventClass valueClass class.
-	 * @param valueClass the return valueClass of the converter for the eventClass value.
+	 * @param eventClass the event valueClass class.
+	 * @param valueClass the return valueClass of the converter for the event value.
 	 * @param converter the converter to get the value with the provided eventClass.
 	 * @param time value of TIME_PAST if this is the value before the eventClass, TIME_FUTURE if after, and TIME_NOW if it's the default or this value doesn't have distinct states.
 	 *            <b>Always register a default state!</b> You can leave out one of the other states instead, e.g. only register a default and a past state. The future state will
@@ -90,17 +90,17 @@ public class EventValues {
 	}
 
 	/**
-	 * Registers an eventClass value and with excluded events.
-	 * Excluded events are events that this eventClass value can't operate in.
+	 * Registers an event value and with excluded events.
+	 * Excluded events are events that this event value can't operate in.
 	 *
 	 * @param eventClass the eventClass type class.
-	 * @param valueClass the return type of the converter for the eventClass value.
+	 * @param valueClass the return type of the converter for the event value.
 	 * @param converter the converter to get the value with the provided eventClass.
 	 * @param time value of TIME_PAST if this is the value before the eventClass, TIME_FUTURE if after, and TIME_NOW if it's the default or this value doesn't have distinct states.
 	 *            <b>Always register a default state!</b> You can leave out one of the other states instead, e.g. only register a default and a past state. The future state will
 	 *            default to the default state in this case.
 	 * @param excludeErrorMessage The error message to display when used in the excluded events.
-	 * @param excludes subclasses of the eventClass for which this eventClass value should not be registered for
+	 * @param excludes subclasses of the eventClass for which this event value should not be registered for
 	 */
 	@SafeVarargs
 	public static <T, E extends Event> void registerEventValue(
@@ -192,7 +192,7 @@ public class EventValues {
 	 *
 	 * @param eventClass the eventClass class the getter will be getting from
 	 * @param valueClass type of {@link Converter}
-	 * @param time the eventClass-value's time
+	 * @param time the event-value's time
 	 * @return A getter to get values for a given type of events
 	 * @see #registerEventValue(Class, Class, Converter, int)
 	 * @see EventValueExpression#EventValueExpression(Class)
@@ -228,7 +228,7 @@ public class EventValues {
 	 *
 	 * @param eventClass the eventClass class the {@link Converter} will be getting from.
 	 * @param valueClass type of {@link Converter}.
-	 * @param time the eventClass-value's time.
+	 * @param time the event-value's time.
 	 * @return true or false if the eventClass and type have multiple {@link Converter}s.
 	 */
 	public static <T, E extends Event> Kleenean hasMultipleConverters(Class<E> eventClass, Class<T> valueClass, int time) {
@@ -251,11 +251,11 @@ public class EventValues {
 	/**
 	 * Returns a {@link Converter} to get a value from in an eventClass.
 	 * <p>
-	 * Can print an error if the eventClass value is blocked for the given eventClass.
+	 * Can print an error if the event value is blocked for the given eventClass.
 	 *
 	 * @param eventClass the eventClass class the {@link Converter} will be getting from.
 	 * @param valueClass type of {@link Converter}.
-	 * @param time the eventClass-value's time.
+	 * @param time the event-value's time.
 	 * @return A getter to get values for a given type of events.
 	 * @see #registerEventValue(Class, Class, Converter, int)
 	 * @see EventValueExpression#EventValueExpression(Class)
@@ -284,7 +284,7 @@ public class EventValues {
 	}
 
 	/*
-	 * We need to be able to collect all possible eventClass-values to a list for determining problematic collisions.
+	 * We need to be able to collect all possible event-values to a list for determining problematic collisions.
 	 * Always return after the loop check if the list is not empty.
 	 */
 	@Nullable
@@ -352,7 +352,7 @@ public class EventValues {
 		}
 		if (!list.isEmpty())
 			return delegateConverters(eventClass, valueClass, infoConverterMap, list);
-		// Fourth check will attempt to convert the eventClass value to the requesting type.
+		// Fourth check will attempt to convert the event value to the requesting type.
 		// This first for loop will check that the events are exact. See issue #5016
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
 			if (!eventClass.equals(eventValueInfo.eventClass))
@@ -372,7 +372,7 @@ public class EventValues {
 			return list;
 		// This loop will attempt to look for converters assignable to the class of the provided eventClass.
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
-			// The requesting eventClass must be assignable to the eventClass value's eventClass. Otherwise it'll throw an error.
+			// The requesting eventClass must be assignable to the event value's eventClass. Otherwise it'll throw an error.
 			if (!eventClass.isAssignableFrom(eventValueInfo.eventClass))
 				continue;
 
@@ -388,7 +388,7 @@ public class EventValues {
 		}
 		if (!list.isEmpty())
 			return list;
-		// If the check should try again matching eventClass values with a 0 time (most eventClass values).
+		// If the check should try again matching event values with a 0 time (most event values).
 		if (allowDefault && time != 0)
 			return getEventValueConverters(eventClass, valueClass, 0, false);
 		return null;
@@ -424,12 +424,12 @@ public class EventValues {
 	}
 
 	/**
-	 * Check if the eventClass value states to exclude events.
+	 * Check if the event value states to exclude events.
 	 * False if the current EventValueInfo cannot operate in the provided eventClass.
 	 *
-	 * @param info The eventClass value info that will be used to grab the value from
+	 * @param info The event value info that will be used to grab the value from
 	 * @param eventClass The eventClass class to check the excludes against.
-	 * @return boolean if true the eventClass value passes for the events.
+	 * @return boolean if true the event value passes for the events.
 	 */
 	private static boolean checkExcludes(EventValueInfo<?, ?> info, Class<? extends Event> eventClass) {
 		if (info.excludes == null)
@@ -444,11 +444,11 @@ public class EventValues {
 	}
 
 	/**
-	 * Return a converter wrapped in a getter that will grab the requested value by converting from the given eventClass value info.
+	 * Return a converter wrapped in a getter that will grab the requested value by converting from the given event value info.
 	 *
-	 * @param info The eventClass value info that will be used to grab the value from
-	 * @param valueClass The class that the converter will look for to convert the type from the eventClass value to
-	 * @param checkInstanceOf If the eventClass must be an exact instance of the eventClass value info's eventClass or not.
+	 * @param info The event value info that will be used to grab the value from
+	 * @param valueClass The class that the converter will look for to convert the type from the event value to
+	 * @param checkInstanceOf If the eventClass must be an exact instance of the event value info's eventClass or not.
 	 * @return The found Converter wrapped in a Getter object, or null if no Converter was found.
 	 */
 	@Nullable
