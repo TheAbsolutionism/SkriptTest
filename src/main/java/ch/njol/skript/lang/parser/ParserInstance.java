@@ -523,7 +523,7 @@ public final class ParserInstance implements Experimented {
 		return new ExperimentSet(set);
 	}
 
-	public Feature[] getExperiments() {
+	public Experiment[] getExperiments() {
 		Script script = this.getCurrentScript();
 		ExperimentSet set = script.getData(ExperimentSet.class);
 		if (set == null)

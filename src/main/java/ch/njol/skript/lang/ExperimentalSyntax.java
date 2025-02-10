@@ -1,48 +1,49 @@
 package ch.njol.skript.lang;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.registrations.Feature;
 import ch.njol.util.Kleenean;
+import org.skriptlang.skript.lang.experiment.Experiment;
 
 /**
  * A syntax element that requires an experimental feature to be enabled.
+ * When implementing this interface, it is required to override {@link #requiredExperiment()} or {@link #isSatisfiedBy(Experiment[])}
  */
 public interface ExperimentalSyntax extends SyntaxElement {
 
 	/**
-	 * Returns the experiment {@link Feature} required for this syntax to be used.
+	 * Returns the experiment {@link Experiment} required for this syntax to be used.
 	 * <p>
 	 * Before {@link SyntaxElement#init(Expression[], int, Kleenean, SkriptParser.ParseResult)} is called, checks
 	 * to see if the experiment required has been enabled.
 	 * If it is not, an error will be printed and the syntax element will not be initialised.
 	 * </p>
 	 *
-	 * @return The required experiment feature.
+	 * @return The required experiment.
 	 */
-	default Feature requiredExperiment() {
+	default Experiment requiredExperiment() {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * Checks whether the required features are enabled for this syntax element.
+	 * Checks whether the required experiments are enabled for this syntax element.
 	 * <p>
-	 * By default, this method checks for the required {@link Feature} defined by {@link #requiredExperiment()}
-	 * in the provided array of features. If the required feature is found, the method returns {@code true}.
+	 * By default, this method checks for the required {@link Experiment} defined by {@link #requiredExperiment()}
+	 * in the provided array of experiments. If the required experiment is found, the method returns {@code true}.
 	 * </p>
 	 * <p>
-	 * Subclasses or implementations may override this method to perform custom checks for enabled or disabled features
+	 * Implementations may override this method to perform custom checks for enabled or disabled experiments
 	 * and declare specific requirements for syntax availability.
 	 * When overriding this method, it is recommended to use {@link Skript#error(String)} to inform users
 	 * why the syntax element cannot be used.
 	 * </p>
 	 *
-	 * @param features An array of {@link Feature} instances currently active in the environment.
+	 * @param experiments An array of {@link Experiment} instances currently active in the environment.
 	 * @return {@code true} if the element can be used.
 	 */
-	default boolean isSatisfiedBy(Feature[] features) {
-		Feature required = requiredExperiment();
-		for (Feature feature : features)
-			if (feature.equals(required))
+	default boolean isSatisfiedBy(Experiment[] experiments) {
+		Experiment required = requiredExperiment();
+		for (Experiment experiment : experiments)
+			if (experiment.equals(required))
 				return true;
 		Skript.error("This syntax element is experimental. To enable this experiment, add "
 			+ "'using " + required.codeName() + "' at the top of this file.");
