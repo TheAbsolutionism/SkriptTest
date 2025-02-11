@@ -250,7 +250,7 @@ public class SkriptParser {
 								}
 							}
 							if (element instanceof ExperimentalSyntax experimentalSyntax) {
-								if (!experimentalSyntax.isSatisfiedBy(getParser().getExperiments()))
+								if (!experimentalSyntax.isSatisfiedBy(getParser().getExperimentSet()))
 									continue;
 							}
 

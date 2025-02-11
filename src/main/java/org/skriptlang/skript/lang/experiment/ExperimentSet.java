@@ -33,8 +33,4 @@ public class ExperimentSet extends LinkedHashSet<Experiment> implements ScriptDa
 		return false;
 	}
 
-	public Experiment[] getExperiments() {
-		return this.toArray(Experiment[]::new);
-	}
-
 }

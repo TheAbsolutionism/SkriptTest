@@ -3,10 +3,11 @@ package ch.njol.skript.lang;
 import ch.njol.skript.Skript;
 import ch.njol.util.Kleenean;
 import org.skriptlang.skript.lang.experiment.Experiment;
+import org.skriptlang.skript.lang.experiment.ExperimentSet;
 
 /**
  * A syntax element that requires an experimental feature to be enabled.
- * When implementing this interface, it is required to override {@link #requiredExperiment()} or {@link #isSatisfiedBy(Experiment[])}
+ * When implementing this interface, it is required to override {@link #requiredExperiment()} or {@link #isSatisfiedBy(ExperimentSet)}
  */
 public interface ExperimentalSyntax extends SyntaxElement {
 
@@ -37,12 +38,12 @@ public interface ExperimentalSyntax extends SyntaxElement {
 	 * why the syntax element cannot be used.
 	 * </p>
 	 *
-	 * @param experiments An array of {@link Experiment} instances currently active in the environment.
+	 * @param experimentSet An {@link Experiment} instance containing currently active experiments in the environment.
 	 * @return {@code true} if the element can be used.
 	 */
-	default boolean isSatisfiedBy(Experiment[] experiments) {
+	default boolean isSatisfiedBy(ExperimentSet experimentSet) {
 		Experiment required = requiredExperiment();
-		for (Experiment experiment : experiments)
+		for (Experiment experiment : experimentSet)
 			if (experiment.equals(required))
 				return true;
 		Skript.error("This syntax element is experimental. To enable this experiment, add "
