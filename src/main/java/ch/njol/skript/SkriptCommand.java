@@ -227,7 +227,7 @@ public class SkriptCommand implements CommandExecutor {
 				if (args[1].equalsIgnoreCase("all")) {
 					try {
 						info(sender, "enable.all.enabling");
-						ScriptLoader.loadScripts(newToggleFiles(Skript.getInstance().getScriptsFolder(), true, true), logHandler)
+						ScriptLoader.loadScripts(toggleFiles(Skript.getInstance().getScriptsFolder(), true, true), logHandler)
 							.thenAccept(scriptInfo -> {
 								if (logHandler.numErrors() == 0) {
 									info(sender, "enable.all.enabled");
@@ -279,7 +279,7 @@ public class SkriptCommand implements CommandExecutor {
 
 							Set<File> enabledFiles;
 							try {
-								enabledFiles = newToggleFiles(enabledDirectory, true, false);
+								enabledFiles = toggleFiles(enabledDirectory, true, false);
 							} catch (IOException e) {
 								error(sender, "enable.folder.io error", enabledDirectory.getName(), ExceptionUtils.toString(e));
 								return true;
@@ -304,7 +304,7 @@ public class SkriptCommand implements CommandExecutor {
 				if (args[1].equalsIgnoreCase("all")) {
 					ScriptLoader.unloadScripts(ScriptLoader.getLoadedScripts());
 					try {
-						newToggleFiles(Skript.getInstance().getScriptsFolder(), false, true);
+						toggleFiles(Skript.getInstance().getScriptsFolder(), false, true);
 						info(sender, "disable.all.disabled");
 					} catch (IOException e) {
 						error(sender, "disable.all.io error", ExceptionUtils.toString(e));
@@ -635,11 +635,11 @@ public class SkriptCommand implements CommandExecutor {
 		);
 	}
 
-	private static Set<File> newToggleFiles(File folder, boolean enable, boolean change) throws IOException {
-		return newToggleFiles(folder, enable, change, scriptIsDisabled(folder));
+	private static Set<File> toggleFiles(File folder, boolean enable, boolean change) throws IOException {
+		return toggleFiles(folder, enable, change, scriptIsDisabled(folder));
 	}
 
-	private static Set<File> newToggleFiles(File folder, boolean enable, boolean change, boolean previouslyDisabled) throws IOException {
+	private static Set<File> toggleFiles(File folder, boolean enable, boolean change, boolean previouslyDisabled) throws IOException {
 		Set<File> files = new HashSet<>();
 		for (File file : folder.listFiles()) {
 			if (file.isDirectory()) {
@@ -647,7 +647,7 @@ public class SkriptCommand implements CommandExecutor {
 				boolean isDisabled = scriptIsDisabled(file);
 				if (enable == isDisabled && change)
 					subFolder = toggleFile(file, enable);
-				files.addAll(newToggleFiles(subFolder, enable, change, isDisabled || previouslyDisabled));
+				files.addAll(toggleFiles(subFolder, enable, change, isDisabled || previouslyDisabled));
 			} else {
 				boolean isDisabled = scriptIsDisabled(file);
 				// If we're enabling and this script is disabled, we don't want it to be parsed
