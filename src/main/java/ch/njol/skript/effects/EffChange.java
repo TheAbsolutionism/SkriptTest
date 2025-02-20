@@ -1,14 +1,5 @@
 package ch.njol.skript.effects;
 
-import java.util.Arrays;
-import java.util.logging.Level;
-
-import ch.njol.skript.expressions.ExprParse;
-import ch.njol.skript.lang.*;
-import org.skriptlang.skript.lang.script.ScriptWarning;
-import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
-
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.classes.Changer;
@@ -18,6 +9,8 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.expressions.ExprParse;
+import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.log.CountingLogHandler;
 import ch.njol.skript.log.ErrorQuality;
@@ -27,6 +20,12 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Patterns;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
+import org.bukkit.event.Event;
+import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.script.ScriptWarning;
+
+import java.util.Arrays;
+import java.util.logging.Level;
 
 /**
  * @author Peter Güttinger
@@ -275,6 +274,10 @@ public class EffChange extends Effect {
 		} else {
 			changed.change(event, delta, mode);
 		}
+	}
+
+	public @Nullable Expression<?> getChanger() {
+		return changer;
 	}
 
 	@Override
