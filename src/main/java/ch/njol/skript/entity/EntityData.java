@@ -29,10 +29,7 @@ import java.io.StreamCorruptedException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -54,24 +51,24 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		} catch (NoSuchMethodException | SecurityException ignored) { /* We already checked if the method exists */ }
 	}
 
-	private static boolean HAS_ENABLED_BY_FEATURE = Skript.methodExists(EntityType.class, "isEnabledByFeature", World.class);
-	public static String LANGUAGE_NODE = "entities";
+	private static final boolean HAS_ENABLED_BY_FEATURE = Skript.methodExists(EntityType.class, "isEnabledByFeature", World.class);
+	public final static String LANGUAGE_NODE = "entities";
 
-	public static Message m_age_pattern = new Message(LANGUAGE_NODE + ".age pattern");
-	public static Adjective m_baby = new Adjective(LANGUAGE_NODE + ".age adjectives.baby"),
+	public final static Message m_age_pattern = new Message(LANGUAGE_NODE + ".age pattern");
+	public final static Adjective m_baby = new Adjective(LANGUAGE_NODE + ".age adjectives.baby"),
 			m_adult = new Adjective(LANGUAGE_NODE + ".age adjectives.adult");
 
 	// must be here to be initialised before 'new SimpleLiteral' is called in the register block below
-	private static List<EntityDataInfo<EntityData<?>>> infos = new ArrayList<>();
+	private final static List<EntityDataInfo<EntityData<?>>> infos = new ArrayList<>();
 
-	private static List<EntityData> ALL_ENTITY_DATAS = new ArrayList<>();
+	private static final List<EntityData> ALL_ENTITY_DATAS = new ArrayList<>();
 
 	public static Serializer<EntityData> serializer = new Serializer<EntityData>() {
 		@Override
 		public Fields serialize(EntityData entityData) throws NotSerializableException {
-			Fields f = entityData.serialize();
-			f.putObject("codeName", entityData.info.codeName);
-			return f;
+			Fields fields = entityData.serialize();
+			fields.putObject("codeName", entityData.info.codeName);
+			return fields;
 		}
 
 		@Override
@@ -174,7 +171,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		});
 	}
 
-	private static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T>
+	private final static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T>
 		implements LanguageChangeListener {
 
 		final String codeName;
@@ -207,10 +204,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 
 		@Override
 		public int hashCode() {
-			int prime = 31;
-			int result = 1;
-			result = prime * result + codeName.hashCode();
-			return result;
+			return Objects.hashCode(codeName);
 		}
 
 		@Override
@@ -276,7 +270,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 
 	@SuppressWarnings("null")
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+	public final boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		this.matchedPattern = matchedPattern;
 		// plural bits (0x3): 0 = singular, 1 = plural, 2 = unknown
 		int pluralBits = parseResult.mark & 0x3;
@@ -310,7 +304,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	public abstract EntityData getSuperType();
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return toString(0);
 	}
 
@@ -340,7 +334,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	protected abstract int hashCode_i();
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		int prime = 31;
 		int result = 1;
 		result = prime * result + baby.hashCode();
@@ -354,7 +348,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	protected abstract boolean equals_i(EntityData<?> obj);
 
 	@Override
-	public boolean equals(@Nullable Object obj) {
+	public final boolean equals(@Nullable Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -449,7 +443,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	 * @param location The {@link Location} to spawn the entity at.
 	 * @return The Entity object that is spawned.
 	 */
-	public @Nullable E spawn(Location location) {
+	public final @Nullable E spawn(Location location) {
 		return spawn(location, (Consumer<E>) null);
 	}
 
@@ -609,7 +603,7 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean isInstance(@Nullable Entity entity) {
+	public final boolean isInstance(@Nullable Entity entity) {
 		if (entity == null)
 			return false;
 		if (!baby.isUnknown() && EntityUtils.isAgeable(entity) && EntityUtils.isAdult(entity) != baby.isFalse())

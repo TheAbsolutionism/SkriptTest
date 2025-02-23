@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SimpleEntityData extends EntityData<Entity> {
 	
-	public static class SimpleEntityDataInfo {
+	public final static class SimpleEntityDataInfo {
 		final String codeName;
 		final Class<? extends Entity> c;
 		final boolean isSupertype;
@@ -51,7 +51,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		}
 	}
 	
-	private static List<SimpleEntityDataInfo> types = new ArrayList<>();
+	private final static List<SimpleEntityDataInfo> types = new ArrayList<>();
 
 	private static void addSimpleEntity(String codeName, Class<? extends Entity> entityClass) {
 		addSimpleEntity(codeName, entityClass, Kleenean.UNKNOWN);
