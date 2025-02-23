@@ -18,10 +18,10 @@ import java.util.List;
 public class SimpleEntityData extends EntityData<Entity> {
 	
 	public static class SimpleEntityDataInfo {
-		String codeName;
-		Class<? extends Entity> c;
-		boolean isSupertype;
-		Kleenean allowSpawning;
+		final String codeName;
+		final Class<? extends Entity> c;
+		final boolean isSupertype;
+		final Kleenean allowSpawning;
 		
 		SimpleEntityDataInfo(String codeName, Class<? extends Entity> c, boolean isSupertype, Kleenean allowSpawning) {
 			this.codeName = codeName;

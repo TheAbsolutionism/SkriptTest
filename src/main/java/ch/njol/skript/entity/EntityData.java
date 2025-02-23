@@ -177,11 +177,11 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 	private static class EntityDataInfo<T extends EntityData<?>> extends SyntaxElementInfo<T>
 		implements LanguageChangeListener {
 
-		String codeName;
-		String[] codeNames;
-		int defaultName;
-		Class<? extends Entity> entityClass;
-		Noun[] names;
+		final String codeName;
+		final String[] codeNames;
+		final int defaultName;
+		final Class<? extends Entity> entityClass;
+		final Noun[] names;
 
 		public EntityDataInfo(Class<T> dataClass, String codeName, String[] codeNames, int defaultName, Class<? extends Entity> entityClass) throws IllegalArgumentException {
 			super(new String[codeNames.length], dataClass, dataClass.getName());
