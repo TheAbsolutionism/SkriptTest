@@ -1,28 +1,19 @@
 package ch.njol.skript.hooks.regions;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import ch.njol.skript.Skript;
+import ch.njol.skript.hooks.Hook;
+import ch.njol.skript.hooks.regions.classes.Region;
+import ch.njol.skript.variables.Variables;
+import ch.njol.yggdrasil.ClassResolver;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.hooks.Hook;
-import ch.njol.skript.hooks.regions.classes.Region;
-import ch.njol.skript.variables.Variables;
-import ch.njol.yggdrasil.ClassResolver;
+import java.io.IOException;
+import java.util.*;
 
-/**
- * @author Peter Güttinger
- */
-// REMIND support more plugins?
 public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	
 	public RegionsPlugin() throws IOException {}
@@ -32,20 +23,18 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	static {
 		Variables.yggdrasil.registerClassResolver(new ClassResolver() {
 			@Override
-			@Nullable
-			public String getID(final Class<?> c) {
-				for (final RegionsPlugin<?> p : plugins)
-					if (p.getRegionClass() == c)
-						return c.getClass().getSimpleName();
+			public @Nullable String getID(Class<?> clazz) {
+				for (RegionsPlugin<?> regionsPlugin : plugins)
+					if (regionsPlugin.getRegionClass() == clazz)
+						return clazz.getClass().getSimpleName();
 				return null;
 			}
 			
 			@Override
-			@Nullable
-			public Class<?> getClass(final String id) {
-				for (final RegionsPlugin<?> p : plugins)
-					if (id.equals(p.getRegionClass().getSimpleName()))
-						return p.getRegionClass();
+			public @Nullable Class<?> getClass(String id) {
+				for (RegionsPlugin<?> regionsPlugin : plugins)
+					if (id.equals(regionsPlugin.getRegionClass().getSimpleName()))
+						return regionsPlugin.getRegionClass();
 				return null;
 			}
 		});
@@ -57,44 +46,56 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 		return true;
 	}
 	
-	public abstract boolean canBuild_i(Player p, Location l);
+	public abstract boolean canBuild_i(Player player, Location location);
 	
-	public static boolean canBuild(final Player p, final Location l) {
-		for (final RegionsPlugin<?> pl : plugins) {
-			if (!pl.canBuild_i(p, l))
+	public static boolean canBuild(Player player, Location location) {
+		for (RegionsPlugin<?> regionsPlugin : plugins) {
+			if (!regionsPlugin.canBuild_i(player, location))
 				return false;
 		}
 		return true;
 	}
 	
-	public abstract Collection<? extends Region> getRegionsAt_i(Location l);
+	public abstract Collection<? extends Region> getRegionsAt_i(Location location);
 	
-	public static Set<? extends Region> getRegionsAt(final Location l) {
-		final Set<Region> r = new HashSet<>();
-		Iterator<RegionsPlugin<?>> it = plugins.iterator();
-		while (it.hasNext()) {
-			RegionsPlugin<?> pl = it.next();
+	public static Set<? extends Region> getRegionsAt(Location location) {
+		Set<Region> regions = new HashSet<>();
+		Iterator<RegionsPlugin<?>> iterator = plugins.iterator();
+		while (iterator.hasNext()) {
+			RegionsPlugin<?> regionsPlugin = iterator.next();
 			try {
-				r.addAll(pl.getRegionsAt_i(l));
+				regions.addAll(regionsPlugin.getRegionsAt_i(location));
 			} catch (Throwable e) { // Unstable WorldGuard API
-				Skript.error(pl.getName() + " hook crashed and was removed to prevent future errors.");
+				Skript.error(regionsPlugin.getName() + " hook crashed and was removed to prevent future errors.");
 				e.printStackTrace();
-				it.remove();
+				iterator.remove();
 			}
 		}
-		return r;
+		return regions;
 	}
-	
-	@Nullable
-	public abstract Region getRegion_i(World world, String name);
-	
-	@Nullable
-	public static Region getRegion(final World world, final String name) {
-		for (final RegionsPlugin<?> pl : plugins) {
-			return pl.getRegion_i(world, name);
+
+	public abstract @Nullable Region getRegion_i(World world, String name);
+
+	public static @Nullable Region getRegion(World world, String name) {
+		for (RegionsPlugin<?> regionsPlugin : plugins) {
+			return regionsPlugin.getRegion_i(world, name);
 		}
 		return null;
 	}
+
+	public abstract Region @Nullable [] getRegions_i(@Nullable World world);
+
+	public static Region @Nullable [] getRegions() {
+		return getRegions(null);
+	}
+
+	public static Region @Nullable [] getRegions(@Nullable World world) {
+		for (RegionsPlugin<?> regionsPlugin : plugins) {
+			return regionsPlugin.getRegions_i(world);
+		}
+		return null;
+	}
+
 	
 	public abstract boolean hasMultipleOwners_i();
 	
@@ -107,12 +108,11 @@ public abstract class RegionsPlugin<P extends Plugin> extends Hook<P> {
 	}
 	
 	protected abstract Class<? extends Region> getRegionClass();
-	
-	@Nullable
-	public static RegionsPlugin<?> getPlugin(final String name) {
-		for (final RegionsPlugin<?> pl : plugins) {
-			if (pl.getName().equalsIgnoreCase(name))
-				return pl;
+
+	public static @Nullable RegionsPlugin<?> getPlugin(String name) {
+		for (RegionsPlugin<?> regionsPlugin : plugins) {
+			if (regionsPlugin.getName().equalsIgnoreCase(name))
+				return regionsPlugin;
 		}
 		return null;
 	}

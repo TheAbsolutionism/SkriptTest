@@ -1,15 +1,21 @@
 package ch.njol.skript.hooks.regions;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.StreamCorruptedException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.UUID;
-
+import ch.njol.skript.Skript;
+import ch.njol.skript.hooks.regions.classes.Region;
+import ch.njol.skript.util.AABB;
+import ch.njol.skript.variables.Variables;
+import ch.njol.yggdrasil.Fields;
+import ch.njol.yggdrasil.YggdrasilID;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -19,22 +25,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.hooks.regions.classes.Region;
-import ch.njol.skript.util.AABB;
-import ch.njol.skript.variables.Variables;
-import ch.njol.yggdrasil.Fields;
-import ch.njol.yggdrasil.YggdrasilID;
-
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.StreamCorruptedException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	
@@ -55,12 +50,12 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 	}
 	
 	@Override
-	public boolean canBuild_i(Player p, Location l) {
-		if (p.hasPermission("worldguard.region.bypass." + l.getWorld().getName()))
+	public boolean canBuild_i(Player player, Location location) {
+		if (player.hasPermission("worldguard.region.bypass." + location.getWorld().getName()))
 			return true; // Build access always granted by permission
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
 		RegionQuery query = platform.getRegionContainer().createQuery();
-		return query.testBuild(BukkitAdapter.adapt(l), plugin.wrapPlayer(p));
+		return query.testBuild(BukkitAdapter.adapt(location), plugin.wrapPlayer(player));
 	}
 	
 	static {
@@ -72,73 +67,72 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		
 		final World world;
 		private transient ProtectedRegion region;
-		
-		@SuppressWarnings({"null", "unused"})
+
 		private WorldGuardRegion() {
 			world = null;
 		}
 		
-		public WorldGuardRegion(final World w, final ProtectedRegion r) {
-			world = w;
-			region = r;
+		public WorldGuardRegion(World world, ProtectedRegion region) {
+			this.world = world;
+			this.region = region;
 		}
 		
 		@Override
-		public boolean contains(final Location l) {
-			return l.getWorld().equals(world) && region.contains(l.getBlockX(), l.getBlockY(), l.getBlockZ());
+		public boolean contains(Location location) {
+			return location.getWorld().equals(world) && region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 		}
 		
 		@Override
-		public boolean isMember(final OfflinePlayer p) {
-			return region.isMember(plugin.wrapOfflinePlayer(p));
+		public boolean isMember(OfflinePlayer player) {
+			return region.isMember(plugin.wrapOfflinePlayer(player));
 		}
 		
 		@Override
 		public Collection<OfflinePlayer> getMembers() {
-			final Collection<UUID> ids = region.getMembers().getUniqueIds();
-			final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
-			for (final UUID id : ids)
-				r.add(Bukkit.getOfflinePlayer(id));
-			return r;
+			Collection<UUID> ids = region.getMembers().getUniqueIds();
+			Collection<OfflinePlayer> players = new ArrayList<>(ids.size());
+			for (UUID id : ids)
+				players.add(Bukkit.getOfflinePlayer(id));
+			return players;
 		}
 		
 		@Override
-		public boolean isOwner(final OfflinePlayer p) {
-			return region.isOwner(plugin.wrapOfflinePlayer(p));
+		public boolean isOwner(OfflinePlayer player) {
+			return region.isOwner(plugin.wrapOfflinePlayer(player));
 		}
 		
 		@Override
 		public Collection<OfflinePlayer> getOwners() {
-			final Collection<UUID> ids = region.getOwners().getUniqueIds();
-			final Collection<OfflinePlayer> r = new ArrayList<>(ids.size());
-			for (final UUID id : ids)
-				r.add(Bukkit.getOfflinePlayer(id));
-			return r;
+			Collection<UUID> ids = region.getOwners().getUniqueIds();
+			Collection<OfflinePlayer> players = new ArrayList<>(ids.size());
+			for (UUID id : ids)
+				players.add(Bukkit.getOfflinePlayer(id));
+			return players;
 		}
 		
 		@Override
 		public Iterator<Block> getBlocks() {
-			final BlockVector3 min = region.getMinimumPoint(), max = region.getMaximumPoint();
+			BlockVector3 min = region.getMinimumPoint(), max = region.getMaximumPoint();
 			return new AABB(world, new Vector(min.getBlockX(), min.getBlockY(), min.getBlockZ()),
 					new Vector(max.getBlockX(), max.getBlockY(), max.getBlockZ())).iterator();
 		}
 		
 		@Override
 		public Fields serialize() throws NotSerializableException {
-			final Fields f = new Fields(this);
-			f.putObject("region", region.getId());
-			return f;
+			Fields fields = new Fields(this);
+			fields.putObject("region", region.getId());
+			return fields;
 		}
-		
+
 		@Override
-		public void deserialize(final Fields fields) throws StreamCorruptedException, NotSerializableException {
-			final String r = fields.getAndRemoveObject("region", String.class);
+		public void deserialize(Fields fields) throws StreamCorruptedException, NotSerializableException {
+			String stringRegion = fields.getAndRemoveObject("region", String.class);
 			fields.setFields(this);
 			
 			WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-			ProtectedRegion region = platform.getRegionContainer().get(BukkitAdapter.adapt(world)).getRegion(r);
+			ProtectedRegion region = platform.getRegionContainer().get(BukkitAdapter.adapt(world)).getRegion(stringRegion);
 			if (region == null)
-				throw new StreamCorruptedException("Invalid region " + r + " in world " + world);
+				throw new StreamCorruptedException("Invalid region " + stringRegion + " in world " + world);
 			this.region = region;
 		}
 		
@@ -153,14 +147,12 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		}
 		
 		@Override
-		public boolean equals(final @Nullable Object o) {
-			if (o == this)
+		public boolean equals(@Nullable Object obj) {
+			if (!(obj instanceof WorldGuardRegion other))
+				return false;
+			if (this == other)
 				return true;
-			if (o == null)
-				return false;
-			if (!(o instanceof WorldGuardRegion))
-				return false;
-			return world.equals(((WorldGuardRegion) o).world) && region.equals(((WorldGuardRegion) o).region);
+			return world.equals(other.world) && region.equals(other.region);
 		}
 		
 		@Override
@@ -169,37 +161,56 @@ public class WorldGuardHook extends RegionsPlugin<WorldGuardPlugin> {
 		}
 		
 	}
-	
-	@SuppressWarnings("null")
+
 	@Override
-	public Collection<? extends Region> getRegionsAt_i(@Nullable final Location l) {
-		final ArrayList<Region> r = new ArrayList<>();
+	public Collection<? extends Region> getRegionsAt_i(@Nullable Location location) {
+		ArrayList<Region> regions = new ArrayList<>();
 		
-		if (l == null) // Working around possible cause of issue #280
+		if (location == null) // Working around possible cause of issue #280
 			return Collections.emptyList();
-		if (l.getWorld() == null)
+		if (location.getWorld() == null)
 			return Collections.emptyList();
 		
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
-		RegionManager manager = platform.getRegionContainer().get(BukkitAdapter.adapt(l.getWorld()));
+		RegionManager manager = platform.getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()));
 		if (manager == null)
-			return r;
-		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asBlockVector(l));
+			return regions;
+		ApplicableRegionSet applicable = manager.getApplicableRegions(BukkitAdapter.asBlockVector(location));
 		if (applicable == null)
-			return r;
+			return regions;
 		for (ProtectedRegion region : applicable)
-			r.add(new WorldGuardRegion(l.getWorld(), region));
-		return r;
+			regions.add(new WorldGuardRegion(location.getWorld(), region));
+		return regions;
 	}
 	
 	@Override
-	@Nullable
-	public Region getRegion_i(final World world, final String name) {
+	public @Nullable Region getRegion_i(World world, String name) {
 		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
 		ProtectedRegion region = platform.getRegionContainer().get(BukkitAdapter.adapt(world)).getRegion(name);
 		if (region != null)
 			return new WorldGuardRegion(world, region);
 		return null;
+	}
+
+	@Override
+	public Region @Nullable [] getRegions_i(@Nullable World world) {
+		WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
+		RegionContainer container = platform.getRegionContainer();
+		Map<World, RegionManager> managers = new HashMap<>();
+		if (world == null) {
+			for (World world1 : Bukkit.getWorlds()) {
+				managers.put(world1, container.get(BukkitAdapter.adapt(world1)));
+			}
+		} else {
+			managers.put(world, container.get(BukkitAdapter.adapt(world)));
+		}
+		List<WorldGuardRegion> regions = new ArrayList<>();
+		for (Entry<World, RegionManager> managerEntry : managers.entrySet()) {
+			for (Entry<String, ProtectedRegion> regionEntry : managerEntry.getValue().getRegions().entrySet()) {
+				regions.add(new WorldGuardRegion(managerEntry.getKey(), regionEntry.getValue()));
+			}
+		}
+		return regions.toArray(Region[]::new);
 	}
 	
 	@Override

@@ -1,20 +1,15 @@
 package ch.njol.skript.hooks.regions;
 
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
+import ch.njol.skript.Skript;
+import ch.njol.skript.hooks.regions.classes.Region;
+import ch.njol.skript.util.AABB;
+import ch.njol.skript.variables.Variables;
+import ch.njol.util.coll.iterator.EmptyIterator;
+import ch.njol.yggdrasil.Fields;
+import ch.njol.yggdrasil.YggdrasilID;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -23,28 +18,21 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.hooks.regions.classes.Region;
-import ch.njol.skript.util.AABB;
-import ch.njol.skript.variables.Variables;
-import ch.njol.util.coll.iterator.EmptyIterator;
-import ch.njol.yggdrasil.Fields;
-import ch.njol.yggdrasil.YggdrasilID;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
-/**
- * @author Peter Güttinger
- */
 public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 	
 	public GriefPreventionHook() throws IOException {}
 	
 	boolean supportsUUIDs;
-	@Nullable
-	Method getClaim;
-	@Nullable
-	Field claimsField;
-	
-	@SuppressWarnings("null")
+	@Nullable Method getClaim;
+	@Nullable Field claimsField;
+
 	@Override
 	protected boolean init() {
 		// ownerID is a public field
@@ -68,32 +56,27 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		}
 		return super.init();
 	}
-	
-	@Nullable
-	Claim getClaim(final long id) {
+
+	@Nullable Claim getClaim(long id) {
 		if (getClaim != null) {
 			try {
 				return (Claim) getClaim.invoke(plugin.dataStore, id);
-			} catch (final IllegalAccessException e) {
+			} catch (IllegalAccessException | IllegalArgumentException e) {
 				assert false : e;
-			} catch (final IllegalArgumentException e) {
-				assert false : e;
-			} catch (final InvocationTargetException e) {
+			} catch (InvocationTargetException e) {
 				throw new RuntimeException(e.getCause());
 			}
 		} else {
 			assert claimsField != null;
 			try {
-				final List<?> claims = (List<?>) claimsField.get(plugin.dataStore);
-				for (final Object claim : claims) {
-					if (!(claim instanceof Claim))
+				List<?> claims = (List<?>) claimsField.get(plugin.dataStore);
+				for (Object claim : claims) {
+					if (!(claim instanceof Claim claimObject))
 						continue;
-					if (((Claim) claim).getID() == id)
-						return (Claim) claim;
+					if (claimObject.getID() == id)
+						return claimObject;
 				}
-			} catch (final IllegalArgumentException e) {
-				assert false : e;
-			} catch (final IllegalAccessException e) {
+			} catch (IllegalArgumentException | IllegalAccessException e) {
 				assert false : e;
 			}
 		}
@@ -106,8 +89,8 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 	}
 	
 	@Override
-	public boolean canBuild_i(final Player p, final Location l) {
-		return plugin.allowBuild(p, l) == null; // returns reason string if not allowed to build
+	public boolean canBuild_i(Player player, Location location) {
+		return plugin.allowBuild(player, location) == null; // returns reason string if not allowed to build
 	}
 	
 	static {
@@ -118,22 +101,21 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 	public final class GriefPreventionRegion extends Region {
 		
 		private transient Claim claim;
-		
-		@SuppressWarnings({"null", "unused"})
+
 		private GriefPreventionRegion() {}
 		
-		public GriefPreventionRegion(final Claim c) {
-			claim = c;
+		public GriefPreventionRegion(Claim claim) {
+			this.claim = claim;
 		}
 		
 		@Override
-		public boolean contains(final Location l) {
-			return claim.contains(l, false, false);
+		public boolean contains(Location location) {
+			return claim.contains(location, false, false);
 		}
 		
 		@Override
-		public boolean isMember(final OfflinePlayer p) {
-			return isOwner(p);
+		public boolean isMember(OfflinePlayer player) {
+			return isOwner(player);
 		}
 		
 		@Override
@@ -142,27 +124,27 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		}
 		
 		@Override
-		public boolean isOwner(final OfflinePlayer p) {
-			String name = p.getName();
+		public boolean isOwner(OfflinePlayer player) {
+			String name = player.getName();
 			if (name != null)
 				return name.equalsIgnoreCase(claim.getOwnerName());
 			return false; // Assume no ownership when player has never visited server
 		}
-		
-		@SuppressWarnings({"null", "deprecation"})
+
 		@Override
 		public Collection<OfflinePlayer> getOwners() {
-			if (claim.isAdminClaim() || (supportsUUIDs && claim.ownerID == null)) // Not all claims have owners!
+			if (claim.isAdminClaim() || (supportsUUIDs && claim.ownerID == null)) { // Not all claims have owners!
 				return Collections.emptyList();
-			else if (supportsUUIDs)
-				return Arrays.asList(Bukkit.getOfflinePlayer(claim.ownerID));
-			else
-				return Arrays.asList(Bukkit.getOfflinePlayer(claim.getOwnerName()));
+			} else if (supportsUUIDs) {
+				return List.of(Bukkit.getOfflinePlayer(claim.ownerID));
+			} else {
+				return List.of(Bukkit.getOfflinePlayer(claim.getOwnerName()));
+			}
 		}
 		
 		@Override
 		public Iterator<Block> getBlocks() {
-			final Location lower = claim.getLesserBoundaryCorner(), upper = claim.getGreaterBoundaryCorner();
+			Location lower = claim.getLesserBoundaryCorner(), upper = claim.getGreaterBoundaryCorner();
 			if (lower == null || upper == null || lower.getWorld() == null || upper.getWorld() == null || lower.getWorld() != upper.getWorld())
 				return EmptyIterator.get();
 			upper.setY(upper.getWorld().getMaxHeight() - 1);
@@ -175,22 +157,21 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		public String toString() {
 			return "Claim #" + claim.getID();
 		}
-		
-		@SuppressWarnings("null")
+
 		@Override
 		public Fields serialize() {
-			final Fields f = new Fields();
-			f.putPrimitive("id", claim.getID());
-			return f;
+			Fields fields = new Fields();
+			fields.putPrimitive("id", claim.getID());
+			return fields;
 		}
 		
 		@Override
-		public void deserialize(final Fields fields) throws StreamCorruptedException {
-			final long id = fields.getPrimitive("id", long.class);
-			final Claim c = getClaim(id);
-			if (c == null)
+		public void deserialize(Fields fields) throws StreamCorruptedException {
+			long id = fields.getPrimitive("id", long.class);
+			Claim claim1 = getClaim(id);
+			if (claim1 == null)
 				throw new StreamCorruptedException("Invalid claim " + id);
-			claim = c;
+			claim = claim1;
 		}
 		
 		@Override
@@ -199,14 +180,14 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		}
 		
 		@Override
-		public boolean equals(final @Nullable Object o) {
-			if (o == this)
+		public boolean equals(@Nullable Object obj) {
+			if (obj == this)
 				return true;
-			if (o == null)
+			if (obj == null)
 				return false;
-			if (!(o instanceof GriefPreventionRegion))
+			if (!(obj instanceof GriefPreventionRegion other))
 				return false;
-			return claim.equals(((GriefPreventionRegion) o).claim);
+			return claim.equals(other.claim);
 		}
 		
 		@Override
@@ -215,29 +196,47 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 		}
 		
 	}
-	
-	@SuppressWarnings("null")
+
 	@Override
-	public Collection<? extends Region> getRegionsAt_i(final Location l) {
-		final Claim c = plugin.dataStore.getClaimAt(l, false, null);
-		if (c != null)
-			return Arrays.asList(new GriefPreventionRegion(c));
+	public Collection<? extends Region> getRegionsAt_i(Location location) {
+		Claim claim = plugin.dataStore.getClaimAt(location, false, null);
+		if (claim != null)
+			return List.of(new GriefPreventionRegion(claim));
 		return Collections.emptySet();
 	}
 	
 	@Override
-	@Nullable
-	public Region getRegion_i(final World world, final String name) {
+	public @Nullable Region getRegion_i(World world, String name) {
 		try {
-			final Claim c = getClaim(Long.parseLong(name));
-			if (c != null && world.equals(c.getLesserBoundaryCorner().getWorld()))
-				return new GriefPreventionRegion(c);
+			Claim claim = getClaim(Long.parseLong(name));
+			if (claim != null && world.equals(claim.getLesserBoundaryCorner().getWorld()))
+				return new GriefPreventionRegion(claim);
 			return null;
-		} catch (final NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return null;
 		}
 	}
-	
+
+	@Override
+	public Region @Nullable [] getRegions_i(@Nullable World world) {
+		if (claimsField == null)
+			return null;
+		List<Claim> claims = new ArrayList<>();
+		try {
+			//noinspection unchecked
+			claims = (List<Claim>) claimsField.get(plugin.dataStore);
+		} catch (IllegalAccessException ignored) {}
+		if (claims == null || claims.isEmpty())
+			return null;
+		List<GriefPreventionRegion> regions = new ArrayList<>();
+		for (Claim claim : claims) {
+			if (world != null && !claim.getLesserBoundaryCorner().getWorld().equals(world))
+				continue;
+			regions.add(new GriefPreventionRegion(claim));
+		}
+		return regions.toArray(Region[]::new);
+	}
+
 	@Override
 	public boolean hasMultipleOwners_i() {
 		return false;
@@ -247,4 +246,5 @@ public class GriefPreventionHook extends RegionsPlugin<GriefPrevention> {
 	protected Class<? extends Region> getRegionClass() {
 		return GriefPreventionRegion.class;
 	}
+
 }
