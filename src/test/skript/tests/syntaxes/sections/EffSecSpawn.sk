@@ -89,7 +89,7 @@ test "spawn entities":
 
 	if running minecraft "1.20.0":
 		add "camel" and "sniffer" to {_entities::*}
-	if running minecraft "1.20.3":
+	if running minecraft "1.20.5":
 		add "wind charge" to {_entities::*}
 	if running minecraft "1.20.6":
 		add "armadillo" to {_entities::*}

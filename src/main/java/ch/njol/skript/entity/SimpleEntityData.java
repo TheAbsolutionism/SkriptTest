@@ -65,8 +65,13 @@ public class SimpleEntityData extends EntityData<Entity> {
 	}
 
 	private static void addSuperEntity(String codeName, Class<? extends Entity> entityClass) {
-		types.add(new SimpleEntityDataInfo(codeName, entityClass, true, Kleenean.UNKNOWN));
+		addSuperEntity(codeName, entityClass, Kleenean.UNKNOWN);
 	}
+
+	private static void addSuperEntity(String codeName, Class<? extends Entity> entityClass, Kleenean allowSpawning) {
+		types.add(new SimpleEntityDataInfo(codeName, entityClass, true, allowSpawning));
+	}
+
 	static {
 		// Simple Entities
 		addSimpleEntity("arrow", Arrow.class);
@@ -85,7 +90,7 @@ public class SimpleEntityData extends EntityData<Entity> {
 		addSimpleEntity("ender eye", EnderSignal.class);
 		addSimpleEntity("small fireball", SmallFireball.class);
 		addSimpleEntity("large fireball", LargeFireball.class);
-		addSuperEntity("fireball", Fireball.class);
+		addSuperEntity("fireball", Fireball.class, Kleenean.TRUE);
 		addSimpleEntity("fish hook", FishHook.class);
 		addSimpleEntity("ghast", Ghast.class);
 		addSimpleEntity("giant", Giant.class);

@@ -32,7 +32,7 @@ test "wither skull":
 	assert {_entity} is a wither skull with "Entity should be a wither skull"
 	clear entity within {_entity}
 
-test "wind charge" when running minecraft "1.20.3":
+test "wind charge" when running minecraft "1.20.5":
 	spawn a wind charge at test-location:
 		set {_entity} to entity
 	assert {_entity} is a wind charge with "Entity should be a wind charge"
