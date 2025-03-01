@@ -489,9 +489,10 @@ public abstract class EntityData<E extends Entity> implements SyntaxElement, Ygg
 		assert worlds != null && worlds.length > 0 : Arrays.toString(worlds);
 		List<E> list = new ArrayList<>();
 		for (World world : worlds) {
-			for (E entity : world.getEntitiesByClass(getType()))
+			for (E entity : world.getEntitiesByClass(getType())) {
 				if (match(entity))
 					list.add(entity);
+			}
 		}
 		return list.toArray((E[]) Array.newInstance(getType(), list.size()));
 	}
