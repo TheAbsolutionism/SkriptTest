@@ -114,7 +114,7 @@ public class EventValues {
 	) {
 		Skript.checkAcceptRegistrations();
 		List<EventValueInfo<?, ?>> eventValues = getEventValuesList(time);
-		EventValueInfo<E, T> element = new EventValueInfo<>(eventClass, valueClass, converter, excludeErrorMessage, excludes);
+		EventValueInfo<E, T> element = new EventValueInfo<>(eventClass, valueClass, converter, excludeErrorMessage, excludes, time);
 
 		for (int i = 0; i < eventValues.size(); i++) {
 			EventValueInfo<?, ?> info = eventValues.get(i);
@@ -327,7 +327,7 @@ public class EventValues {
 			infoConverterMap.put(eventValueInfo, converter);
 		}
 		if (!list.isEmpty())
-			return delegateConverters(eventClass, valueClass, infoConverterMap, list);
+			return stripConverters(eventClass, valueClass, infoConverterMap, list);
 		if (!allowConverting)
 			return null;
 		// Most checks have returned before this below is called, but Skript will attempt to convert or find an alternative.
@@ -354,7 +354,7 @@ public class EventValues {
 			infoConverterMap.put(eventValueInfo, converter);
 		}
 		if (!list.isEmpty())
-			return delegateConverters(eventClass, valueClass, infoConverterMap, list);
+			return stripConverters(eventClass, valueClass, infoConverterMap, list);
 		// Fourth check will attempt to convert the event value to the requesting type.
 		// This first for loop will check that the events are exact. See issue #5016
 		for (EventValueInfo<?, ?> eventValueInfo : eventValues) {
@@ -397,15 +397,17 @@ public class EventValues {
 		return null;
 	}
 
-	/*
-		In this method we can delegate/strip converters that are able to be obtainable through their own 'event-classinfo'.
-		For example, PlayerTradeEvent has a player value (player who traded) and an AbstractVillager value (villager traded from).
-		Beforehand, since there is no Entity value, it was then grabbing both values as they both can be casted as an Entity
-			resulting in a parse error of "multiple entities"
-		Now, we filter out the ones that can be obtained using their own classinfo, such as 'event-player'
-			which leaves us only the AbstractVillager for 'event-entity'
+	/**
+	 * <p>
+	 *  In this method we can strip converters that are able to be obtainable through their own 'event-classinfo'.
+	 *  For example, PlayerTradeEvent has a player value (player who traded) and an AbstractVillager value (villager traded from).
+	 *  Beforehand, since there is no Entity value, it was then grabbing both values as they both can be casted as an Entity
+	 *  	resulting in a parse error of "multiple entities"
+	 * 	Now, we filter out the ones that can be obtained using their own classinfo, such as 'event-player'
+	 * 		which leaves us only the AbstractVillager for 'event-entity'
+	 * </p>
 	 */
-	private static <E extends Event, T> List<Converter<? super E, ? extends T>> delegateConverters(
+	private static <E extends Event, T> List<Converter<? super E, ? extends T>> stripConverters(
 		Class<E> eventClass,
 		Class<T> valueClass,
 		Map<EventValueInfo<?, ?>, Converter<? super E, ? extends T>> infoConverterMap,
@@ -516,15 +518,15 @@ public class EventValues {
 
 		for (int time : getTimeStates()) {
 			for (EventValueInfo<?, ?> eventValueInfo : getEventValuesListForTime(time)) {
-				Collection<EventValueInfo<?, ?>> existing = eventValues.get(eventValueInfo.event);
+				Collection<EventValueInfo<?, ?>> existing = eventValues.get(eventValueInfo.eventClass);
 				existing.add(eventValueInfo);
-				eventValues.putAll(eventValueInfo.event, existing);
+				eventValues.putAll(eventValueInfo.eventClass, existing);
 			}
 		}
 		return eventValues;
 	}
 
-	private record EventValueInfo<E extends Event, T>(
+	public record EventValueInfo<E extends Event, T>(
 		Class<E> eventClass, Class<T> valueClass, Converter<E, T> converter,
 		@Nullable String excludeErrorMessage,
 		@Nullable Class<? extends E>[] excludes, int time
