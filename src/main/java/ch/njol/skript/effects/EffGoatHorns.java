@@ -31,10 +31,10 @@ public class EffGoatHorns extends Effect {
 
 	static {
 		Skript.registerEffect(EffGoatHorns.class,
-			"remove [the] (left horn|right:right horn|both:both horns) of %livingentities%",
-			"remove %livingentities%'[s] (left horn|right:right horn|both:horns)",
-			"(regrow|replace) [the] (left horn|right:right horn|both:both horns) of %livingentities%",
-			"(regrow|replace) %livingentities%'[s] (left horn|right:right horn|both:horns)");
+			"remove [the] (left horn[s]|right:right horn[s]|both:both horns) of %livingentities%",
+			"remove %livingentities%'[s] (left horn[s]|right:right horn[s]|both:horns)",
+			"(regrow|replace) [the] (left horn[s]|right:right horn[s]|both:both horns) of %livingentities%",
+			"(regrow|replace) %livingentities%'[s] (left horn[s]|right:right horn[s]|both:horns)");
 	}
 
 	private Expression<LivingEntity> entities;
