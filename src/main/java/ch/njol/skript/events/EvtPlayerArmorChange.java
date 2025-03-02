@@ -20,7 +20,8 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
 			Skript.registerEvent("Armor Change", EvtPlayerArmorChange.class, PlayerArmorChangeEvent.class,
-				"[player] armo[u]r change[d] [(from|at) %-equipmentslots%]")
+				"[player] armo[u]r change[d] [(from|at|of) %-equipmentslots%]",
+					"[player] %equipmentslot% change[d]")
 				.description("Called when armor pieces of a player are changed.")
 				.requiredPlugins("Paper")
 				.keywords("armor", "armour")
@@ -28,7 +29,8 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 					"on armor change:",
 						"\tbroadcast the old armor item",
 					"on player armour changed from helmet slot:",
-						"\tbroadcast the new armor item"
+						"\tbroadcast the new armor item",
+					"on helmet change:"
 				)
 				.since("2.5, INSERT VERSION (equipment slots)");
 
@@ -48,7 +50,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 		if (args[0] != null) {
 			//noinspection unchecked
 			slotLiteral = (Literal<EquipmentSlot>) args[0];
-			slots = slotLiteral.getArray();
+			slots = slotLiteral.getAll();
 			for (EquipmentSlot slot : slots) {
 				if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || (BODY_SLOT_EXISTS && slot == EquipmentSlot.BODY)) {
 					Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
@@ -61,8 +63,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 
 	@Override
 	public boolean check(Event event) {
-		if (!(event instanceof PlayerArmorChangeEvent changeEvent))
-			return false;
+		PlayerArmorChangeEvent changeEvent = (PlayerArmorChangeEvent) event;
 		if (slots == null || slots.length == 0)
 			return true;
 		EquipmentSlot changedSlot = switch (changeEvent.getSlotType()) {
