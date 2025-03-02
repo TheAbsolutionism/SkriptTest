@@ -6,12 +6,15 @@ import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.util.Getter;
 import ch.njol.util.Kleenean;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.Converters;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +78,8 @@ public class EventValues {
 	/**
 	 * Registers an event value.
 	 *
-	 * @param eventClass the event valueClass class.
-	 * @param valueClass the return valueClass of the converter for the event value.
+	 * @param eventClass the event class.
+	 * @param valueClass the return type of the converter for the event value.
 	 * @param converter the converter to get the value with the provided eventClass.
 	 * @param time value of TIME_PAST if this is the value before the eventClass, TIME_FUTURE if after, and TIME_NOW if it's the default or this value doesn't have distinct states.
 	 *            <b>Always register a default state!</b> You can leave out one of the other states instead, e.g. only register a default and a past state. The future state will
@@ -93,7 +96,7 @@ public class EventValues {
 	 * Registers an event value and with excluded events.
 	 * Excluded events are events that this event value can't operate in.
 	 *
-	 * @param eventClass the eventClass type class.
+	 * @param eventClass the event class.
 	 * @param valueClass the return type of the converter for the event value.
 	 * @param converter the converter to get the value with the provided eventClass.
 	 * @param time value of TIME_PAST if this is the value before the eventClass, TIME_FUTURE if after, and TIME_NOW if it's the default or this value doesn't have distinct states.
@@ -118,7 +121,7 @@ public class EventValues {
 			// We don't care for exact duplicates. Prefer Skript's over any addon.
 			if (info.eventClass.equals(eventClass) && info.valueClass.equals(valueClass))
 				return;
-			// If the events don't match, we prefer the highest subclass eventClass.
+			// If the events don't match, we prefer the highest subclass event.
 			// If the events match, we prefer the highest subclass type.
 			if (!info.eventClass.equals(eventClass) ? info.eventClass.isAssignableFrom(eventClass) : info.valueClass.isAssignableFrom(valueClass)) {
 				eventValues.add(i, element);
@@ -166,7 +169,7 @@ public class EventValues {
 	 * @param time -1 if this is the value before the eventClass, 1 if after, and 0 if it's the default or this value doesn't have distinct states.
 	 *            <b>Always register a default state!</b> You can leave out one of the other states instead, e.g. only register a default and a past state. The future state will
 	 *            default to the default state in this case.
-	 * @return The eventClass's value
+	 * @return The event's value
 	 * @see #registerEventValue(Class, Class, Converter, int)
 	 */
 	public static <T, E extends Event> @Nullable T getEventValue(E event, Class<T> valueClass, int time) {
@@ -190,7 +193,7 @@ public class EventValues {
 	/**
 	 * Checks that a {@link Converter} exists for the exact type. No converting or subclass checking.
 	 *
-	 * @param eventClass the eventClass class the getter will be getting from
+	 * @param eventClass the event class the getter will be getting from
 	 * @param valueClass type of {@link Converter}
 	 * @param time the event-value's time
 	 * @return A getter to get values for a given type of events
@@ -224,12 +227,12 @@ public class EventValues {
 	}
 
 	/**
-	 * Checks if an eventClass has multiple {@link Converter}s, including default ones.
+	 * Checks if an event has multiple {@link Converter}s, including default ones.
 	 *
-	 * @param eventClass the eventClass class the {@link Converter} will be getting from.
+	 * @param eventClass the event class the {@link Converter} will be getting from.
 	 * @param valueClass type of {@link Converter}.
 	 * @param time the event-value's time.
-	 * @return true or false if the eventClass and type have multiple {@link Converter}s.
+	 * @return true or false if the event and type have multiple {@link Converter}s.
 	 */
 	public static <T, E extends Event> Kleenean hasMultipleConverters(Class<E> eventClass, Class<T> valueClass, int time) {
 		List<Converter<? super E, ? extends T>> getters = getEventValueConverters(eventClass, valueClass, time, true, false);
@@ -249,11 +252,11 @@ public class EventValues {
 	}
 
 	/**
-	 * Returns a {@link Converter} to get a value from in an eventClass.
+	 * Returns a {@link Converter} to get a value from in an event.
 	 * <p>
-	 * Can print an error if the event value is blocked for the given eventClass.
+	 * Can print an error if the event value is blocked for the given event.
 	 *
-	 * @param eventClass the eventClass class the {@link Converter} will be getting from.
+	 * @param eventClass the event class the {@link Converter} will be getting from.
 	 * @param valueClass type of {@link Converter}.
 	 * @param time the event-value's time.
 	 * @return A getter to get values for a given type of events.
@@ -428,7 +431,7 @@ public class EventValues {
 	 * False if the current EventValueInfo cannot operate in the provided eventClass.
 	 *
 	 * @param info The event value info that will be used to grab the value from
-	 * @param eventClass The eventClass class to check the excludes against.
+	 * @param eventClass The event class to check the excludes against.
 	 * @return boolean if true the event value passes for the events.
 	 */
 	private static boolean checkExcludes(EventValueInfo<?, ?> info, Class<? extends Event> eventClass) {
@@ -494,12 +497,39 @@ public class EventValues {
 			|| getEventValueConverter(eventClass, valueClass, TIME_FUTURE, false) != null;
 	}
 
+	/**
+	 * All supported time states for an event value.
+	 * @return An array of all the time states.
+	 */
+	public static int[] getTimeStates() {
+		return new int[] {TIME_PAST, TIME_NOW, TIME_FUTURE};
+	}
+
+	/**
+	 * @return All the event values for each registered event's class.
+	 */
+	public static Multimap<Class<? extends Event>, EventValueInfo<?, ?>> getPerEventEventValues() {
+		Multimap<Class<? extends Event>, EventValueInfo<?, ?>> eventValues = MultimapBuilder
+			.hashKeys()
+			.hashSetValues()
+			.build();
+
+		for (int time : getTimeStates()) {
+			for (EventValueInfo<?, ?> eventValueInfo : getEventValuesListForTime(time)) {
+				Collection<EventValueInfo<?, ?>> existing = eventValues.get(eventValueInfo.event);
+				existing.add(eventValueInfo);
+				eventValues.putAll(eventValueInfo.event, existing);
+			}
+		}
+		return eventValues;
+	}
+
 	private record EventValueInfo<E extends Event, T>(
 		Class<E> eventClass, Class<T> valueClass, Converter<E, T> converter,
 		@Nullable String excludeErrorMessage,
-		@Nullable Class<? extends E>[] excludes
+		@Nullable Class<? extends E>[] excludes, int time
 	) {
-		private EventValueInfo {
+		public EventValueInfo {
 			assert eventClass != null;
 			assert valueClass != null;
 			assert converter != null;
