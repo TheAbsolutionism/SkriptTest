@@ -13,6 +13,7 @@ import ch.njol.skript.registrations.Feature;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
+import org.skriptlang.skript.lang.experiment.ExperimentSet;
 import org.skriptlang.skript.lang.structure.Structure;
 
 @NoDoc
@@ -49,8 +50,8 @@ public class StructExample extends Structure implements ExperimentalSyntax {
 	}
 
 	@Override
-	public Feature requiredExperiment() {
-		return Feature.EXAMPLES;
+	public boolean isSatisfiedBy(ExperimentSet experimentSet) {
+		return experimentSet.hasExperiment(Feature.EXAMPLES);
 	}
 
 	@Override

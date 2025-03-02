@@ -21,6 +21,7 @@ import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.experiment.ExperimentSet;
 
 import java.util.List;
 import java.util.Map;
@@ -122,8 +123,8 @@ public class SecFor extends SecLoop implements ExperimentalSyntax {
 	}
 
 	@Override
-	public Feature requiredExperiment() {
-		return Feature.FOR_EACH_LOOPS;
+	public boolean isSatisfiedBy(ExperimentSet experimentSet) {
+		return experimentSet.hasExperiment(Feature.FOR_EACH_LOOPS);
 	}
 
 	@Override

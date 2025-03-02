@@ -15,6 +15,7 @@ import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.experiment.ExperimentSet;
 import org.skriptlang.skript.lang.util.SkriptQueue;
 
 import java.util.Iterator;
@@ -61,8 +62,8 @@ public class ExprQueue extends SimpleExpression<SkriptQueue> implements Experime
 	}
 
 	@Override
-	public Feature requiredExperiment() {
-		return Feature.QUEUES;
+	public boolean isSatisfiedBy(ExperimentSet experimentSet) {
+		return experimentSet.hasExperiment(Feature.QUEUES);
 	}
 
 	@Override

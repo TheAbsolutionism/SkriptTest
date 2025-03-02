@@ -14,6 +14,7 @@ import ch.njol.skript.registrations.Feature;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.lang.experiment.ExperimentSet;
 import org.skriptlang.skript.lang.util.SkriptQueue;
 
 @Name("De-queue Queue (Experimental)")
@@ -48,8 +49,8 @@ public class ExprDequeuedQueue extends SimpleExpression<Object> implements Exper
 	}
 
 	@Override
-	public Feature requiredExperiment() {
-		return Feature.QUEUES;
+	public boolean isSatisfiedBy(ExperimentSet experimentSet) {
+		return experimentSet.hasExperiment(Feature.QUEUES);
 	}
 
 	@Override
