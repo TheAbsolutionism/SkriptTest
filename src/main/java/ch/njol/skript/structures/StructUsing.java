@@ -29,7 +29,7 @@ public class StructUsing extends Structure {
 	public static final Priority PRIORITY = new Priority(15);
 
 	static {
-		Skript.registerSimpleStructure(StructUsing.class, "(using|enable) [[the] experiment] <.+>");
+		Skript.registerSimpleStructure(StructUsing.class, "using [[the] experiment] <.+>");
 	}
 
 	@SuppressWarnings("NotNullFieldNotInitialized")
