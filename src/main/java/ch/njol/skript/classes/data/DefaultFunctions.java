@@ -7,6 +7,7 @@ import ch.njol.skript.lang.function.*;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.DefaultClasses;
+import ch.njol.skript.util.Date;
 import ch.njol.skript.util.*;
 import ch.njol.util.Math2;
 import ch.njol.util.StringUtils;
