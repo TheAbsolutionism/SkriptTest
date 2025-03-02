@@ -186,26 +186,36 @@ public class SkriptCommand implements CommandExecutor {
 						lastReloaded = args;
 					}
 
+					List<File> scripts = new ArrayList<>();
+
+					for (File scriptFile : scriptFiles) {
+						if (ScriptLoader.getDisabledScriptsFilter().accept(scriptFile)) {
+							info(sender, "reload.script disabled", scriptFile.getName().substring(ScriptLoader.DISABLED_SCRIPT_PREFIX_LENGTH), scriptFile.getName());
+							continue;
+						}
+						if (!scriptFile.isDirectory()) {
+							Script script = ScriptLoader.getScript(scriptFile);
+							if (!scripts.contains(scriptFile)) {
+								if (script != null)
+									ScriptLoader.unloadScript(script);
+								scripts.add(scriptFile);
+							}
+						} else {
+							ScriptLoader.unloadScripts(ScriptLoader.getScripts(scriptFile));
+							scripts.add(scriptFile);
+						}
+					}
+
 					for (File scriptFile : scriptFiles) {
 						if (!scriptFile.isDirectory()) {
-							if (ScriptLoader.getDisabledScriptsFilter().accept(scriptFile)) {
-								info(sender, "reload.script disabled", scriptFile.getName().substring(ScriptLoader.DISABLED_SCRIPT_PREFIX_LENGTH), scriptFile.getName());
-								return true;
-							}
 							reloading(sender, "script", logHandler, scriptFile.getName());
-
-							Script script = ScriptLoader.getScript(scriptFile);
-							if (script != null)
-								ScriptLoader.unloadScript(script);
 							ScriptLoader.loadScripts(scriptFile, OpenCloseable.combine(logHandler, timingLogHandler))
 								.thenAccept(scriptInfo ->
 									reloaded(sender, logHandler, timingLogHandler, "script", scriptFile.getName())
 								);
 						} else {
-
-							final String fileName = scriptFile.getName();
+							String fileName = scriptFile.getName();
 							reloading(sender, "scripts in folder", logHandler, fileName);
-							ScriptLoader.unloadScripts(ScriptLoader.getScripts(scriptFile));
 							ScriptLoader.loadScripts(scriptFile, OpenCloseable.combine(logHandler, timingLogHandler))
 								.thenAccept(scriptInfo -> {
 									if (scriptInfo.files == 0) {
