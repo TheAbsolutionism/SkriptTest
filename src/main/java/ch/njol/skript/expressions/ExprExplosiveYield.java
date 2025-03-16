@@ -64,28 +64,27 @@ public class ExprExplosiveYield extends SimplePropertyExpression<Entity, Number>
 
 		for (Entity entity : getExpr().getArray(event)) {
 			if (entity instanceof Explosive explosive) {
-				switch (mode) {
-					case SET, DELETE -> explosive.setYield(floatValue);
-					case ADD -> {
-						float current = explosive.getYield();
-						float newValue = Math2.fit(0, current + floatValue, Float.MAX_VALUE);
-						explosive.setYield(newValue);
-					}
-					case REMOVE -> {
-						float current = explosive.getYield();
-						float newValue = Math2.fit(0, current - floatValue, Float.MAX_VALUE);
-						explosive.setYield(newValue);
-					}
-				}
+				changeExplosion(mode, floatValue, explosive::getYield, explosive::setYield, Float.MAX_VALUE);
 			} else if (entity instanceof Creeper creeper) {
-				changeExplosionInteger(mode, intValue, creeper::getExplosionRadius, creeper::setExplosionRadius, Integer.MAX_VALUE);
+				changeExplosion(mode, intValue, creeper::getExplosionRadius, creeper::setExplosionRadius, Integer.MAX_VALUE);
 			} else if (SUPPORTS_GHASTS && entity instanceof Ghast ghast) {
-				changeExplosionInteger(mode, intValue, ghast::getExplosionPower, ghast::setExplosionPower, 127);
+				changeExplosion(mode, intValue, ghast::getExplosionPower, ghast::setExplosionPower, 127);
 			}
 		}
 	}
 
-	private void changeExplosionInteger(ChangeMode mode, int value, Supplier<Integer> getter, Consumer<Integer> setter, int max) {
+	private void changeExplosion(ChangeMode mode, float value, Supplier<Float> getter, Consumer<Float> setter, float max) {
+		setter.accept(Math2.fit(0F,
+			switch (mode) {
+				case SET, DELETE -> value;
+				case ADD -> getter.get() + value;
+				case REMOVE -> getter.get() - value;
+				default -> throw new IllegalArgumentException("Unexpected mode: " + mode);
+			},
+			max));
+	}
+
+	private void changeExplosion(ChangeMode mode, int value, Supplier<Integer> getter, Consumer<Integer> setter, int max) {
 		setter.accept(Math2.fit(0,
 				switch (mode) {
 					case SET, DELETE -> value;
