@@ -1,5 +1,6 @@
-package ch.njol.skript.lang;
+package org.skriptlang.skript.lang.experiment;
 
+import ch.njol.skript.lang.SyntaxElement;
 import org.skriptlang.skript.lang.experiment.Experiment;
 import org.skriptlang.skript.lang.experiment.ExperimentSet;
 

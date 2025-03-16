@@ -4,7 +4,7 @@ import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.lang.ExperimentalSyntax;
+import org.skriptlang.skript.lang.experiment.ExperimentalSyntax;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.function.FunctionEvent;
