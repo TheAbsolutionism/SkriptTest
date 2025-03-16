@@ -20,7 +20,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent")) {
 			Skript.registerEvent("Armor Change", EvtPlayerArmorChange.class, PlayerArmorChangeEvent.class,
-				"[player] armo[u]r change[d] [(from|at|of) %-equipmentslots%]",
+				"[player] armo[u]r change[d]",
 					"[player] %equipmentslot% change[d]")
 				.description("Called when armor pieces of a player are changed.")
 				.requiredPlugins("Paper")
@@ -28,8 +28,6 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 				.examples(
 					"on armor change:",
 						"\tbroadcast the old armor item",
-					"on player armour changed from helmet slot:",
-						"\tbroadcast the new armor item",
 					"on helmet change:"
 				)
 				.since("2.5, INSERT VERSION (equipment slots)");
@@ -42,20 +40,17 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 		}
 	}
 
-	private @Nullable Literal<EquipmentSlot> slotLiteral;
-	private @Nullable EquipmentSlot[] slots = null;
+	private @Nullable EquipmentSlot slot = null;
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
-		if (args[0] != null) {
+		if (args.length == 1) {
 			//noinspection unchecked
-			slotLiteral = (Literal<EquipmentSlot>) args[0];
-			slots = slotLiteral.getAll();
-			for (EquipmentSlot slot : slots) {
-				if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || (BODY_SLOT_EXISTS && slot == EquipmentSlot.BODY)) {
-					Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
-					return false;
-				}
+			Literal<EquipmentSlot> slotLiteral = (Literal<EquipmentSlot>) args[0];
+			slot = slotLiteral.getSingle();
+			if (slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND || (BODY_SLOT_EXISTS && slot == EquipmentSlot.BODY)) {
+				Skript.error("You can't detect an armor change event for a '" + Classes.toString(slot) + "'.");
+				return false;
 			}
 		}
 		return true;
@@ -64,7 +59,7 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 	@Override
 	public boolean check(Event event) {
 		PlayerArmorChangeEvent changeEvent = (PlayerArmorChangeEvent) event;
-		if (slots == null || slots.length == 0)
+		if (slot == null)
 			return true;
 		EquipmentSlot changedSlot = switch (changeEvent.getSlotType()) {
 			case HEAD -> EquipmentSlot.HEAD;
@@ -72,19 +67,24 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			case LEGS -> EquipmentSlot.LEGS;
 			case FEET -> EquipmentSlot.FEET;
 		};
-		for (EquipmentSlot slot : slots) {
-			if (slot == changedSlot)
-				return true;
-		}
-		return false;
-	}
+        return slot == changedSlot;
+    }
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("player armor change");
-		if (slotLiteral != null)
-			builder.append("from", slotLiteral);
+		if (slot == null) {
+			builder.append("armor change");
+		} else {
+			builder.append(switch (slot) {
+				case HEAD -> "helmet";
+				case CHEST -> "chestplate";
+				case LEGS -> "legging";
+				case FEET -> "boots";
+				default -> "";
+			});
+			builder.append("changed");
+		}
 		return builder.toString();
 	}
 

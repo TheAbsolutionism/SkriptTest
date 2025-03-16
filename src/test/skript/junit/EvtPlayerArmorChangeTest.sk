@@ -6,7 +6,7 @@ on load:
 	add "helmet change - called", "helmet change - old diamond helmet" and "helmet change - new netherite helmet" to {_tests::*}
 	ensure junit test {@test} completes {_tests::*}
 
-on player armor change:
+on player armor changed:
 	junit test is {@test}
 	complete "general change - called" for {@test}
 	if the old armor item is a diamond helmet:
@@ -14,7 +14,7 @@ on player armor change:
 	if the new armor item is a netherite helmet:
 		complete "general change - new netherite helmet" for {@test}
 
-on player armor change from helmet slot:
+on helmet changed:
 	junit test is {@test}
 	complete "helmet change - called" for {@test}
 	if the old armor item is a diamond helmet:
