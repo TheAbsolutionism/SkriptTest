@@ -8,16 +8,16 @@ import ch.njol.util.Kleenean;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import io.papermc.paper.event.player.PlayerTradeEvent;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.AbstractVillager;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.Converters;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EventValues {
 
@@ -400,11 +400,12 @@ public class EventValues {
 	/**
 	 * <p>
 	 *  In this method we can strip converters that are able to be obtainable through their own 'event-classinfo'.
-	 *  For example, PlayerTradeEvent has a player value (player who traded) and an AbstractVillager value (villager traded from).
-	 *  Beforehand, since there is no Entity value, it was then grabbing both values as they both can be casted as an Entity
-	 *  	resulting in a parse error of "multiple entities"
-	 * 	Now, we filter out the ones that can be obtained using their own classinfo, such as 'event-player'
-	 * 		which leaves us only the AbstractVillager for 'event-entity'
+	 *  For example, {@link PlayerTradeEvent} has a {@link Player} value (player who traded)
+	 *  	and an {@link AbstractVillager} value (villager traded from).
+	 *  Beforehand, since there is no {@link Entity} value, it was grabbing both values as they both can be casted as an {@link Entity},
+	 *  	resulting in a parse error of "multiple entities".
+	 * 	Now, we filter out the values that can be obtained using their own classinfo, such as 'event-player'
+	 * 		which leaves us only the {@link AbstractVillager} for 'event-entity'.
 	 * </p>
 	 */
 	private static <E extends Event, T> List<Converter<? super E, ? extends T>> stripConverters(
@@ -416,16 +417,16 @@ public class EventValues {
 		if (converters.size() == 1)
 			return converters;
 		ClassInfo<T> valueClassInfo = Classes.getExactClassInfo(valueClass);
-		List<Converter<? super E, ? extends T>> delegated = new ArrayList<>();
+		List<Converter<? super E, ? extends T>> stripped = new ArrayList<>();
 		for (EventValueInfo<?, ?> eventValueInfo : infoConverterMap.keySet()) {
 			ClassInfo<?> thisClassInfo = Classes.getExactClassInfo(eventValueInfo.valueClass);
 			if (thisClassInfo != null && !thisClassInfo.equals(valueClassInfo))
 				continue;
-			delegated.add(infoConverterMap.get(eventValueInfo));
+			stripped.add(infoConverterMap.get(eventValueInfo));
 		}
-		if (delegated.isEmpty())
+		if (stripped.isEmpty())
 			return converters;
-		return delegated;
+		return stripped;
 	}
 
 	/**
