@@ -589,9 +589,13 @@ public class SkriptParser {
 					log.printError();
 					return null;
 				}
-				boolean canParse = Arrays.stream(exprInfo.classes).anyMatch(exprClassInfo ->
-					exprClassInfo.getC() == Object.class || classInfo.getC().isAssignableFrom(exprClassInfo.getC())
-				);
+				boolean canParse = false;
+				for (ClassInfo<?> exprClassInfo : exprInfo.classes) {
+					if (exprClassInfo.getC().isAssignableFrom(classInfo.getC())) {
+						canParse = true;
+						break;
+					}
+				}
 				if (!canParse) {
 					log.printError();
 					return null;
