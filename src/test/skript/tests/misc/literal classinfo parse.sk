@@ -1,4 +1,4 @@
-test "literal classinfo parse":
+test "literal type annotation":
 	parse if running minecraft "1.20.5":
 		assert black (wolf variant) is a wolf variant with "Literal classinfo parse should return black - wolf variant"
 	assert black (color) is a color with "Literal classinfo parse should return black - color"
