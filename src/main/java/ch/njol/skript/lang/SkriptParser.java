@@ -4,6 +4,7 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAPIException;
 import ch.njol.skript.SkriptConfig;
 import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.classes.Parser;
 import ch.njol.skript.command.Argument;
 import ch.njol.skript.command.Commands;
 import ch.njol.skript.command.ScriptCommand;
@@ -578,6 +579,25 @@ public class SkriptParser {
 				return null;
 			}
 			if (exprInfo.classes[0].getC() == Object.class) {
+				if (expr.matches(".+? \\(.+?\\)")) {
+					String[] split = expr.split(" \\(");
+					String parseAs = split[1].replace(")", "");
+					ClassInfo<?> parseClassInfo = Classes.parse(parseAs, ClassInfo.class, context);
+					if (parseClassInfo == null) {
+						log.printError();
+						return null;
+					}
+					Parser<?> parser = parseClassInfo.getParser();
+					if (parser == null || !parser.canParse(context)) {
+						log.printError();
+						return null;
+					}
+					Object parsedObject = parser.parse(split[0], context);
+					if (parsedObject != null) {
+						log.printLog();
+						return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(split[0]));
+					}
+				}
 				// Do check if a literal with this name actually exists before returning an UnparsedLiteral
 				if (!allowUnparsedLiteral || Classes.parseSimple(expr, Object.class, context) == null) {
 					log.printError();
