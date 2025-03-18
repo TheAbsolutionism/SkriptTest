@@ -415,6 +415,8 @@ public class SkriptParser {
 		}
 	}
 
+	private static final Pattern LITERAL_CLASSINFO_PARSE = Pattern.compile("([^(]+) \\(([^)]+)\\)");
+
 	private @Nullable Expression<?> parseSingleExpr(boolean allowUnparsedLiteral, @Nullable LogEntry error, ExprInfo exprInfo) {
 		if (expr.isEmpty()) // Empty expressions return nothing, obviously
 			return null;
@@ -578,26 +580,34 @@ public class SkriptParser {
 				log.printError();
 				return null;
 			}
-			if (exprInfo.classes[0].getC() == Object.class) {
-				if (expr.matches(".+? \\(.+?\\)")) {
-					String[] split = expr.split(" \\(");
-					String parseAs = split[1].replace(")", "");
-					ClassInfo<?> parseClassInfo = Classes.parse(parseAs, ClassInfo.class, context);
-					if (parseClassInfo == null) {
-						log.printError();
-						return null;
-					}
-					Parser<?> parser = parseClassInfo.getParser();
-					if (parser == null || !parser.canParse(context)) {
-						log.printError();
-						return null;
-					}
-					Object parsedObject = parser.parse(split[0], context);
-					if (parsedObject != null) {
-						log.printLog();
-						return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(split[0]));
-					}
+			Matcher literalClassInfoMatcher = LITERAL_CLASSINFO_PARSE.matcher(expr);
+			if (literalClassInfoMatcher.matches()) {
+				String literalString = literalClassInfoMatcher.group(1);
+				String classInfoString = literalClassInfoMatcher.group(2);
+				ClassInfo<?> classInfo = Classes.parse(classInfoString, ClassInfo.class, context);
+				if (classInfo == null) {
+					log.printError();
+					return null;
 				}
+				boolean canParse = Arrays.stream(exprInfo.classes).anyMatch(exprClassInfo ->
+					exprClassInfo.getC() == Object.class || classInfo.getC().isAssignableFrom(exprClassInfo.getC())
+				);
+				if (!canParse) {
+					log.printError();
+					return null;
+				}
+				Parser<?> classInfoParser = classInfo.getParser();
+				if (classInfoParser == null || !classInfoParser.canParse(context)) {
+					log.printError();
+					return null;
+				}
+				Object parsedObject = classInfoParser.parse(literalString, context);
+				if (parsedObject != null) {
+					log.printLog();
+					return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(literalString));
+				}
+			}
+			if (exprInfo.classes[0].getC() == Object.class) {
 				// Do check if a literal with this name actually exists before returning an UnparsedLiteral
 				if (!allowUnparsedLiteral || Classes.parseSimple(expr, Object.class, context) == null) {
 					log.printError();

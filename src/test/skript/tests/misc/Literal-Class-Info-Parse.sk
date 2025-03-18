@@ -1,0 +1,27 @@
+test "literal classinfo parse":
+	assert black (wolf variant) is a wolf variant with "Literal classinfo parse should return black - wolf variant"
+	assert black (color) is a color with "Literal classinfo parse should return black - color"
+	assert black (cat type) is a cat type with "Literal classinfo parse should return black - cat type"
+
+	assert unknown (heal reason) is a heal reason with "Literal classinfo parse should return unknown - heal reason"
+	assert unknown (potion effect cause) is a potion effect cause with "Literal classinfo parse should return unknown - potion effect cause"
+	assert unknown (inventory action) is an inventory action with "Literal classinfo parse should return unknown - inventory action"
+	assert unknown (click type) is a click type with "Literal classinfo parse should return unknown - click type"
+	assert unknown (damage cause) is a damage cause with "Literal classinfo parse should return unknown - damage cause"
+	assert unknown (unleash reason) is an unleash reason with "Literal classinfo parse should return unknown - unleash reason"
+	assert unknown (transform reason) is a transform reason with "Literal classinfo parse should return unknown - transform reason"
+	assert unknown (inventory close reason) is an inventory close reason with "Literal classinfo parse should return unknown - inventory close reason"
+	assert unknown (teleport cause) is a teleport cause with "Literal classinfo parse should return unknown - teleport cause"
+
+	assert custom (heal reason) is a heal reason with "Literal classinfo parse should return custom - heal reason"
+	assert custom (damage cause) is a damage cause with "Literal classinfo parse should return custom - damage cause"
+	assert custom (inventory action) is an inventory action with "Literal classinfo parse should return custom - inventory action"
+	assert custom (click type) is a click type with "Literal classinfo parse should return custom - click type"
+	assert custom (spawn reason) is a spawn reason with "Literal classinfo parse should return custom - spawn reason"
+	assert custom (environment) is an environment with "Literal classinfo parse should return custom - environment"
+
+	assert attack (damage cause) is a damage cause with "Literal classinfo parse should return attack - damage cause"
+	assert attack (potion effect cause) is a potion effect cause with "Literal classinfo parse should return attack - potion effect cause"
+
+	assert firework (entity type) is an entity type with "Literal classinfo parse should return firework - entity type"
+	assert firework (item type) is an item type with "Literal classinfo parse should return firework - item type"
