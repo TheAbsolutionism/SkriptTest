@@ -597,11 +597,13 @@ public class SkriptParser {
 					}
 				}
 				if (!canParse) {
+					Skript.error(expr + " " + Language.get("is") + " " + notOfType(types), ErrorQuality.NOT_AN_EXPRESSION);
 					log.printError();
 					return null;
 				}
 				Parser<?> classInfoParser = classInfo.getParser();
 				if (classInfoParser == null || !classInfoParser.canParse(context)) {
+					Skript.error("A '" + expr  + "' cannot be parsed.");
 					log.printError();
 					return null;
 				}
