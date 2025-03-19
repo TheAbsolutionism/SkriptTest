@@ -26,3 +26,8 @@ test "literal specification":
 
 	assert firework (entity type) is an entity type with "Literal specification should return firework - entity type"
 	assert firework (item type) is an item type with "Literal specification should return firework - item type"
+
+test "literal specification error":
+	parse:
+		set {_block} to oak log (block)
+	assert last parse logs contains "A 'block' cannot be parsed." with "Literal specification should error when specifying an unparseable classinfo"
