@@ -13,10 +13,8 @@ import org.bukkit.block.BrewingStand;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 @Name("Brewing Stand Fuel Level")
-@Description("The fuel level of a brewing stand.")
+@Description("The fuel level of a brewing stand. The fuel level is decreased by one for each potion that is being brewed.")
 @Examples({
 	"set the brewing stand fuel level of {_block} to 10",
 	"clear the brewing stand fuel level of {_block}"
@@ -46,33 +44,25 @@ public class ExprBrewingFuelLevel extends SimplePropertyExpression<Block, Intege
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedValue = delta != null ? (Integer) delta[0] : 0;
-		Consumer<BrewingStand> consumer = switch (mode) {
-			case ADD -> brewingStand -> {
-				int current = brewingStand.getFuelLevel();
-				int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
-				brewingStand.setFuelLevel(newValue);
-			};
-			case REMOVE -> brewingStand -> {
-				int current = brewingStand.getFuelLevel();
-				int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
-				brewingStand.setFuelLevel(newValue);
-			};
-			case SET -> {
-				int newValue = Math2.fit(0, providedValue, Integer.MAX_VALUE);
-				yield brewingStand -> {
-					brewingStand.setFuelLevel(newValue);
-				};
-			}
-			case DELETE -> brewingStand -> {
-				brewingStand.setFuelLevel(0);
-			};
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		};
-
 		for (Block block : getExpr().getArray(event)) {
 			if (!(block.getState() instanceof BrewingStand brewingStand))
 				continue;
-			consumer.accept(brewingStand);
+			switch (mode) {
+				case SET, DELETE -> {
+					int newValue = Math2.fit(0, providedValue, Integer.MAX_VALUE);
+					brewingStand.setFuelLevel(newValue);
+				}
+				case ADD -> {
+					int current = brewingStand.getFuelLevel();
+					int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
+					brewingStand.setFuelLevel(newValue);
+				}
+				case REMOVE -> {
+					int current = brewingStand.getFuelLevel();
+					int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
+					brewingStand.setFuelLevel(newValue);
+				}
+			}
 		}
 	}
 

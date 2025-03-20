@@ -14,7 +14,6 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.slot.InventorySlot;
 import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BrewingStand;
 import org.bukkit.event.Event;
@@ -38,11 +37,11 @@ import java.util.List;
 public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 
 	private enum BrewingSlot {
-		FIRST("(first|1st) bottle"),
-		SECOND("(second|2nd) bottle"),
-		THIRD("(third|3rd) bottle"),
-		INGREDIENT("ingredient"),
-		FUEL("fuel");
+		FIRST("[brewing [stand]] (first|1st) bottle"),
+		SECOND("[brewing [stand]] (second|2nd) bottle"),
+		THIRD("[brewing [stand]] (third|3rd) bottle"),
+		INGREDIENT("brewing [stand] ingredient"),
+		FUEL("brewing [stand] fuel");
 
 		private String pattern;
 
@@ -56,8 +55,8 @@ public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 	static {
 		String[] patterns = new String[brewingSlots.length * 2];
 		for (BrewingSlot slot : brewingSlots) {
-			patterns[2 * slot.ordinal()] = "[the] brewing [stand] " + slot.pattern + " slot[s] [of %blocks%]";
-			patterns[(2 * slot.ordinal()) + 1] = "%blocks%'[s] brewing [stand] " + slot.pattern + " slot[s]";
+			patterns[2 * slot.ordinal()] = "[the] " + slot.pattern + " slot[s] [of %blocks%]";
+			patterns[(2 * slot.ordinal()) + 1] = "%blocks%'[s] " + slot.pattern + " slot[s]";
 		}
 		Skript.registerExpression(ExprBrewingSlot.class, Slot.class, ExpressionType.PROPERTY, patterns);
 	}
@@ -126,28 +125,14 @@ public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 
 		@Override
 		public @Nullable ItemStack getItem() {
-			return switch (selectedSlot) {
-				case FUEL -> {
-					if (event instanceof BrewingStandFuelEvent brewingStandFuelEvent) {
-						ItemStack source = brewingStandFuelEvent.getFuel().clone();
-						if (getTime() != EventValues.TIME_FUTURE)
-							yield source;
-						source.setAmount(source.getAmount() - 1);
-						yield source;
-					}
-					yield super.getItem();
-				}
-				default -> super.getItem();
-			};
-		}
-
-		@Override
-		public void setItem(@Nullable ItemStack item) {
-			if (getTime() == EventValues.TIME_FUTURE) {
-				Bukkit.getScheduler().scheduleSyncDelayedTask(Skript.getInstance(), () -> BrewingEventSlot.super.setItem(item));
-			} else {
-				super.setItem(item);
+			if (selectedSlot == BrewingSlot.FUEL && event instanceof BrewingStandFuelEvent brewingStandFuelEvent) {
+				ItemStack source = brewingStandFuelEvent.getFuel().clone();
+				if (getTime() != EventValues.TIME_FUTURE || !brewingStandFuelEvent.isConsuming())
+					return source;
+				source.setAmount(source.getAmount() - 1);
+				return source;
 			}
+			return super.getItem();
 		}
 
 	}

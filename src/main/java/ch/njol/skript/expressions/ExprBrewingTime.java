@@ -17,6 +17,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.BrewingStartEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Name("Brewing Time")
@@ -52,37 +54,31 @@ public class ExprBrewingTime extends SimplePropertyExpression<Block, Timespan> {
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int providedValue = delta != null ? (int) ((Timespan) delta[0]).getAs(TimePeriod.TICK) : 0;
-		Consumer<BrewingStand> consumer = switch (mode) {
-			case ADD -> brewingStand -> {
-				int current = brewingStand.getBrewingTime();
-				int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
-				brewingStand.setBrewingTime(newValue);
-			};
-			case REMOVE -> brewingStand -> {
-				int current = brewingStand.getBrewingTime();
-				int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
-				brewingStand.setBrewingTime(newValue);
-			};
-			case SET, DELETE -> {
-				int newValue = Math2.fit(0, providedValue, Integer.MAX_VALUE);
-				yield brewingStand -> {
-					brewingStand.setBrewingTime(newValue);
-				};
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		};
-		Block eventBlock = null;
-		BrewingStartEvent brewingStartEvent = null;
-		if (event instanceof BrewingStartEvent brewingStartEvent1) {
-			eventBlock = brewingStartEvent1.getBlock();
-			brewingStartEvent = brewingStartEvent1;
+		List<Block> blocks = new ArrayList<>(getExpr().stream(event).toList());
+
+		if (event instanceof BrewingStartEvent brewingStartEvent) {
+			Block eventBlock = brewingStartEvent.getBlock();
+			if (blocks.remove(eventBlock))
+				getEventConsumer(providedValue, mode).accept(brewingStartEvent);
 		}
-		for (Block block : getExpr().getArray(event)) {
+
+		for (Block block : blocks) {
 			if (block.getState() instanceof BrewingStand brewingStand) {
-				if (eventBlock == null || block != eventBlock) {
-					consumer.accept(brewingStand);
-				} else {
-					getEventConsumer(providedValue, mode).accept(brewingStartEvent);
+				switch (mode) {
+					case SET, DELETE -> {
+						int newValue = Math2.fit(0, providedValue, Integer.MAX_VALUE);
+						brewingStand.setBrewingTime(newValue);
+					}
+					case ADD -> {
+						int current = brewingStand.getBrewingTime();
+						int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
+						brewingStand.setBrewingTime(newValue);
+					}
+					case REMOVE -> {
+						int current = brewingStand.getBrewingTime();
+						int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
+						brewingStand.setBrewingTime(newValue);
+					}
 				}
 			}
 		}

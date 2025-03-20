@@ -6,9 +6,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
+import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.event.inventory.BrewingStandFuelEvent;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 		"make the brewing stand not consume the fuel"
 })
 @Since("INSERT VERSION")
-public class EffBrewingConsume extends Effect {
+public class EffBrewingConsume extends Effect implements EventRestrictedSyntax {
 
 	static {
 		Skript.registerEffect(EffBrewingConsume.class,
@@ -35,12 +37,13 @@ public class EffBrewingConsume extends Effect {
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		if (!getParser().isCurrentEvent(BrewingStandFuelEvent.class)) {
-			Skript.error("The 'consume brewing fuel' effect only be used in a 'brewing fuel' event.");
-			return false;
-		}
 		consume = matchedPattern == 0;
 		return true;
+	}
+
+	@Override
+	public Class<? extends Event>[] supportedEvents() {
+		return CollectionUtils.array(BrewingStandFuelEvent.class);
 	}
 
 	@Override

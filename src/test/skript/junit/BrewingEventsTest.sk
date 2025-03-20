@@ -13,11 +13,11 @@ on brew of glass bottle:
 	junit test is {@test}
 	complete objective "brew event - glass bottle" for {@test}
 
-on brewing fuel:
+on brewing fuel consumption:
 	junit test is {@test}
 	complete objective "brewing fuel event" for {@test}
 
-on brewing fuel of blaze powder:
+on brewing fuel consumption of blaze powder:
 	junit test is {@test}
 	complete objective "brewing fuel event - blaze powder" for {@test}
 
