@@ -19,6 +19,7 @@ import ch.njol.skript.lang.parser.ParsingStack;
 import ch.njol.skript.lang.util.SimpleLiteral;
 import ch.njol.skript.localization.Language;
 import ch.njol.skript.localization.Message;
+import ch.njol.skript.localization.Noun;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.log.LogEntry;
 import ch.njol.skript.log.ParseLogHandler;
@@ -50,6 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
+import java.lang.reflect.Array;
 
 /**
  * Used for parsing my custom patterns.<br>
@@ -415,7 +417,7 @@ public class SkriptParser {
 		}
 	}
 
-	private static final Pattern LITERAL_CLASSINFO_PARSE = Pattern.compile("([^(]+) \\(([^)]+)\\)");
+	private static final Pattern LITERAL_SPECIFICATION_PATTERN = Pattern.compile("(?<literal>[^(]+) \\((?<classinfo>[^)]+)\\)");
 
 	private @Nullable Expression<?> parseSingleExpr(boolean allowUnparsedLiteral, @Nullable LogEntry error, ExprInfo exprInfo) {
 		if (expr.isEmpty()) // Empty expressions return nothing, obviously
@@ -580,37 +582,10 @@ public class SkriptParser {
 				log.printError();
 				return null;
 			}
-			Matcher literalClassInfoMatcher = LITERAL_CLASSINFO_PARSE.matcher(expr);
-			if (literalClassInfoMatcher.matches()) {
-				String literalString = literalClassInfoMatcher.group(1);
-				String classInfoString = literalClassInfoMatcher.group(2);
-				ClassInfo<?> classInfo = Classes.parse(classInfoString, ClassInfo.class, context);
-				if (classInfo == null) {
-					log.printError();
-					return null;
-				}
-				Parser<?> classInfoParser = classInfo.getParser();
-				if (classInfoParser == null || !classInfoParser.canParse(context)) {
-					Skript.error("A '" + classInfoString  + "' cannot be parsed.");
-					log.printError();
-					return null;
-				}
-				boolean canParse = false;
-				for (ClassInfo<?> exprClassInfo : exprInfo.classes) {
-					if (exprClassInfo.getC().isAssignableFrom(classInfo.getC())) {
-						canParse = true;
-						break;
-					}
-				}
-				if (!canParse) {
-					Skript.error(expr + " " + Language.get("is") + " " + notOfType(types));
-					log.printError();
-					return null;
-				}
-				Object parsedObject = classInfoParser.parse(literalString, context);
-				if (parsedObject != null) {
-					log.printLog();
-					return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(literalString));
+			if (expr.contains("(") && expr.endsWith(")") && expr.indexOf("(") < expr.indexOf(")")) {
+				Matcher classInfoMatcher = LITERAL_SPECIFICATION_PATTERN.matcher(expr);
+				if (classInfoMatcher.matches()) {
+					return specifyLiteral(classInfoMatcher, exprInfo, log, types);
 				}
 			}
 			if (exprInfo.classes[0].getC() == Object.class) {
@@ -645,6 +620,53 @@ public class SkriptParser {
 			log.printError();
 			return null;
 		}
+	}
+
+	/**
+	 * <p>
+	 *     With ambiguous literals being used in multiple {@link ClassInfo}s, users can specify which one they want
+	 *     in the format of 'literal (classinfo)'; Example: black (wolf variant)
+	 *     This checks to ensure the given 'classinfo' exists, is parseable, and is of the accepted types that is required.
+	 *     Then proceeds to check the {@link ClassInfo} contains the given 'literal'.
+	 * </p>
+	 * @param classInfoMatcher The {@link Matcher} from the {@link #LITERAL_SPECIFICATION_PATTERN}
+	 * @param exprInfo The {@link ExprInfo} containing the acceptable {@link Class}es
+	 * @param log The current {@link ParseLogHandler} for containing errors
+	 * @param types An {@link Array} of the acceptable {@link Class}es
+	 * @return {@link SimpleLiteral} or {@code null} if any checks fail
+	 */
+	private @Nullable Expression<?> specifyLiteral(Matcher classInfoMatcher, ExprInfo exprInfo, ParseLogHandler log, Class<?>[] types) {
+		String literalString = classInfoMatcher.group("literal");
+		String unparsedClassInfo = Noun.stripDefiniteArticle(classInfoMatcher.group("classinfo"));
+		ClassInfo<?> classInfo = Classes.parse(unparsedClassInfo, ClassInfo.class, context);
+		if (classInfo == null) {
+			log.printError();
+			return null;
+		}
+		Parser<?> classInfoParser = classInfo.getParser();
+		if (classInfoParser == null || !classInfoParser.canParse(context)) {
+			Skript.error("A '" + unparsedClassInfo  + "' cannot be parsed.");
+			log.printError();
+			return null;
+		}
+		boolean isAcceptableType = false;
+		for (ClassInfo<?> exprClassInfo : exprInfo.classes) {
+			if (exprClassInfo.getC().isAssignableFrom(classInfo.getC())) {
+				isAcceptableType = true;
+				break;
+			}
+		}
+		if (!isAcceptableType) {
+			Skript.error(expr + " " + Language.get("is") + " " + notOfType(types));
+			log.printError();
+			return null;
+		}
+		Object parsedObject = classInfoParser.parse(literalString, context);
+		if (parsedObject != null) {
+			log.printLog();
+			return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(literalString));
+		}
+		return null;
 	}
 
 	/**

@@ -331,6 +331,14 @@ public class Noun extends Message {
 		}
 		return s;
 	}
+
+	public static String stripDefiniteArticle(String string) {
+		for (String article : definiteArticles) {
+			if (StringUtils.startsWithIgnoreCase(string, article + " "))
+				return string.substring(article.length() + 1);
+		}
+		return string;
+	}
 	
 	public static boolean isIndefiniteArticle(String s) {
 		return indefiniteArticles.contains(s.toLowerCase());
