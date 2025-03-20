@@ -1,32 +1,27 @@
 package ch.njol.skript.events;
 
-import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
-import org.bukkit.event.Event;
-import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.entity.EntityDropItemEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
-import org.bukkit.event.entity.ItemMergeEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.jetbrains.annotations.Nullable;
-
-import ch.njol.skript.sections.EffSecSpawn;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleEvent;
+import ch.njol.skript.sections.EffSecSpawn;
 import ch.njol.util.coll.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.papermc.paper.event.player.PlayerStonecutterRecipeSelectEvent;
+import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class EvtItem extends SkriptEvent {
@@ -159,7 +154,6 @@ public class EvtItem extends SkriptEvent {
 		if (types == null)
 			return true;
 		ItemStack itemStack = null;
-		List<ItemStack> itemStacks = new ArrayList<>();
 		if (event instanceof BlockDispenseEvent blockDispenseEvent) {
 			itemStack = blockDispenseEvent.getItem();
 		} else if (event instanceof ItemSpawnEvent itemSpawnEvent) {
@@ -185,8 +179,6 @@ public class EvtItem extends SkriptEvent {
 			itemStack = playerPickupItemEvent.getItem().getItemStack();
 		} else if (hasConsumeEvent && event instanceof PlayerItemConsumeEvent playerItemConsumeEvent) {
 			itemStack = playerItemConsumeEvent.getItem();
-		} else if (event instanceof BrewEvent brewEvent) {
-			itemStacks.addAll(brewEvent.getResults());
 		} else if (event instanceof InventoryClickEvent inventoryClickEvent) {
 			itemStack = inventoryClickEvent.getCurrentItem();
 		} else if (event instanceof ItemDespawnEvent itemDespawnEvent) {
@@ -195,8 +187,6 @@ public class EvtItem extends SkriptEvent {
 			itemStack = itemMergeEvent.getTarget().getItemStack();
 		} else if (event instanceof InventoryMoveItemEvent inventoryMoveItemEvent) {
 			itemStack = inventoryMoveItemEvent.getItem();
-		} else if (event instanceof BrewingStandFuelEvent brewingStandFuelEvent) {
-			itemStack = brewingStandFuelEvent.getFuel();
 		} else {
 			assert false;
 			return false;
@@ -204,17 +194,8 @@ public class EvtItem extends SkriptEvent {
 
 		ItemStack finalItemStack = itemStack;
 
-		if (itemStack != null) {
+		if (finalItemStack != null)
 			return types.check(event, itemType -> itemType.isOfType(finalItemStack));
-		} else if (!itemStacks.isEmpty()) {
-			return types.check(event, itemType -> {
-				for (ItemStack itemStack1 : itemStacks) {
-					if (itemType.isOfType(itemStack1))
-						return true;
-				}
-				return false;
-			});
-		}
 		return false;
 	}
 	
