@@ -589,6 +589,12 @@ public class SkriptParser {
 					log.printError();
 					return null;
 				}
+				Parser<?> classInfoParser = classInfo.getParser();
+				if (classInfoParser == null || !classInfoParser.canParse(context)) {
+					Skript.error("A '" + classInfoString  + "' cannot be parsed.");
+					log.printError();
+					return null;
+				}
 				boolean canParse = false;
 				for (ClassInfo<?> exprClassInfo : exprInfo.classes) {
 					if (exprClassInfo.getC().isAssignableFrom(classInfo.getC())) {
@@ -598,12 +604,6 @@ public class SkriptParser {
 				}
 				if (!canParse) {
 					Skript.error(expr + " " + Language.get("is") + " " + notOfType(types));
-					log.printError();
-					return null;
-				}
-				Parser<?> classInfoParser = classInfo.getParser();
-				if (classInfoParser == null || !classInfoParser.canParse(context)) {
-					Skript.error("A '" + classInfoString  + "' cannot be parsed.");
 					log.printError();
 					return null;
 				}
