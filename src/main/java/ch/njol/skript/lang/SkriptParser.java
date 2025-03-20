@@ -582,7 +582,7 @@ public class SkriptParser {
 				log.printError();
 				return null;
 			}
-			if (expr.endsWith(")") && expr.indexOf("(") < expr.indexOf(")")) {
+			if (expr.endsWith(")") && expr.indexOf("(") != -1 && expr.indexOf("(") < expr.indexOf(")")) {
 				Matcher classInfoMatcher = LITERAL_SPECIFICATION_PATTERN.matcher(expr);
 				if (classInfoMatcher.matches()) {
 					String literalString = classInfoMatcher.group("literal");
@@ -650,7 +650,7 @@ public class SkriptParser {
 		}
 		Parser<?> classInfoParser = classInfo.getParser();
 		if (classInfoParser == null || !classInfoParser.canParse(context)) {
-			Skript.error("A '" + unparsedClassInfo  + "' cannot be parsed.");
+			Skript.error("A " + unparsedClassInfo  + " cannot be parsed.");
 			log.printError();
 			return null;
 		}
