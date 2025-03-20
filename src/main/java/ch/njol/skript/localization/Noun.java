@@ -323,7 +323,7 @@ public class Noun extends Message {
 			definitePluralArticle = dpa == null ? "" : dpa;
 		}, LanguageListenerPriority.EARLIEST);
 	}
-	
+
 	public static String stripIndefiniteArticle(String s) {
 		for (String a : indefiniteArticles) {
 			if (StringUtils.startsWithIgnoreCase(s, a + " "))
@@ -332,6 +332,9 @@ public class Noun extends Message {
 		return s;
 	}
 
+	/**
+	 * Removes definite articles, such as 'the', from the provided {@code string}.
+	 */
 	public static String stripDefiniteArticle(String string) {
 		for (String article : definiteArticles) {
 			if (StringUtils.startsWithIgnoreCase(string, article + " "))

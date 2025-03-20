@@ -582,10 +582,12 @@ public class SkriptParser {
 				log.printError();
 				return null;
 			}
-			if (expr.contains("(") && expr.endsWith(")") && expr.indexOf("(") < expr.indexOf(")")) {
+			if (expr.endsWith(")") && expr.indexOf("(") < expr.indexOf(")")) {
 				Matcher classInfoMatcher = LITERAL_SPECIFICATION_PATTERN.matcher(expr);
 				if (classInfoMatcher.matches()) {
-					return specifyLiteral(classInfoMatcher, exprInfo, log, types);
+					String literalString = classInfoMatcher.group("literal");
+					String unparsedClassInfo = Noun.stripDefiniteArticle(classInfoMatcher.group("classinfo"));
+					return parseSpecifiedLiteral(literalString, unparsedClassInfo, log, types);
 				}
 			}
 			if (exprInfo.classes[0].getC() == Object.class) {
@@ -627,17 +629,20 @@ public class SkriptParser {
 	 *     With ambiguous literals being used in multiple {@link ClassInfo}s, users can specify which one they want
 	 *     in the format of 'literal (classinfo)'; Example: black (wolf variant)
 	 *     This checks to ensure the given 'classinfo' exists, is parseable, and is of the accepted types that is required.
-	 *     Then proceeds to check the {@link ClassInfo} contains the given 'literal'.
+	 *     If so, the literal section of the input is parsed as the given classinfo and the result returned.
 	 * </p>
-	 * @param classInfoMatcher The {@link Matcher} from the {@link #LITERAL_SPECIFICATION_PATTERN}
-	 * @param exprInfo The {@link ExprInfo} containing the acceptable {@link Class}es
+	 * @param literalString A {@link String} representing a literal
+	 * @param unparsedClassInfo A {@link String} representing a class info
 	 * @param log The current {@link ParseLogHandler} for containing errors
 	 * @param types An {@link Array} of the acceptable {@link Class}es
 	 * @return {@link SimpleLiteral} or {@code null} if any checks fail
 	 */
-	private @Nullable Expression<?> specifyLiteral(Matcher classInfoMatcher, ExprInfo exprInfo, ParseLogHandler log, Class<?>[] types) {
-		String literalString = classInfoMatcher.group("literal");
-		String unparsedClassInfo = Noun.stripDefiniteArticle(classInfoMatcher.group("classinfo"));
+	private @Nullable Expression<?> parseSpecifiedLiteral(
+		String literalString,
+		String unparsedClassInfo,
+		ParseLogHandler log,
+		Class<?> ... types
+	) {
 		ClassInfo<?> classInfo = Classes.parse(unparsedClassInfo, ClassInfo.class, context);
 		if (classInfo == null) {
 			log.printError();
@@ -650,8 +655,8 @@ public class SkriptParser {
 			return null;
 		}
 		boolean isAcceptableType = false;
-		for (ClassInfo<?> exprClassInfo : exprInfo.classes) {
-			if (exprClassInfo.getC().isAssignableFrom(classInfo.getC())) {
+		for (Class<?> targetType : types) {
+			if (targetType.isAssignableFrom(classInfo.getC())) {
 				isAcceptableType = true;
 				break;
 			}
