@@ -2,7 +2,9 @@ options:
 	test: "org.skriptlang.skript.test.tests.syntaxes.events.BrewingEventsTest"
 
 test "BrewingEventsTest" when running JUnit:
-	set {_tests::*} to "brew event", "brew event - glass bottle", "brewing fuel event", "brewing fuel event - blaze powder" and "brew start event"
+	set {_tests::*} to "brew event" and "brew event - glass bottle"
+	add "brewing results - get", "brewing results - set", "brewing results - clear", "brewing results - add" and "brewing results - remove" to {_tests::*}
+	add "brewing fuel event", "brewing fuel event - blaze powder" and "brew start event" to {_tests::*}
 	ensure junit test {@test} completes {_tests::*}
 
 on brew:
@@ -12,6 +14,20 @@ on brew:
 on brew of glass bottle:
 	junit test is {@test}
 	complete objective "brew event - glass bottle" for {@test}
+	if the brewing results contains a glass bottle:
+		complete objective "brewing results - get" for {@test}
+	set the brewing results to a diamond and a netherite ingot
+	if the brewing results is a diamond and a netherite ingot:
+		complete objective "brewing results - set" for {@test}
+	add an iron ingot to the brewing results
+	if the brewing results is a diamond, a netherite ingot and an iron ingot:
+		complete objective "brewing results - add" for {@test}
+	remove a netherite ingot from the brewing results
+	if the brewing results is a diamond and an iron ingot:
+		complete objective "brewing results - remove" for {@test}
+	clear the brewing results
+	if the brewing results is not set:
+		complete objective "brewing results - clear" for {@test}
 
 on brewing fuel consumption:
 	junit test is {@test}
