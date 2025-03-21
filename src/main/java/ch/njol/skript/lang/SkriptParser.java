@@ -582,7 +582,7 @@ public class SkriptParser {
 				log.printError();
 				return null;
 			}
-			if (expr.endsWith(")") && expr.indexOf("(") != -1 && expr.indexOf("(") < expr.indexOf(")")) {
+			if (expr.endsWith(")") && expr.indexOf("(") != -1) {
 				Matcher classInfoMatcher = LITERAL_SPECIFICATION_PATTERN.matcher(expr);
 				if (classInfoMatcher.matches()) {
 					String literalString = classInfoMatcher.group("literal");
