@@ -654,14 +654,7 @@ public class SkriptParser {
 			log.printError();
 			return null;
 		}
-		boolean isAcceptableType = false;
-		for (Class<?> targetType : types) {
-			if (targetType.isAssignableFrom(classInfo.getC())) {
-				isAcceptableType = true;
-				break;
-			}
-		}
-		if (!isAcceptableType) {
+		if (!checkAcceptedType(classInfo.getC(), types)) {
 			Skript.error(expr + " " + Language.get("is") + " " + notOfType(types));
 			log.printError();
 			return null;
@@ -673,6 +666,20 @@ public class SkriptParser {
 		}
 		log.printError();
 		return null;
+	}
+
+	/**
+	 * Check if the provided {@code clazz} is an accepted type from any class of {@code types}.
+	 * @param clazz The {@link Class} to check
+	 * @param types The {@link Class}es that are accepted
+	 * @return true if {@code clazz} is of a {@link Class} from {@code types}
+	 */
+	private boolean checkAcceptedType(Class<?> clazz, Class<?> ... types) {
+		for (Class<?> targetType : types) {
+			if (targetType.isAssignableFrom(clazz))
+				return true;
+		}
+		return false;
 	}
 
 	/**
