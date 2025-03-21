@@ -95,7 +95,7 @@ public class ExprBrewingSlot extends PropertyExpression<Block, Slot> {
 			if (!(block.getState() instanceof BrewingStand brewingStand))
 				continue;
 			BrewerInventory brewerInventory = brewingStand.getInventory();
-			if (isEvent && block == eventBlock && !Delay.isDelayed(event)) {
+			if (isEvent && block.equals(eventBlock) && !Delay.isDelayed(event)) {
 				slots.add(new BrewingEventSlot(event, brewerInventory));
 			} else {
 				slots.add(new InventorySlot(brewerInventory, selectedSlot.ordinal()));

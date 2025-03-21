@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 	"By making it not consume the fuel, it will keep the fuel item and still add to the fuel level of the brewing stand."
 })
 @Examples({
-	"on brewing fuel:",
-		"make the brewing stand not consume the fuel"
+	"on brewing fuel consumption:",
+		"prevent the brewing stand from consuming the fuel"
 })
 @Since("INSERT VERSION")
 public class EffBrewingConsume extends Effect implements EventRestrictedSyntax {
@@ -30,7 +30,7 @@ public class EffBrewingConsume extends Effect implements EventRestrictedSyntax {
 	static {
 		Skript.registerEffect(EffBrewingConsume.class,
 			"make [the] brewing stand consume [the] fuel",
-			"make [the] brewing stand not consume [the] fuel");
+			"prevent [the] brewing stand from consuming [the] fuel");
 	}
 
 	private boolean consume;
@@ -55,7 +55,9 @@ public class EffBrewingConsume extends Effect implements EventRestrictedSyntax {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "make the brewing stand " + (consume ? "" : "not") + " consume the fuel";
+		if (consume)
+			return "make the brewing stand consume the fuel";
+		return "prevent the brewing stand from consuming the fuel";
 	}
 
 }

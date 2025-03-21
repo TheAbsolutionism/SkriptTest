@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Name("Brewing Time")
 @Description("The remaining brewing time of the brewing stand.")
@@ -58,65 +59,32 @@ public class ExprBrewingTime extends SimplePropertyExpression<Block, Timespan> {
 
 		if (event instanceof BrewingStartEvent brewingStartEvent) {
 			Block eventBlock = brewingStartEvent.getBlock();
-			if (blocks.remove(eventBlock))
-				getEventConsumer(providedValue, mode).accept(brewingStartEvent);
+			if (blocks.remove(eventBlock)) {
+				if (BREWING_START_EVENT_1_21) {
+					//noinspection UnstableApiUsage
+					changeBrewingTime(providedValue, mode, brewingStartEvent::getBrewingTime, brewingStartEvent::setBrewingTime);
+				} else {
+					//noinspection removal,UnstableApiUsage
+					changeBrewingTime(providedValue, mode, brewingStartEvent::getTotalBrewTime, brewingStartEvent::setTotalBrewTime);
+				}
+			}
 		}
 
 		for (Block block : blocks) {
 			if (block.getState() instanceof BrewingStand brewingStand) {
-				switch (mode) {
-					case SET, DELETE -> {
-						int newValue = Math2.fit(0, providedValue, Integer.MAX_VALUE);
-						brewingStand.setBrewingTime(newValue);
-					}
-					case ADD -> {
-						int current = brewingStand.getBrewingTime();
-						int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
-						brewingStand.setBrewingTime(newValue);
-					}
-					case REMOVE -> {
-						int current = brewingStand.getBrewingTime();
-						int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
-						brewingStand.setBrewingTime(newValue);
-					}
-				}
+				changeBrewingTime(providedValue, mode, brewingStand::getBrewingTime, brewingStand::setBrewingTime);
 			}
 		}
 	}
 
-	// Paper has deprecated the usage of #getTotalBrewTime and #setTotalBrewTime
-	@SuppressWarnings("removal")
-	private Consumer<BrewingStartEvent> getEventConsumer(int providedValue, ChangeMode mode) {
-		if (BREWING_START_EVENT_1_21) {
-			return switch (mode) {
-				case ADD -> brewingStartEvent -> {
-					int current = brewingStartEvent.getBrewingTime();
-					int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
-					brewingStartEvent.setBrewingTime(newValue);
-				};
-				case REMOVE -> brewingStartEvent -> {
-					int current = brewingStartEvent.getBrewingTime();
-					int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
-					brewingStartEvent.setBrewingTime(newValue);
-				};
-				case SET, DELETE -> brewingStartEvent -> brewingStartEvent.setBrewingTime(providedValue);
-				default -> throw new IllegalStateException("Unexpected value: " + mode);
-			};
-		}
-		return switch (mode) {
-			case ADD -> brewingStartEvent -> {
-				int current = brewingStartEvent.getTotalBrewTime();
-				int newValue = Math2.fit(0, current + providedValue, Integer.MAX_VALUE);
-				brewingStartEvent.setTotalBrewTime(newValue);
-			};
-			case REMOVE -> brewingStartEvent -> {
-				int current = brewingStartEvent.getTotalBrewTime();
-				int newValue = Math2.fit(0, current - providedValue, Integer.MAX_VALUE);
-				brewingStartEvent.setTotalBrewTime(newValue);
-			};
-			case SET, DELETE -> brewingStartEvent -> brewingStartEvent.setTotalBrewTime(providedValue);
-			default -> throw new IllegalStateException("Unexpected value: " + mode);
-		};
+	private void changeBrewingTime(int providedValue, ChangeMode mode, Supplier<Integer> getter, Consumer<Integer> setter) {
+		if (mode == ChangeMode.REMOVE)
+			providedValue = -providedValue;
+		setter.accept(switch (mode) {
+			case SET, DELETE -> Math2.fit(0, providedValue, Integer.MAX_VALUE);
+			case ADD, REMOVE -> Math2.fit(0, getter.get() + providedValue, Integer.MAX_VALUE);
+			default -> throw new IllegalStateException("Unexpected mode: " + mode);
+		});
 	}
 
 	@Override

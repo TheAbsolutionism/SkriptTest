@@ -17,13 +17,13 @@ public class EvtBrewingComplete extends SkriptEvent {
 
 	static {
 		Skript.registerEvent("Brewing Complete", EvtBrewingComplete.class, BrewEvent.class,
-				"brew[ed|ing] [complet[ed|ion]] [(of|for) %-itemtypes%]",
-				"brew[ed|ing] [finish[ed]] [(of|for) %-itemtypes%]")
+				"brew[ing] [complet[ed|ion]] [(of|for) %-itemtypes%]",
+				"brew[ing] [finish[ed]] [(of|for) %-itemtypes%]")
 			.description("Called when a brewing stand finishes brewing the ingredient and changes the potions.")
 			.examples(
 				"on brew:",
 					"\tbroadcast event-items",
-				"on brew complete of speed potion:"
+				"on brewing of speed potion:"
 			)
 			.since("INSERT VERSION");
 	}
@@ -44,14 +44,14 @@ public class EvtBrewingComplete extends SkriptEvent {
 		if (items == null)
 			return true;
 
-		List<ItemStack> itemStacks =  brewEvent.getResults();
-		return items.check(event, itemType -> {
+		List<ItemStack> itemStacks = brewEvent.getResults();
+		for (ItemType itemType : items.getArray()) {
 			for (ItemStack itemStack : itemStacks) {
 				if (itemType.isOfType(itemStack))
 					return true;
 			}
-			return false;
-		});
+		}
+		return false;
 	}
 
 	@Override

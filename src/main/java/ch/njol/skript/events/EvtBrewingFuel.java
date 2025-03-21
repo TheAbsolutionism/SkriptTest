@@ -19,9 +19,9 @@ public class EvtBrewingFuel extends SkriptEvent {
 				"brew[ing [stand]] fuel consumption [of %-itemtypes%]")
 			.description("Called when a brewing stand is about to use an item to increase its fuel level.")
 			.examples(
-				"on brewing fuel:",
-					"\tmake the brewing stand not consume fuel",
-				"on brewing fuel of blaze powder:"
+				"on brewing consume fuel:",
+					"\tprevent the brewing stand from consuming fuel",
+				"on brewing fuel consumption of blaze powder:"
 			)
 			.since("INSERT VERSION");
 	}
@@ -43,7 +43,11 @@ public class EvtBrewingFuel extends SkriptEvent {
 			return true;
 
 		ItemStack itemStack = brewingStandFuelEvent.getFuel();
-		return items.check(event, itemType -> itemType.isOfType(itemStack));
+		for (ItemType itemType : items.getArray()) {
+			if (itemType.isOfType(itemStack))
+				return true;
+		}
+		return false;
 	}
 
 	@Override
