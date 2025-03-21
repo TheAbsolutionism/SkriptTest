@@ -671,6 +671,7 @@ public class SkriptParser {
 			log.printLog();
 			return new SimpleLiteral<>(parsedObject, false, new UnparsedLiteral(literalString));
 		}
+		log.printError();
 		return null;
 	}
 
