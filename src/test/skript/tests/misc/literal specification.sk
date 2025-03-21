@@ -33,4 +33,4 @@ test "literal specification":
 test "literal specification error":
 	parse:
 		set {_block} to oak log (block)
-	assert last parse logs contains "A 'block' cannot be parsed." with "Literal specification should error when specifying an unparseable classinfo"
+	assert last parse logs contains "A block cannot be parsed." with "Literal specification should error when specifying an unparseable classinfo"
