@@ -2,11 +2,11 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.registrations.EventValues;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
@@ -18,26 +18,31 @@ import org.jetbrains.annotations.Nullable;
 @Description("Get the unequipped or equipped armor item from a 'armor change' event.")
 @Examples({
 	"on armor change:",
-		"\tbroadcast the old armor item"
+	"\tbroadcast the old armor item"
 })
 @RequiredPlugins("Paper")
 @Events("Armor Change")
 @Since("INSERT VERSION")
-public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements EventRestrictedSyntax {
+public class ExprArmorChangeItem extends EventValueExpression<ItemStack> implements EventRestrictedSyntax {
 
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent"))
-			Skript.registerExpression(ExprArmorChangeItem.class, ItemStack.class, ExpressionType.SIMPLE,
+			register(ExprArmorChangeItem.class, ItemStack.class,
 				"[the] (old|unequipped) armo[u]r item",
 				"[the] (new|equipped) armo[u]r item");
+	}
+
+	public ExprArmorChangeItem() {
+		super(ItemStack.class);
 	}
 
 	private boolean oldArmor;
 
 	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
 		oldArmor = matchedPattern == 0;
-		return true;
+		super.setTime(oldArmor ? EventValues.TIME_PAST : EventValues.TIME_FUTURE);
+		return super.init(exprs, matchedPattern, isDelayed, parser);
 	}
 
 	@Override
@@ -46,25 +51,13 @@ public class ExprArmorChangeItem extends SimpleExpression<ItemStack> implements 
 	}
 
 	@Override
-	protected ItemStack @Nullable [] get(Event event) {
-		if (!(event instanceof PlayerArmorChangeEvent changeEvent))
-			return null;
-		return new ItemStack[]{oldArmor ? changeEvent.getOldItem() : changeEvent.getNewItem()};
-	}
-
-	@Override
-	public boolean isSingle() {
-		return true;
-	}
-
-	@Override
-	public Class<ItemStack> getReturnType() {
-		return ItemStack.class;
+	public boolean setTime(int time) {
+		return false;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (oldArmor ? "old" : "new") + " armor item";
+		return oldArmor ? "old armor item" : "new armor item";
 	}
 
 }

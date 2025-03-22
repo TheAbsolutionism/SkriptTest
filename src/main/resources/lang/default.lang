@@ -2566,7 +2566,7 @@ equipment slots:
 	feet: feet slot, boots slot, boots
 	hand: tool slot, hand slot, main hand slot, main hand
 	off_hand: off hand slot, off hand
-	body: body slot, body armor slot
+	body: body slot, body armor slot, body armour slot
 
 # -- Boolean --
 boolean:

@@ -3,8 +3,6 @@ package ch.njol.skript.util.slot;
 import ch.njol.skript.bukkitutil.PlayerUtils;
 import ch.njol.skript.registrations.Classes;
 import com.google.common.base.Preconditions;
-import ch.njol.skript.bukkitutil.PlayerUtils;
-import ch.njol.skript.registrations.Classes;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -17,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Locale;
 
 /**
  * Represents equipment slot of an entity.
@@ -40,7 +37,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setItemInMainHand(item);
 			}
-
 		},
 		OFF_HAND(40) {
 
@@ -54,7 +50,7 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(EntityEquipment e, @Nullable ItemStack item) {
 				e.setItemInOffHand(item);
 			}
-
+			
 		},
 		HELMET(39) {
 			@Override
@@ -67,7 +63,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setHelmet(item);
 			}
-
 		},
 		CHESTPLATE(38) {
 			@Override
@@ -80,7 +75,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setChestplate(item);
 			}
-
 		},
 		LEGGINGS(37) {
 			@Override
@@ -93,7 +87,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setLeggings(item);
 			}
-
 		},
 		BOOTS(36) {
 			@Override
@@ -106,7 +99,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(final EntityEquipment e, final @Nullable ItemStack item) {
 				e.setBoots(item);
 			}
-
 		},
 
 		BODY() {
@@ -119,7 +111,6 @@ public class EquipmentSlot extends SlotWithIndex {
 			public void set(EntityEquipment equipment, @Nullable ItemStack item) {
 				equipment.setItem(org.bukkit.inventory.EquipmentSlot.BODY, item);
 			}
-
 		};
 		
 		public final int slotNumber;

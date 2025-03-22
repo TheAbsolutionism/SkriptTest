@@ -19,6 +19,7 @@ import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Utils;
 import ch.njol.util.Kleenean;
+import ch.njol.util.StringUtils;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.skript.registrations.EventConverter;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -95,6 +96,22 @@ public class EventValueExpression<T> extends SimpleExpression<T> implements Defa
 	 */
 	public static <T> void register(Class<? extends EventValueExpression<T>> expression, Class<T> type, String pattern) {
 		Skript.registerExpression(expression, type, ExpressionType.EVENT, "[the] " + pattern);
+	}
+
+	/**
+	 * Registers an expression as {@link ExpressionType#EVENT} with the provided patterns.
+	 * This also adds '[the]' to the start of all patterns.
+	 *
+	 * @param expression The class that represents this EventValueExpression.
+	 * @param type The return type of the expression.
+	 * @param patterns The patterns for this syntax.
+	 */
+	public static <T> void register(Class<? extends EventValueExpression<T>> expression, Class<T> type, String ... patterns) {
+		for (int i = 0; i < patterns.length; i++) {
+			if (!StringUtils.startsWithIgnoreCase(patterns[i], "[the] "))
+				patterns[i] = "[the] " + patterns[i];
+		}
+		Skript.registerExpression(expression, type, ExpressionType.EVENT, patterns);
 	}
 
 	private final Map<Class<? extends Event>, Converter<?, ? extends T>> converters = new HashMap<>();

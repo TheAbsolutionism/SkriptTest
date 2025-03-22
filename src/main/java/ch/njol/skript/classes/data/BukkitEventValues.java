@@ -594,6 +594,8 @@ public final class BukkitEventValues {
 					case LEGS -> EquipmentSlot.LEGS;
 					case FEET -> EquipmentSlot.FEET;
 			});
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, ItemStack.class, PlayerArmorChangeEvent::getOldItem, TIME_PAST);
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, ItemStack.class, PlayerArmorChangeEvent::getNewItem, TIME_FUTURE);
 		}
 		//PlayerInventorySlotChangeEvent
 		if (Skript.classExists("io.papermc.paper.event.player.PlayerInventorySlotChangeEvent")) {
