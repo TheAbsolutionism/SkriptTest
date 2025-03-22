@@ -1,10 +1,7 @@
 package ch.njol.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -18,19 +15,22 @@ import org.skriptlang.skript.lang.comparator.Relation;
 
 @Name("Except")
 @Description("Filter a list by providing objects to be excluded.")
-@Examples({
-	"spawn zombie at location(0, 0, 0):",
-		"\thide entity from all players except {_player}",
-	"",
-	"set {_items::*} to a copper ingot, an iron ingot and a gold ingot",
-	"set {_except::*} to {_items::*} excluding copper ingot"
-})
+@Example("""
+		spawn zombie at location(0, 0, 0):
+			hide entity from all players except {_player}
+	"""
+)
+@Example("""
+		set {_items::*} to a copper ingot, an iron ingot and a gold ingot
+		set {_except::*} to {_items::*} excluding copper ingot
+	"""
+)
 @Since("INSERT VERSION")
 public class ExprExcept extends SimpleExpression<Object> {
 
 	static {
 		Skript.registerExpression(ExprExcept.class, Object.class, ExpressionType.COMBINED,
-			"%~objects% (except|excluding|not including) %objects%");
+			"%~objects% (except[ing]|excluding|not including) %objects%");
 	}
 
 	private Expression<?> source;
@@ -70,7 +70,7 @@ public class ExprExcept extends SimpleExpression<Object> {
 
 	@Override
 	public Class<?> getReturnType() {
-		return Object.class;
+		return source.getReturnType();
 	}
 
 	@Override
