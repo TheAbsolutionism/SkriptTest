@@ -3,10 +3,7 @@ package ch.njol.skript.expressions;
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.UUIDUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.util.coll.CollectionUtils;
@@ -22,19 +19,20 @@ import java.util.UUID;
 @Name("Entity Owner")
 @Description({
 	"The owner of a tameable entity (i.e. horse or wolf) or a dropped item.",
-	"Getting the owner of a dropped item will only return a loaded entity or a player that has played before. "
-		+ "If the entity was killed, or the player has never played before, will return null.",
-	"Setting the owner of a dropped item means only that entity or player can pick it up. "
-		+ "This is UUID based, so it can also be set to a specific UUID.",
+	"Getting the owner of a dropped item will only return the uuid of the owner",
+	"Setting the owner of a dropped item means only that entity or player can pick it up.",
 	"Dropping an item does not automatically make the entity or player the owner."
 })
-@Examples({
-	"set owner of target entity to player",
-	"delete owner of target entity",
-	"set {_t} to uuid of tamer of target entity",
-	"",
-	"set the owner of all dropped items to player"
-})
+@Example("""
+		set owner of last spawned wolf to player
+		if the owner of last spawned wolf is player:
+	"""
+)
+@Example("""
+		set dropped item owner of last dropped item to player
+		if the dropped item owner of last dropped item is uuid of player:
+	"""
+)
 @Since("2.5, INSERT VERSION (dropped items)")
 public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 
@@ -51,10 +49,7 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 		if (entity instanceof Tameable tameable && tameable.isTamed()) {
 			return tameable.getOwner();
 		} else if (entity instanceof Item item) {
-			UUID uuid = item.getOwner();
-			if (uuid == null)
-				return null;
-			return UUIDUtils.fromUUID(uuid, true);
+			return item.getOwner();
 		}
 		return null;
 	}
@@ -62,7 +57,7 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, RESET -> CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class);
+			case SET, DELETE, RESET -> CollectionUtils.array(OfflinePlayer.class, Entity.class, UUID.class);
 			default -> null;
 		};
 	}
@@ -96,7 +91,7 @@ public class ExprEntityOwner extends SimplePropertyExpression<Entity, Object> {
 
 	@Override
 	public Class<?>[] possibleReturnTypes() {
-		return CollectionUtils.array(Entity.class, OfflinePlayer.class);
+		return CollectionUtils.array(UUID.class, OfflinePlayer.class);
 	}
 
 	@Override

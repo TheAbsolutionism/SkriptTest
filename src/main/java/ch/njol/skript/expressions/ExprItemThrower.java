@@ -2,10 +2,7 @@ package ch.njol.skript.expressions;
 
 import ch.njol.skript.bukkitutil.UUIDUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.OfflinePlayer;
@@ -17,35 +14,29 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Name("Item Thrower")
-@Description({
-	"The entity that threw/dropped the dropped item.",
-	"Getting the item thrower will only return a living entity or a player that has played before. "
-		+ "If the entity was killed, or the player has never played before, this will return null."
-})
-@Examples({
-	"broadcast the item thrower of all dropped items",
-	"set the dropped item thrower of {_dropped item} to player",
-	"clear the item thrower of {_dropped item}"
-})
+@Description("The uuid of the entity or player that threw/dropped the dropped item.")
+@Example("""
+	set the dropped item thrower of {_dropped item} to player
+	if the dropped item thrower of {_dropped item} is uuid of player:
+	"""
+)
+@Example("clear the item thrower of {_dropped item}")
 @Since("INSERT VERSION")
-public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
+public class ExprItemThrower extends SimplePropertyExpression<Item, UUID> {
 
 	static {
-		registerDefault(ExprItemThrower.class, Object.class, "[dropped] item thrower", "itementities");
+		registerDefault(ExprItemThrower.class, UUID.class, "[dropped] item thrower", "itementities");
 	}
 
 	@Override
-	public @Nullable Object convert(Item item) {
-		UUID uuid = item.getThrower();
-		if (uuid == null)
-			return null;
-		return UUIDUtils.fromUUID(uuid, true);
+	public @Nullable UUID convert(Item item) {
+		return item.getThrower();
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-			return CollectionUtils.array(OfflinePlayer.class, Entity.class, String.class);
+			return CollectionUtils.array(OfflinePlayer.class, Entity.class, UUID.class);
 		return null;
 	}
 
@@ -62,13 +53,8 @@ public class ExprItemThrower extends SimplePropertyExpression<Item, Object> {
 	}
 
 	@Override
-	public Class<Object> getReturnType() {
-		return Object.class;
-	}
-
-	@Override
-	public Class<?>[] possibleReturnTypes() {
-		return CollectionUtils.array(Entity.class, OfflinePlayer.class);
+	public Class<UUID> getReturnType() {
+		return UUID.class;
 	}
 
 	@Override
