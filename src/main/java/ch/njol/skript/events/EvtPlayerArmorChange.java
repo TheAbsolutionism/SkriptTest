@@ -6,12 +6,17 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.registrations.EventValues;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletionException;
+
+import static ch.njol.skript.registrations.EventValues.TIME_FUTURE;
+import static ch.njol.skript.registrations.EventValues.TIME_PAST;
 
 public class EvtPlayerArmorChange extends SkriptEvent {
 
@@ -37,6 +42,16 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 				bodySlot = EquipmentSlot.valueOf("BODY");
 			} catch (IllegalArgumentException | NoSuchFieldError | CompletionException ignored) {};
 			BODY_SLOT_EXISTS = bodySlot != null;
+
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, EquipmentSlot.class,
+				event -> switch (event.getSlotType()) {
+					case HEAD -> EquipmentSlot.HEAD;
+					case CHEST -> EquipmentSlot.CHEST;
+					case LEGS -> EquipmentSlot.LEGS;
+					case FEET -> EquipmentSlot.FEET;
+				});
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, ItemStack.class, PlayerArmorChangeEvent::getOldItem, TIME_PAST);
+			EventValues.registerEventValue(PlayerArmorChangeEvent.class, ItemStack.class, PlayerArmorChangeEvent::getNewItem, TIME_FUTURE);
 		}
 	}
 
@@ -67,8 +82,8 @@ public class EvtPlayerArmorChange extends SkriptEvent {
 			case LEGS -> EquipmentSlot.LEGS;
 			case FEET -> EquipmentSlot.FEET;
 		};
-        return slot == changedSlot;
-    }
+		return slot == changedSlot;
+	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
