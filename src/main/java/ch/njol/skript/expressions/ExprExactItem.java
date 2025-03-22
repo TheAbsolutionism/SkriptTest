@@ -11,10 +11,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Exact Item")
-@Description("Get an exact item of block, carrying over any data. Such as a chest with items stored inside.")
-@Examples({
-	"set {_item} to exact item of block at location(0, 0, 0)"
-})
+@Description("Get an exact item representation of a block, carrying over any data. For example, a chest with items stored inside.")
+@Examples("set {_item} to exact item of block at location(0, 0, 0)")
 @Since("INSERT VERSION")
 public class ExprExactItem extends SimplePropertyExpression<Block, ItemStack> {
 
@@ -33,13 +31,13 @@ public class ExprExactItem extends SimplePropertyExpression<Block, ItemStack> {
 	}
 
 	@Override
-	protected String getPropertyName() {
-		return "exact item";
+	public Class<? extends ItemStack> getReturnType() {
+		return ItemStack.class;
 	}
 
 	@Override
-	public Class<? extends ItemStack> getReturnType() {
-		return ItemStack.class;
+	protected String getPropertyName() {
+		return "exact item";
 	}
 
 }
