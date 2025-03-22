@@ -1,10 +1,7 @@
 package ch.njol.skript.conditions;
 
 import ch.njol.skript.conditions.base.PropertyCondition;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.effects.EffGoatHorns.GoatHorn;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -14,13 +11,16 @@ import org.bukkit.entity.LivingEntity;
 
 @Name("Goat Has Horns")
 @Description("Checks to see if a goat has or does not have a left, right, or both horns.")
-@Examples({
-	"if last spawned goat does not have both horns:",
-		"\tmake last spawned goat have both horns",
-	"",
-	"if {_goat} has a right horn:",
-		"\tforce {_goat} to not have a right horn"
-})
+@Example("""
+		if last spawned goat does not have both horns:
+			make last spawned goat have both horns
+	"""
+)
+@Example("""
+		if {_goat} has a right horn:
+			force {_goat} to not have a right horn
+	"""
+)
 @Since("INSERT VERSION")
 public class CondGoatHasHorns extends PropertyCondition<LivingEntity> {
 

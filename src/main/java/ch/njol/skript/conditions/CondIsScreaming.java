@@ -9,13 +9,16 @@ import org.bukkit.entity.LivingEntity;
 
 @Name("Is Screaming")
 @Description("Check whether a goat or enderman is screaming.")
-@Examples({
-	"if last spawned goat is not screaming:",
-		"\tmake last spawned goat scream",
-	"",
-	"if {_enderman} is screaming:",
-		"\tforce {_enderman} to stop screaming"
-})
+@Example("""
+		if last spawned goat is not screaming:
+			make last spawned goat scream
+	"""
+)
+@Example("""
+		if {_enderman} is screaming:
+			force {_enderman} to stop screaming
+	"""
+)
 @RequiredPlugins("Paper (endermen)")
 @Since("INSERT VERSION")
 public class CondIsScreaming extends PropertyCondition<LivingEntity> {

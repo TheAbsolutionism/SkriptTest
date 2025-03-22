@@ -14,13 +14,16 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Make Entity Scream")
 @Description("Make a goat or enderman start or stop screaming.")
-@Examples({
-	"make last spawned goat start screaming",
-	"force last spawned goat to stop screaming",
-	"",
-	"make {_enderman} scream",
-	"force {_enderman} to stop screaming"
-})
+@Example("""
+		make last spawned goat start screaming
+		force last spawned goat to stop screaming
+	"""
+)
+@Example("""
+		make {_enderman} scream
+		force {_enderman} to stop screaming
+	"""
+)
 @RequiredPlugins("Paper (endermen)")
 @Since("INSERT VERSION")
 public class EffScreaming extends Effect {
