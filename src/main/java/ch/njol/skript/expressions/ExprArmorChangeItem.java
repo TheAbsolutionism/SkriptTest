@@ -16,10 +16,11 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Armor Change Item")
 @Description("Get the unequipped or equipped armor item from a 'armor change' event.")
-@Examples({
-	"on armor change:",
-	"\tbroadcast the old armor item"
-})
+@Examples("""
+	on armor change
+		broadcast the old armor item
+	"""
+)
 @RequiredPlugins("Paper")
 @Events("Armor Change")
 @Since("INSERT VERSION")
@@ -28,8 +29,8 @@ public class ExprArmorChangeItem extends EventValueExpression<ItemStack> impleme
 	static {
 		if (Skript.classExists("com.destroystokyo.paper.event.player.PlayerArmorChangeEvent"))
 			register(ExprArmorChangeItem.class, ItemStack.class,
-				"[the] (old|unequipped) armo[u]r item",
-				"[the] (new|equipped) armo[u]r item");
+				"(old|unequipped) armo[u]r item",
+				"(new|equipped) armo[u]r item");
 	}
 
 	public ExprArmorChangeItem() {
